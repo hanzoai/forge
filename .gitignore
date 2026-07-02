@@ -1,0 +1,7 @@
+/bin/
+*.db
+*.db-*
+.claude/
+
+# internal port blueprint — maps upstream→hanzo, never committed
+docs/PORT_PLAN.md
