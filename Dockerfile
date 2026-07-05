@@ -42,7 +42,8 @@ RUN chmod 755 /tmp/local/usr/bin/entrypoint \
 RUN chmod 644 /go/src/code.gitea.io/gitea/contrib/autocompletion/bash_autocomplete
 
 FROM docker.io/library/alpine:3.22
-LABEL maintainer="maintainers@gitea.io"
+LABEL maintainer="dev@hanzo.ai"
+LABEL org.opencontainers.image.title="Hanzo Git" org.opencontainers.image.description="Hanzo Git — white-label Gitea fork for git.hanzo.ai" org.opencontainers.image.vendor="Hanzo AI" org.opencontainers.image.source="https://github.com/hanzoai/git" org.opencontainers.image.url="https://git.hanzo.ai"
 
 EXPOSE 22 3000
 
