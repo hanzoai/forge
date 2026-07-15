@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.dev/models/system"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/setting/config"
-	"gitea.dev/modules/test"
-	"gitea.dev/tests"
+	"github.com/hanzoai/git/models/system"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/setting/config"
+	"github.com/hanzoai/git/modules/test"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"testing"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/test"
-	"gitea.dev/tests"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/test"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

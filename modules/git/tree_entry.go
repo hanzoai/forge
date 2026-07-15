@@ -10,7 +10,7 @@ import (
 	"slices"
 	"strings"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // TreeEntry the leaf in the git tree

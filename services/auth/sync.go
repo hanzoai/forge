@@ -6,9 +6,9 @@ package auth
 import (
 	"context"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // SyncExternalUsers is used to synchronize users with external authorization source

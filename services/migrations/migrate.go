@@ -13,16 +13,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	repo_model "gitea.dev/models/repo"
-	system_model "gitea.dev/models/system"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/hostmatcher"
-	"gitea.dev/modules/log"
-	base "gitea.dev/modules/migration"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	repo_model "github.com/hanzoai/git/models/repo"
+	system_model "github.com/hanzoai/git/models/system"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/hostmatcher"
+	"github.com/hanzoai/git/modules/log"
+	base "github.com/hanzoai/git/modules/migration"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // MigrateOptions is equal to base.MigrateOptions

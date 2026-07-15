@@ -8,15 +8,15 @@ import (
 	"errors"
 	"net/http"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/organization"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/web"
-	"gitea.dev/services/context"
-	"gitea.dev/services/forms"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/organization"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/forms"
 )
 
 const (

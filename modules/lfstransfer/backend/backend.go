@@ -12,9 +12,9 @@ import (
 	"net/url"
 	"strconv"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/lfs"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/lfs"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/charmbracelet/git-lfs-transfer/transfer"
 )

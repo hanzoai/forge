@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/go-chi/chi/v5"
 )

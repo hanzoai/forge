@@ -7,14 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	git_model "gitea.dev/models/git"
-	"gitea.dev/models/gituser"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/setting"
-	git_service "gitea.dev/services/git"
-	"gitea.dev/services/gitdiff"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/models/gituser"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/setting"
+	git_service "github.com/hanzoai/git/services/git"
+	"github.com/hanzoai/git/services/gitdiff"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -11,10 +11,10 @@ import (
 	"strings"
 	"testing"
 
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/tests"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/stretchr/testify/assert"

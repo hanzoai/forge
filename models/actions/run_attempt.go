@@ -9,11 +9,11 @@ import (
 	"slices"
 	"time"
 
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ActionRunAttempt represents a single execution attempt of an ActionRun.

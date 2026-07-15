@@ -11,9 +11,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // BatchChecker provides a reader for check-attribute content that can be long running

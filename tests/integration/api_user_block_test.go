@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"testing"
 
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/tests"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

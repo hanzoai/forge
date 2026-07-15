@@ -6,14 +6,14 @@ package repo_test
 import (
 	"testing"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/organization"
-	perm_model "gitea.dev/models/perm"
-	access_model "gitea.dev/models/perm/access"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unit"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/organization"
+	perm_model "github.com/hanzoai/git/models/perm"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

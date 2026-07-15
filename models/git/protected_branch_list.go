@@ -7,9 +7,9 @@ import (
 	"context"
 	"sort"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/optional"
 )
 
 type ProtectedBranchRules []*ProtectedBranch

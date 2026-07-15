@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"net/url"
 
-	"gitea.dev/models/organization"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/routers/api/v1/user"
-	"gitea.dev/routers/api/v1/utils"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	org_service "gitea.dev/services/org"
+	"github.com/hanzoai/git/models/organization"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/routers/api/v1/user"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	org_service "github.com/hanzoai/git/services/org"
 )
 
 // listMembers list an organization's members

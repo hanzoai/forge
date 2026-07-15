@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/optional"
 
 	"xorm.io/builder"
 )

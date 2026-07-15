@@ -10,16 +10,16 @@ import (
 	"strings"
 	"time"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	"gitea.dev/models/db"
-	git_model "gitea.dev/models/git"
-	"gitea.dev/models/gituser"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	asymkey_service "gitea.dev/services/asymkey"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/db"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/models/gituser"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	asymkey_service "github.com/hanzoai/git/services/asymkey"
 )
 
 // NewGraph creates a basic graph

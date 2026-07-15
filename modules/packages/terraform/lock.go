@@ -9,10 +9,10 @@ import (
 	"io"
 	"time"
 
-	"gitea.dev/models/db"
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
 
 	"xorm.io/builder"
 )

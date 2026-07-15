@@ -6,11 +6,11 @@ package ldap
 import (
 	"strings"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/secret"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/secret"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // .____     ________      _____ __________

@@ -3,7 +3,7 @@
 
 package v1_21
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddIndexToCommentDependentIssueID(x db.EngineMigration) error {
 	type Comment struct {

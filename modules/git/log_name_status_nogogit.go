@@ -15,9 +15,9 @@ import (
 	"sort"
 	"strings"
 
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // logNameStatusRepo opens git log --raw in the provided repo and returns a parser

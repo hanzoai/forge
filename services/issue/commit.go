@@ -15,15 +15,15 @@ import (
 	"strings"
 	"time"
 
-	issues_model "gitea.dev/models/issues"
-	access_model "gitea.dev/models/perm/access"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/references"
-	"gitea.dev/modules/repository"
+	issues_model "github.com/hanzoai/git/models/issues"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/references"
+	"github.com/hanzoai/git/modules/repository"
 )
 
 const (

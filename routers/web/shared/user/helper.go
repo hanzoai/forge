@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strconv"
 
-	"gitea.dev/models/user"
+	"github.com/hanzoai/git/models/user"
 )
 
 type SearchUserInfo struct {

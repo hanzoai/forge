@@ -15,7 +15,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/container"
+	"github.com/hanzoai/git/modules/container"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"

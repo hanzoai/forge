@@ -13,10 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

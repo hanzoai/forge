@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/optional"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/optional"
 
 	"github.com/stretchr/testify/assert"
 )

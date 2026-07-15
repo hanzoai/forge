@@ -6,17 +6,17 @@ package repo
 import (
 	"net/http"
 
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/models/db"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unit"
-	"gitea.dev/modules/git"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/api/v1/utils"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	release_service "gitea.dev/services/release"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/modules/git"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	release_service "github.com/hanzoai/git/services/release"
 )
 
 func canAccessReleaseDraft(ctx *context.APIContext) bool {

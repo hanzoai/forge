@@ -6,7 +6,7 @@ package v1_26
 import (
 	"fmt"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func FixClosedMilestoneCompleteness(x db.EngineMigration) error {

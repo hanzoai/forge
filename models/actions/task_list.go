@@ -6,9 +6,9 @@ package actions
 import (
 	"context"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"xorm.io/builder"
 )

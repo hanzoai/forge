@@ -8,11 +8,11 @@ import (
 	"errors"
 	"fmt"
 
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/log"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // checkConflictsMergeTree uses git merge-tree to check for conflicts and if none are found checks if the patch is empty

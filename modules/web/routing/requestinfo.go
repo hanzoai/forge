@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // NewRequestInfoHandler is a handler that saves request info into request context.

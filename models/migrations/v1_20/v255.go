@@ -4,8 +4,8 @@
 package v1_20
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 func AddArchivedUnixToRepository(x db.EngineMigration) error {

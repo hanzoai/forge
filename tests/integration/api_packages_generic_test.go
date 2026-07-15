@@ -12,13 +12,13 @@ import (
 	neturl "net/url"
 	"testing"
 
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/models/packages"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/test"
-	"gitea.dev/tests"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/test"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

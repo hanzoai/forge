@@ -6,8 +6,8 @@ package auth
 import (
 	"net/http"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // Ensure the struct implements the interface.

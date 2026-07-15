@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/web/org"
-	"gitea.dev/services/contexttest"
-	"gitea.dev/services/forms"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/web/org"
+	"github.com/hanzoai/git/services/contexttest"
+	"github.com/hanzoai/git/services/forms"
 
 	"github.com/stretchr/testify/assert"
 )

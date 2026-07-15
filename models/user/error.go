@@ -6,7 +6,7 @@ package user
 import (
 	"fmt"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ErrUserAlreadyExist represents a "user already exists" error.

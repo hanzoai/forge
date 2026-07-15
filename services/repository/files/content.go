@@ -10,15 +10,15 @@ import (
 	"path"
 	"strings"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/lfs"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/v1/utils"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/lfs"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/v1/utils"
 )
 
 // ContentType repo content type

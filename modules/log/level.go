@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"strings"
 
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/json"
 )
 
 // Level is the level of the logger

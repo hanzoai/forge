@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting/config"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting/config"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"xorm.io/builder"
 )

@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	pingv1 "gitea.dev/actions-proto-go/ping/v1"
-	"gitea.dev/actions-proto-go/ping/v1/pingv1connect"
-	runnerv1 "gitea.dev/actions-proto-go/runner/v1"
-	"gitea.dev/actions-proto-go/runner/v1/runnerv1connect"
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/modules/setting"
+	pingv1 "github.com/hanzo-git/actions-proto-go/ping/v1"
+	"github.com/hanzo-git/actions-proto-go/ping/v1/pingv1connect"
+	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
+	"github.com/hanzo-git/actions-proto-go/runner/v1/runnerv1connect"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/modules/setting"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"

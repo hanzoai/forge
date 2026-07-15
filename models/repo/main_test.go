@@ -6,14 +6,14 @@ package repo_test
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
+	"github.com/hanzoai/git/models/unittest"
 
-	_ "gitea.dev/models" // register table model
-	_ "gitea.dev/models/actions"
-	_ "gitea.dev/models/activities"
-	_ "gitea.dev/models/perm/access" // register table model
-	_ "gitea.dev/models/repo"        // register table model
-	_ "gitea.dev/models/user"        // register table model
+	_ "github.com/hanzoai/git/models" // register table model
+	_ "github.com/hanzoai/git/models/actions"
+	_ "github.com/hanzoai/git/models/activities"
+	_ "github.com/hanzoai/git/models/perm/access" // register table model
+	_ "github.com/hanzoai/git/models/repo"        // register table model
+	_ "github.com/hanzoai/git/models/user"        // register table model
 )
 
 func TestMain(m *testing.M) {

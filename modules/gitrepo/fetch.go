@@ -6,8 +6,8 @@ package gitrepo
 import (
 	"context"
 
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/globallock"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/globallock"
 )
 
 // FetchRemoteCommit fetches a specific commit and its related objects from a remote

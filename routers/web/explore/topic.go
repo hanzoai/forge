@@ -6,11 +6,11 @@ package explore
 import (
 	"net/http"
 
-	"gitea.dev/models/db"
-	repo_model "gitea.dev/models/repo"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
 )
 
 // TopicSearch search for creating topic

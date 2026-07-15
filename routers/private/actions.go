@@ -9,14 +9,14 @@ import (
 	"net/http"
 	"strings"
 
-	actions_model "gitea.dev/models/actions"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/private"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
+	actions_model "github.com/hanzoai/git/models/actions"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
 )
 
 // GenerateActionsRunnerToken generates a new runner token for a given scope

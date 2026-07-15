@@ -9,12 +9,12 @@ import (
 	"net/url"
 	"testing"
 
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/test"
-	repo_service "gitea.dev/services/repository"
-	"gitea.dev/tests"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/test"
+	repo_service "github.com/hanzoai/git/services/repository"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

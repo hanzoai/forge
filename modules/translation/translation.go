@@ -10,11 +10,11 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/options"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/translation/i18n"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/options"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/translation/i18n"
+	"github.com/hanzoai/git/modules/util"
 
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"

@@ -6,10 +6,10 @@ package admin
 import (
 	"net/http"
 
-	user_model "gitea.dev/models/user"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/web"
-	"gitea.dev/services/context"
+	user_model "github.com/hanzoai/git/models/user"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/services/context"
 )
 
 // ListUserBadges lists all badges belonging to a user

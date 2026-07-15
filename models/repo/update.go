@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // UpdateRepositoryOwnerNames updates repository owner_names (this should only be used when the ownerName has changed case)

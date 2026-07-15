@@ -3,7 +3,7 @@
 
 package v1_12
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddIsRestricted(x db.EngineMigration) error {
 	// User see models/user.go

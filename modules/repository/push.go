@@ -4,7 +4,7 @@
 package repository
 
 import (
-	"gitea.dev/modules/git"
+	"github.com/hanzoai/git/modules/git"
 )
 
 // PushUpdateOptions defines the push update options

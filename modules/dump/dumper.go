@@ -16,9 +16,9 @@ import (
 	"slices"
 	"strings"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/mholt/archives"
 )

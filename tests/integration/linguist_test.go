@@ -10,14 +10,14 @@ import (
 	"testing"
 	"time"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/indexer/stats"
-	"gitea.dev/modules/queue"
-	repo_service "gitea.dev/services/repository"
-	files_service "gitea.dev/services/repository/files"
-	"gitea.dev/tests"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/indexer/stats"
+	"github.com/hanzoai/git/modules/queue"
+	repo_service "github.com/hanzoai/git/services/repository"
+	files_service "github.com/hanzoai/git/services/repository/files"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

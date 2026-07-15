@@ -9,16 +9,16 @@ import (
 	"net/url"
 	"strings"
 
-	issues_model "gitea.dev/models/issues"
-	access_model "gitea.dev/models/perm/access"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/label"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
+	issues_model "github.com/hanzoai/git/models/issues"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/label"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
 )
 
 func ToIssue(ctx context.Context, doer *user_model.User, issue *issues_model.Issue) *api.Issue {

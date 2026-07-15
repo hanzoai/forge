@@ -4,9 +4,9 @@
 package smtp_test
 
 import (
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/services/auth"
-	"gitea.dev/services/auth/source/smtp"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/services/auth"
+	"github.com/hanzoai/git/services/auth/source/smtp"
 )
 
 // This test file exists to assert that our Source exposes the interfaces that we expect

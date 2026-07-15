@@ -7,10 +7,10 @@ import (
 	"context"
 	"errors"
 
-	"gitea.dev/models/db"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/indexer"
-	"gitea.dev/modules/indexer/internal"
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/indexer"
+	"github.com/hanzoai/git/modules/indexer/internal"
 )
 
 // Indexer defines an interface to index and search code contents

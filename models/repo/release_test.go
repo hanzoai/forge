@@ -6,9 +6,9 @@ package repo
 import (
 	"testing"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/util"
 
 	"github.com/stretchr/testify/assert"
 )

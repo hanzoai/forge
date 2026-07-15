@@ -7,14 +7,14 @@ import (
 	"sort"
 	"testing"
 
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
 )

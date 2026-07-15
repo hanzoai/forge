@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"testing"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
-	"gitea.dev/services/contexttest"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -12,17 +12,17 @@ import (
 	"path"
 	"strconv"
 
-	packages_model "gitea.dev/models/packages"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/json"
-	cargo_module "gitea.dev/modules/packages/cargo"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	repo_service "gitea.dev/services/repository"
-	files_service "gitea.dev/services/repository/files"
+	packages_model "github.com/hanzoai/git/models/packages"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/json"
+	cargo_module "github.com/hanzoai/git/modules/packages/cargo"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	repo_service "github.com/hanzoai/git/services/repository"
+	files_service "github.com/hanzoai/git/services/repository/files"
 )
 
 const (

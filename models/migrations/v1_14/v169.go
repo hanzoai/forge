@@ -3,7 +3,7 @@
 
 package v1_14
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func CommentTypeDeleteBranchUseOldRef(x db.EngineMigration) error {
 	_, err := x.Exec("UPDATE comment SET old_ref = commit_sha, commit_sha = '' WHERE type = 11")

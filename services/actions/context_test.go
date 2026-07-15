@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"testing"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/models/db"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/json"
-	api "gitea.dev/modules/structs"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/json"
+	api "github.com/hanzoai/git/modules/structs"
 
 	act_model "gitea.com/gitea/runner/act/model"
 	"github.com/stretchr/testify/assert"

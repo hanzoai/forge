@@ -6,14 +6,14 @@ package issues_test
 import (
 	"testing"
 
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/models/unittest"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/models/unittest"
 
-	_ "gitea.dev/models"
-	_ "gitea.dev/models/actions"
-	_ "gitea.dev/models/activities"
-	_ "gitea.dev/models/repo"
-	_ "gitea.dev/models/user"
+	_ "github.com/hanzoai/git/models"
+	_ "github.com/hanzoai/git/models/actions"
+	_ "github.com/hanzoai/git/models/activities"
+	_ "github.com/hanzoai/git/models/repo"
+	_ "github.com/hanzoai/git/models/user"
 
 	"github.com/stretchr/testify/assert"
 )

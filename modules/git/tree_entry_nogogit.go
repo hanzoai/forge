@@ -8,7 +8,7 @@ package git
 import (
 	"context"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 func (te *TreeEntry) GetSize(ctx context.Context, gitRepo *Repository) int64 {

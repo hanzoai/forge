@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // CreateTemporaryPath creates a temporary path

@@ -13,16 +13,16 @@ import (
 	"sync"
 	"time"
 
-	"gitea.dev/models/avatars"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/log"
-	api "gitea.dev/modules/structs"
+	"github.com/hanzoai/git/models/avatars"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/log"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 const (

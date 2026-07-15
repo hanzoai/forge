@@ -4,9 +4,9 @@
 package v1_12
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func ExpandWebhooks(x db.EngineMigration) error {

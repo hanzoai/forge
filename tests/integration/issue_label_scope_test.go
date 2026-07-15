@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.dev/tests"
+	"github.com/hanzoai/git/tests"
 )
 
 // TestUpdateIssueLabelForeignLabel verifies that the web issue-label action rejects a

@@ -6,7 +6,7 @@ package languagestats
 import (
 	"testing"
 
-	"gitea.dev/modules/git"
+	"github.com/hanzoai/git/modules/git"
 )
 
 func TestMain(m *testing.M) {

@@ -8,15 +8,15 @@ import (
 	"errors"
 	"net/http"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/web"
-	asymkey_service "gitea.dev/services/asymkey"
-	"gitea.dev/services/context"
-	"gitea.dev/services/forms"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/web"
+	asymkey_service "github.com/hanzoai/git/services/asymkey"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/forms"
 )
 
 const (

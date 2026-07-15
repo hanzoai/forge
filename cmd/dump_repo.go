@@ -10,14 +10,14 @@ import (
 	"os"
 	"strings"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	base "gitea.dev/modules/migration"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/convert"
-	"gitea.dev/services/migrations"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	base "github.com/hanzoai/git/modules/migration"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/convert"
+	"github.com/hanzoai/git/services/migrations"
 
 	"github.com/urfave/cli/v3"
 )

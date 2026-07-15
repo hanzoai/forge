@@ -6,11 +6,11 @@ package repository_test
 import (
 	"testing"
 
-	"gitea.dev/models/organization"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	repo_service "gitea.dev/services/repository"
+	"github.com/hanzoai/git/models/organization"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	repo_service "github.com/hanzoai/git/services/repository"
 
 	"github.com/stretchr/testify/assert"
 )

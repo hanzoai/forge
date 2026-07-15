@@ -6,7 +6,7 @@ package gitrepo
 import (
 	"context"
 
-	"gitea.dev/modules/git"
+	"github.com/hanzoai/git/modules/git"
 )
 
 func WriteCommitGraph(ctx context.Context, repo Repository) error {

@@ -8,8 +8,8 @@ import (
 	"errors"
 	"strings"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
 )
 
 // GetBranchesByPath returns a branch by its path

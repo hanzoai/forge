@@ -13,17 +13,17 @@ import (
 	"time"
 	"unicode"
 
-	"gitea.dev/models/asymkey"
-	"gitea.dev/models/db"
-	"gitea.dev/models/gituser"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/badge"
-	"gitea.dev/modules/charset"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/indexer/code"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/gituser"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/badge"
+	"github.com/hanzoai/git/modules/charset"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/indexer/code"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
 )
 
 // List all devtest templates, they will be used for e2e tests for the UI components

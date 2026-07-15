@@ -6,14 +6,14 @@ package repo
 import (
 	"errors"
 
-	git_model "gitea.dev/models/git"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/utils"
-	context_service "gitea.dev/services/context"
-	files_service "gitea.dev/services/repository/files"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/utils"
+	context_service "github.com/hanzoai/git/services/context"
+	files_service "github.com/hanzoai/git/services/repository/files"
 )
 
 func errorAs[T error](v error) (e T, ok bool) {

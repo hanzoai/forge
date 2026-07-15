@@ -6,9 +6,9 @@ package convert
 import (
 	"context"
 
-	"gitea.dev/models/perm"
-	user_model "gitea.dev/models/user"
-	api "gitea.dev/modules/structs"
+	"github.com/hanzoai/git/models/perm"
+	user_model "github.com/hanzoai/git/models/user"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 // ToUser convert user_model.User to api.User

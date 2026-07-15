@@ -7,10 +7,10 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ErrDependencyExists represents a "DependencyAlreadyExists" kind of error.

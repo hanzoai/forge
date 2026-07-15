@@ -12,13 +12,13 @@ import (
 	"strings"
 	"testing"
 
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/models/packages"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/json"
-	vagrant_module "gitea.dev/modules/packages/vagrant"
-	"gitea.dev/tests"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/json"
+	vagrant_module "github.com/hanzoai/git/modules/packages/vagrant"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -7,8 +7,8 @@ import (
 	"context"
 	"errors"
 
-	"gitea.dev/modules/indexer/internal"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/indexer/internal"
+	"github.com/hanzoai/git/modules/log"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/mapping"

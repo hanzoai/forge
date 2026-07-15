@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/models/db"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/util"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/util"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

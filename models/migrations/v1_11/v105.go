@@ -3,7 +3,7 @@
 
 package v1_11
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddTeamIncludesAllRepositories(x db.EngineMigration) error {
 	type Team struct {

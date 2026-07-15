@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"net/url"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	"gitea.dev/models/perm"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/setting"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/perm"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // KeyAndOwner is the response from ServNoCommand

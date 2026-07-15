@@ -14,12 +14,12 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.dev/models/packages"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	alpine_module "gitea.dev/modules/packages/alpine"
-	alpine_service "gitea.dev/services/packages/alpine"
-	"gitea.dev/tests"
+	"github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	alpine_module "github.com/hanzoai/git/modules/packages/alpine"
+	alpine_service "github.com/hanzoai/git/services/packages/alpine"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

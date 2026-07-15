@@ -6,7 +6,7 @@ package session
 import (
 	"net/http"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 
 	"gitea.com/go-chi/session"
 )

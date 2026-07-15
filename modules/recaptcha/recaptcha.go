@@ -11,8 +11,8 @@ import (
 	"net/url"
 	"strings"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // Response is the structure of JSON returned from API

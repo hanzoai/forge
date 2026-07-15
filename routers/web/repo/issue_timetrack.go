@@ -8,13 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web"
-	"gitea.dev/services/context"
-	"gitea.dev/services/forms"
-	issue_service "gitea.dev/services/issue"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/forms"
+	issue_service "github.com/hanzoai/git/services/issue"
 )
 
 // AddTimeManually tracks time manually

@@ -7,7 +7,7 @@ import (
 	"context"
 	"html/template"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 const (

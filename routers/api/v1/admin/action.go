@@ -4,8 +4,8 @@
 package admin
 
 import (
-	"gitea.dev/routers/api/v1/shared"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/routers/api/v1/shared"
+	"github.com/hanzoai/git/services/context"
 )
 
 // ListWorkflowJobs Lists all jobs

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"slices"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func AddBranchProtectionCanPushAndEnableWhitelist(x db.EngineMigration) error {

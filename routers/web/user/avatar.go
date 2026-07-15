@@ -6,10 +6,10 @@ package user
 import (
 	"time"
 
-	"gitea.dev/models/avatars"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/httpcache"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/avatars"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/httpcache"
+	"github.com/hanzoai/git/services/context"
 )
 
 func cacheableRedirect(ctx *context.Context, location string) {

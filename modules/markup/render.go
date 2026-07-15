@@ -15,12 +15,12 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/markup/internal"
-	"gitea.dev/modules/public"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/typesniffer"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/markup/internal"
+	"github.com/hanzoai/git/modules/public"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/typesniffer"
+	"github.com/hanzoai/git/modules/util"
 
 	"golang.org/x/sync/errgroup"
 )

@@ -3,7 +3,7 @@
 
 package v1_7
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddApprovalWhitelistsToProtectedBranches(x db.EngineMigration) error {
 	type ProtectedBranch struct {

@@ -7,14 +7,14 @@ import (
 	"context"
 	"slices"
 
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
 )
 
 const maxPushCommitsInCommentCount = 1000

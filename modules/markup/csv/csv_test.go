@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.dev/modules/markup"
+	"github.com/hanzoai/git/modules/markup"
 
 	"github.com/stretchr/testify/assert"
 )

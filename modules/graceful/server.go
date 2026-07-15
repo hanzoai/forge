@@ -14,9 +14,9 @@ import (
 	"syscall"
 	"time"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/proxyprotocol"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/proxyprotocol"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // GetListener returns a net listener

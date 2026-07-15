@@ -4,9 +4,9 @@
 package project
 
 import (
-	project_model "gitea.dev/models/project"
-	"gitea.dev/modules/json"
-	"gitea.dev/services/context"
+	project_model "github.com/hanzoai/git/models/project"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/services/context"
 )
 
 // MoveColumns moves or keeps columns in a project and sorts them inside that project

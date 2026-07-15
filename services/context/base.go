@@ -12,14 +12,14 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/translation"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/middleware"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/translation"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/middleware"
 )
 
 type BaseContextKeyType struct{}

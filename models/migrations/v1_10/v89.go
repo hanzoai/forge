@@ -3,7 +3,7 @@
 
 package v1_10
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddOriginalMigrationInfo(x db.EngineMigration) error {
 	// Issue see models/issue.go

@@ -10,13 +10,13 @@ import (
 	"net/http"
 	"strings"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/private"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/common"
-	"gitea.dev/routers/web/misc"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/common"
+	"github.com/hanzoai/git/routers/web/misc"
+	"github.com/hanzoai/git/services/context"
 
 	"gitea.com/go-chi/binding"
 )

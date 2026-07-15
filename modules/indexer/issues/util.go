@@ -8,12 +8,12 @@ import (
 	"errors"
 	"fmt"
 
-	"gitea.dev/models/db"
-	issue_model "gitea.dev/models/issues"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/queue"
+	"github.com/hanzoai/git/models/db"
+	issue_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/queue"
 )
 
 // getIssueIndexerData returns the indexer data of an issue and a bool value indicating whether the issue exists.

@@ -4,8 +4,8 @@
 package templates
 
 import (
-	"gitea.dev/modules/assetfs"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/assetfs"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func AssetFS() *assetfs.LayeredFS {

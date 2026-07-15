@@ -4,8 +4,8 @@
 package oauth2
 
 import (
-	"gitea.dev/models/auth"
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/modules/json"
 )
 
 // Source holds configuration for the OAuth2 login source.

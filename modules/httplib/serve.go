@@ -15,12 +15,12 @@ import (
 	"strings"
 	"time"
 
-	charsetModule "gitea.dev/modules/charset"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/httpcache"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/typesniffer"
-	"gitea.dev/modules/util"
+	charsetModule "github.com/hanzoai/git/modules/charset"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/httpcache"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/typesniffer"
+	"github.com/hanzoai/git/modules/util"
 
 	"github.com/klauspost/compress/gzhttp"
 )

@@ -6,7 +6,7 @@ package common
 import (
 	"net/http"
 
-	"gitea.dev/modules/httplib"
+	"github.com/hanzoai/git/modules/httplib"
 )
 
 // FetchRedirectDelegate helps the "fetch" requests to redirect to the correct location

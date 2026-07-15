@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // Helper to get a signature from the commit line, which looks like:

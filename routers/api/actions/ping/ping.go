@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"net/http"
 
-	pingv1 "gitea.dev/actions-proto-go/ping/v1"
-	"gitea.dev/actions-proto-go/ping/v1/pingv1connect"
-	"gitea.dev/modules/log"
+	pingv1 "github.com/hanzo-git/actions-proto-go/ping/v1"
+	"github.com/hanzo-git/actions-proto-go/ping/v1/pingv1connect"
+	"github.com/hanzoai/git/modules/log"
 
 	"connectrpc.com/connect"
 )

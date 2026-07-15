@@ -6,10 +6,10 @@ package repo
 import (
 	"net/http"
 
-	issues_model "gitea.dev/models/issues"
-	access_model "gitea.dev/models/perm/access"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
+	issues_model "github.com/hanzoai/git/models/issues"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
 )
 
 // AddDependency adds new dependencies

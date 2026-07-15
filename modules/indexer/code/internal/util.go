@@ -6,8 +6,8 @@ package internal
 import (
 	"strings"
 
-	"gitea.dev/modules/indexer/internal"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/indexer/internal"
+	"github.com/hanzoai/git/modules/log"
 )
 
 const filenameMatchNumberOfLines = 7 // Copied from GitHub search

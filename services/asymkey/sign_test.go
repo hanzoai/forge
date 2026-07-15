@@ -6,7 +6,7 @@ package asymkey
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
+	"github.com/hanzoai/git/models/unittest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -7,14 +7,14 @@ import (
 	"testing"
 	"time"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/queue"
-	"gitea.dev/modules/setting"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/queue"
+	"github.com/hanzoai/git/modules/setting"
 
-	_ "gitea.dev/models"
-	_ "gitea.dev/models/actions"
-	_ "gitea.dev/models/activities"
+	_ "github.com/hanzoai/git/models"
+	_ "github.com/hanzoai/git/models/actions"
+	_ "github.com/hanzoai/git/models/activities"
 
 	"github.com/stretchr/testify/assert"
 )

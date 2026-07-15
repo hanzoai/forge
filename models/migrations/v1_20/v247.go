@@ -4,8 +4,8 @@
 package v1_20
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // FixIncorrectProjectType: set individual project's type from 3(TypeOrganization) to 1(TypeIndividual)

@@ -7,9 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	"gitea.dev/models/db"
-	"gitea.dev/models/perm"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/perm"
 )
 
 // AddPrincipalKey adds new principal to database and authorized_principals file.

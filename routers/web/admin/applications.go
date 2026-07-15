@@ -6,12 +6,12 @@ package admin
 import (
 	"net/http"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/models/db"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	user_setting "gitea.dev/routers/web/user/setting"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	user_setting "github.com/hanzoai/git/routers/web/user/setting"
+	"github.com/hanzoai/git/services/context"
 )
 
 var (

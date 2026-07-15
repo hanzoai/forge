@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
 )
 
 func SettingsCtxData(ctx *context.Context) {

@@ -6,7 +6,7 @@ package private
 import (
 	"context"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 type GenerateTokenRequest struct {

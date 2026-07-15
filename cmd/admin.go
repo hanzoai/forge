@@ -8,12 +8,12 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.dev/models/db"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/log"
-	repo_module "gitea.dev/modules/repository"
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/log"
+	repo_module "github.com/hanzoai/git/modules/repository"
 
 	"github.com/urfave/cli/v3"
 )

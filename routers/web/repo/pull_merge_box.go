@@ -6,10 +6,10 @@ package repo
 import (
 	"html/template"
 
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/svg"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/svg"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
 )
 
 type pullMergeBoxInfoItem struct {

@@ -9,12 +9,12 @@ import (
 	"net/url"
 	"testing"
 
-	actions_model "gitea.dev/models/actions"
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/models/db"
-	api "gitea.dev/modules/structs"
-	webhook_module "gitea.dev/modules/webhook"
-	"gitea.dev/tests"
+	actions_model "github.com/hanzoai/git/models/actions"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
+	api "github.com/hanzoai/git/modules/structs"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

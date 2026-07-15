@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // QueueSettings represent the settings for a queue from the ini

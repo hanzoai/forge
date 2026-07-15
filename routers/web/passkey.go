@@ -6,8 +6,8 @@ package web
 import (
 	"net/http"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
 )
 
 type passkeyEndpointsType struct {

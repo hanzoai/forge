@@ -6,9 +6,9 @@ package gituser
 import (
 	"context"
 
-	"gitea.dev/models/user"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // AvatarStackData is the view-model for the AvatarStack render helpers. Participants[0] is

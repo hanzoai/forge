@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/nosql"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/nosql"
 
 	"gitea.com/go-chi/cache" //nolint:depguard // we wrap this package here
 	"github.com/redis/go-redis/v9"

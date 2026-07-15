@@ -9,16 +9,16 @@ import (
 	"net/http"
 	"strings"
 
-	git_model "gitea.dev/models/git"
-	"gitea.dev/models/organization"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/api/v1/utils"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	release_service "gitea.dev/services/release"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/models/organization"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	release_service "github.com/hanzoai/git/services/release"
 )
 
 // ListTags list all the tags of a repository

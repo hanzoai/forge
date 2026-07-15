@@ -8,10 +8,10 @@ import (
 	"errors"
 	"strings"
 
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ReplacePrimaryEmailAddress replaces the user's primary email address with the given email address.

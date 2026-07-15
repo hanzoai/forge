@@ -12,14 +12,14 @@ import (
 	"path"
 	"strings"
 
-	"gitea.dev/modules/assetfs"
-	"gitea.dev/modules/avatar"
-	"gitea.dev/modules/httpcache"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/routing"
+	"github.com/hanzoai/git/modules/assetfs"
+	"github.com/hanzoai/git/modules/avatar"
+	"github.com/hanzoai/git/modules/httpcache"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/routing"
 )
 
 func avatarStorageHandler(storageSetting *setting.Storage, prefix string, objStore storage.ObjectStorage) http.HandlerFunc {

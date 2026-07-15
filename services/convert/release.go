@@ -6,8 +6,8 @@ package convert
 import (
 	"context"
 
-	repo_model "gitea.dev/models/repo"
-	api "gitea.dev/modules/structs"
+	repo_model "github.com/hanzoai/git/models/repo"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 // ToAPIRelease convert a repo_model.Release to api.Release

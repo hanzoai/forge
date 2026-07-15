@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/private"
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/web"
-	web_types "gitea.dev/modules/web/types"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/web"
+	web_types "github.com/hanzoai/git/modules/web/types"
 )
 
 // PrivateContext represents a context for private routes

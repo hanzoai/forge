@@ -8,7 +8,7 @@ import (
 	"io"
 	"strings"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // NotesRef is the git ref where Gitea will look for git-notes data.

@@ -6,10 +6,10 @@ package v1_6
 import (
 	"fmt"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/migrations/base"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/migrations/base"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/modules/util"
 )
 
 func AddScratchHash(x db.EngineMigration) error {

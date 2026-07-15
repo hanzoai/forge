@@ -20,15 +20,15 @@ import (
 	"io"
 	"strings"
 
-	packages_model "gitea.dev/models/packages"
-	alpine_model "gitea.dev/models/packages/alpine"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/json"
-	packages_module "gitea.dev/modules/packages"
-	alpine_module "gitea.dev/modules/packages/alpine"
-	"gitea.dev/modules/util"
-	packages_service "gitea.dev/services/packages"
+	packages_model "github.com/hanzoai/git/models/packages"
+	alpine_model "github.com/hanzoai/git/models/packages/alpine"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/json"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	alpine_module "github.com/hanzoai/git/modules/packages/alpine"
+	"github.com/hanzoai/git/modules/util"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 const (

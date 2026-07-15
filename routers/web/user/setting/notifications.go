@@ -6,13 +6,13 @@ package setting
 import (
 	"net/http"
 
-	"gitea.dev/models/unit"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
-	"gitea.dev/services/user"
+	"github.com/hanzoai/git/models/unit"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/user"
 )
 
 const tplSettingsNotifications templates.TplName = "user/settings/notifications"

@@ -6,9 +6,9 @@ package system
 import (
 	"context"
 
-	"gitea.dev/models/system"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/system"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // DBStore can be used to store app state items in local filesystem

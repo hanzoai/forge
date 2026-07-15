@@ -7,7 +7,7 @@ import (
 	"encoding/base32"
 	"testing"
 
-	"gitea.dev/models/migrations/migrationtest"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
 
 	"github.com/stretchr/testify/assert"
 )

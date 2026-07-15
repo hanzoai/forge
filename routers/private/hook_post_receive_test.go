@@ -6,14 +6,14 @@ package private
 import (
 	"testing"
 
-	issues_model "gitea.dev/models/issues"
-	pull_model "gitea.dev/models/pull"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/private"
-	repo_module "gitea.dev/modules/repository"
-	"gitea.dev/services/contexttest"
+	issues_model "github.com/hanzoai/git/models/issues"
+	pull_model "github.com/hanzoai/git/models/pull"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/private"
+	repo_module "github.com/hanzoai/git/modules/repository"
+	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
 )

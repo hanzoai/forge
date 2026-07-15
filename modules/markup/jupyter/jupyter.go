@@ -11,14 +11,14 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/highlight"
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/markup/markdown"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/highlight"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/markup/markdown"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 func init() {

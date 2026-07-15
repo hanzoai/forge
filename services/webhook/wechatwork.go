@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"strings"
 
-	webhook_model "gitea.dev/models/webhook"
-	"gitea.dev/modules/git"
-	api "gitea.dev/modules/structs"
-	webhook_module "gitea.dev/modules/webhook"
+	webhook_model "github.com/hanzoai/git/models/webhook"
+	"github.com/hanzoai/git/modules/git"
+	api "github.com/hanzoai/git/modules/structs"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
 )
 
 type (

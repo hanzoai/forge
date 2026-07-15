@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/json"
 
 	"github.com/getkin/kin-openapi/openapi2"
 	"github.com/getkin/kin-openapi/openapi2conv"

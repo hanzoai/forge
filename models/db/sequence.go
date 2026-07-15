@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // CountBadSequences looks for broken sequences from recreate-table mistakes

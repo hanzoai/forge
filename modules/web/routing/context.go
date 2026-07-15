@@ -7,10 +7,10 @@ import (
 	"context"
 	"net/http"
 
-	"gitea.dev/modules/gtprof"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/modules/web/types"
+	"github.com/hanzoai/git/modules/gtprof"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/modules/web/types"
 )
 
 type contextKeyType struct{}

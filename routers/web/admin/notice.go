@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"gitea.dev/models/db"
-	system_model "gitea.dev/models/system"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/db"
+	system_model "github.com/hanzoai/git/models/system"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
 )
 
 const (

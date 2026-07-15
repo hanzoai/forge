@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // VersionedIndexName returns the full index name with version suffix.

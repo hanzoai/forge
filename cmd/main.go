@@ -10,8 +10,8 @@ import (
 	"io"
 	"os"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/urfave/cli/v3"
 )

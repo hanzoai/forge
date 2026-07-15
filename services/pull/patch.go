@@ -12,15 +12,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	git_model "gitea.dev/models/git"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/util"
+	git_model "github.com/hanzoai/git/models/git"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // DownloadDiffOrPatch will write the patch for the pr to the writer

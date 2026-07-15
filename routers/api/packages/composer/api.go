@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"time"
 
-	packages_model "gitea.dev/models/packages"
-	access_model "gitea.dev/models/perm/access"
-	"gitea.dev/modules/log"
-	composer_module "gitea.dev/modules/packages/composer"
-	"gitea.dev/services/context"
+	packages_model "github.com/hanzoai/git/models/packages"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	"github.com/hanzoai/git/modules/log"
+	composer_module "github.com/hanzoai/git/modules/packages/composer"
+	"github.com/hanzoai/git/services/context"
 )
 
 // ServiceIndexResponse contains registry endpoints

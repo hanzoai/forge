@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"gitea.dev/modules/generate"
+	"github.com/hanzoai/git/modules/generate"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

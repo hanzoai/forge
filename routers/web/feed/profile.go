@@ -6,12 +6,12 @@ package feed
 import (
 	"time"
 
-	activities_model "gitea.dev/models/activities"
-	"gitea.dev/models/organization"
-	"gitea.dev/models/renderhelper"
-	"gitea.dev/modules/markup/markdown"
-	"gitea.dev/services/context"
-	feed_service "gitea.dev/services/feed"
+	activities_model "github.com/hanzoai/git/models/activities"
+	"github.com/hanzoai/git/models/organization"
+	"github.com/hanzoai/git/models/renderhelper"
+	"github.com/hanzoai/git/modules/markup/markdown"
+	"github.com/hanzoai/git/services/context"
+	feed_service "github.com/hanzoai/git/services/feed"
 
 	"github.com/gorilla/feeds"
 )

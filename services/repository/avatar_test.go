@@ -9,9 +9,9 @@ import (
 	"image/png"
 	"testing"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/avatar"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/avatar"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -3,7 +3,7 @@
 
 package v1_16
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddSSHKeyIsVerified(x db.EngineMigration) error {
 	type PublicKey struct {

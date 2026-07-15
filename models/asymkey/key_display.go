@@ -6,9 +6,9 @@ package asymkey
 import (
 	"os"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func GetDisplaySigningKey(key *git.SigningKey) string {

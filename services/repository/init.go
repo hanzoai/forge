@@ -9,14 +9,14 @@ import (
 	"os"
 	"time"
 
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/log"
-	repo_module "gitea.dev/modules/repository"
-	asymkey_service "gitea.dev/services/asymkey"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/log"
+	repo_module "github.com/hanzoai/git/modules/repository"
+	asymkey_service "github.com/hanzoai/git/services/asymkey"
 )
 
 // initRepoCommit temporarily changes with work directory.

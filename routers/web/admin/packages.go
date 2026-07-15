@@ -8,14 +8,14 @@ import (
 	"net/url"
 	"time"
 
-	"gitea.dev/models/db"
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
-	packages_cleanup_service "gitea.dev/services/packages/cleanup"
+	"github.com/hanzoai/git/models/db"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
+	packages_cleanup_service "github.com/hanzoai/git/services/packages/cleanup"
 )
 
 const (

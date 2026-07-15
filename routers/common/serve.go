@@ -7,13 +7,13 @@ import (
 	"path"
 	"time"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/httpcache"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
-	"gitea.dev/services/context"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/httpcache"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/context"
 )
 
 // ServeBlob download a git.Blob

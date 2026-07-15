@@ -4,13 +4,13 @@
 package misc
 
 import (
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/markup/markdown"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/common"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/markup/markdown"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/common"
+	"github.com/hanzoai/git/services/context"
 )
 
 // Markup render markup document to HTML

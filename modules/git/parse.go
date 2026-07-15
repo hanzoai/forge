@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/modules/optional"
 )
 
 var sepSpace = []byte{' '}

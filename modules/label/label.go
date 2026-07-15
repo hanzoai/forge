@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // Label represents label information loaded from template

@@ -6,10 +6,10 @@ package issues
 import (
 	"context"
 
-	"gitea.dev/models/db"
-	project_model "gitea.dev/models/project"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	project_model "github.com/hanzoai/git/models/project"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // LoadProjects loads all projects the issue is assigned to

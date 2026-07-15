@@ -9,11 +9,11 @@ import (
 	"path"
 	"strconv"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/markup/markdown"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/markup/markdown"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
 
 	"go.yaml.in/yaml/v4"
 )

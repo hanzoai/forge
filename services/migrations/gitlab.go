@@ -15,12 +15,12 @@ import (
 	"strings"
 	"time"
 
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/log"
-	base "gitea.dev/modules/migration"
-	"gitea.dev/modules/structs"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/log"
+	base "github.com/hanzoai/git/modules/migration"
+	"github.com/hanzoai/git/modules/structs"
 
 	gitlab "gitlab.com/gitlab-org/api/client-go/v2"
 )

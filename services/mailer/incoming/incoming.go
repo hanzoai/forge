@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/mailer/token"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/mailer/token"
 
 	"github.com/emersion/go-imap"
 	"github.com/emersion/go-imap/client"

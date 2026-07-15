@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/user"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/user"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // settings

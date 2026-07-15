@@ -13,8 +13,8 @@ import (
 	"slices"
 	"strings"
 
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // CreateArchive create archive content to the target path

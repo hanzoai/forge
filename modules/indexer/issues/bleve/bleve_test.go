@@ -6,8 +6,8 @@ package bleve
 import (
 	"testing"
 
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/indexer/issues/internal/tests"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/indexer/issues/internal/tests"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

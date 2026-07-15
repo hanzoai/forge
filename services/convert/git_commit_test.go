@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/git"
-	api "gitea.dev/modules/structs"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/git"
+	api "github.com/hanzoai/git/modules/structs"
 
 	"github.com/stretchr/testify/assert"
 )

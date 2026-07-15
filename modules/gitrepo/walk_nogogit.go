@@ -8,7 +8,7 @@ package gitrepo
 import (
 	"context"
 
-	"gitea.dev/modules/git"
+	"github.com/hanzoai/git/modules/git"
 )
 
 // WalkReferences walks all the references from the repository

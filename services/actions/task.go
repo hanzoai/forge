@@ -10,13 +10,13 @@ import (
 	"sync"
 	"time"
 
-	runnerv1 "gitea.dev/actions-proto-go/runner/v1"
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/models/db"
-	secret_model "gitea.dev/models/secret"
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/models/db"
+	secret_model "github.com/hanzoai/git/models/secret"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 
 	"google.golang.org/protobuf/types/known/structpb"
 )

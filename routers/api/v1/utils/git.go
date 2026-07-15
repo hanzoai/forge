@@ -6,12 +6,12 @@ package utils
 import (
 	"errors"
 
-	git_model "gitea.dev/models/git"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/services/context"
+	git_model "github.com/hanzoai/git/models/git"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/services/context"
 )
 
 type RefCommit struct {

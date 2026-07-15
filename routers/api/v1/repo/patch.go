@@ -6,10 +6,10 @@ package repo
 import (
 	"net/http"
 
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
-	"gitea.dev/services/repository/files"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/repository/files"
 )
 
 // ApplyDiffPatch handles API call for applying a patch

@@ -3,7 +3,7 @@
 
 package v1_19
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddExclusiveLabel(x db.EngineMigration) error {
 	type Label struct {

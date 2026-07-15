@@ -4,10 +4,10 @@
 package common
 
 import (
-	"gitea.dev/modules/indexer"
-	code_indexer "gitea.dev/modules/indexer/code"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/indexer"
+	code_indexer "github.com/hanzoai/git/modules/indexer/code"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
 )
 
 func PrepareCodeSearch(ctx *context.Context) (ret struct {

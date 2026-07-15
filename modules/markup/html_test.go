@@ -8,12 +8,12 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.dev/modules/emoji"
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/markup/markdown"
-	"gitea.dev/modules/setting"
-	testModule "gitea.dev/modules/test"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/emoji"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/markup/markdown"
+	"github.com/hanzoai/git/modules/setting"
+	testModule "github.com/hanzoai/git/modules/test"
+	"github.com/hanzoai/git/modules/util"
 
 	"github.com/stretchr/testify/assert"
 )

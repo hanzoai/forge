@@ -10,7 +10,7 @@ import (
 	"path"
 	"time"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 /*

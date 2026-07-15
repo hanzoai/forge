@@ -14,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/json"
-	base "gitea.dev/modules/migration"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/json"
+	base "github.com/hanzoai/git/modules/migration"
 
 	"github.com/stretchr/testify/assert"
 	gitlab "gitlab.com/gitlab-org/api/client-go/v2"

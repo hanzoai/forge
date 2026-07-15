@@ -6,10 +6,10 @@ package integration
 import (
 	"testing"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/test"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/assert"
 )

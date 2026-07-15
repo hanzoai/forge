@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"strings"
 
-	user_model "gitea.dev/models/user"
-	chef_module "gitea.dev/modules/packages/chef"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/util"
-	shared "gitea.dev/routers/web/shared/packages"
-	"gitea.dev/services/context"
+	user_model "github.com/hanzoai/git/models/user"
+	chef_module "github.com/hanzoai/git/modules/packages/chef"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/util"
+	shared "github.com/hanzoai/git/routers/web/shared/packages"
+	"github.com/hanzoai/git/services/context"
 )
 
 const (

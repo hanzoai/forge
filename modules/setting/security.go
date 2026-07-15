@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"gitea.dev/modules/auth/password/hash"
-	"gitea.dev/modules/generate"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/auth/password/hash"
+	"github.com/hanzoai/git/modules/generate"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // Security settings

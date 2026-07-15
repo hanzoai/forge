@@ -7,10 +7,10 @@ import (
 	"context"
 	"html/template"
 
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/log"
 )
 
 type SubmoduleDiffInfo struct {

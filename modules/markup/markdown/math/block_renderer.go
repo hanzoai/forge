@@ -6,8 +6,8 @@ package math
 import (
 	"html/template"
 
-	"gitea.dev/modules/markup/internal"
-	giteaUtil "gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/markup/internal"
+	giteaUtil "github.com/hanzoai/git/modules/util"
 
 	gast "github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"

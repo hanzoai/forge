@@ -11,10 +11,10 @@ import (
 	"net/url"
 	"strings"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/proxy"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/proxy"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // httpClient returns an HTTP client that honors Gitea's proxy configuration.

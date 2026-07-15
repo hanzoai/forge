@@ -6,15 +6,15 @@ package auth
 import (
 	"fmt"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	"gitea.dev/models/auth"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/util"
-	asymkey_service "gitea.dev/services/asymkey"
-	"gitea.dev/services/auth/source/oauth2"
-	"gitea.dev/services/context"
-	user_service "gitea.dev/services/user"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/util"
+	asymkey_service "github.com/hanzoai/git/services/asymkey"
+	"github.com/hanzoai/git/services/auth/source/oauth2"
+	"github.com/hanzoai/git/services/context"
+	user_service "github.com/hanzoai/git/services/user"
 
 	"github.com/markbates/goth"
 )

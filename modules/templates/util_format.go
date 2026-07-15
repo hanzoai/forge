@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 func timeEstimateString(timeSec any) string {

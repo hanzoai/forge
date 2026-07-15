@@ -3,7 +3,7 @@
 
 package setting
 
-import "gitea.dev/modules/log"
+import "github.com/hanzoai/git/modules/log"
 
 type OtherConfig struct {
 	ShowFooterVersion          bool

@@ -11,7 +11,7 @@ import (
 	"path"
 	"sort"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // GetCommitsInfo gets information of all commits that are corresponding to these entries

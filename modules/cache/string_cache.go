@@ -7,9 +7,9 @@ import (
 	"errors"
 	"strings"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 
 	chi_cache "gitea.com/go-chi/cache" //nolint:depguard // we wrap this package here
 )

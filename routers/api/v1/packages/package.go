@@ -7,15 +7,15 @@ import (
 	"errors"
 	"net/http"
 
-	"gitea.dev/models/packages"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/optional"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/v1/utils"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	packages_service "gitea.dev/services/packages"
+	"github.com/hanzoai/git/models/packages"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/optional"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 // ListPackages gets all packages of an owner

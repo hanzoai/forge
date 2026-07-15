@@ -15,7 +15,7 @@ import (
 	"regexp"
 	"strings"
 
-	"gitea.dev/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/git/gitcmd"
 )
 
 type lineCountWriter struct {

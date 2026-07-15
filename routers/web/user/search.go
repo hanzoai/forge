@@ -6,12 +6,12 @@ package user
 import (
 	"net/http"
 
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
 )
 
 // SearchCandidates searches candidate users for dropdown list

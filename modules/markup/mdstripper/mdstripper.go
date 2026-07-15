@@ -10,9 +10,9 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/markup/common"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/markup/common"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"

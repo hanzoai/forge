@@ -6,8 +6,8 @@ package user
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
 
 	"github.com/stretchr/testify/assert"
 )

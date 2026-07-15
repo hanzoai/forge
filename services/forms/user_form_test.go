@@ -6,9 +6,9 @@ package forms
 import (
 	"testing"
 
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/test"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/assert"
 )

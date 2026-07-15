@@ -6,7 +6,7 @@ package user
 import (
 	"context"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func IncrUserRepoNum(ctx context.Context, userID int64) error {

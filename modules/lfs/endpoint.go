@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	giturl "gitea.dev/modules/git/url"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/util"
+	giturl "github.com/hanzoai/git/modules/git/url"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // DetermineEndpoint determines an endpoint from the clone url or uses the specified LFS url.

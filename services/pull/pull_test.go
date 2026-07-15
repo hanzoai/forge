@@ -7,14 +7,14 @@ package pull
 import (
 	"testing"
 
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unit"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/test"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/assert"
 )

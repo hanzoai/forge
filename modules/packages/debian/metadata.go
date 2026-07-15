@@ -13,9 +13,9 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/validation"
-	"gitea.dev/modules/zstd"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/validation"
+	"github.com/hanzoai/git/modules/zstd"
 
 	"github.com/blakesmith/ar"
 	"github.com/ulikunitz/xz"

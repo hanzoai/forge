@@ -16,14 +16,14 @@ import (
 	"syscall"
 	"time"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/middleware"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/middleware"
 )
 
 // RedirectToUser redirect to a differently-named user

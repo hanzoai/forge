@@ -9,8 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitea.dev/modules/structs"
-	"gitea.dev/tests"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

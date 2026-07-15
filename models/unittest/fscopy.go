@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // SyncFile synchronizes the two files. This is skipped if both files

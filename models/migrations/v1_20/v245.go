@@ -6,9 +6,9 @@ package v1_20
 import (
 	"context"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/migrations/base"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/migrations/base"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func RenameWebhookOrgToOwner(x db.EngineMigration) error {

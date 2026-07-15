@@ -3,7 +3,7 @@
 
 package v1_16
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func DropTableRemoteVersion(x db.EngineMigration) error {
 	// drop the orphaned table introduced in `v199`, now the update checker also uses AppState, do not need this table

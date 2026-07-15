@@ -12,12 +12,12 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/models/packages"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	helm_module "gitea.dev/modules/packages/helm"
-	"gitea.dev/modules/setting"
-	"gitea.dev/tests"
+	"github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	helm_module "github.com/hanzoai/git/modules/packages/helm"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 	"go.yaml.in/yaml/v4"

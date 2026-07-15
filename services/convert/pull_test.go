@@ -6,12 +6,12 @@ package convert
 import (
 	"testing"
 
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/models/perm"
-	access_model "gitea.dev/models/perm/access"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/structs"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/models/perm"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/structs"
 
 	"github.com/stretchr/testify/assert"
 )

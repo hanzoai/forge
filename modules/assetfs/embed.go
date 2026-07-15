@@ -15,8 +15,8 @@ import (
 	"sync"
 	"time"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type EmbeddedFile interface {

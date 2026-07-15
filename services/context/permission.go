@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"slices"
 
-	auth_model "gitea.dev/models/auth"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unit"
+	auth_model "github.com/hanzoai/git/models/auth"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unit"
 )
 
 // isOwnerHidden reports whether repo's owner is not publicly visible (a limited or private owner), so

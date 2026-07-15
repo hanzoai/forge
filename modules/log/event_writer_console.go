@@ -6,7 +6,7 @@ package log
 import (
 	"os"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type WriterConsoleOption struct {

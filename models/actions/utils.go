@@ -12,10 +12,10 @@ import (
 	"io"
 	"time"
 
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/modules/util"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/modules/util"
 )
 
 func generateSaltedToken() (string, string, string, string) {

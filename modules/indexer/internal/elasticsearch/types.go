@@ -3,7 +3,7 @@
 
 package elasticsearch
 
-import "gitea.dev/modules/json"
+import "github.com/hanzoai/git/modules/json"
 
 const (
 	bulkActionIndex  = "index"

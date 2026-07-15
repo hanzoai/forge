@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync"
 
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/json"
 
 	"gitea.com/go-chi/session"
 	couchbase "gitea.com/go-chi/session/couchbase"

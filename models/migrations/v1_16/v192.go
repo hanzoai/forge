@@ -4,8 +4,8 @@
 package v1_16
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/models/migrations/base"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/migrations/base"
 )
 
 func RecreateIssueResourceIndexTable(x db.EngineMigration) error {

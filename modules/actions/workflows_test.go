@@ -6,11 +6,11 @@ package actions
 import (
 	"testing"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/test"
-	webhook_module "gitea.dev/modules/webhook"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/test"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
 
 	"github.com/stretchr/testify/assert"
 )

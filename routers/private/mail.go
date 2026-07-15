@@ -9,15 +9,15 @@ import (
 	"net/http"
 	"strconv"
 
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/private"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
-	"gitea.dev/services/mailer"
-	sender_service "gitea.dev/services/mailer/sender"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/mailer"
+	sender_service "github.com/hanzoai/git/services/mailer/sender"
 )
 
 // SendEmail pushes messages to mail queue

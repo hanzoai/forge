@@ -7,19 +7,19 @@ package repo
 import (
 	"net/http"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/perm"
-	access_model "gitea.dev/models/perm/access"
-	"gitea.dev/models/webhook"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/web"
-	webhook_module "gitea.dev/modules/webhook"
-	"gitea.dev/routers/api/v1/utils"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	webhook_service "gitea.dev/services/webhook"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/perm"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	"github.com/hanzoai/git/models/webhook"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/web"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	webhook_service "github.com/hanzoai/git/services/webhook"
 )
 
 // ListHooks list all hooks of a repository

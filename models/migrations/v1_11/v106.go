@@ -3,7 +3,7 @@
 
 package v1_11
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 // RepoWatchMode specifies what kind of watch the user has on a repository
 type RepoWatchMode int8

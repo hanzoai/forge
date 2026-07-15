@@ -7,16 +7,16 @@ import (
 	"errors"
 	"net/http"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/models/db"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/api/v1/shared"
-	"gitea.dev/routers/api/v1/utils"
-	actions_service "gitea.dev/services/actions"
-	"gitea.dev/services/context"
-	secret_service "gitea.dev/services/secrets"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/models/db"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/api/v1/shared"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	actions_service "github.com/hanzoai/git/services/actions"
+	"github.com/hanzoai/git/services/context"
+	secret_service "github.com/hanzoai/git/services/secrets"
 )
 
 // create or update one secret of the user scope

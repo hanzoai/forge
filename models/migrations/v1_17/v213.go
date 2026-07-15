@@ -3,7 +3,7 @@
 
 package v1_17
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddAllowMaintainerEdit(x db.EngineMigration) error {
 	// PullRequest represents relation between pull request and repositories.

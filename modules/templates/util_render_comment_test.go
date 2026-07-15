@@ -7,9 +7,9 @@ import (
 	"html/template"
 	"testing"
 
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/modules/translation"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/modules/translation"
 
 	"github.com/stretchr/testify/assert"
 )

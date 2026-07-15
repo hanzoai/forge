@@ -6,10 +6,10 @@ package repo
 import (
 	"net/http"
 
-	issues_model "gitea.dev/models/issues"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
+	issues_model "github.com/hanzoai/git/models/issues"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
 )
 
 // PinIssue pins a issue

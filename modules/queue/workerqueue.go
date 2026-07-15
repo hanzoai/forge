@@ -11,10 +11,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // WorkerPoolQueue is a queue that uses a pool of workers to process items

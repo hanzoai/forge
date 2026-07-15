@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"net/url"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/repository"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/repository"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // Git environment variables

@@ -13,15 +13,15 @@ import (
 	"strings"
 	"time"
 
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/modules/json"
-	packages_module "gitea.dev/modules/packages"
-	pub_module "gitea.dev/modules/packages/pub"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/modules/json"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	pub_module "github.com/hanzoai/git/modules/packages/pub"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 func jsonResponse(ctx *context.Context, status int, obj any) {

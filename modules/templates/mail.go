@@ -13,11 +13,11 @@ import (
 	"sync"
 	texttmpl "text/template"
 
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type MailRender struct {

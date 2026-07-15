@@ -6,14 +6,14 @@ package stats
 import (
 	"fmt"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/languagestats"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/setting"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/languagestats"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // DBIndexer implements Indexer interface to use database's like search

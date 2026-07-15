@@ -9,16 +9,16 @@ import (
 	"path"
 	"strings"
 
-	activities_model "gitea.dev/models/activities"
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/repository"
-	"gitea.dev/modules/util"
-	notify_service "gitea.dev/services/notify"
+	activities_model "github.com/hanzoai/git/models/activities"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/repository"
+	"github.com/hanzoai/git/modules/util"
+	notify_service "github.com/hanzoai/git/services/notify"
 )
 
 type actionNotifier struct {

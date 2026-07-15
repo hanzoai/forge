@@ -3,7 +3,7 @@
 
 package v1_10
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddEmailNotificationEnabledToUser(x db.EngineMigration) error {
 	// User see models/user.go

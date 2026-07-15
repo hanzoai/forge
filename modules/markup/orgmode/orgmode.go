@@ -9,11 +9,11 @@ import (
 	"io"
 	"strings"
 
-	"gitea.dev/modules/highlight"
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/highlight"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/alecthomas/chroma/v2"
 	"github.com/niklasfasching/go-org/org"

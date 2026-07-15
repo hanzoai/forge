@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"strings"
 
-	"gitea.dev/models/db"
-	org_model "gitea.dev/models/organization"
-	user_model "gitea.dev/models/user"
+	"github.com/hanzoai/git/models/db"
+	org_model "github.com/hanzoai/git/models/organization"
+	user_model "github.com/hanzoai/git/models/user"
 
 	"xorm.io/builder"
 )

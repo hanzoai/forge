@@ -9,11 +9,11 @@ import (
 	"slices"
 	"strings"
 
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	project_model "gitea.dev/models/project"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	project_model "github.com/hanzoai/git/models/project"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/optional"
 
 	"xorm.io/builder"
 )

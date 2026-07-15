@@ -9,14 +9,14 @@ import (
 	"html/template"
 	"strconv"
 
-	activities_model "gitea.dev/models/activities"
-	"gitea.dev/models/avatars"
-	"gitea.dev/models/organization"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	gitea_html "gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	activities_model "github.com/hanzoai/git/models/activities"
+	"github.com/hanzoai/git/models/avatars"
+	"github.com/hanzoai/git/models/organization"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	gitea_html "github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type AvatarUtils struct {

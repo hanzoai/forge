@@ -6,9 +6,9 @@ package utils
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/setting"
-	webhook_service "gitea.dev/services/webhook"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/setting"
+	webhook_service "github.com/hanzoai/git/services/webhook"
 )
 
 func TestMain(m *testing.M) {

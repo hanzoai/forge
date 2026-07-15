@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/public"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/middleware"
-	"gitea.dev/services/webtheme"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/public"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/middleware"
+	"github.com/hanzoai/git/services/webtheme"
 )
 
 type TemplateContext map[string]any

@@ -7,12 +7,12 @@ import (
 	"context"
 	"slices"
 
-	"gitea.dev/models/db"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"xorm.io/builder"
 )

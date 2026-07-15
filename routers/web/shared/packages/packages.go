@@ -8,16 +8,16 @@ import (
 	"net/http"
 	"time"
 
-	packages_model "gitea.dev/models/packages"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/web"
-	"gitea.dev/services/context"
-	"gitea.dev/services/forms"
-	cargo_service "gitea.dev/services/packages/cargo"
-	container_service "gitea.dev/services/packages/container"
+	packages_model "github.com/hanzoai/git/models/packages"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/forms"
+	cargo_service "github.com/hanzoai/git/services/packages/cargo"
+	container_service "github.com/hanzoai/git/services/packages/container"
 )
 
 func SetPackagesContext(ctx *context.Context, owner *user_model.User) {

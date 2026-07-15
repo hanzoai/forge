@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	activities_model "gitea.dev/models/activities"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/timeutil"
+	activities_model "github.com/hanzoai/git/models/activities"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
 )

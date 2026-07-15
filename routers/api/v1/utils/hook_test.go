@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"testing"
 
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/structs"
-	"gitea.dev/services/contexttest"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
 )

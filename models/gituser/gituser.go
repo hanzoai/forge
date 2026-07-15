@@ -7,9 +7,9 @@ import (
 	"context"
 	"net/url"
 
-	"gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/git"
+	"github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/git"
 )
 
 // CommitParticipant is one participant of a commit (its author or a co-author):

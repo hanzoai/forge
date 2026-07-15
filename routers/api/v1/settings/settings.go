@@ -6,9 +6,9 @@ package settings
 import (
 	"net/http"
 
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/context"
 )
 
 // GetGeneralUISettings returns instance's global settings for ui

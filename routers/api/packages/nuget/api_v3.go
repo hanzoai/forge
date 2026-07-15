@@ -7,8 +7,8 @@ import (
 	"sort"
 	"time"
 
-	packages_model "gitea.dev/models/packages"
-	nuget_module "gitea.dev/modules/packages/nuget"
+	packages_model "github.com/hanzoai/git/models/packages"
+	nuget_module "github.com/hanzoai/git/modules/packages/nuget"
 
 	"golang.org/x/text/collate"
 	"golang.org/x/text/language"

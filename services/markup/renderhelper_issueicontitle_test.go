@@ -6,12 +6,12 @@ package markup
 import (
 	"testing"
 
-	"gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/contexttest"
+	"github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
 )

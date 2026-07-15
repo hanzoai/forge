@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func TestMain(m *testing.M) {

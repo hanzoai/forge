@@ -15,9 +15,9 @@ import (
 	"regexp"
 	"strings"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/validation"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/validation"
 
 	"github.com/hashicorp/go-version"
 )

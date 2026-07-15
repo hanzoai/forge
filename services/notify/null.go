@@ -6,14 +6,14 @@ package notify
 import (
 	"context"
 
-	actions_model "gitea.dev/models/actions"
-	git_model "gitea.dev/models/git"
-	issues_model "gitea.dev/models/issues"
-	packages_model "gitea.dev/models/packages"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/repository"
+	actions_model "github.com/hanzoai/git/models/actions"
+	git_model "github.com/hanzoai/git/models/git"
+	issues_model "github.com/hanzoai/git/models/issues"
+	packages_model "github.com/hanzoai/git/models/packages"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/repository"
 )
 
 // NullNotifier implements a blank notifier

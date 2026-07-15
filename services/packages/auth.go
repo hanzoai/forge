@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	auth_model "gitea.dev/models/auth"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	auth_model "github.com/hanzoai/git/models/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/golang-jwt/jwt/v5"
 )

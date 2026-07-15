@@ -10,16 +10,16 @@ import (
 	"net/http"
 	"net/url"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web"
-	shared_user "gitea.dev/routers/web/shared/user"
-	"gitea.dev/services/context"
-	"gitea.dev/services/forms"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web"
+	shared_user "github.com/hanzoai/git/routers/web/shared/user"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/forms"
 )
 
 const (

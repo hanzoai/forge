@@ -11,10 +11,10 @@ import (
 	"runtime"
 	"time"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/private"
-	process_module "gitea.dev/modules/process"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/private"
+	process_module "github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/services/context"
 )
 
 // Processes prints out the processes

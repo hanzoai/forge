@@ -9,8 +9,8 @@ import (
 	"io"
 	"net/http"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // TransferAdapter represents an adapter for downloading/uploading LFS objects.

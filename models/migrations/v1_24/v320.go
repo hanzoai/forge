@@ -4,8 +4,8 @@
 package v1_24
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/json"
 
 	"xorm.io/xorm"
 )

@@ -9,7 +9,7 @@ import (
 	"net/mail"
 	"strings"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 const IncomingEmailTokenPlaceholder = "%{token}"

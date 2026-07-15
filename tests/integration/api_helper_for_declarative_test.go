@@ -12,13 +12,13 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/models/perm"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/queue"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/services/forms"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/perm"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/queue"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/forms"
 
 	"github.com/stretchr/testify/assert"
 )

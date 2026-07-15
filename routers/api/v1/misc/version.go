@@ -6,9 +6,9 @@ package misc
 import (
 	"net/http"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/context"
 )
 
 // Version shows the version of the Gitea server

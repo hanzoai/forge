@@ -6,7 +6,7 @@ package internal
 import (
 	"math"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 // ParsePaginator parses a db.Paginator into a skip and limit

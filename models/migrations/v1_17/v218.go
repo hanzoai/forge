@@ -4,9 +4,9 @@
 package v1_17
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"xorm.io/xorm/schemas"
 )

@@ -9,15 +9,15 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/httpcache"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/middleware"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/httpcache"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/middleware"
+	"github.com/hanzoai/git/services/context"
 )
 
 func SiteManifest(w http.ResponseWriter, req *http.Request) {

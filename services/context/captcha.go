@@ -8,14 +8,14 @@ import (
 	"image/color"
 	"sync"
 
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/hcaptcha"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/mcaptcha"
-	"gitea.dev/modules/recaptcha"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/turnstile"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/hcaptcha"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/mcaptcha"
+	"github.com/hanzoai/git/modules/recaptcha"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/turnstile"
 
 	"gitea.com/go-chi/captcha"
 )

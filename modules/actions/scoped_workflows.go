@@ -6,12 +6,12 @@ package actions
 import (
 	"context"
 
-	"gitea.dev/modules/actions/jobparser"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	api "gitea.dev/modules/structs"
-	webhook_module "gitea.dev/modules/webhook"
+	"github.com/hanzoai/git/modules/actions/jobparser"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	api "github.com/hanzoai/git/modules/structs"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
 )
 
 // ListScopedWorkflows lists scoped workflow files (under SCOPED_WORKFLOW_DIRS) at the given commit.

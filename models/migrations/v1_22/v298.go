@@ -3,7 +3,7 @@
 
 package v1_22
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func DropWronglyCreatedTable(x db.EngineMigration) error {
 	return x.DropTables("o_auth2_application")

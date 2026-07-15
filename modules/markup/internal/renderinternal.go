@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/htmlutil"
+	"github.com/hanzoai/git/modules/htmlutil"
 
 	"golang.org/x/net/html"
 )

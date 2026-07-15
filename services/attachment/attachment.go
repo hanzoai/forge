@@ -11,12 +11,12 @@ import (
 	"io"
 	"net/http"
 
-	"gitea.dev/models/db"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context/upload"
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context/upload"
 
 	"github.com/google/uuid"
 )

@@ -6,9 +6,9 @@ package v1_10
 import (
 	"path/filepath"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 func DeleteOrphanedAttachments(x db.EngineMigration) error {

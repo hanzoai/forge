@@ -6,8 +6,8 @@ package v1_23
 import (
 	"testing"
 
-	"gitea.dev/models/migrations/migrationtest"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
 )

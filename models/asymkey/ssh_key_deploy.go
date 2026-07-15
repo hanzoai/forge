@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/perm"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/perm"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"xorm.io/builder"
 )

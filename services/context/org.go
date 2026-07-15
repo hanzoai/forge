@@ -7,14 +7,14 @@ package context
 import (
 	"strings"
 
-	"gitea.dev/models/organization"
-	"gitea.dev/models/perm"
-	"gitea.dev/models/unit"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/markup/markdown"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
+	"github.com/hanzoai/git/models/organization"
+	"github.com/hanzoai/git/models/perm"
+	"github.com/hanzoai/git/models/unit"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/markup/markdown"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
 )
 
 // Organization contains organization context

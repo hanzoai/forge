@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
 )
 
 // UserList is a list of user.

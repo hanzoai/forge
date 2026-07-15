@@ -4,10 +4,10 @@
 package indexer
 
 import (
-	code_indexer "gitea.dev/modules/indexer/code"
-	issue_indexer "gitea.dev/modules/indexer/issues"
-	stats_indexer "gitea.dev/modules/indexer/stats"
-	notify_service "gitea.dev/services/notify"
+	code_indexer "github.com/hanzoai/git/modules/indexer/code"
+	issue_indexer "github.com/hanzoai/git/modules/indexer/issues"
+	stats_indexer "github.com/hanzoai/git/modules/indexer/stats"
+	notify_service "github.com/hanzoai/git/services/notify"
 )
 
 // Init initialize the repo indexer

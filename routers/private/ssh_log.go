@@ -6,11 +6,11 @@ package private
 import (
 	"net/http"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/private"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/web"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/services/context"
 )
 
 // SSHLog hook to response ssh log

@@ -6,8 +6,8 @@ package v1_21
 import (
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 func AddExpiredUnixColumnInActionArtifactTable(x db.EngineMigration) error {

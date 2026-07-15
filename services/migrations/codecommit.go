@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	git_module "gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	base "gitea.dev/modules/migration"
-	"gitea.dev/modules/structs"
+	git_module "github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	base "github.com/hanzoai/git/modules/migration"
+	"github.com/hanzoai/git/modules/structs"
 
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit"

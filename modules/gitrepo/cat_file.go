@@ -6,7 +6,7 @@ package gitrepo
 import (
 	"context"
 
-	"gitea.dev/modules/git"
+	"github.com/hanzoai/git/modules/git"
 )
 
 func NewBatch(ctx context.Context, repo Repository) (git.CatFileBatchCloser, error) {

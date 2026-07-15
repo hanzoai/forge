@@ -3,7 +3,7 @@
 
 package v1_18
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func CreateUserBadgesTable(x db.EngineMigration) error {
 	type Badge struct {

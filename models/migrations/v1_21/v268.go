@@ -3,7 +3,7 @@
 
 package v1_21
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 // UpdateActionsRefIndex updates the index of actions ref field
 func UpdateActionsRefIndex(x db.EngineMigration) error {

@@ -6,9 +6,9 @@ package setting
 import (
 	"testing"
 
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/structs"
-	"gitea.dev/modules/test"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/assert"
 )

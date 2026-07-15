@@ -7,11 +7,11 @@ import (
 	"context"
 	"slices"
 
-	"gitea.dev/models/db"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unit"
-	"gitea.dev/modules/log"
-	actions_service "gitea.dev/services/actions"
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/modules/log"
+	actions_service "github.com/hanzoai/git/services/actions"
 )
 
 // UpdateRepositoryUnits updates a repository's units

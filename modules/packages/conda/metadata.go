@@ -10,10 +10,10 @@ import (
 	"io"
 	"strings"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/validation"
-	"gitea.dev/modules/zstd"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/validation"
+	"github.com/hanzoai/git/modules/zstd"
 )
 
 var (

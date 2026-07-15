@@ -11,12 +11,12 @@ import (
 	"net/url"
 	"strconv"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/avatar"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/avatar"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
 )
 
 // CustomAvatarRelativePath returns repository custom avatar file path.

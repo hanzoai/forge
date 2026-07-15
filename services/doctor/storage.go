@@ -9,16 +9,16 @@ import (
 	"io/fs"
 	"strings"
 
-	"gitea.dev/models/git"
-	"gitea.dev/models/packages"
-	"gitea.dev/models/repo"
-	"gitea.dev/models/user"
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/log"
-	packages_module "gitea.dev/modules/packages"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/log"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type commonStorageCheckOptions struct {

@@ -7,10 +7,10 @@ import (
 	"context"
 	"errors"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/queue"
-	"gitea.dev/modules/setting"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/queue"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // doMirrorSync causes this request to mirror itself

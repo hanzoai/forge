@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"gitea.dev/models/organization"
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/models/perm"
-	"gitea.dev/models/unit"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
-	"gitea.dev/modules/templates"
+	"github.com/hanzoai/git/models/organization"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/models/perm"
+	"github.com/hanzoai/git/models/unit"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/templates"
 )
 
 // Package contains owner, access mode and optional the package descriptor

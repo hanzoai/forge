@@ -6,11 +6,11 @@ package renderhelper
 import (
 	"testing"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/markup/markdown"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/markup/markdown"
 
-	_ "gitea.dev/modules/markup/orgmode"
+	_ "github.com/hanzoai/git/modules/markup/orgmode"
 
 	"github.com/stretchr/testify/assert"
 )

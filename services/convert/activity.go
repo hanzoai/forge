@@ -6,12 +6,12 @@ package convert
 import (
 	"context"
 
-	activities_model "gitea.dev/models/activities"
-	perm_model "gitea.dev/models/perm"
-	access_model "gitea.dev/models/perm/access"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
-	api "gitea.dev/modules/structs"
+	activities_model "github.com/hanzoai/git/models/activities"
+	perm_model "github.com/hanzoai/git/models/perm"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 func ToActivity(ctx context.Context, ac *activities_model.Action, doer *user_model.User) *api.Activity {

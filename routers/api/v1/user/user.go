@@ -7,12 +7,12 @@ package user
 import (
 	"net/http"
 
-	activities_model "gitea.dev/models/activities"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/routers/api/v1/utils"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	feed_service "gitea.dev/services/feed"
+	activities_model "github.com/hanzoai/git/models/activities"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	feed_service "github.com/hanzoai/git/services/feed"
 )
 
 // Search search users

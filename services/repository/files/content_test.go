@@ -6,11 +6,11 @@ package files
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/services/contexttest"
+	"github.com/hanzoai/git/models/unittest"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/contexttest"
 
-	_ "gitea.dev/models/actions"
+	_ "github.com/hanzoai/git/models/actions"
 
 	"github.com/stretchr/testify/assert"
 )

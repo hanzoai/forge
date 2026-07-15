@@ -6,7 +6,7 @@ package v1_14
 import (
 	"fmt"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func AddTimeIDCommentColumn(x db.EngineMigration) error {

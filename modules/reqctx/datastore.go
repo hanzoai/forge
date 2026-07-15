@@ -9,7 +9,7 @@ import (
 	"maps"
 	"sync"
 
-	"gitea.dev/modules/process"
+	"github.com/hanzoai/git/modules/process"
 )
 
 type ContextDataProvider interface {

@@ -4,9 +4,9 @@
 package v1_17
 
 import (
-	"gitea.dev/models/db"
-	packages_model "gitea.dev/models/packages"
-	container_module "gitea.dev/modules/packages/container"
+	"github.com/hanzoai/git/models/db"
+	packages_model "github.com/hanzoai/git/models/packages"
+	container_module "github.com/hanzoai/git/modules/packages/container"
 
 	"xorm.io/xorm/schemas"
 )

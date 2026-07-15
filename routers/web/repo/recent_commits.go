@@ -6,8 +6,8 @@ package repo
 import (
 	"net/http"
 
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
 )
 
 const (

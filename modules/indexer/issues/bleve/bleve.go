@@ -7,11 +7,11 @@ import (
 	"context"
 	"strconv"
 
-	"gitea.dev/modules/indexer"
-	indexer_internal "gitea.dev/modules/indexer/internal"
-	inner_bleve "gitea.dev/modules/indexer/internal/bleve"
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/indexer"
+	indexer_internal "github.com/hanzoai/git/modules/indexer/internal"
+	inner_bleve "github.com/hanzoai/git/modules/indexer/internal/bleve"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/util"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"

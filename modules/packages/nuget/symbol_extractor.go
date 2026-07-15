@@ -13,8 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitea.dev/modules/packages"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/packages"
+	"github.com/hanzoai/git/modules/util"
 )
 
 var (

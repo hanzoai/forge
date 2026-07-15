@@ -3,7 +3,7 @@
 
 package actions
 
-import "gitea.dev/services/context"
+import "github.com/hanzoai/git/services/context"
 
 // API for actions of a repository or organization
 type API interface {

@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"strings"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/auth/source/ldap"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/auth/source/ldap"
 
 	"github.com/urfave/cli/v3"
 )

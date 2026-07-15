@@ -4,8 +4,8 @@
 package v1_18
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 type SystemSetting struct {

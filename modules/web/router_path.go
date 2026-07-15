@@ -9,8 +9,8 @@ import (
 	"slices"
 	"strings"
 
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/util"
 
 	"github.com/go-chi/chi/v5"
 )

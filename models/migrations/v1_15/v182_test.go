@@ -6,7 +6,7 @@ package v1_15
 import (
 	"testing"
 
-	"gitea.dev/models/migrations/migrationtest"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
 
 	"github.com/stretchr/testify/assert"
 )

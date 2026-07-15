@@ -11,13 +11,13 @@ import (
 	"io"
 	"strconv"
 
-	git_model "gitea.dev/models/git"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/git/pipeline"
-	"gitea.dev/modules/lfs"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/util"
+	git_model "github.com/hanzoai/git/models/git"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/git/pipeline"
+	"github.com/hanzoai/git/modules/lfs"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/util"
 
 	"golang.org/x/sync/errgroup"
 )

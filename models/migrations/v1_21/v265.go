@@ -3,7 +3,7 @@
 
 package v1_21
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AlterActionArtifactTable(x db.EngineMigration) error {
 	// ActionArtifact is a file that is stored in the artifact storage.

@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"strings"
 
-	"gitea.dev/modules/translation"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/validation"
+	"github.com/hanzoai/git/modules/translation"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/validation"
 
 	"gitea.com/go-chi/binding"
 )

@@ -6,7 +6,7 @@ package markdown
 import (
 	"fmt"
 
-	"gitea.dev/modules/markup"
+	"github.com/hanzoai/git/modules/markup"
 
 	"github.com/yuin/goldmark/ast"
 	east "github.com/yuin/goldmark/extension/ast"

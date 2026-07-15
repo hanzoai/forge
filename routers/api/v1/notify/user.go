@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	activities_model "gitea.dev/models/activities"
-	"gitea.dev/models/db"
-	"gitea.dev/modules/structs"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
+	activities_model "github.com/hanzoai/git/models/activities"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
 )
 
 // ListNotifications list users's notification threads

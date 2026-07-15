@@ -6,14 +6,14 @@ package v1_26
 import (
 	"testing"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/migrations/migrationtest"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/test"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/test"
 
-	_ "gitea.dev/models/actions"
-	_ "gitea.dev/models/git"
-	_ "gitea.dev/models/repo"
+	_ "github.com/hanzoai/git/models/actions"
+	_ "github.com/hanzoai/git/models/git"
+	_ "github.com/hanzoai/git/models/repo"
 
 	"github.com/stretchr/testify/require"
 )

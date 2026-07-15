@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 const (

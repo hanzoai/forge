@@ -19,15 +19,15 @@ import (
 	"strconv"
 	"strings"
 
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/modules/globallock"
-	"gitea.dev/modules/json"
-	packages_module "gitea.dev/modules/packages"
-	maven_module "gitea.dev/modules/packages/maven"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/modules/globallock"
+	"github.com/hanzoai/git/modules/json"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	maven_module "github.com/hanzoai/git/modules/packages/maven"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 const (

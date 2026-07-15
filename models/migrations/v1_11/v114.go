@@ -6,7 +6,7 @@ package v1_11
 import (
 	"net/url"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func SanitizeOriginalURL(x db.EngineMigration) error {

@@ -8,13 +8,13 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/models/db"
-	issue_model "gitea.dev/models/issues"
-	"gitea.dev/modules/indexer"
-	indexer_internal "gitea.dev/modules/indexer/internal"
-	inner_db "gitea.dev/modules/indexer/internal/db"
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	issue_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/indexer"
+	indexer_internal "github.com/hanzoai/git/modules/indexer/internal"
+	inner_db "github.com/hanzoai/git/modules/indexer/internal/db"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/util"
 
 	"xorm.io/builder"
 )

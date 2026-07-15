@@ -9,12 +9,12 @@ import (
 	"io/fs"
 	"strings"
 
-	actions_model "gitea.dev/models/actions"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/actions"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
+	actions_model "github.com/hanzoai/git/models/actions"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/actions"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
 )
 
 func DownloadActionsRunJobLogsWithID(ctx *context.Base, ctxRepo *repo_model.Repository, runID, jobID int64) error {

@@ -6,7 +6,7 @@ package timeutil
 import (
 	"time"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // TimeStamp defines a timestamp

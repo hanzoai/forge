@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/analyze"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/analyze"
+	"github.com/hanzoai/git/modules/log"
 
 	"github.com/alecthomas/chroma/v2"
 	"github.com/alecthomas/chroma/v2/lexers"

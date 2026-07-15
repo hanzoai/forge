@@ -12,15 +12,15 @@ import (
 	"strings"
 	"time"
 
-	actions_model "gitea.dev/models/actions"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/web/repo/actions"
-	"gitea.dev/services/context"
+	actions_model "github.com/hanzoai/git/models/actions"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/web/repo/actions"
+	"github.com/hanzoai/git/services/context"
 )
 
 type generateMockStepsLogOptions struct {

@@ -6,9 +6,9 @@ package v1_17
 import (
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/repo"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 func AddSyncOnCommitColForPushMirror(x db.EngineMigration) error {

@@ -13,8 +13,8 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/translation"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/translation"
 )
 
 var (

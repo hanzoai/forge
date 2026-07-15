@@ -4,8 +4,8 @@
 package user
 
 import (
-	"gitea.dev/routers/api/v1/shared"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/routers/api/v1/shared"
+	"github.com/hanzoai/git/services/context"
 )
 
 // https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#create-a-registration-token-for-an-organization

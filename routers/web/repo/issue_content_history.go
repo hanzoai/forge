@@ -10,12 +10,12 @@ import (
 	"net/http"
 	"strings"
 
-	"gitea.dev/models/avatars"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/avatars"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
 )

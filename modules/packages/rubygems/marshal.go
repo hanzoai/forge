@@ -9,7 +9,7 @@ import (
 	"io"
 	"reflect"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 const (

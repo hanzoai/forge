@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	activities_model "gitea.dev/models/activities"
-	git_model "gitea.dev/models/git"
-	"gitea.dev/models/unit"
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
+	activities_model "github.com/hanzoai/git/models/activities"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
 )
 
 const (

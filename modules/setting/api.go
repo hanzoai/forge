@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"path"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // API settings

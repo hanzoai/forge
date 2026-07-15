@@ -4,7 +4,7 @@
 package queue
 
 import (
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 type BaseConfig struct {

@@ -61,7 +61,7 @@
 //	 func handler(items ...*mypkg.QueueItem) []*mypkg.QueueItem { ... }
 package queue
 
-import "gitea.dev/modules/util"
+import "github.com/hanzoai/git/modules/util"
 
 type HandlerFuncT[T any] func(...T) (unhandled []T)
 

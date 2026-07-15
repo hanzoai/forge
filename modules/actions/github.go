@@ -4,7 +4,7 @@
 package actions
 
 import (
-	webhook_module "gitea.dev/modules/webhook"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
 )
 
 const (

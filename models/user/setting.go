@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"strings"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/json"
-	setting_module "gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/json"
+	setting_module "github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 
 	"xorm.io/builder"
 	"xorm.io/xorm/convert"

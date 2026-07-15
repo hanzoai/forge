@@ -9,10 +9,10 @@ import (
 	"strings"
 	"unicode"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/auth/password/hash"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/auth/password/hash"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 
 	"xorm.io/xorm"
 	"xorm.io/xorm/contexts"

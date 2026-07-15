@@ -9,10 +9,10 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/tailmsg"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/tailmsg"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
 )
 
 func MonitorDiagnosis(ctx *context.Context) {

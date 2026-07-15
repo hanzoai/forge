@@ -3,7 +3,7 @@
 
 package v1_9
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddHTTPMethodToWebhook(x db.EngineMigration) error {
 	type Webhook struct {

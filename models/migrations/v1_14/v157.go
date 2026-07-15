@@ -3,7 +3,7 @@
 
 package v1_14
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func FixRepoTopics(x db.EngineMigration) error {
 	type Repository struct {

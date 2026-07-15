@@ -4,8 +4,8 @@
 package repo
 
 import (
-	"gitea.dev/modules/git"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/services/context"
 )
 
 func HandleGitError(ctx *context.Context, msg string, err error) {

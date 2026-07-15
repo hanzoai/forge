@@ -3,7 +3,7 @@
 
 package v1_20
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddNewColumnForProject(x db.EngineMigration) error {
 	type Project struct {

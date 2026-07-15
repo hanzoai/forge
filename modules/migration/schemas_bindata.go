@@ -12,7 +12,7 @@ import (
 	"path"
 	"sync"
 
-	"gitea.dev/modules/assetfs"
+	"github.com/hanzoai/git/modules/assetfs"
 
 	_ "embed"
 

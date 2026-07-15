@@ -7,8 +7,8 @@ import (
 	"context"
 	"sync"
 
-	packages_model "gitea.dev/models/packages"
-	user_model "gitea.dev/models/user"
+	packages_model "github.com/hanzoai/git/models/packages"
+	user_model "github.com/hanzoai/git/models/user"
 )
 
 type nop struct{}

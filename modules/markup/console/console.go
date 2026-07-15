@@ -8,10 +8,10 @@ import (
 	"io"
 	"unicode/utf8"
 
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/typesniffer"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/typesniffer"
+	"github.com/hanzoai/git/modules/util"
 
 	trend "github.com/buildkite/terminal-to-html/v3"
 )

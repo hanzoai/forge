@@ -7,10 +7,10 @@ import (
 	"context"
 	"net/url"
 
-	git_model "gitea.dev/models/git"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/commitstatus"
-	api "gitea.dev/modules/structs"
+	git_model "github.com/hanzoai/git/models/git"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/commitstatus"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 // ToCommitStatus converts git_model.CommitStatus to api.CommitStatus

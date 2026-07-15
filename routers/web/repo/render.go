@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"path"
 
-	"gitea.dev/models/renderhelper"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/markup"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/renderhelper"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/services/context"
 )
 
 // RenderFile renders a file by repos path

@@ -5,10 +5,10 @@ package feed_test
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/routers/web/feed"
-	"gitea.dev/services/contexttest"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/routers/web/feed"
+	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
 )

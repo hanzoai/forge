@@ -11,8 +11,8 @@ import (
 	"io"
 	"strings"
 
-	"gitea.dev/modules/typesniffer"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/typesniffer"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // This file contains common functions between the gogit and !gogit variants for git Blobs

@@ -6,11 +6,11 @@ package actions
 import (
 	"context"
 
-	"gitea.dev/models/perm"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/perm"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
 
 	"xorm.io/xorm/convert"
 )

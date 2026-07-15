@@ -6,8 +6,8 @@ package v1_22
 import (
 	"testing"
 
-	"gitea.dev/models/migrations/migrationtest"
-	"gitea.dev/models/project"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
+	"github.com/hanzoai/git/models/project"
 
 	"github.com/stretchr/testify/assert"
 )

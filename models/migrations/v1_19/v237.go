@@ -3,7 +3,7 @@
 
 package v1_19
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func DropForeignReferenceTable(x db.EngineMigration) error {
 	// Drop the table introduced in `v211`, it's considered badly designed and doesn't look like to be used.

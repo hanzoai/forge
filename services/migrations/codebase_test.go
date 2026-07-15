@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/models/unittest"
-	base "gitea.dev/modules/migration"
+	"github.com/hanzoai/git/models/unittest"
+	base "github.com/hanzoai/git/modules/migration"
 
 	"github.com/stretchr/testify/assert"
 )

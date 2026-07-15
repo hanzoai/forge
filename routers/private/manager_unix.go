@@ -8,8 +8,8 @@ package private
 import (
 	"net/http"
 
-	"gitea.dev/modules/graceful"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/services/context"
 )
 
 // Restart causes the server to perform a graceful restart

@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/translation"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/translation"
 
 	"github.com/stretchr/testify/assert"
 )

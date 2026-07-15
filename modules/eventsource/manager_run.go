@@ -7,16 +7,16 @@ import (
 	"context"
 	"time"
 
-	activities_model "gitea.dev/models/activities"
-	issues_model "gitea.dev/models/issues"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/services/convert"
+	activities_model "github.com/hanzoai/git/models/activities"
+	issues_model "github.com/hanzoai/git/models/issues"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/services/convert"
 )
 
 // Init starts this eventsource

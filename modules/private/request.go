@@ -8,8 +8,8 @@ import (
 	"io"
 	"net/http"
 
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/json"
 )
 
 // ResponseText is used to get the response as text, instead of parsing it as JSON.

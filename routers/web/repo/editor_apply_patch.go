@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strings"
 
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
-	"gitea.dev/services/forms"
-	"gitea.dev/services/repository/files"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/forms"
+	"github.com/hanzoai/git/services/repository/files"
 )
 
 func NewDiffPatch(ctx *context.Context) {

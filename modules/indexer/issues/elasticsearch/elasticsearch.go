@@ -8,12 +8,12 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/indexer"
-	indexer_internal "gitea.dev/modules/indexer/internal"
-	es "gitea.dev/modules/indexer/internal/elasticsearch"
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/indexer"
+	indexer_internal "github.com/hanzoai/git/modules/indexer/internal"
+	es "github.com/hanzoai/git/modules/indexer/internal/elasticsearch"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/util"
 )
 
 const issueIndexerLatestVersion = 4

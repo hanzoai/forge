@@ -10,16 +10,16 @@ import (
 	"fmt"
 	"slices"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/models/db"
-	git_model "gitea.dev/models/git"
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/commitstatus"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/log"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/models/db"
+	git_model "github.com/hanzoai/git/models/git"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/commitstatus"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // MergeRequiredContextsCommitStatus returns a commit status state for given required contexts

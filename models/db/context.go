@@ -11,7 +11,7 @@ import (
 	"slices"
 	"sync"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 
 	"xorm.io/builder"
 	"xorm.io/xorm"

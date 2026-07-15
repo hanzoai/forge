@@ -7,7 +7,7 @@ package git
 import (
 	"strings"
 
-	"gitea.dev/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/git/gitcmd"
 )
 
 // ObjectType git object type

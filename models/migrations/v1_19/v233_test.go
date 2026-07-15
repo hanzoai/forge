@@ -6,11 +6,11 @@ package v1_19
 import (
 	"testing"
 
-	"gitea.dev/models/migrations/migrationtest"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/secret"
-	"gitea.dev/modules/setting"
-	webhook_module "gitea.dev/modules/webhook"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/secret"
+	"github.com/hanzoai/git/modules/setting"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
 
 	"github.com/stretchr/testify/assert"
 )

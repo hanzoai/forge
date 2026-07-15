@@ -17,11 +17,11 @@ import (
 	"sync/atomic"
 	texttemplate "text/template"
 
-	"gitea.dev/modules/assetfs"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates/scopedtmpl"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/assetfs"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates/scopedtmpl"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type TemplateExecutor scopedtmpl.TemplateExecutor

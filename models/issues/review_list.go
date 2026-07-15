@@ -8,11 +8,11 @@ import (
 	"slices"
 	"sort"
 
-	"gitea.dev/models/db"
-	organization_model "gitea.dev/models/organization"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/models/db"
+	organization_model "github.com/hanzoai/git/models/organization"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/optional"
 
 	"xorm.io/builder"
 )

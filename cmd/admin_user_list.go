@@ -9,7 +9,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	user_model "gitea.dev/models/user"
+	user_model "github.com/hanzoai/git/models/user"
 
 	"github.com/urfave/cli/v3"
 )

@@ -3,7 +3,7 @@
 
 package v1_16
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddProjectIssueSorting(x db.EngineMigration) error {
 	// ProjectIssue saves relation from issue to a project

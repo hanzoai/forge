@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"strings"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
-	"gitea.dev/services/context"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
+	"github.com/hanzoai/git/services/context"
 )
 
 // IsArtifactV4 detects whether the artifact is likely from v4.

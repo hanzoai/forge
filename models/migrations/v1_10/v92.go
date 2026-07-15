@@ -4,7 +4,7 @@
 package v1_10
 
 import (
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 
 	"xorm.io/builder"
 )

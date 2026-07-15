@@ -3,7 +3,7 @@
 
 package v1_19
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 // AddCardTypeToProjectTable: add CardType column, setting existing rows to CardTypeTextOnly
 func AddCardTypeToProjectTable(x db.EngineMigration) error {

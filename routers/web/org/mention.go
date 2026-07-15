@@ -6,10 +6,10 @@ package org
 import (
 	"net/http"
 
-	"gitea.dev/models/organization"
-	"gitea.dev/modules/util"
-	shared_mention "gitea.dev/routers/web/shared/mention"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/organization"
+	"github.com/hanzoai/git/modules/util"
+	shared_mention "github.com/hanzoai/git/routers/web/shared/mention"
+	"github.com/hanzoai/git/services/context"
 )
 
 // GetMentionsInOwner returns JSON data for mention autocomplete on owner-level pages.

@@ -6,10 +6,10 @@ package internal
 import (
 	"strconv"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/indexer"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/indexer"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 // IndexerData data stored in the issue indexer

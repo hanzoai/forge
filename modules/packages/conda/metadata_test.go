@@ -10,7 +10,7 @@ import (
 	"io"
 	"testing"
 
-	"gitea.dev/modules/zstd"
+	"github.com/hanzoai/git/modules/zstd"
 
 	"github.com/dsnet/compress/bzip2"
 	"github.com/stretchr/testify/assert"

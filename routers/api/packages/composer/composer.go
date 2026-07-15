@@ -10,17 +10,17 @@ import (
 	"net/url"
 	"strconv"
 
-	"gitea.dev/models/db"
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/modules/optional"
-	packages_module "gitea.dev/modules/packages"
-	composer_module "gitea.dev/modules/packages/composer"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	packages_service "gitea.dev/services/packages"
+	"github.com/hanzoai/git/models/db"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/modules/optional"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	composer_module "github.com/hanzoai/git/modules/packages/composer"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 func apiError(ctx *context.Context, status int, obj any) {

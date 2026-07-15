@@ -9,9 +9,9 @@ import (
 	"path"
 	"strings"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // BlobHash256Key is the key to address a blob content

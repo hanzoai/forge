@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/modules/indexer/issues/internal/tests"
-	"gitea.dev/modules/test"
+	"github.com/hanzoai/git/modules/indexer/issues/internal/tests"
+	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/require"
 )

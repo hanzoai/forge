@@ -10,16 +10,16 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/cmd"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/cmd"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 
 	// register supported doc types
-	_ "gitea.dev/modules/markup/console"
-	_ "gitea.dev/modules/markup/csv"
-	_ "gitea.dev/modules/markup/jupyter"
-	_ "gitea.dev/modules/markup/markdown"
-	_ "gitea.dev/modules/markup/orgmode"
+	_ "github.com/hanzoai/git/modules/markup/console"
+	_ "github.com/hanzoai/git/modules/markup/csv"
+	_ "github.com/hanzoai/git/modules/markup/jupyter"
+	_ "github.com/hanzoai/git/modules/markup/markdown"
+	_ "github.com/hanzoai/git/modules/markup/orgmode"
 
 	"github.com/urfave/cli/v3"
 )

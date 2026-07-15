@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/json"
 
 	"github.com/dsnet/compress/bzip2"
 	"github.com/stretchr/testify/assert"

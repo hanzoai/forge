@@ -7,12 +7,12 @@ import (
 	"context"
 	"fmt"
 
-	auth_model "gitea.dev/models/auth"
-	user_model "gitea.dev/models/user"
-	password_module "gitea.dev/modules/auth/password"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/structs"
+	auth_model "github.com/hanzoai/git/models/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	password_module "github.com/hanzoai/git/modules/auth/password"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/structs"
 )
 
 type UpdateOptionField[T any] struct {

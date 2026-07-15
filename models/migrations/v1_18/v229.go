@@ -6,8 +6,8 @@ package v1_18
 import (
 	"fmt"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/issues"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/issues"
 
 	"xorm.io/builder"
 )

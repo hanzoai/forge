@@ -9,7 +9,7 @@ import (
 	"encoding/binary"
 	"io"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 type tagType string

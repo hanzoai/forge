@@ -6,8 +6,8 @@ package arch
 import (
 	"context"
 
-	packages_model "gitea.dev/models/packages"
-	arch_module "gitea.dev/modules/packages/arch"
+	packages_model "github.com/hanzoai/git/models/packages"
+	arch_module "github.com/hanzoai/git/modules/packages/arch"
 )
 
 // GetRepositories gets all available repositories

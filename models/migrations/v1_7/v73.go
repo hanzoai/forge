@@ -3,7 +3,7 @@
 
 package v1_7
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddMustChangePassword(x db.EngineMigration) error {
 	// User see models/user.go

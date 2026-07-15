@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/packages"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/validation"
+	"github.com/hanzoai/git/modules/packages"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/validation"
 
 	"github.com/klauspost/compress/zstd"
 	"github.com/ulikunitz/xz"

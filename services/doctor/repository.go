@@ -6,10 +6,10 @@ package doctor
 import (
 	"context"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/storage"
-	repo_service "gitea.dev/services/repository"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/storage"
+	repo_service "github.com/hanzoai/git/services/repository"
 
 	"xorm.io/builder"
 )

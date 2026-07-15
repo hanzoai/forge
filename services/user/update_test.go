@@ -6,11 +6,11 @@ package user
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	password_module "gitea.dev/modules/auth/password"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/structs"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	password_module "github.com/hanzoai/git/modules/auth/password"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/structs"
 
 	"github.com/stretchr/testify/assert"
 )

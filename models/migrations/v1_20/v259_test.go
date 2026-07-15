@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.dev/models/migrations/migrationtest"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
 
 	"github.com/stretchr/testify/assert"
 )

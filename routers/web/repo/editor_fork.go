@@ -6,9 +6,9 @@ package repo
 import (
 	"net/http"
 
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
-	repo_service "gitea.dev/services/repository"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
+	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 const tplEditorFork templates.TplName = "repo/editor/fork"

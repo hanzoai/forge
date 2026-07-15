@@ -6,13 +6,13 @@ package misc
 import (
 	"net/http"
 
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/middleware"
-	"gitea.dev/services/context"
-	user_service "gitea.dev/services/user"
-	"gitea.dev/services/webtheme"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/middleware"
+	"github.com/hanzoai/git/services/context"
+	user_service "github.com/hanzoai/git/services/user"
+	"github.com/hanzoai/git/services/webtheme"
 )
 
 func WebThemeList(ctx *context.Context) {

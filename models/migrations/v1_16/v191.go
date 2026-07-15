@@ -4,8 +4,8 @@
 package v1_16
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func AlterIssueAndCommentTextFieldsToLongText(x db.EngineMigration) error {

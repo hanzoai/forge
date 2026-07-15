@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.dev/modules/highlight"
+	"github.com/hanzoai/git/modules/highlight"
 
 	"github.com/stretchr/testify/assert"
 )

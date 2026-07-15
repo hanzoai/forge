@@ -9,7 +9,7 @@ import (
 	"path"
 	"strings"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 
 	"golang.org/x/mod/semver"
 )

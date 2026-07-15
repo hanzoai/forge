@@ -7,8 +7,8 @@ import (
 	"context"
 	"errors"
 
-	"gitea.dev/modules/indexer"
-	"gitea.dev/modules/indexer/internal"
+	"github.com/hanzoai/git/modules/indexer"
+	"github.com/hanzoai/git/modules/indexer/internal"
 )
 
 // Indexer defines an interface to indexer issues contents

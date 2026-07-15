@@ -6,10 +6,10 @@ package setting
 import (
 	"net/http"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	shared_user "gitea.dev/routers/web/shared/user"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	shared_user "github.com/hanzoai/git/routers/web/shared/user"
+	"github.com/hanzoai/git/services/context"
 )
 
 const (

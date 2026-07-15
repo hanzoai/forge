@@ -13,11 +13,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/routing"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/routing"
 )
 
 const viteDevPortFile = "public/assets/.vite/dev-port"

@@ -8,9 +8,9 @@ package private
 import (
 	"net/http"
 
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/private"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/services/context"
 )
 
 // Restart is not implemented for Windows based servers as they can't fork

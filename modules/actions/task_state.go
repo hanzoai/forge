@@ -4,7 +4,7 @@
 package actions
 
 import (
-	actions_model "gitea.dev/models/actions"
+	actions_model "github.com/hanzoai/git/models/actions"
 )
 
 const (

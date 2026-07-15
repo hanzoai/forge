@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	auth_model "gitea.dev/models/auth"
-	"gitea.dev/models/unittest"
+	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/unittest"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/pquerna/otp/totp"

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ObjectCache provides thread-safe cache operations.

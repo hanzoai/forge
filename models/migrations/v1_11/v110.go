@@ -4,7 +4,7 @@
 package v1_11
 
 import (
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 
 	"xorm.io/xorm/schemas"
 )

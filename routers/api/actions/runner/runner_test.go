@@ -6,8 +6,8 @@ package runner
 import (
 	"testing"
 
-	runnerv1 "gitea.dev/actions-proto-go/runner/v1"
-	actions_model "gitea.dev/models/actions"
+	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
+	actions_model "github.com/hanzoai/git/models/actions"
 
 	"github.com/stretchr/testify/assert"
 )

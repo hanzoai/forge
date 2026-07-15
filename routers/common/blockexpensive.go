@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"strings"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/web/middleware"
-	"gitea.dev/modules/web/routing"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/web/middleware"
+	"github.com/hanzoai/git/modules/web/routing"
 
 	"github.com/go-chi/chi/v5"
 )

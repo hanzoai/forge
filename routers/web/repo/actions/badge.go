@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/modules/badge"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/modules/badge"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
 )
 
 func GetWorkflowBadge(ctx *context.Context) {

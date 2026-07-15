@@ -10,7 +10,7 @@ import (
 	"errors"
 	"sync"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/lib/pq"
 	"xorm.io/xorm/dialects"

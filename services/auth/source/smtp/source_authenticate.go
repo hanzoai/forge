@@ -10,10 +10,10 @@ import (
 	"net/textproto"
 	"strings"
 
-	auth_model "gitea.dev/models/auth"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/util"
+	auth_model "github.com/hanzoai/git/models/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // Authenticate queries if the provided login/password is authenticates against the SMTP server

@@ -6,11 +6,11 @@ package repo
 import (
 	"net/http"
 
-	repo_model "gitea.dev/models/repo"
-	unit_model "gitea.dev/models/unit"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	release_service "gitea.dev/services/release"
+	repo_model "github.com/hanzoai/git/models/repo"
+	unit_model "github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	release_service "github.com/hanzoai/git/services/release"
 )
 
 // GetReleaseByTag get a single release of a repository by tag name

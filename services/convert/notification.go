@@ -7,10 +7,10 @@ import (
 	"context"
 	"net/url"
 
-	activities_model "gitea.dev/models/activities"
-	access_model "gitea.dev/models/perm/access"
-	"gitea.dev/modules/log"
-	api "gitea.dev/modules/structs"
+	activities_model "github.com/hanzoai/git/models/activities"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	"github.com/hanzoai/git/modules/log"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 // ToNotificationThread convert a Notification to api.NotificationThread

@@ -6,9 +6,9 @@ package integration
 import (
 	"testing"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/models/unittest"
-	"gitea.dev/tests"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

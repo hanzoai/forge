@@ -5,7 +5,7 @@
 package git
 
 import (
-	"gitea.dev/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/git/gitcmd"
 )
 
 // BranchPrefix base dir of the branch information file store on git

@@ -7,7 +7,7 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 
 	"golang.org/x/crypto/argon2"
 )

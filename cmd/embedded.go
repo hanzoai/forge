@@ -11,14 +11,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitea.dev/modules/assetfs"
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/options"
-	"gitea.dev/modules/public"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/assetfs"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/options"
+	"github.com/hanzoai/git/modules/public"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/modules/util"
 
 	"github.com/urfave/cli/v3"
 )

@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"io"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // DummySender Sender sendmail mail sender

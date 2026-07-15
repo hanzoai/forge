@@ -3,7 +3,7 @@
 
 package v1_21
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddTriggerEventToActionRun(x db.EngineMigration) error {
 	type ActionRun struct {

@@ -6,16 +6,16 @@ package issues
 import (
 	"testing"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/issues"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
 
-	_ "gitea.dev/models"
-	_ "gitea.dev/models/actions"
-	_ "gitea.dev/models/activities"
+	_ "github.com/hanzoai/git/models"
+	_ "github.com/hanzoai/git/models/actions"
+	_ "github.com/hanzoai/git/models/activities"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

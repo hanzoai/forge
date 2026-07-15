@@ -25,7 +25,7 @@ import (
 	"sort"
 	"strings"
 
-	"gitea.dev/build/openapi3gen"
+	"github.com/hanzoai/git/build/openapi3gen"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )

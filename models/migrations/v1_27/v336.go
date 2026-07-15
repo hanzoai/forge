@@ -4,8 +4,8 @@
 package v1_27
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 func AddActionRunJobSummaryTable(x db.EngineMigration) error {

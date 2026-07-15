@@ -10,13 +10,13 @@ import (
 	"os"
 	"strings"
 
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/queue"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	notify_service "gitea.dev/services/notify"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/queue"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	notify_service "github.com/hanzoai/git/services/notify"
 )
 
 func initGlobalRunnerToken(ctx context.Context) error {

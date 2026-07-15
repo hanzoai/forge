@@ -10,10 +10,10 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"gitea.dev/models/perm"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/perm"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // Type is Unit's Type

@@ -4,8 +4,8 @@
 package v1_13
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
 )
 
 func RecalculateStars(x db.EngineMigration) (err error) {

@@ -14,10 +14,10 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 
 	"strk.kbt.io/projects/go/libravatar"
 	"xorm.io/builder"

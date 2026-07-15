@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"strings"
 
-	"gitea.dev/models/auth"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/auth/pam"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/auth/pam"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/google/uuid"
 )

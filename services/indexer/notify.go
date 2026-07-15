@@ -6,16 +6,16 @@ package indexer
 import (
 	"context"
 
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	code_indexer "gitea.dev/modules/indexer/code"
-	issue_indexer "gitea.dev/modules/indexer/issues"
-	stats_indexer "gitea.dev/modules/indexer/stats"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/repository"
-	"gitea.dev/modules/setting"
-	notify_service "gitea.dev/services/notify"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	code_indexer "github.com/hanzoai/git/modules/indexer/code"
+	issue_indexer "github.com/hanzoai/git/modules/indexer/issues"
+	stats_indexer "github.com/hanzoai/git/modules/indexer/stats"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/repository"
+	"github.com/hanzoai/git/modules/setting"
+	notify_service "github.com/hanzoai/git/services/notify"
 )
 
 type indexerNotifier struct {

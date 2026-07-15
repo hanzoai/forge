@@ -11,8 +11,8 @@ import (
 	"io"
 	"os"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/storage"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/storage"
 )
 
 var (

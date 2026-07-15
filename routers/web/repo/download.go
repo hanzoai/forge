@@ -7,16 +7,16 @@ package repo
 import (
 	"time"
 
-	auth_model "gitea.dev/models/auth"
-	git_model "gitea.dev/models/git"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/httpcache"
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/lfs"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
-	"gitea.dev/routers/common"
-	"gitea.dev/services/context"
+	auth_model "github.com/hanzoai/git/models/auth"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/httpcache"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/lfs"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
+	"github.com/hanzoai/git/routers/common"
+	"github.com/hanzoai/git/services/context"
 )
 
 func checkDownloadTokenScope(ctx *context.Context) bool {

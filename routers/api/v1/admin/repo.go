@@ -4,10 +4,10 @@
 package admin
 
 import (
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/api/v1/repo"
-	"gitea.dev/services/context"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/api/v1/repo"
+	"github.com/hanzoai/git/services/context"
 )
 
 // CreateRepo api for creating a repository

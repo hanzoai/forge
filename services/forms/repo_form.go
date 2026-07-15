@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"strings"
 
-	issues_model "gitea.dev/models/issues"
-	project_model "gitea.dev/models/project"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web/middleware"
-	"gitea.dev/services/context"
-	"gitea.dev/services/webhook"
+	issues_model "github.com/hanzoai/git/models/issues"
+	project_model "github.com/hanzoai/git/models/project"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web/middleware"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/webhook"
 
 	"gitea.com/go-chi/binding"
 )

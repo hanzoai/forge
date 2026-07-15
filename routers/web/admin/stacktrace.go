@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"runtime"
 
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
 )
 
 func monitorTraceCommon(ctx *context.Context) {

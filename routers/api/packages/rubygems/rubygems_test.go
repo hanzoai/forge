@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	rubygems_module "gitea.dev/modules/packages/rubygems"
+	rubygems_module "github.com/hanzoai/git/modules/packages/rubygems"
 
 	"github.com/stretchr/testify/assert"
 )

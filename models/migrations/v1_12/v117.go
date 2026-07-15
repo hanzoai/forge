@@ -3,7 +3,7 @@
 
 package v1_12
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddBlockOnRejectedReviews(x db.EngineMigration) error {
 	type ProtectedBranch struct {

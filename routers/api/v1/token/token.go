@@ -7,12 +7,12 @@ import (
 	"errors"
 	"net/http"
 
-	auth_model "gitea.dev/models/auth"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/auth/httpauth"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/context"
+	auth_model "github.com/hanzoai/git/models/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/auth/httpauth"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/context"
 )
 
 // GetCurrentToken returns metadata about the currently authenticated token.

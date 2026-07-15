@@ -6,9 +6,9 @@ package asymkey
 import (
 	"context"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
 )
 
 // DeletePublicKey deletes SSH key information both in database and authorized_keys file.

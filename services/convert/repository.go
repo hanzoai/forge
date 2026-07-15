@@ -7,15 +7,15 @@ import (
 	"context"
 	"time"
 
-	"gitea.dev/models/db"
-	git_model "gitea.dev/models/git"
-	"gitea.dev/models/perm"
-	access_model "gitea.dev/models/perm/access"
-	repo_model "gitea.dev/models/repo"
-	unit_model "gitea.dev/models/unit"
-	"gitea.dev/modules/log"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/models/perm"
+	access_model "github.com/hanzoai/git/models/perm/access"
+	repo_model "github.com/hanzoai/git/models/repo"
+	unit_model "github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/modules/log"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ToRepo converts a Repository to api.Repository

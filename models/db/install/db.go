@@ -6,8 +6,8 @@ package install
 import (
 	"context"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // CheckDatabaseConnection checks the database connection

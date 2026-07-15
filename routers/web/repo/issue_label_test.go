@@ -9,14 +9,14 @@ import (
 	"strings"
 	"testing"
 
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/repository"
-	"gitea.dev/modules/test"
-	"gitea.dev/modules/web"
-	"gitea.dev/services/contexttest"
-	"gitea.dev/services/forms"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/repository"
+	"github.com/hanzoai/git/modules/test"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/services/contexttest"
+	"github.com/hanzoai/git/services/forms"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 var defaultFileBlockSize int64 = 32 * 1024

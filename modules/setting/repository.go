@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // enumerates all the policy repository creating

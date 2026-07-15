@@ -13,11 +13,11 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/markup/common"
-	"gitea.dev/modules/translation"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/markup/common"
+	"github.com/hanzoai/git/modules/translation"
+	"github.com/hanzoai/git/modules/util"
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"

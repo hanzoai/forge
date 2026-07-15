@@ -6,12 +6,12 @@ package webhook
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/hostmatcher"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/hostmatcher"
+	"github.com/hanzoai/git/modules/setting"
 
-	_ "gitea.dev/models"
-	_ "gitea.dev/models/actions"
+	_ "github.com/hanzoai/git/models"
+	_ "github.com/hanzoai/git/models/actions"
 )
 
 func TestMain(m *testing.M) {

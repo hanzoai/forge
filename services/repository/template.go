@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"strings"
 
-	"gitea.dev/models/db"
-	git_model "gitea.dev/models/git"
-	issues_model "gitea.dev/models/issues"
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/log"
-	notify_service "gitea.dev/services/notify"
+	"github.com/hanzoai/git/models/db"
+	git_model "github.com/hanzoai/git/models/git"
+	issues_model "github.com/hanzoai/git/models/issues"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/log"
+	notify_service "github.com/hanzoai/git/services/notify"
 )
 
 // GenerateIssueLabels generates issue labels from a template repository

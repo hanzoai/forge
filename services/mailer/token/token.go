@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/util"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // A token is a verifiable container describing an action.

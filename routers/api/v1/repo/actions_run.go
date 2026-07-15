@@ -4,9 +4,9 @@
 package repo
 
 import (
-	actions_model "gitea.dev/models/actions"
-	"gitea.dev/routers/common"
-	"gitea.dev/services/context"
+	actions_model "github.com/hanzoai/git/models/actions"
+	"github.com/hanzoai/git/routers/common"
+	"github.com/hanzoai/git/services/context"
 )
 
 func DownloadActionsRunJobLogs(ctx *context.APIContext) {

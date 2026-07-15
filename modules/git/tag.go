@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"sort"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // Tag represents a Git tag.

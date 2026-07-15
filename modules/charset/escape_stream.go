@@ -11,8 +11,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/translation"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/translation"
 )
 
 type htmlChunkReader struct {

@@ -7,7 +7,7 @@ import (
 	"html/template"
 	"strings"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 type RenderedIconPool struct {

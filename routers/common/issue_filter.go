@@ -4,7 +4,7 @@
 package common
 
 import (
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/modules/optional"
 )
 
 func ParseIssueFilterStateIsClosed(state string) optional.Option[bool] {

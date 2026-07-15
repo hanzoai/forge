@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/modules/indexer/internal"
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/indexer/internal"
+	"github.com/hanzoai/git/modules/json"
 )
 
 var _ internal.Indexer = &Indexer{}

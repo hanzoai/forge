@@ -8,13 +8,13 @@ import (
 	"errors"
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/migrations"
-	system_model "gitea.dev/models/system"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/setting/config"
-	"gitea.dev/services/versioned_migration"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/migrations"
+	system_model "github.com/hanzoai/git/models/system"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/setting/config"
+	"github.com/hanzoai/git/services/versioned_migration"
 )
 
 // InitDBEngine In case of problems connecting to DB, retry connection. Eg, PGSQL in Docker Container on Synology

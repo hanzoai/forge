@@ -13,16 +13,16 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/models/db"
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/modules/optional"
-	packages_module "gitea.dev/modules/packages"
-	chef_module "gitea.dev/modules/packages/chef"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	"github.com/hanzoai/git/models/db"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/modules/optional"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	chef_module "github.com/hanzoai/git/modules/packages/chef"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 func apiError(ctx *context.Context, status int, obj any) {

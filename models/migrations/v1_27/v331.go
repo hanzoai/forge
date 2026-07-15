@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/migrations/base"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/migrations/base"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"xorm.io/xorm"
 )

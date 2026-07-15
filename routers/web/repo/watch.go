@@ -6,9 +6,9 @@ package repo
 import (
 	"net/http"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
 )
 
 const tplWatchUnwatch templates.TplName = "repo/header/watch"

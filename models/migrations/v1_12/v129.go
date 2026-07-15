@@ -3,7 +3,7 @@
 
 package v1_12
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func PurgeUnusedDependencies(x db.EngineMigration) error {
 	if _, err := x.Exec("DELETE FROM issue_dependency WHERE issue_id NOT IN (SELECT id FROM issue)"); err != nil {

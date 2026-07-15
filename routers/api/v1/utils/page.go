@@ -4,9 +4,9 @@
 package utils
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
 )
 
 // GetListOptions returns list options using the page and limit parameters

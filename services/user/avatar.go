@@ -10,11 +10,11 @@ import (
 	"io"
 	"os"
 
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/avatar"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/storage"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/avatar"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/storage"
 )
 
 // UploadAvatar saves custom avatar for user.

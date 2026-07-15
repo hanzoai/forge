@@ -13,11 +13,11 @@ import (
 	"slices"
 	"sort"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/openidConnect"

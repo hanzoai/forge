@@ -4,11 +4,11 @@
 package setting
 
 import (
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
-	repo_service "gitea.dev/services/repository"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
+	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 // AdoptOrDeleteRepository adopts or deletes a repository

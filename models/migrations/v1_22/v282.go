@@ -3,7 +3,7 @@
 
 package v1_22
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddIndexToPullAutoMergeDoerID(x db.EngineMigration) error {
 	type PullAutoMerge struct {

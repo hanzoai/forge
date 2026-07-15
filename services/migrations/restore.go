@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	base "gitea.dev/modules/migration"
-	"gitea.dev/modules/util"
+	base "github.com/hanzoai/git/modules/migration"
+	"github.com/hanzoai/git/modules/util"
 
 	"go.yaml.in/yaml/v4"
 )

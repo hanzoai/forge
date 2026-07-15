@@ -4,8 +4,8 @@
 package swagger
 
 import (
-	activities_model "gitea.dev/models/activities"
-	api "gitea.dev/modules/structs"
+	activities_model "github.com/hanzoai/git/models/activities"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 // User

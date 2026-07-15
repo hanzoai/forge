@@ -7,13 +7,13 @@ package mailer
 import (
 	"context"
 
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/queue"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/templates"
-	sender_service "gitea.dev/services/mailer/sender"
-	notify_service "gitea.dev/services/notify"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/queue"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/templates"
+	sender_service "github.com/hanzoai/git/services/mailer/sender"
+	notify_service "github.com/hanzoai/git/services/notify"
 )
 
 var mailQueue *queue.WorkerPoolQueue[*sender_service.Message]

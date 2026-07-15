@@ -3,7 +3,7 @@
 
 package internal
 
-import "gitea.dev/modules/timeutil"
+import "github.com/hanzoai/git/modules/timeutil"
 
 type FileUpdate struct {
 	Filename string

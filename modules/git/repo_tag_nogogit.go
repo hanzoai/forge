@@ -10,7 +10,7 @@ import (
 	"errors"
 	"io"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // IsTagExist returns true if given tag exists in the repository.

@@ -4,8 +4,8 @@
 package v1_22
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/models/perm"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/perm"
 )
 
 func AddRepoUnitEveryoneAccessMode(x db.EngineMigration) error {

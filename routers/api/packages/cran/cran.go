@@ -11,14 +11,14 @@ import (
 	"net/http"
 	"strings"
 
-	packages_model "gitea.dev/models/packages"
-	cran_model "gitea.dev/models/packages/cran"
-	packages_module "gitea.dev/modules/packages"
-	cran_module "gitea.dev/modules/packages/cran"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	packages_model "github.com/hanzoai/git/models/packages"
+	cran_model "github.com/hanzoai/git/models/packages/cran"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	cran_module "github.com/hanzoai/git/modules/packages/cran"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 func apiError(ctx *context.Context, status int, obj any) {

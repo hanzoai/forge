@@ -12,10 +12,10 @@ import (
 	"os"
 	"path"
 
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/public"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/public"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // ErrURLNotSupported represents url is not supported

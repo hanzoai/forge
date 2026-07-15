@@ -14,11 +14,11 @@ import (
 	"sync"
 	"time"
 
-	"gitea.dev/modules/httplib"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/proxyprotocol"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/httplib"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/proxyprotocol"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // Response is used for internal request response (for user message and error message)

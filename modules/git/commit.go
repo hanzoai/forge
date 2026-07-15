@@ -11,8 +11,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // Commit represents a git commit.

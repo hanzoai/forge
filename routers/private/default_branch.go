@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"net/http"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/private"
-	gitea_context "gitea.dev/services/context"
-	repo_service "gitea.dev/services/repository"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/private"
+	gitea_context "github.com/hanzoai/git/services/context"
+	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 // SetDefaultBranch updates the default branch

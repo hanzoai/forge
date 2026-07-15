@@ -6,16 +6,16 @@ package doctor
 import (
 	"context"
 
-	actions_model "gitea.dev/models/actions"
-	activities_model "gitea.dev/models/activities"
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/models/migrations"
-	repo_model "gitea.dev/models/repo"
-	secret_model "gitea.dev/models/secret"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	issue_service "gitea.dev/services/issue"
+	actions_model "github.com/hanzoai/git/models/actions"
+	activities_model "github.com/hanzoai/git/models/activities"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/models/migrations"
+	repo_model "github.com/hanzoai/git/models/repo"
+	secret_model "github.com/hanzoai/git/models/secret"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	issue_service "github.com/hanzoai/git/services/issue"
 )
 
 type consistencyCheck struct {

@@ -6,7 +6,7 @@ package workflowpattern
 import (
 	"strings"
 
-	"gitea.dev/modules/glob"
+	"github.com/hanzoai/git/modules/glob"
 )
 
 type WorkflowPattern struct {

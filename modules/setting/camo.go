@@ -6,7 +6,7 @@ package setting
 import (
 	"strconv"
 
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/log"
 )
 
 var Camo = struct {

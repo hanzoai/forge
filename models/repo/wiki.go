@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"strings"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/util"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ErrWikiAlreadyExist represents a "WikiAlreadyExist" kind of error.

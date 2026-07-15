@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // unknownAccessTokenScope represents the scope for an access token that isn't

@@ -8,13 +8,13 @@ import (
 	"html"
 	"net/http"
 
-	"gitea.dev/modules/public"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/web"
-	"gitea.dev/routers/common"
-	"gitea.dev/routers/web/healthcheck"
-	"gitea.dev/routers/web/misc"
-	"gitea.dev/services/forms"
+	"github.com/hanzoai/git/modules/public"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/routers/common"
+	"github.com/hanzoai/git/routers/web/healthcheck"
+	"github.com/hanzoai/git/routers/web/misc"
+	"github.com/hanzoai/git/services/forms"
 )
 
 // Routes registers the installation routes

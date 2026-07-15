@@ -4,8 +4,8 @@
 package v1_15
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/models/migrations/base"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/migrations/base"
 )
 
 func DropWebhookColumns(x db.EngineMigration) error {

@@ -6,15 +6,15 @@ package org
 import (
 	"errors"
 
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/label"
-	repo_module "gitea.dev/modules/repository"
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/web"
-	shared_label "gitea.dev/routers/web/shared/label"
-	"gitea.dev/services/context"
-	"gitea.dev/services/forms"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/label"
+	repo_module "github.com/hanzoai/git/modules/repository"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/web"
+	shared_label "github.com/hanzoai/git/routers/web/shared/label"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/forms"
 )
 
 // RetrieveLabels find all the labels of an organization

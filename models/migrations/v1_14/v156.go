@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // Copy paste from models/repo.go because we cannot import models package

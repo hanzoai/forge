@@ -3,7 +3,7 @@
 
 package v1_10
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddCrossReferenceColumns(x db.EngineMigration) error {
 	// Comment see models/comment.go

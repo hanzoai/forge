@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func UpdateMigrationServiceTypes(x db.EngineMigration) error {

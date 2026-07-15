@@ -24,10 +24,10 @@ import (
 	"strings"
 	"time"
 
-	user_model "gitea.dev/models/user"
-	chef_module "gitea.dev/modules/packages/chef"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	chef_module "github.com/hanzoai/git/modules/packages/chef"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/auth"
 )
 
 const (

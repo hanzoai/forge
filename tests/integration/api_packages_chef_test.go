@@ -25,13 +25,13 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/models/packages"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	chef_module "gitea.dev/modules/packages/chef"
-	"gitea.dev/modules/setting"
-	chef_router "gitea.dev/routers/api/packages/chef"
-	"gitea.dev/tests"
+	"github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	chef_module "github.com/hanzoai/git/modules/packages/chef"
+	"github.com/hanzoai/git/modules/setting"
+	chef_router "github.com/hanzoai/git/routers/api/packages/chef"
+	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
 )

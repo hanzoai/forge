@@ -12,15 +12,15 @@ import (
 	"strings"
 	"time"
 
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/public"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/svg"
-	"gitea.dev/modules/templates/eval"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/gitdiff"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/public"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/svg"
+	"github.com/hanzoai/git/modules/templates/eval"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/gitdiff"
 )
 
 func newFuncMapWebPage() template.FuncMap {

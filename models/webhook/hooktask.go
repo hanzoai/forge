@@ -8,12 +8,12 @@ import (
 	"errors"
 	"time"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/timeutil"
-	webhook_module "gitea.dev/modules/webhook"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
+	webhook_module "github.com/hanzoai/git/modules/webhook"
 
 	gouuid "github.com/google/uuid"
 	"xorm.io/builder"

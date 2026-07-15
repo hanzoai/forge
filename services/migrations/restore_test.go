@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/modules/optional"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

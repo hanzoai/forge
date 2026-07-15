@@ -6,10 +6,10 @@ package repo
 import (
 	"slices"
 
-	"gitea.dev/models/perm"
-	"gitea.dev/models/unit"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/perm"
+	"github.com/hanzoai/git/models/unit"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // ActionsTokenPermissionMode defines the default permission mode for Actions tokens

@@ -6,8 +6,8 @@ package web
 import (
 	"html/template"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/services/context"
 )
 
 // SwaggerV1Json render swagger v1 json

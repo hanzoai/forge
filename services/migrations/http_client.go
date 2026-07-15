@@ -7,10 +7,10 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"gitea.dev/modules/hostmatcher"
-	"gitea.dev/modules/proxy"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/hostmatcher"
+	"github.com/hanzoai/git/modules/proxy"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // migrationHTTPClient is the shared migration client. Callers that would otherwise build a client per

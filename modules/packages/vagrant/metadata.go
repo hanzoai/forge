@@ -9,8 +9,8 @@ import (
 	"io"
 	"strings"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/validation"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/validation"
 )
 
 const (

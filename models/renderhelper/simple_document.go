@@ -6,7 +6,7 @@ package renderhelper
 import (
 	"context"
 
-	"gitea.dev/modules/markup"
+	"github.com/hanzoai/git/modules/markup"
 )
 
 type SimpleDocument struct {

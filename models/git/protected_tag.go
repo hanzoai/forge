@@ -9,10 +9,10 @@ import (
 	"slices"
 	"strings"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/organization"
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/organization"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"xorm.io/builder"
 )

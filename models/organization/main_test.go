@@ -6,14 +6,14 @@ package organization_test
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
+	"github.com/hanzoai/git/models/unittest"
 
-	_ "gitea.dev/models"
-	_ "gitea.dev/models/actions"
-	_ "gitea.dev/models/activities"
-	_ "gitea.dev/models/organization"
-	_ "gitea.dev/models/repo"
-	_ "gitea.dev/models/user"
+	_ "github.com/hanzoai/git/models"
+	_ "github.com/hanzoai/git/models/actions"
+	_ "github.com/hanzoai/git/models/activities"
+	_ "github.com/hanzoai/git/models/organization"
+	_ "github.com/hanzoai/git/models/repo"
+	_ "github.com/hanzoai/git/models/user"
 )
 
 func TestMain(m *testing.M) {

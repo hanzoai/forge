@@ -4,7 +4,7 @@
 
 package paginator
 
-import "gitea.dev/modules/util"
+import "github.com/hanzoai/git/modules/util"
 
 /*
 In template:

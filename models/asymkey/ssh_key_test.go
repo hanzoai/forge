@@ -12,8 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.dev/models/unittest"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/42wim/sshsig"
 	"github.com/stretchr/testify/assert"

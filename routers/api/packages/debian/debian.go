@@ -11,16 +11,16 @@ import (
 	"net/http"
 	"strings"
 
-	"gitea.dev/models/db"
-	packages_model "gitea.dev/models/packages"
-	packages_module "gitea.dev/modules/packages"
-	debian_module "gitea.dev/modules/packages/debian"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	notify_service "gitea.dev/services/notify"
-	packages_service "gitea.dev/services/packages"
-	debian_service "gitea.dev/services/packages/debian"
+	"github.com/hanzoai/git/models/db"
+	packages_model "github.com/hanzoai/git/models/packages"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	debian_module "github.com/hanzoai/git/modules/packages/debian"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	notify_service "github.com/hanzoai/git/services/notify"
+	packages_service "github.com/hanzoai/git/services/packages"
+	debian_service "github.com/hanzoai/git/services/packages/debian"
 )
 
 func apiError(ctx *context.Context, status int, obj any) {

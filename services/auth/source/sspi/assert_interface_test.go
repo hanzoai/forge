@@ -4,8 +4,8 @@
 package sspi_test
 
 import (
-	"gitea.dev/models/auth"
-	"gitea.dev/services/auth/source/sspi"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/services/auth/source/sspi"
 )
 
 // This test file exists to assert that our Source exposes the interfaces that we expect

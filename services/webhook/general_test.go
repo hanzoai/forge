@@ -6,7 +6,7 @@ package webhook
 import (
 	"testing"
 
-	api "gitea.dev/modules/structs"
+	api "github.com/hanzoai/git/modules/structs"
 
 	"github.com/stretchr/testify/assert"
 )

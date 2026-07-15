@@ -7,17 +7,17 @@ import (
 	"context"
 	"strings"
 
-	asymkey_model "gitea.dev/models/asymkey"
-	"gitea.dev/models/db"
-	"gitea.dev/models/organization"
-	user_model "gitea.dev/models/user"
-	auth_module "gitea.dev/modules/auth"
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/optional"
-	asymkey_service "gitea.dev/services/asymkey"
-	source_service "gitea.dev/services/auth/source"
-	user_service "gitea.dev/services/user"
+	asymkey_model "github.com/hanzoai/git/models/asymkey"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/organization"
+	user_model "github.com/hanzoai/git/models/user"
+	auth_module "github.com/hanzoai/git/modules/auth"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/optional"
+	asymkey_service "github.com/hanzoai/git/services/asymkey"
+	source_service "github.com/hanzoai/git/services/auth/source"
+	user_service "github.com/hanzoai/git/services/user"
 )
 
 // Sync causes this ldap source to synchronize its users with the db

@@ -4,7 +4,7 @@
 package db
 
 import (
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 
 	"xorm.io/xorm/schemas"
 )

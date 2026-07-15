@@ -9,9 +9,9 @@ import (
 	"html/template"
 	"strings"
 
-	"gitea.dev/modules/highlight"
-	"gitea.dev/modules/indexer/code/internal"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/modules/highlight"
+	"github.com/hanzoai/git/modules/indexer/code/internal"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 // Result a search result to display

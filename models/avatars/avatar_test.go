@@ -6,10 +6,10 @@ package avatars_test
 import (
 	"testing"
 
-	avatars_model "gitea.dev/models/avatars"
-	system_model "gitea.dev/models/system"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/setting/config"
+	avatars_model "github.com/hanzoai/git/models/avatars"
+	system_model "github.com/hanzoai/git/models/system"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/setting/config"
 
 	"github.com/stretchr/testify/assert"
 )

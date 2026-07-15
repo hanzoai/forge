@@ -8,14 +8,14 @@ import (
 	"net/url"
 	"time"
 
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/log"
-	api "gitea.dev/modules/structs"
-	ctx "gitea.dev/services/context"
-	"gitea.dev/services/gitdiff"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/log"
+	api "github.com/hanzoai/git/modules/structs"
+	ctx "github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/gitdiff"
 )
 
 // ToCommitUser convert a git.Signature to an api.CommitUser

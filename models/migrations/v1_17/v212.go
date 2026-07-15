@@ -4,8 +4,8 @@
 package v1_17
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 func AddPackageTables(x db.EngineMigration) error {

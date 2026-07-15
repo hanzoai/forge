@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/glob"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/glob"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 type globalVarsStruct struct {

@@ -6,7 +6,7 @@ package v1_15
 import (
 	"strings"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func AddPrimaryEmail2EmailAddress(x db.EngineMigration) error {

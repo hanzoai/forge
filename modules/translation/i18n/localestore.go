@@ -10,8 +10,8 @@ import (
 	"html/template"
 	"slices"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // This file implements the static LocaleStore that will not watch for changes

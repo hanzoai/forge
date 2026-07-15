@@ -6,7 +6,7 @@ package oauth2_provider
 import (
 	"context"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // Init initializes the oauth source

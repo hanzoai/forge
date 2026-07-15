@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"os"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/private"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/private"
 
 	"github.com/urfave/cli/v3"
 )

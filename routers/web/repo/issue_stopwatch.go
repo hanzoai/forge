@@ -4,10 +4,10 @@
 package repo
 
 import (
-	"gitea.dev/models/db"
-	issues_model "gitea.dev/models/issues"
-	"gitea.dev/modules/eventsource"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/models/db"
+	issues_model "github.com/hanzoai/git/models/issues"
+	"github.com/hanzoai/git/modules/eventsource"
+	"github.com/hanzoai/git/services/context"
 )
 
 // IssueStartStopwatch creates a stopwatch for the given issue.

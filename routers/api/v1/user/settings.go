@@ -6,12 +6,12 @@ package user
 import (
 	"net/http"
 
-	"gitea.dev/modules/optional"
-	api "gitea.dev/modules/structs"
-	"gitea.dev/modules/web"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	user_service "gitea.dev/services/user"
+	"github.com/hanzoai/git/modules/optional"
+	api "github.com/hanzoai/git/modules/structs"
+	"github.com/hanzoai/git/modules/web"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	user_service "github.com/hanzoai/git/services/user"
 )
 
 // GetUserSettings returns user settings

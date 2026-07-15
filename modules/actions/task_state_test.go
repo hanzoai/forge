@@ -6,7 +6,7 @@ package actions
 import (
 	"testing"
 
-	actions_model "gitea.dev/models/actions"
+	actions_model "github.com/hanzoai/git/models/actions"
 
 	"github.com/stretchr/testify/assert"
 )

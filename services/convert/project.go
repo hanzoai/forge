@@ -4,8 +4,8 @@
 package convert
 
 import (
-	project_model "gitea.dev/models/project"
-	api "gitea.dev/modules/structs"
+	project_model "github.com/hanzoai/git/models/project"
+	api "github.com/hanzoai/git/modules/structs"
 )
 
 // ToAPIProject converts a Project to API format

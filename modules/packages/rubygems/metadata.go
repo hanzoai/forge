@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"sync"
 
-	"gitea.dev/modules/util"
-	"gitea.dev/modules/validation"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/modules/validation"
 
 	"go.yaml.in/yaml/v4"
 )

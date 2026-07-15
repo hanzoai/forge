@@ -6,7 +6,7 @@ package v1_23
 import (
 	"testing"
 
-	"gitea.dev/models/migrations/migrationtest"
+	"github.com/hanzoai/git/models/migrations/migrationtest"
 )
 
 func TestMain(m *testing.M) {

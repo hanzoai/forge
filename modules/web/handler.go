@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"slices"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/web/routing"
-	"gitea.dev/modules/web/types"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/web/routing"
+	"github.com/hanzoai/git/modules/web/types"
 )
 
 var responseStatusProviders = map[reflect.Type]func(req *http.Request) types.ResponseStatusProvider{}

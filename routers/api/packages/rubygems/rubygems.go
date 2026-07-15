@@ -13,15 +13,15 @@ import (
 	"net/http"
 	"strings"
 
-	packages_model "gitea.dev/models/packages"
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/optional"
-	packages_module "gitea.dev/modules/packages"
-	rubygems_module "gitea.dev/modules/packages/rubygems"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	packages_model "github.com/hanzoai/git/models/packages"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/optional"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	rubygems_module "github.com/hanzoai/git/modules/packages/rubygems"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 func apiError(ctx *context.Context, status int, obj any) {

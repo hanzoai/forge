@@ -4,9 +4,9 @@
 package pull
 
 import (
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/log"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // doMergeStyleMerge merges the tracking branch into the current HEAD - which is assumed to be the staging branch (equal to the pr.BaseBranch)

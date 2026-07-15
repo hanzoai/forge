@@ -9,10 +9,10 @@ import (
 	"io"
 	"os"
 
-	packages_model "gitea.dev/models/packages"
-	packages_module "gitea.dev/modules/packages"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/tempdir"
+	packages_model "github.com/hanzoai/git/models/packages"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/tempdir"
 )
 
 var (

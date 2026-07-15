@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/web/types"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/web/types"
 )
 
 var (

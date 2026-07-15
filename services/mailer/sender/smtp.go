@@ -14,8 +14,8 @@ import (
 	"os"
 	"strings"
 
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // SMTPSender Sender SMTP mail sender

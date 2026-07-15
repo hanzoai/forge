@@ -7,7 +7,7 @@ package structs
 import (
 	"time"
 
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/json"
 )
 
 // User represents a user

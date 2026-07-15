@@ -7,10 +7,10 @@ import (
 	"context"
 	"strconv"
 
-	"gitea.dev/models/db"
-	"gitea.dev/models/renderhelper"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/markup/markdown"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/models/renderhelper"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/markup/markdown"
 
 	"xorm.io/builder"
 )

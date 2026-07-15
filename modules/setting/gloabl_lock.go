@@ -4,8 +4,8 @@
 package setting
 
 import (
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/nosql"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/nosql"
 )
 
 // GlobalLock represents configuration of global lock

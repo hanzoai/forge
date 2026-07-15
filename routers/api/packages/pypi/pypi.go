@@ -13,14 +13,14 @@ import (
 	"strings"
 	"unicode"
 
-	packages_model "gitea.dev/models/packages"
-	packages_module "gitea.dev/modules/packages"
-	pypi_module "gitea.dev/modules/packages/pypi"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/validation"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	packages_model "github.com/hanzoai/git/models/packages"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	pypi_module "github.com/hanzoai/git/modules/packages/pypi"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/validation"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 // https://peps.python.org/pep-0426/#name

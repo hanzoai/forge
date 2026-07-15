@@ -9,7 +9,7 @@ import (
 	"io"
 	"time"
 
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/json"
 )
 
 func wrapNewlines(w io.Writer, prefix, value []byte) (sum int64, err error) {

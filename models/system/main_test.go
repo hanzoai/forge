@@ -6,12 +6,12 @@ package system_test
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
+	"github.com/hanzoai/git/models/unittest"
 
-	_ "gitea.dev/models" // register models
-	_ "gitea.dev/models/actions"
-	_ "gitea.dev/models/activities"
-	_ "gitea.dev/models/system" // register models of system
+	_ "github.com/hanzoai/git/models" // register models
+	_ "github.com/hanzoai/git/models/actions"
+	_ "github.com/hanzoai/git/models/activities"
+	_ "github.com/hanzoai/git/models/system" // register models of system
 )
 
 func TestMain(m *testing.M) {

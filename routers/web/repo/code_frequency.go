@@ -7,9 +7,9 @@ import (
 	"errors"
 	"net/http"
 
-	"gitea.dev/modules/templates"
-	"gitea.dev/services/context"
-	contributors_service "gitea.dev/services/repository"
+	"github.com/hanzoai/git/modules/templates"
+	"github.com/hanzoai/git/services/context"
+	contributors_service "github.com/hanzoai/git/services/repository"
 )
 
 const (

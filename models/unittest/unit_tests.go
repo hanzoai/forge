@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

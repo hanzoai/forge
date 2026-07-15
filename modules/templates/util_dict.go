@@ -10,9 +10,9 @@ import (
 	"html/template"
 	"reflect"
 
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func dictMerge(base map[string]any, arg any) bool {

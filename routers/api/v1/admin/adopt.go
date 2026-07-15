@@ -6,12 +6,12 @@ package admin
 import (
 	"net/http"
 
-	repo_model "gitea.dev/models/repo"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/routers/api/v1/utils"
-	"gitea.dev/services/context"
-	repo_service "gitea.dev/services/repository"
+	repo_model "github.com/hanzoai/git/models/repo"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/routers/api/v1/utils"
+	"github.com/hanzoai/git/services/context"
+	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 // ListUnadoptedRepositories lists the unadopted repositories that match the provided names

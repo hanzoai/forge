@@ -6,9 +6,9 @@ package org
 import (
 	"context"
 
-	org_model "gitea.dev/models/organization"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/services/mailer"
+	org_model "github.com/hanzoai/git/models/organization"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/services/mailer"
 )
 
 // CreateTeamInvite make a persistent invite in db and mail it

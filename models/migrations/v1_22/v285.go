@@ -6,7 +6,7 @@ package v1_22
 import (
 	"time"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 
 	"xorm.io/xorm"
 )

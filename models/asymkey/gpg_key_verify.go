@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // This file provides functions relating verifying gpg keys

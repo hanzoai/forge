@@ -6,7 +6,7 @@ package v1_16
 import (
 	"fmt"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 func AddBranchProtectionUnprotectedFilesColumn(x db.EngineMigration) error {

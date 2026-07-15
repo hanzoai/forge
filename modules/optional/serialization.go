@@ -4,7 +4,7 @@
 package optional
 
 import (
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/json"
 
 	"go.yaml.in/yaml/v4"
 )

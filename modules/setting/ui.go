@@ -6,8 +6,8 @@ package setting
 import (
 	"time"
 
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/log"
 )
 
 // UI settings

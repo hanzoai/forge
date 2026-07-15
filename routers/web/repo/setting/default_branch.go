@@ -6,12 +6,12 @@ package setting
 import (
 	"net/http"
 
-	git_model "gitea.dev/models/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/routers/web/repo"
-	"gitea.dev/services/context"
-	repo_service "gitea.dev/services/repository"
+	git_model "github.com/hanzoai/git/models/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/routers/web/repo"
+	"github.com/hanzoai/git/services/context"
+	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 // SetDefaultBranchPost set default branch

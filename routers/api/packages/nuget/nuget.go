@@ -14,17 +14,17 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/models/db"
-	packages_model "gitea.dev/models/packages"
-	nuget_model "gitea.dev/models/packages/nuget"
-	"gitea.dev/modules/optional"
-	packages_module "gitea.dev/modules/packages"
-	nuget_module "gitea.dev/modules/packages/nuget"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	"github.com/hanzoai/git/models/db"
+	packages_model "github.com/hanzoai/git/models/packages"
+	nuget_model "github.com/hanzoai/git/models/packages/nuget"
+	"github.com/hanzoai/git/modules/optional"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	nuget_module "github.com/hanzoai/git/modules/packages/nuget"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 )
 
 func apiError(ctx *context.Context, status int, obj any) {

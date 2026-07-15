@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 func TestMain(m *testing.M) {

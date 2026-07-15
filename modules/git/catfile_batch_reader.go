@@ -15,9 +15,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type catFileBatchCommunicator struct {

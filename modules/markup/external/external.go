@@ -12,9 +12,9 @@ import (
 	"runtime"
 	"strings"
 
-	"gitea.dev/modules/markup"
-	"gitea.dev/modules/process"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/markup"
+	"github.com/hanzoai/git/modules/process"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/kballard/go-shellquote"
 )

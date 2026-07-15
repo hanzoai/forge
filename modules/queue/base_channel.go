@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"gitea.dev/modules/container"
+	"github.com/hanzoai/git/modules/container"
 )
 
 var errChannelClosed = errors.New("channel is closed")

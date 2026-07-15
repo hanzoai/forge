@@ -4,8 +4,8 @@
 package v1_9
 
 import (
-	"gitea.dev/models/db"
-	"gitea.dev/modules/timeutil"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 func AddUploaderIDForAttachment(x db.EngineMigration) error {

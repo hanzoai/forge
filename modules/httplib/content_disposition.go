@@ -7,7 +7,7 @@ import (
 	"mime"
 	"strings"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 type ContentDispositionType string

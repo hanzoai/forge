@@ -3,7 +3,7 @@
 
 package v1_15
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddKeyIsVerified(x db.EngineMigration) error {
 	type GPGKey struct {

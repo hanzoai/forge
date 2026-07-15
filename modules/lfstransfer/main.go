@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"gitea.dev/modules/lfstransfer/backend"
+	"github.com/hanzoai/git/modules/lfstransfer/backend"
 
 	"github.com/charmbracelet/git-lfs-transfer/transfer"
 )

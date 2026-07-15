@@ -3,7 +3,7 @@
 
 package v1_10
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func AddOriginalAuthorOnMigratedReleases(x db.EngineMigration) error {
 	type Release struct {

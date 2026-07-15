@@ -10,11 +10,11 @@ import (
 	"sort"
 	"strings"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/storage"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/storage"
 )
 
 // Check represents a Doctor check

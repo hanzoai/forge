@@ -11,7 +11,7 @@ import (
 	"slices"
 	"strings"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 // hookNames is a list of Git server hooks' name that are supported.

@@ -18,7 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/util"
 )
 
 func main() {

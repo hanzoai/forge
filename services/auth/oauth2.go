@@ -11,16 +11,16 @@ import (
 	"strings"
 	"time"
 
-	actions_model "gitea.dev/models/actions"
-	auth_model "gitea.dev/models/auth"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/auth/httpauth"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/modules/util"
-	"gitea.dev/services/actions"
-	"gitea.dev/services/oauth2_provider"
+	actions_model "github.com/hanzoai/git/models/actions"
+	auth_model "github.com/hanzoai/git/models/auth"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/auth/httpauth"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/modules/util"
+	"github.com/hanzoai/git/services/actions"
+	"github.com/hanzoai/git/services/oauth2_provider"
 )
 
 var _ Method = &OAuth2{}

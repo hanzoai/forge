@@ -6,9 +6,9 @@ package forms
 import (
 	"net/http"
 
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/web/middleware"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/web/middleware"
+	"github.com/hanzoai/git/services/context"
 
 	"gitea.com/go-chi/binding"
 )

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // ResourceIndex represents a resource index which could be used as issue/release and others

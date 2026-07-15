@@ -6,10 +6,10 @@ package v1_19
 import (
 	"fmt"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/secret"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/secret"
+	"github.com/hanzoai/git/modules/setting"
 
 	"xorm.io/builder"
 )

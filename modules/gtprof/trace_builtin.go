@@ -10,7 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitea.dev/modules/tailmsg"
+	"github.com/hanzoai/git/modules/tailmsg"
 )
 
 type traceBuiltinStarter struct{}

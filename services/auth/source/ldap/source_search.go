@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/container"
-	"gitea.dev/modules/log"
+	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/log"
 
 	"github.com/go-ldap/ldap/v3"
 )

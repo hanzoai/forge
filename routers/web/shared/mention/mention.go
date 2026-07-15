@@ -6,8 +6,8 @@ package mention
 import (
 	"context"
 
-	"gitea.dev/models/organization"
-	user_model "gitea.dev/models/user"
+	"github.com/hanzoai/git/models/organization"
+	user_model "github.com/hanzoai/git/models/user"
 )
 
 // Mention is the JSON structure returned by mention autocomplete endpoints.

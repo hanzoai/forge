@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	"gitea.dev/modules/indexer"
-	indexer_internal "gitea.dev/modules/indexer/internal"
-	inner_meilisearch "gitea.dev/modules/indexer/internal/meilisearch"
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/modules/indexer"
+	indexer_internal "github.com/hanzoai/git/modules/indexer/internal"
+	inner_meilisearch "github.com/hanzoai/git/modules/indexer/internal/meilisearch"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/json"
 
 	"github.com/meilisearch/meilisearch-go"
 )

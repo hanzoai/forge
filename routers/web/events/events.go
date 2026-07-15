@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	"gitea.dev/modules/eventsource"
-	"gitea.dev/modules/graceful"
-	"gitea.dev/modules/log"
-	"gitea.dev/routers/web/auth"
-	"gitea.dev/services/context"
+	"github.com/hanzoai/git/modules/eventsource"
+	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/routers/web/auth"
+	"github.com/hanzoai/git/services/context"
 )
 
 // Events listens for events

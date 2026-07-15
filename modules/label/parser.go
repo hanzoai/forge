@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitea.dev/modules/options"
+	"github.com/hanzoai/git/modules/options"
 
 	"go.yaml.in/yaml/v4"
 )

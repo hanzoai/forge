@@ -18,8 +18,8 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/util"
 
 	"golang.org/x/net/html"
 )

@@ -8,10 +8,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitea.dev/models/unittest"
-	"gitea.dev/models/user"
-	gitea_context "gitea.dev/services/context"
-	"gitea.dev/services/contexttest"
+	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/models/user"
+	gitea_context "github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
 )

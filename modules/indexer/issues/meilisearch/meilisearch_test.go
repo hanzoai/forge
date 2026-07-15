@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"gitea.dev/modules/indexer/issues/internal"
-	"gitea.dev/modules/indexer/issues/internal/tests"
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/test"
+	"github.com/hanzoai/git/modules/indexer/issues/internal"
+	"github.com/hanzoai/git/modules/indexer/issues/internal/tests"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/test"
 
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/stretchr/testify/assert"

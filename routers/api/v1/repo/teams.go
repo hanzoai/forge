@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"gitea.dev/models/organization"
-	"gitea.dev/services/context"
-	"gitea.dev/services/convert"
-	repo_service "gitea.dev/services/repository"
+	"github.com/hanzoai/git/models/organization"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/convert"
+	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 // ListTeams list a repository's teams

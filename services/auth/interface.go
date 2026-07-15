@@ -7,9 +7,9 @@ import (
 	"context"
 	"net/http"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/modules/session"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/modules/session"
 )
 
 type DataStore = reqctx.ContextDataProvider

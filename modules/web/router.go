@@ -9,11 +9,11 @@ import (
 	"reflect"
 	"strings"
 
-	"gitea.dev/modules/htmlutil"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/web/middleware"
-	"gitea.dev/modules/web/types"
+	"github.com/hanzoai/git/modules/htmlutil"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/web/middleware"
+	"github.com/hanzoai/git/modules/web/types"
 
 	"gitea.com/go-chi/binding"
 	"github.com/go-chi/chi/v5"

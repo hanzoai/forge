@@ -6,7 +6,7 @@ package issues
 import (
 	"context"
 
-	"gitea.dev/models/db"
+	"github.com/hanzoai/git/models/db"
 )
 
 // RecalculateIssueIndexForRepo create issue_index for repo if not exist and

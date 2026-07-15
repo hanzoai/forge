@@ -8,17 +8,17 @@ import (
 	"testing"
 	"time"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/models/unittest"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/gitrepo"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/test"
-	"gitea.dev/modules/timeutil"
-	"gitea.dev/services/attachment"
-	"gitea.dev/services/context/upload"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/gitrepo"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/test"
+	"github.com/hanzoai/git/modules/timeutil"
+	"github.com/hanzoai/git/services/attachment"
+	"github.com/hanzoai/git/services/context/upload"
 
-	_ "gitea.dev/models/actions"
+	_ "github.com/hanzoai/git/models/actions"
 
 	"github.com/stretchr/testify/assert"
 )

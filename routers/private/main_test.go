@@ -6,7 +6,7 @@ package private
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
+	"github.com/hanzoai/git/models/unittest"
 )
 
 func TestMain(m *testing.M) {

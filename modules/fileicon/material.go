@@ -8,12 +8,12 @@ import (
 	"strings"
 	"sync"
 
-	"gitea.dev/modules/json"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/options"
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/svg"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/options"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/svg"
+	"github.com/hanzoai/git/modules/util"
 )
 
 type materialIconRulesData struct {

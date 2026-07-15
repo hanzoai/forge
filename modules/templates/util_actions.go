@@ -6,8 +6,8 @@ package templates
 import (
 	"context"
 
-	git_model "gitea.dev/models/git"
-	actions_module "gitea.dev/modules/actions"
+	git_model "github.com/hanzoai/git/models/git"
+	actions_module "github.com/hanzoai/git/modules/actions"
 )
 
 type ActionsUtils struct {

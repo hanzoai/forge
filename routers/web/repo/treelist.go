@@ -9,13 +9,13 @@ import (
 	"path"
 	"strings"
 
-	pull_model "gitea.dev/models/pull"
-	"gitea.dev/modules/base"
-	"gitea.dev/modules/fileicon"
-	"gitea.dev/modules/git"
-	"gitea.dev/services/context"
-	"gitea.dev/services/gitdiff"
-	files_service "gitea.dev/services/repository/files"
+	pull_model "github.com/hanzoai/git/models/pull"
+	"github.com/hanzoai/git/modules/base"
+	"github.com/hanzoai/git/modules/fileicon"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/services/context"
+	"github.com/hanzoai/git/services/gitdiff"
+	files_service "github.com/hanzoai/git/services/repository/files"
 
 	"github.com/go-enry/go-enry/v2"
 )

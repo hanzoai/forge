@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	gitealog "gitea.dev/modules/log"
+	gitealog "github.com/hanzoai/git/modules/log"
 
 	commitgraph "github.com/go-git/go-git/v5/plumbing/format/commitgraph/v2"
 	cgobject "github.com/go-git/go-git/v5/plumbing/object/commitgraph"

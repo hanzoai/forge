@@ -4,8 +4,8 @@
 package smtp
 
 import (
-	"gitea.dev/models/auth"
-	"gitea.dev/modules/json"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/modules/json"
 )
 
 //   _________   __________________________

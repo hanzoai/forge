@@ -6,8 +6,8 @@ package repo
 import (
 	"net/http"
 
-	"gitea.dev/services/context"
-	files_service "gitea.dev/services/repository/files"
+	"github.com/hanzoai/git/services/context"
+	files_service "github.com/hanzoai/git/services/repository/files"
 )
 
 // GetTree get the tree of a repository.

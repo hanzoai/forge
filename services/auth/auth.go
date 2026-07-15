@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"net/http"
 
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/auth/webauthn"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/optional"
-	"gitea.dev/modules/session"
-	"gitea.dev/modules/web/middleware"
-	user_service "gitea.dev/services/user"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/auth/webauthn"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/modules/session"
+	"github.com/hanzoai/git/modules/web/middleware"
+	user_service "github.com/hanzoai/git/services/user"
 )
 
 type ErrUserAuthMessage string

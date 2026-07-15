@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
-	"gitea.dev/modules/public"
-	"gitea.dev/modules/reqctx"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/public"
+	"github.com/hanzoai/git/modules/reqctx"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 const ContextDataKeySignedUser = "SignedUser"

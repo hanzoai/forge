@@ -6,8 +6,8 @@ package packages
 import (
 	"io"
 
-	"gitea.dev/modules/setting"
-	"gitea.dev/modules/util/filebuffer"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/util/filebuffer"
 )
 
 // HashedSizeReader provide methods to read, sum hashes and a Size method

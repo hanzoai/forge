@@ -6,11 +6,11 @@ package avatars_test
 import (
 	"testing"
 
-	"gitea.dev/models/unittest"
+	"github.com/hanzoai/git/models/unittest"
 
-	_ "gitea.dev/models"
-	_ "gitea.dev/models/activities"
-	_ "gitea.dev/models/perm/access"
+	_ "github.com/hanzoai/git/models"
+	_ "github.com/hanzoai/git/models/activities"
+	_ "github.com/hanzoai/git/models/perm/access"
 )
 
 func TestMain(m *testing.M) {

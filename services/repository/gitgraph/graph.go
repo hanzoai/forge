@@ -7,9 +7,9 @@ import (
 	"bufio"
 	"bytes"
 
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/git/gitcmd"
-	"gitea.dev/modules/setting"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/git/gitcmd"
+	"github.com/hanzoai/git/modules/setting"
 )
 
 // GetCommitGraph return a list of commit (GraphItems) from all branches

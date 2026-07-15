@@ -6,10 +6,10 @@ package repository
 import (
 	"context"
 
-	repo_model "gitea.dev/models/repo"
-	"gitea.dev/modules/cache"
-	"gitea.dev/modules/git"
-	"gitea.dev/modules/gitrepo"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/modules/cache"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/gitrepo"
 )
 
 // CacheRef cachhe last commit information of the branch or the tag

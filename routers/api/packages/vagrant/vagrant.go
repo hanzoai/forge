@@ -12,13 +12,13 @@ import (
 	"sort"
 	"strings"
 
-	packages_model "gitea.dev/models/packages"
-	packages_module "gitea.dev/modules/packages"
-	vagrant_module "gitea.dev/modules/packages/vagrant"
-	"gitea.dev/modules/setting"
-	"gitea.dev/routers/api/packages/helper"
-	"gitea.dev/services/context"
-	packages_service "gitea.dev/services/packages"
+	packages_model "github.com/hanzoai/git/models/packages"
+	packages_module "github.com/hanzoai/git/modules/packages"
+	vagrant_module "github.com/hanzoai/git/modules/packages/vagrant"
+	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/routers/api/packages/helper"
+	"github.com/hanzoai/git/services/context"
+	packages_service "github.com/hanzoai/git/services/packages"
 
 	"github.com/hashicorp/go-version"
 )

@@ -7,18 +7,18 @@ import (
 	"context"
 	"strings"
 
-	"gitea.dev/models/auth"
-	"gitea.dev/models/db"
-	user_model "gitea.dev/models/user"
-	"gitea.dev/modules/log"
-	"gitea.dev/modules/optional"
-	"gitea.dev/services/auth/source/oauth2"
-	"gitea.dev/services/auth/source/smtp"
+	"github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
+	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/optional"
+	"github.com/hanzoai/git/services/auth/source/oauth2"
+	"github.com/hanzoai/git/services/auth/source/smtp"
 
-	_ "gitea.dev/services/auth/source/db"   // register the sources (and below)
-	_ "gitea.dev/services/auth/source/ldap" // register the ldap source
-	_ "gitea.dev/services/auth/source/pam"  // register the pam source
-	_ "gitea.dev/services/auth/source/sspi" // register the sspi source
+	_ "github.com/hanzoai/git/services/auth/source/db"   // register the sources (and below)
+	_ "github.com/hanzoai/git/services/auth/source/ldap" // register the ldap source
+	_ "github.com/hanzoai/git/services/auth/source/pam"  // register the pam source
+	_ "github.com/hanzoai/git/services/auth/source/sspi" // register the sspi source
 
 	"xorm.io/builder"
 )

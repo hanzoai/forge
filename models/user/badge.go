@@ -6,8 +6,8 @@ package user
 import (
 	"context"
 
-	"gitea.dev/models/db"
-	"gitea.dev/modules/util"
+	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/util"
 
 	"xorm.io/builder"
 	"xorm.io/xorm/schemas"

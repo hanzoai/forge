@@ -7,10 +7,10 @@ import (
 	"html/template"
 	"testing"
 
-	pull_model "gitea.dev/models/pull"
-	"gitea.dev/modules/fileicon"
-	"gitea.dev/modules/git"
-	"gitea.dev/services/gitdiff"
+	pull_model "github.com/hanzoai/git/models/pull"
+	"github.com/hanzoai/git/modules/fileicon"
+	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/services/gitdiff"
 
 	"github.com/stretchr/testify/assert"
 )

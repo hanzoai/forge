@@ -3,7 +3,7 @@
 
 package v1_14
 
-import "gitea.dev/models/db"
+import "github.com/hanzoai/git/models/db"
 
 func RecreateUserTableToFixDefaultValues(_ db.EngineMigration) error {
 	return nil

@@ -6,7 +6,7 @@ package attribute
 import (
 	"strings"
 
-	"gitea.dev/modules/optional"
+	"github.com/hanzoai/git/modules/optional"
 )
 
 type Attribute string
