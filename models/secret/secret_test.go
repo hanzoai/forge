@@ -20,7 +20,7 @@ func TestGetScopedSecretsForJob(t *testing.T) {
 
 	base := map[string]string{
 		"GITHUB_TOKEN": "tok",
-		"GITEA_TOKEN":  "tok",
+		"GIT_TOKEN":  "tok",
 		"PROD_API_KEY": "prod-secret",
 		"DEV_API_KEY":  "dev-secret",
 	}
@@ -68,7 +68,7 @@ func TestGetScopedSecretsForJob(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, map[string]string{
 			"GITHUB_TOKEN": "tok",
-			"GITEA_TOKEN":  "tok",
+			"GIT_TOKEN":  "tok",
 		}, got)
 	})
 
@@ -82,7 +82,7 @@ func TestGetScopedSecretsForJob(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, map[string]string{
 			"GITHUB_TOKEN": "tok",
-			"GITEA_TOKEN":  "tok",
+			"GIT_TOKEN":  "tok",
 			"MY_KEY":       "prod-secret",
 			// no "dev-secret"
 		}, got)
@@ -132,7 +132,7 @@ func TestGetScopedSecretsForJob(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, map[string]string{
 			"GITHUB_TOKEN": "tok",
-			"GITEA_TOKEN":  "tok",
+			"GIT_TOKEN":  "tok",
 			"ALIAS_OUT":    "prod-secret",
 			// no "dev-secret"
 		}, got)
@@ -149,7 +149,7 @@ func TestGetScopedSecretsForJob(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, map[string]string{
 			"GITHUB_TOKEN": "tok",
-			"GITEA_TOKEN":  "tok",
+			"GIT_TOKEN":  "tok",
 			"OUTER_ALIAS":  "prod-secret",
 			// no "dev-secret"
 		}, got)
@@ -166,7 +166,7 @@ func TestGetScopedSecretsForJob(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, map[string]string{
 			"GITHUB_TOKEN": "tok",
-			"GITEA_TOKEN":  "tok",
+			"GIT_TOKEN":  "tok",
 			"ALIAS_C":      "prod-secret",
 			// no "dev-secret"
 		}, got)

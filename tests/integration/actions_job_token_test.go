@@ -420,7 +420,7 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo1.Name, wfTreePath, opts)
 
 		task1 := runner1.fetchTask(t)
-		task1Token := task1.Secrets["GITEA_TOKEN"]
+		task1Token := task1.Secrets["GIT_TOKEN"]
 		require.NotEmpty(t, task1Token)
 
 		// should fail: target repo does not allow code access

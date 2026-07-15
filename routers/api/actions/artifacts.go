@@ -160,7 +160,7 @@ func ArtifactContexter() func(next http.Handler) http.Handler {
 					return
 				}
 			} else {
-				// Old act_runner uses GITEA_TOKEN to authenticate
+				// Old act_runner uses GIT_TOKEN to authenticate
 				authToken := strings.TrimPrefix(authHeader, "Bearer ")
 
 				task, err = actions.GetRunningTaskByToken(req.Context(), authToken)

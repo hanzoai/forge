@@ -3053,7 +3053,7 @@
   "packages.owner.settings.chef.keypair": "Згенерувати ключову пару",
   "packages.owner.settings.chef.keypair.description": "Ключова пара необхідна для автентифікації у реєстрі Chef. Якщо ви створювали ключову пару раніше, створення нової пари призведе до скасування старої.",
   "secrets.creation.description": "Опис",
-  "secrets.creation.name_placeholder": "без урахування регістру, тільки алфавітно-цифрові символи або підкреслення, не можуть починатися з GITEA_ або GITHUB_.",
+  "secrets.creation.name_placeholder": "без урахування регістру, тільки алфавітно-цифрові символи або підкреслення, не можуть починатися з GIT_ або GITHUB_.",
   "secrets.creation.value_placeholder": "Введіть довільний вміст. Пробіли на початку та в кінці будуть пропущені.",
   "secrets.creation.description_placeholder": "Введіть короткий опис (необов'язково).",
   "actions.actions": "Дії",

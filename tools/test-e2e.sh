@@ -147,12 +147,12 @@ IS_INPUT_FILE = false
 RENDER_CONTENT_MODE = iframe
 EOF
 
-export GITEA_WORK_DIR="$WORK_DIR"
-export GITEA_TEST_E2E=true
+export GIT_WORK_DIR="$WORK_DIR"
+export GIT_TEST_E2E=true
 
 # Start Gitea server
 echo "Starting Gitea server on port $FREE_PORT (workdir: $WORK_DIR)..."
-if [ -n "${GITEA_TEST_E2E_DEBUG:-}" ]; then
+if [ -n "${GIT_TEST_E2E_DEBUG:-}" ]; then
   "./$EXECUTABLE" web &
 else
   "./$EXECUTABLE" web > "$WORK_DIR/server.log" 2>&1 &
@@ -180,35 +180,35 @@ done
 
 echo "Gitea server is ready at $E2E_URL"
 
-GITEA_TEST_E2E_DOMAIN="e2e.gitea.com"
-GITEA_TEST_E2E_USER="e2e-admin"
-GITEA_TEST_E2E_PASSWORD="password"
-GITEA_TEST_E2E_EMAIL="$GITEA_TEST_E2E_USER@$GITEA_TEST_E2E_DOMAIN"
+GIT_TEST_E2E_DOMAIN="e2e.gitea.com"
+GIT_TEST_E2E_USER="e2e-admin"
+GIT_TEST_E2E_PASSWORD="password"
+GIT_TEST_E2E_EMAIL="$GIT_TEST_E2E_USER@$GIT_TEST_E2E_DOMAIN"
 
 # Create admin test user
 "./$EXECUTABLE" admin user create \
-  --username "$GITEA_TEST_E2E_USER" \
-  --password "$GITEA_TEST_E2E_PASSWORD" \
-  --email "$GITEA_TEST_E2E_EMAIL" \
+  --username "$GIT_TEST_E2E_USER" \
+  --password "$GIT_TEST_E2E_PASSWORD" \
+  --email "$GIT_TEST_E2E_EMAIL" \
   --must-change-password=false \
   --admin
 
 # timeout multiplier to make the tests pass on slow CI runners while using
 # factor 1 on a fast local machine like a MacBook Pro M1+
-if [ -z "${GITEA_TEST_E2E_TIMEOUT_FACTOR:-}" ]; then
+if [ -z "${GIT_TEST_E2E_TIMEOUT_FACTOR:-}" ]; then
   if [ -n "${CI:-}" ]; then
-    GITEA_TEST_E2E_TIMEOUT_FACTOR=4
+    GIT_TEST_E2E_TIMEOUT_FACTOR=4
   else
-    GITEA_TEST_E2E_TIMEOUT_FACTOR=1
+    GIT_TEST_E2E_TIMEOUT_FACTOR=1
   fi
 fi
 
-export GITEA_TEST_E2E_URL="$E2E_URL"
-export GITEA_TEST_E2E_DOMAIN
-export GITEA_TEST_E2E_USER
-export GITEA_TEST_E2E_PASSWORD
-export GITEA_TEST_E2E_EMAIL
-export GITEA_TEST_E2E_TIMEOUT_FACTOR
+export GIT_TEST_E2E_URL="$E2E_URL"
+export GIT_TEST_E2E_DOMAIN
+export GIT_TEST_E2E_USER
+export GIT_TEST_E2E_PASSWORD
+export GIT_TEST_E2E_EMAIL
+export GIT_TEST_E2E_TIMEOUT_FACTOR
 
 if [ "$PLAYWRIGHT_MODE" = "container" ]; then
   export PW_TEST_CONNECT_WS_ENDPOINT="ws://127.0.0.1:${PLAYWRIGHT_SERVER_PORT}/"

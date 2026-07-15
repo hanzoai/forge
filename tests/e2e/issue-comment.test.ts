@@ -4,7 +4,7 @@ import {login, apiCreateRepo, apiCreateIssue, randomString} from './utils.ts';
 
 test('comment on and close an issue', async ({page, request}) => {
   const repoName = `e2e-issue-comment-${randomString(8)}`;
-  const owner = env.GITEA_TEST_E2E_USER;
+  const owner = env.GIT_TEST_E2E_USER;
   await apiCreateRepo(request, {name: repoName, autoInit: false});
   await Promise.all([
     apiCreateIssue(request, {owner, repo: repoName, title: 'Comment test'}),

@@ -35,11 +35,11 @@ $ ./gitea config edit-ini --config app-old.ini --config-keep-keys app-keys.ini -
 
 # Map Environment Variables to INI Configuration
 
-Environment variables of the form "GITEA__section_name__KEY_NAME"
+Environment variables of the form "GIT__section_name__KEY_NAME"
 will be mapped to the ini section "[section_name]" and the key
 "KEY_NAME" with the value as provided.
 
-Environment variables of the form "GITEA__section_name__KEY_NAME__FILE"
+Environment variables of the form "GIT__section_name__KEY_NAME__FILE"
 will be mapped to the ini section "[section_name]" and the key
 "KEY_NAME" with the value loaded from the specified file.
 
@@ -50,7 +50,7 @@ For example, to apply this config:
 	[git.config]
 	foo.bar=val
 
-$ export GITEA__git_0x2E_config__foo_0x2E_bar=val
+$ export GIT__git_0x2E_config__foo_0x2E_bar=val
 
 # Put All Together
 
@@ -69,7 +69,7 @@ $ ./gitea config edit-ini --config app.ini --config-keep-keys app-keys.ini --app
 			},
 			&cli.BoolFlag{
 				Name:  "apply-env",
-				Usage: "Apply all GITEA__* variables from the environment to the config.",
+				Usage: "Apply all GIT__* variables from the environment to the config.",
 			},
 			&cli.StringFlag{
 				Name:  "out",

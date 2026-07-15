@@ -37,11 +37,11 @@ STOP_SCHEDULE="${STOP_SCHEDULE:-QUIT/5/TERM/1/KILL/5}"
 
 do_start()
 {
-    GITEA_ENVS="USER=$USER GITEA_WORK_DIR=$WORKINGDIR HOME=/home/$USER"
-    GITEA_EXEC="$DAEMON -- $DAEMON_ARGS"
+    GIT_ENVS="USER=$USER GIT_WORK_DIR=$WORKINGDIR HOME=/home/$USER"
+    GIT_EXEC="$DAEMON -- $DAEMON_ARGS"
     sh -c "start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile \\
         --background --chdir $WORKINGDIR --chuid $USER \\
-        --exec /bin/bash -- -c '/usr/bin/env $GITEA_ENVS $GITEA_EXEC'"
+        --exec /bin/bash -- -c '/usr/bin/env $GIT_ENVS $GIT_EXEC'"
 }
 
 do_stop()

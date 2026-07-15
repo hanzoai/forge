@@ -37,7 +37,7 @@ const (
 	appSubUrlVar = "{{.SwaggerAppSubUrl}}"
 	appVerVar    = "{{.SwaggerAppVer}}"
 
-	appSubUrlPlaceholder = "GITEA_APP_SUB_URL_PLACEHOLDER"
+	appSubUrlPlaceholder = "GIT_APP_SUB_URL_PLACEHOLDER"
 	appVerPlaceholder    = "0.0.0-gitea-placeholder"
 )
 

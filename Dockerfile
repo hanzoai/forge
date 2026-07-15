@@ -11,7 +11,7 @@ RUN make frontend
 # Build backend for each target platform
 FROM docker.io/library/golang:1.26-alpine3.24 AS build-env
 
-ARG GITEA_VERSION
+ARG GIT_VERSION
 ARG TAGS=""
 ENV TAGS="bindata timetzdata $TAGS"
 ARG CGO_EXTRA_CFLAGS
@@ -77,7 +77,7 @@ COPY --from=build-env /tmp/local /
 COPY --from=build-env /go/src/gitea.dev/gitea /app/gitea/gitea
 
 ENV USER=git
-ENV GITEA_CUSTOM=/data/gitea
+ENV GIT_CUSTOM=/data/gitea
 
 VOLUME ["/data"]
 

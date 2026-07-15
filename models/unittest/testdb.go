@@ -221,7 +221,7 @@ func CreateTestEngine(testSQLiteFile string, opts FixturesOptions) error {
 	if err = db.SyncAllTables(); err != nil {
 		return err
 	}
-	switch os.Getenv("GITEA_TEST_LOG_SQL") {
+	switch os.Getenv("GIT_TEST_LOG_SQL") {
 	case "true", "1":
 		x.ShowSQL(true)
 	}

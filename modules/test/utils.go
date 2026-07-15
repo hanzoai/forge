@@ -151,7 +151,7 @@ func CompressGzip(content string) *bytes.Buffer {
 
 var AllowSkipExternalService = sync.OnceValue(func() bool {
 	isLocalTesting := os.Getenv("CI") == ""
-	ciSkipExternal, _ := strconv.ParseBool(os.Getenv("GITEA_TEST_CI_SKIP_EXTERNAL"))
+	ciSkipExternal, _ := strconv.ParseBool(os.Getenv("GIT_TEST_CI_SKIP_EXTERNAL"))
 	return isLocalTesting || ciSkipExternal
 })
 

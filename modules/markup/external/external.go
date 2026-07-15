@@ -103,8 +103,8 @@ func (p *Renderer) Render(ctx *markup.RenderContext, input io.Reader, output io.
 	baseLinkSrc := ctx.RenderHelper.ResolveLink("", markup.LinkTypeDefault)
 	baseLinkRaw := ctx.RenderHelper.ResolveLink("", markup.LinkTypeRaw)
 	command := strings.NewReplacer(
-		envMark("GITEA_PREFIX_SRC"), baseLinkSrc,
-		envMark("GITEA_PREFIX_RAW"), baseLinkRaw,
+		envMark("GIT_PREFIX_SRC"), baseLinkSrc,
+		envMark("GIT_PREFIX_RAW"), baseLinkRaw,
 	).Replace(p.Command)
 	commands, err := shellquote.Split(command)
 	if err != nil || len(commands) == 0 {
@@ -139,8 +139,8 @@ func (p *Renderer) Render(ctx *markup.RenderContext, input io.Reader, output io.
 	cmd := exec.CommandContext(processCtx, commands[0], args...)
 	cmd.Env = append(
 		os.Environ(),
-		"GITEA_PREFIX_SRC="+baseLinkSrc,
-		"GITEA_PREFIX_RAW="+baseLinkRaw,
+		"GIT_PREFIX_SRC="+baseLinkSrc,
+		"GIT_PREFIX_RAW="+baseLinkRaw,
 	)
 	if !p.IsInputFile {
 		cmd.Stdin = input

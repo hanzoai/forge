@@ -2877,7 +2877,7 @@
   "secrets.description": "Τα μυστικά θα περάσουν σε ορισμένες δράσεις και δεν μπορούν να αναγνωστούν αλλού.",
   "secrets.none": "Δεν υπάρχουν ακόμα μυστικά.",
   "secrets.creation.description": "Περιγραφή",
-  "secrets.creation.name_placeholder": "αλφαριθμητικοί χαρακτήρες ή κάτω παύλες μόνο, δεν μπορούν να ξεκινούν με GITEA_ ή GITHUB_",
+  "secrets.creation.name_placeholder": "αλφαριθμητικοί χαρακτήρες ή κάτω παύλες μόνο, δεν μπορούν να ξεκινούν με GIT_ ή GITHUB_",
   "secrets.creation.value_placeholder": "Εισάγετε οποιοδήποτε περιεχόμενο. Τα κενά στην αρχή παραλείπονται.",
   "secrets.deletion": "Αφαίρεση μυστικού",
   "secrets.deletion.description": "Η αφαίρεση ενός μυστικού είναι μόνιμη και δεν μπορεί να αναιρεθεί. Συνέχεια;",

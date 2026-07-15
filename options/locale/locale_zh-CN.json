@@ -3703,7 +3703,7 @@
   "secrets.description": "密钥将被传给特定的工作流，其它情况无法读取。",
   "secrets.none": "还没有密钥。",
   "secrets.creation.description": "组织描述",
-  "secrets.creation.name_placeholder": "不区分大小写，仅限字母数字或下划线且不能以 GITEA_ 或 GITHUB_ 开头",
+  "secrets.creation.name_placeholder": "不区分大小写，仅限字母数字或下划线且不能以 GIT_ 或 GITHUB_ 开头",
   "secrets.creation.value_placeholder": "输入任何内容，开头和结尾的空白将会被忽略",
   "secrets.creation.description_placeholder": "输入简短描述（可选）",
   "secrets.save_success": "密钥「%s」保存成功。",
@@ -3921,7 +3921,7 @@
   "actions.general.token_permissions.fork_pr_note": "如果任务是由来自派生仓库的合并请求触发的，那么它的实际权限不会超过只读权限。",
   "actions.general.token_permissions.customize_max_permissions": "自定义最大权限",
   "actions.general.cross_repo": "跨仓库访问",
-  "actions.general.cross_repo_desc": "允许此所有者下的所有仓库在运行工作流任务时，通过 GITEA_TOKEN 以只读方式访问所选仓库。",
+  "actions.general.cross_repo_desc": "允许此所有者下的所有仓库在运行工作流任务时，通过 GIT_TOKEN 以只读方式访问所选仓库。",
   "actions.general.cross_repo_selected": "选择的仓库",
   "actions.general.cross_repo_target_repos": "目标仓库",
   "actions.general.cross_repo_add": "添加目标仓库"

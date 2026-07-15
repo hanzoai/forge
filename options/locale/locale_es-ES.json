@@ -2841,7 +2841,7 @@
   "secrets.description": "Los secretos pasarán a ciertas acciones y no se podrán leer de otro modo.",
   "secrets.none": "Todavía no hay secretos.",
   "secrets.creation.description": "Descripción",
-  "secrets.creation.name_placeholder": "sin distinción de mayúsculas, solo carácteres alfanuméricos o guiones bajos, no puede empezar por GITEA_ o GITHUB_",
+  "secrets.creation.name_placeholder": "sin distinción de mayúsculas, solo carácteres alfanuméricos o guiones bajos, no puede empezar por GIT_ o GITHUB_",
   "secrets.creation.value_placeholder": "Introduce cualquier contenido. Se omitirá el espacio en blanco en el inicio y el final.",
   "secrets.deletion": "Eliminar secreto",
   "secrets.deletion.description": "Eliminar un secreto es permanente y no se puede deshacer. ¿Continuar?",

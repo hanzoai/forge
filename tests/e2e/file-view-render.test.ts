@@ -5,7 +5,7 @@ import {apiCreateRepo, apiCreateFile, assertFlushWithParent, assertNoJsError, lo
 test('3d model file', async ({page, request, browserName}) => {
   test.skip(browserName === 'firefox', 'unclear firefox-only CI-only failure'); // eslint-disable-line playwright/no-skipped-test
   const repoName = `e2e-3d-render-${randomString(8)}`;
-  const owner = env.GITEA_TEST_E2E_USER;
+  const owner = env.GIT_TEST_E2E_USER;
   await apiCreateRepo(request, {name: repoName});
   const stl = 'solid test\nfacet normal 0 0 1\nouter loop\nvertex 0 0 0\nvertex 1 0 0\nvertex 0 1 0\nendloop\nendfacet\nendsolid test\n';
   await apiCreateFile(request, owner, repoName, 'test.stl', stl);
@@ -29,7 +29,7 @@ test('3d model file', async ({page, request, browserName}) => {
 test('pdf file', async ({page, request}) => {
   // headless playwright cannot render PDFs (PDFObject.embed returns false), so this is a limited test
   const repoName = `e2e-pdf-render-${randomString(8)}`;
-  const owner = env.GITEA_TEST_E2E_USER;
+  const owner = env.GIT_TEST_E2E_USER;
   await apiCreateRepo(request, {name: repoName});
   await apiCreateFile(request, owner, repoName, 'test.pdf', '%PDF-1.0\n%%EOF\n');
   await page.goto(`/${owner}/${repoName}/src/branch/main/test.pdf`);
@@ -41,7 +41,7 @@ test('pdf file', async ({page, request}) => {
 
 test('asciicast file', async ({page, request}) => {
   const repoName = `e2e-asciicast-render-${randomString(8)}`;
-  const owner = env.GITEA_TEST_E2E_USER;
+  const owner = env.GIT_TEST_E2E_USER;
   const branch = '日本語-branch';
   const branchEnc = encodeURIComponent(branch);
   await Promise.all([apiCreateRepo(request, {name: repoName, autoInit: false}), login(page)]);

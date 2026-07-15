@@ -211,7 +211,7 @@ jobs:
 					assert.Equal(t, "prepared_data", payload.Inputs["needs_out"])
 				}
 				if assert.Len(t, r1Job1Task.Secrets, 3) {
-					assert.Contains(t, r1Job1Task.Secrets, "GITEA_TOKEN")
+					assert.Contains(t, r1Job1Task.Secrets, "GIT_TOKEN")
 					assert.Contains(t, r1Job1Task.Secrets, "GITHUB_TOKEN")
 					assert.Equal(t, "secRET-t0Ken", r1Job1Task.Secrets["PARENT_TOKEN"])
 				}
@@ -648,7 +648,7 @@ jobs:
 			assert.Equal(t, forkRun.ID, taskRun.ID)
 
 			// Only the auto-issued tokens should be present. The user-defined `leaked_secret` must not appear.
-			assert.Contains(t, task.Secrets, "GITEA_TOKEN")
+			assert.Contains(t, task.Secrets, "GIT_TOKEN")
 			assert.Contains(t, task.Secrets, "GITHUB_TOKEN")
 			assert.NotContains(t, task.Secrets, "leaked_secret")
 			for name, value := range task.Secrets {

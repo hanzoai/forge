@@ -44,7 +44,7 @@ func TestAPIUserSecrets(t *testing.T) {
 				ExpectedStatus: http.StatusBadRequest,
 			},
 			{
-				Name:           "GITEA_secret",
+				Name:           "GIT_secret",
 				ExpectedStatus: http.StatusBadRequest,
 			},
 			{

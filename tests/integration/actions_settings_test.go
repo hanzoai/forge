@@ -51,7 +51,7 @@ jobs:
 
 		// fetch the task and get its token
 		task := runner.fetchTask(t)
-		taskToken := task.Secrets["GITEA_TOKEN"]
+		taskToken := task.Secrets["GIT_TOKEN"]
 		assert.NotEmpty(t, taskToken)
 
 		// prepare for clone

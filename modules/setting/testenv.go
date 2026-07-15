@@ -52,7 +52,7 @@ func SetupGiteaTestEnv() {
 	}
 
 	initGiteaRoot := func() string {
-		giteaRoot := os.Getenv("GITEA_TEST_ROOT")
+		giteaRoot := os.Getenv("GIT_TEST_ROOT")
 		if giteaRoot == "" {
 			giteaRoot = detectGiteaTestRoot()
 		}
@@ -70,10 +70,10 @@ func SetupGiteaTestEnv() {
 	}
 
 	initGiteaConf := func() string {
-		// giteaConf (GITEA_CONF) must be relative because it is used in the git hooks as "$GITEA_ROOT/$GITEA_CONF"
-		giteaConf := os.Getenv("GITEA_TEST_CONF")
+		// giteaConf (GIT_CONF) must be relative because it is used in the git hooks as "$GIT_ROOT/$GIT_CONF"
+		giteaConf := os.Getenv("GIT_TEST_CONF")
 		if giteaConf == "" {
-			// if no GITEA_TEST_CONF, then it is in unit test, use a temp (non-existing / empty) config file
+			// if no GIT_TEST_CONF, then it is in unit test, use a temp (non-existing / empty) config file
 			// do not really use such config file, the test can run concurrently, using the same config file will cause data-race between tests
 			giteaConf = "custom/conf/app-test-tmp.ini"
 			customConfBuiltin = filepath.Join(AppWorkPath, giteaConf)
@@ -81,17 +81,17 @@ func SetupGiteaTestEnv() {
 			_ = os.Remove(CustomConf)
 		} else {
 			// CustomConf must be absolute path to make tests pass.
-			// At the moment, GITEA_TEST_CONF is always in Gitea's source root
+			// At the moment, GIT_TEST_CONF is always in Gitea's source root
 			CustomConf = filepath.Join(giteaRoot, giteaConf)
 		}
 		return giteaConf
 	}
 
 	cleanUpEnv := func() {
-		// also unset unnecessary env vars for testing (only keep "GITEA_TEST_*" ones)
+		// also unset unnecessary env vars for testing (only keep "GIT_TEST_*" ones)
 		UnsetUnnecessaryEnvVars()
 		for _, env := range os.Environ() {
-			if strings.HasPrefix(env, "GIT_") || (strings.HasPrefix(env, "GITEA_") && !strings.HasPrefix(env, "GITEA_TEST_")) {
+			if strings.HasPrefix(env, "GIT_") || (strings.HasPrefix(env, "GIT_") && !strings.HasPrefix(env, "GIT_TEST_")) {
 				k, _, _ := strings.Cut(env, "=")
 				_ = os.Unsetenv(k)
 			}
@@ -122,25 +122,25 @@ func SetupGiteaTestEnv() {
 	}
 
 	// TODO: some git repo hooks (test fixtures) still use these env variables, need to be refactored in the future
-	_ = os.Setenv("GITEA_ROOT", giteaRoot)
-	_ = os.Setenv("GITEA_CONF", giteaConf) // test fixture git hooks use "$GITEA_ROOT/$GITEA_CONF" in their scripts
+	_ = os.Setenv("GIT_ROOT", giteaRoot)
+	_ = os.Setenv("GIT_CONF", giteaConf) // test fixture git hooks use "$GIT_ROOT/$GIT_CONF" in their scripts
 }
 
 func PrepareIntegrationTestConfig() error {
 	giteaTestRoot := detectGiteaTestRoot()
 	isInCI := os.Getenv("CI") != ""
-	testDatabase := os.Getenv("GITEA_TEST_DATABASE")
+	testDatabase := os.Getenv("GIT_TEST_DATABASE")
 	if testDatabase == "" {
 		if isInCI {
-			return errors.New("GITEA_TEST_DATABASE environment variable not set")
+			return errors.New("GIT_TEST_DATABASE environment variable not set")
 		}
 		// for local development, default to sqlite. CI needs to explicitly set a database to avoid unexpected results
 		testDatabase = "sqlite"
-		_, _ = fmt.Fprintf(os.Stderr, "Environment variable GITEA_TEST_DATABASE not set - defaulting to %s\n", testDatabase)
+		_, _ = fmt.Fprintf(os.Stderr, "Environment variable GIT_TEST_DATABASE not set - defaulting to %s\n", testDatabase)
 	}
 
-	_ = os.Setenv("GITEA_TEST_ROOT", giteaTestRoot)
-	_ = os.Setenv("GITEA_TEST_CONF", filepath.Join("tests", testDatabase+".ini"))
+	_ = os.Setenv("GIT_TEST_ROOT", giteaTestRoot)
+	_ = os.Setenv("GIT_TEST_CONF", filepath.Join("tests", testDatabase+".ini"))
 
 	workPath := filepath.Join(giteaTestRoot, "tests/integration/gitea-integration-"+testDatabase)
 	if err := os.MkdirAll(workPath, 0o755); err != nil {
