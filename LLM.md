@@ -40,10 +40,13 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 Operator-managed in `hanzoai/universe` (DOKS `hanzo-k8s`, namespace `hanzo`):
 
 - `infra/k8s/operator/crs/git.yaml` — the `hanzo-git` App (this image), SQLite on
-  the RWO `gitea-data` PVC, OIDC via the `oauth-sync` init container.
+  the RWO `gitea-data` PVC, OIDC via the `oauth-sync` init container. Synced by
+  Hanzo CD (ArgoCD; the App-only successor to the operator GitSource).
+- `infra/k8s/git/` — the App's non-App supporting resources (Hanzo CD's project is
+  `hanzo.ai/App`-only): `gitea-data` PVC, `hanzo-git-oauth` ConfigMap, the
+  `git.hanzo.ai` Ingress, and `git-secrets-kms.yaml` (gitea-secrets from KMS).
 - `infra/k8s/git-runner/` — the act_runner DinD pool (upstream
   `gitea/act_runner:0.6.1-dind`) that runs Actions jobs; maps `hanzo-build-linux-amd64`.
-- `crs/git-ingress.yaml` — `git.hanzo.ai` ingress (staged; cut by the coordinator).
 - Push-to-deploy: a Gitea push webhook → cloud `/v1/git/webhook` → the `/v1/runner`
   build core. Architecture: `universe/docs/architecture/paas-in-cloud.md` §9.
 
