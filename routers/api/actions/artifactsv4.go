@@ -90,6 +90,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -115,9 +116,6 @@ import (
 	"github.com/hanzoai/git/services/actions"
 	"github.com/hanzoai/git/services/context"
 
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"xorm.io/builder"
 )
 
@@ -273,14 +271,14 @@ func (r *artifactV4Routes) getArtifactByName(ctx *ArtifactContext, runID, runAtt
 	return &art, nil
 }
 
-func (r *artifactV4Routes) parseProtobufBody(ctx *ArtifactContext, req protoreflect.ProtoMessage) bool {
+func (r *artifactV4Routes) parseProtobufBody(ctx *ArtifactContext, req any) bool {
 	body, err := io.ReadAll(ctx.Req.Body)
 	if err != nil {
 		log.Error("Error decode request body: %v", err)
 		ctx.HTTPError(http.StatusInternalServerError, "Error decode request body")
 		return false
 	}
-	err = protojson.Unmarshal(body, req)
+	err = json.Unmarshal(body, req)
 	if err != nil {
 		log.Error("Error decode request body: %v", err)
 		ctx.HTTPError(http.StatusInternalServerError, "Error decode request body")
@@ -289,8 +287,8 @@ func (r *artifactV4Routes) parseProtobufBody(ctx *ArtifactContext, req protorefl
 	return true
 }
 
-func (r *artifactV4Routes) sendProtobufBody(ctx *ArtifactContext, req protoreflect.ProtoMessage) {
-	resp, err := protojson.Marshal(req)
+func (r *artifactV4Routes) sendProtobufBody(ctx *ArtifactContext, req any) {
+	resp, err := json.Marshal(req)
 	if err != nil {
 		log.Error("Error encode response body: %v", err)
 		ctx.HTTPError(http.StatusInternalServerError, "Error encode response body")
@@ -606,7 +604,7 @@ func (r *artifactV4Routes) listArtifacts(ctx *ArtifactContext) {
 
 		table[artifact.ArtifactName] = &ListArtifactsResponse_MonolithArtifact{
 			Name:                    artifact.ArtifactName,
-			CreatedAt:               timestamppb.New(artifact.CreatedUnix.AsTime()),
+			CreatedAt:               New(artifact.CreatedUnix.AsTime()),
 			DatabaseId:              artifact.ID,
 			WorkflowRunBackendId:    req.WorkflowRunBackendId,
 			WorkflowJobRunBackendId: req.WorkflowJobRunBackendId,
