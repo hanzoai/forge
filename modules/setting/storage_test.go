@@ -38,6 +38,42 @@ MINIO_BUCKET = gitea-storage
 	assert.Equal(t, "avatars/", Avatar.Storage.MinioConfig.BasePath)
 }
 
+func Test_getStorageS3AliasCanonicalisesToMinio(t *testing.T) {
+	// STORAGE_TYPE=s3 is our config surface for the S3-compatible client
+	// (hanzoai/s3 = SeaweedFS). It must resolve exactly like "minio" for every
+	// object type inheriting the [storage] default, and Storage.Type must report
+	// the canonical "minio" (so ServeDirect + the storage registry resolve).
+	iniStr := `
+[storage]
+STORAGE_TYPE = s3
+MINIO_BUCKET = git
+`
+	cfg, err := NewConfigProviderFromData(iniStr)
+	assert.NoError(t, err)
+
+	assert.True(t, IsValidStorageType("s3"))
+
+	assert.NoError(t, loadPackagesFrom(cfg))
+	assert.EqualValues(t, "minio", Packages.Storage.Type)
+	assert.Equal(t, "git", Packages.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "packages/", Packages.Storage.MinioConfig.BasePath)
+
+	assert.NoError(t, loadAttachmentFrom(cfg))
+	assert.EqualValues(t, "minio", Attachment.Storage.Type)
+	assert.Equal(t, "git", Attachment.Storage.MinioConfig.Bucket)
+	assert.Equal(t, "attachments/", Attachment.Storage.MinioConfig.BasePath)
+
+	assert.NoError(t, loadLFSFrom(cfg))
+	assert.EqualValues(t, "minio", LFS.Storage.Type)
+	assert.Equal(t, "lfs/", LFS.Storage.MinioConfig.BasePath)
+
+	assert.NoError(t, loadActionsFrom(cfg))
+	assert.EqualValues(t, "minio", Actions.LogStorage.Type)
+	assert.Equal(t, "actions_log/", Actions.LogStorage.MinioConfig.BasePath)
+	assert.EqualValues(t, "minio", Actions.ArtifactStorage.Type)
+	assert.Equal(t, "actions_artifacts/", Actions.ArtifactStorage.MinioConfig.BasePath)
+}
+
 func Test_getStorageUseOtherNameAsType(t *testing.T) {
 	iniStr := `
 [attachment]
