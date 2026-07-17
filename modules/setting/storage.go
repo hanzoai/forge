@@ -19,6 +19,12 @@ const (
 	LocalStorageType StorageType = "local"
 	// MinioStorageType is the type descriptor for minio storage
 	MinioStorageType StorageType = "minio"
+	// S3StorageType is an alias for MinioStorageType. Our object substrate is
+	// hanzoai/s3 (SeaweedFS), so the config surface says STORAGE_TYPE=s3 — "minio"
+	// only ever names the minio-go S3 client SDK here, never a MinIO server.
+	// getStorage canonicalises it to MinioStorageType, so no downstream switch,
+	// ServeDirect, or storage registry needs an alias case.
+	S3StorageType StorageType = "s3"
 	// AzureBlobStorageType is the type descriptor for azure blob storage
 	AzureBlobStorageType StorageType = "azureblob"
 )
@@ -26,6 +32,7 @@ const (
 var storageTypes = []StorageType{
 	LocalStorageType,
 	MinioStorageType,
+	S3StorageType,
 	AzureBlobStorageType,
 }
 
@@ -136,6 +143,16 @@ func getStorage(rootCfg ConfigProvider, name, typ string, sec ConfigSection) (*S
 	overrideSec := getStorageOverrideSection(rootCfg, sec, tp, name)
 
 	targetType := targetSec.Key("STORAGE_TYPE").String()
+	// "s3" is an alias for the S3-compatible client (minio-go SDK): our object
+	// substrate is hanzoai/s3 (SeaweedFS), so the config says STORAGE_TYPE=s3, never
+	// "minio". Canonicalise once here — the single funnel every storage type flows
+	// through — and write it back, so the switch below plus ServeDirect() and the
+	// storage registry resolve without an alias case (same SetValue normalisation
+	// this file already applies for empty/local types).
+	if targetType == string(S3StorageType) {
+		targetType = string(MinioStorageType)
+		targetSec.Key("STORAGE_TYPE").SetValue(targetType)
+	}
 	switch targetType {
 	case string(LocalStorageType):
 		return getStorageForLocal(targetSec, overrideSec, tp, name)
