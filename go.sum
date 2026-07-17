@@ -26,8 +26,6 @@ gitea.com/lunny/levelqueue v0.4.2-0.20230414023320-3c0159fe0fe4 h1:IFT+hup2xejHq
 gitea.com/lunny/levelqueue v0.4.2-0.20230414023320-3c0159fe0fe4/go.mod h1:HBqmLbz56JWpfEGG0prskAV97ATNRoj5LDmPicD22hU=
 gitea.com/xorm/sqlfiddle v0.0.0-20180821085327-62ce714f951a h1:lSA0F4e9A2NcQSqGqTOXqu2aRi/XEQxDCBwM8yJtE6s=
 gitea.com/xorm/sqlfiddle v0.0.0-20180821085327-62ce714f951a/go.mod h1:EXuID2Zs0pAQhH8yz+DNjUbjppKQzKFAn28TMYPB6IU=
-gitea.dev/actions-proto-go v0.6.0 h1:gjllYQ5vmwlkqOeofTQu5qKTZpmf7kWsafoHvoPCSzY=
-gitea.dev/actions-proto-go v0.6.0/go.mod h1:p4RX+D9oqiEEzzkPMXscw2CmaGuYFPWFc6xIOmDNDqs=
 gitea.dev/sdk v1.2.0 h1:avRtJl/nKCGispgSalo9czoZM9Rto1awnE0caNAoXGo=
 gitea.dev/sdk v1.2.0/go.mod h1:rfh5oNdIK24cbCREwIn1tqWKQW+IICXFGWJyebuOAOE=
 github.com/42wim/httpsig v1.2.4 h1:mI5bH0nm4xn7K18fo1K3okNDRq8CCJ0KbBYWyA6r8lU=
@@ -303,6 +301,8 @@ github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399 h1:eMj
 github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399/go.mod h1:1OCfN199q1Jm3HZlxleg+Dw/mwps2Wbk9frAWm+4FII=
 github.com/go-git/go-git/v5 v5.19.1 h1:nX27AnaU43/K5bKktKwgBmR9lawoYVe1Ckg0rgzzN00=
 github.com/go-git/go-git/v5 v5.19.1/go.mod h1:Pb1v0c7/g8aGQJwx9Us09W85yGoyvSwuhEGMH7zjDKQ=
+github.com/go-ini/ini v1.67.0 h1:z6ZrTEZqSWOTyH2FlglNbNgARyHG8oLW9gMELqKr06A=
+github.com/go-ini/ini v1.67.0/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3Ies8=
 github.com/go-jose/go-jose/v4 v4.1.4 h1:moDMcTHmvE6Groj34emNPLs/qtYXRVcd6S7NHbHz3kA=
 github.com/go-jose/go-jose/v4 v4.1.4/go.mod h1:x4oUasVrzR7071A4TnHLGSPpNOm2a21K9Kf04k1rs08=
 github.com/go-ldap/ldap/v3 v3.4.13 h1:+x1nG9h+MZN7h/lUi5Q3UZ0fJ1GyDQYbPvbuH38baDQ=
@@ -415,6 +415,8 @@ github.com/gorilla/sessions v1.4.0 h1:kpIYOp/oi6MG/p5PgxApU8srsSw9tuFbt46Lt7auzq
 github.com/gorilla/sessions v1.4.0/go.mod h1:FLWm50oby91+hl7p/wRxDth9bWSuk0qVL2emc7lT5ik=
 github.com/hanzo-git/actions-proto-go v0.6.0 h1:eSDSW8tEzeR6R9QsSBHV0uyKVh4Jvt/aafr5fAOW9mA=
 github.com/hanzo-git/actions-proto-go v0.6.0/go.mod h1:nzX2hzsN4ghiM1ud3sxe2Ksa68T/fQVth0RE9RcyDAs=
+github.com/hanzoai/storage-go v1.0.0 h1:c5EO04oGQY67VzZYaiA2Dtc/swTc5k5x8Ts/fpw5VDk=
+github.com/hanzoai/storage-go v1.0.0/go.mod h1:IPXouQWTki5LKa9Y3qfOr6o8Qwlmc4sGObJnGMNKCOM=
 github.com/hashicorp/go-cleanhttp v0.5.2 h1:035FKYIWjmULyFRBKPs8TBQoi0x6d9G4xc9neXJWAZQ=
 github.com/hashicorp/go-cleanhttp v0.5.2/go.mod h1:kO/YDlP8L1346E6Sodw+PrpBSV4/SoxCXGY6BqNFT48=
 github.com/hashicorp/go-hclog v1.6.3 h1:Qr2kF+eVWjTiYmU7Y31tYlP1h0q/X3Nl3tPGdaB11/k=
@@ -529,8 +531,6 @@ github.com/minio/crc64nvme v1.1.1 h1:8dwx/Pz49suywbO+auHCBpCtlW1OfpcLN7wYgVR6wAI
 github.com/minio/crc64nvme v1.1.1/go.mod h1:eVfm2fAzLlxMdUGc0EEBGSMmPwmXD5XiNRpnu9J3bvg=
 github.com/minio/md5-simd v1.1.2 h1:Gdi1DZK69+ZVMoNHRXJyNcxrMA4dSxoYHZSQbirFg34=
 github.com/minio/md5-simd v1.1.2/go.mod h1:MzdKDxYpY2BT9XQFocsiZf/NKVtR7nkE4RoEpN+20RM=
-github.com/minio/minio-go/v7 v7.2.1 h1:PfBfwvKB/MmqyN8Vb1G9voWisaM9OrLv+WwOvMwS9Dw=
-github.com/minio/minio-go/v7 v7.2.1/go.mod h1:EU9hENAStx/xXduNdrGO5e4X5vk19NtgB+RIPjZO8o0=
 github.com/minio/minlz v1.1.1 h1:OGmft1V6AnI/Wme332U6bhG54nxEan+VFgkD7lat4KM=
 github.com/minio/minlz v1.1.1/go.mod h1:qT0aEB35q79LLornSzeDH75LBf3aH1MV+jB5w9Wasec=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=

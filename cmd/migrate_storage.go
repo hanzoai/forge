@@ -42,7 +42,7 @@ func newMigrateStorageCommand() *cli.Command {
 				Name:    "storage",
 				Aliases: []string{"s"},
 				Value:   "",
-				Usage:   "New storage type: local (default), minio or azureblob",
+				Usage:   "New storage type: local (default), s3 or azureblob",
 			},
 			&cli.StringFlag{
 				Name:    "path",
@@ -50,54 +50,54 @@ func newMigrateStorageCommand() *cli.Command {
 				Value:   "",
 				Usage:   "New storage placement if store is local (leave blank for default)",
 			},
-			// Minio Storage special configurations
+			// S3 Storage special configurations
 			&cli.StringFlag{
-				Name:  "minio-endpoint",
+				Name:  "s3-endpoint",
 				Value: "",
-				Usage: "Minio storage endpoint",
+				Usage: "S3 storage endpoint",
 			},
 			&cli.StringFlag{
-				Name:  "minio-access-key-id",
+				Name:  "s3-access-key-id",
 				Value: "",
-				Usage: "Minio storage accessKeyID",
+				Usage: "S3 storage accessKeyID",
 			},
 			&cli.StringFlag{
-				Name:  "minio-secret-access-key",
+				Name:  "s3-secret-access-key",
 				Value: "",
-				Usage: "Minio storage secretAccessKey",
+				Usage: "S3 storage secretAccessKey",
 			},
 			&cli.StringFlag{
-				Name:  "minio-bucket",
+				Name:  "s3-bucket",
 				Value: "",
-				Usage: "Minio storage bucket",
+				Usage: "S3 storage bucket",
 			},
 			&cli.StringFlag{
-				Name:  "minio-location",
+				Name:  "s3-location",
 				Value: "",
-				Usage: "Minio storage location to create bucket",
+				Usage: "S3 storage location to create bucket",
 			},
 			&cli.StringFlag{
-				Name:  "minio-base-path",
+				Name:  "s3-base-path",
 				Value: "",
-				Usage: "Minio storage base path on the bucket",
+				Usage: "S3 storage base path on the bucket",
 			},
 			&cli.BoolFlag{
-				Name:  "minio-use-ssl",
-				Usage: "Enable SSL for minio",
+				Name:  "s3-use-ssl",
+				Usage: "Enable SSL for s3",
 			},
 			&cli.BoolFlag{
-				Name:  "minio-insecure-skip-verify",
+				Name:  "s3-insecure-skip-verify",
 				Usage: "Skip SSL verification",
 			},
 			&cli.StringFlag{
-				Name:  "minio-checksum-algorithm",
+				Name:  "s3-checksum-algorithm",
 				Value: "",
-				Usage: "Minio checksum algorithm (default/md5)",
+				Usage: "S3 checksum algorithm (default/md5)",
 			},
 			&cli.StringFlag{
-				Name:  "minio-bucket-lookup-type",
+				Name:  "s3-bucket-lookup-type",
 				Value: "",
-				Usage: "Minio bucket lookup type",
+				Usage: "S3 bucket lookup type",
 			},
 			// Azure Blob Storage special configurations
 			&cli.StringFlag{
@@ -250,21 +250,21 @@ func runMigrateStorage(ctx context.Context, cmd *cli.Command) error {
 			&setting.Storage{
 				Path: p,
 			})
-	case string(setting.MinioStorageType):
-		dstStorage, err = storage.NewMinioStorage(
+	case string(setting.S3StorageType):
+		dstStorage, err = storage.NewS3Storage(
 			ctx,
 			&setting.Storage{
-				MinioConfig: setting.MinioStorageConfig{
-					Endpoint:           cmd.String("minio-endpoint"),
-					AccessKeyID:        cmd.String("minio-access-key-id"),
-					SecretAccessKey:    cmd.String("minio-secret-access-key"),
-					Bucket:             cmd.String("minio-bucket"),
-					Location:           cmd.String("minio-location"),
-					BasePath:           cmd.String("minio-base-path"),
-					UseSSL:             cmd.Bool("minio-use-ssl"),
-					InsecureSkipVerify: cmd.Bool("minio-insecure-skip-verify"),
-					ChecksumAlgorithm:  cmd.String("minio-checksum-algorithm"),
-					BucketLookUpType:   cmd.String("minio-bucket-lookup-type"),
+				S3Config: setting.S3StorageConfig{
+					Endpoint:           cmd.String("s3-endpoint"),
+					AccessKeyID:        cmd.String("s3-access-key-id"),
+					SecretAccessKey:    cmd.String("s3-secret-access-key"),
+					Bucket:             cmd.String("s3-bucket"),
+					Location:           cmd.String("s3-location"),
+					BasePath:           cmd.String("s3-base-path"),
+					UseSSL:             cmd.Bool("s3-use-ssl"),
+					InsecureSkipVerify: cmd.Bool("s3-insecure-skip-verify"),
+					ChecksumAlgorithm:  cmd.String("s3-checksum-algorithm"),
+					BucketLookUpType:   cmd.String("s3-bucket-lookup-type"),
 				},
 			})
 	case string(setting.AzureBlobStorageType):

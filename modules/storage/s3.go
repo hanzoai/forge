@@ -20,35 +20,35 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
+	s3 "github.com/hanzoai/storage-go"
+	"github.com/hanzoai/storage-go/pkg/credentials"
 )
 
-var _ ObjectStorage = &MinioStorage{}
+var _ ObjectStorage = &S3Storage{}
 
-type minioObject struct {
-	*minio.Object
+type s3Object struct {
+	*s3.Object
 }
 
-func (m *minioObject) Stat() (os.FileInfo, error) {
+func (m *s3Object) Stat() (os.FileInfo, error) {
 	oi, err := m.Object.Stat()
 	if err != nil {
-		return nil, convertMinioErr(err)
+		return nil, convertS3Err(err)
 	}
 
-	return &minioFileInfo{oi}, nil
+	return &s3FileInfo{oi}, nil
 }
 
-// MinioStorage returns a minio bucket storage
-type MinioStorage struct {
-	cfg      *setting.MinioStorageConfig
+// S3Storage returns an S3 bucket storage backed by the hanzoai/storage-go client
+type S3Storage struct {
+	cfg      *setting.S3StorageConfig
 	ctx      context.Context
-	client   *minio.Client
+	client   *s3.Client
 	bucket   string
 	basePath string
 }
 
-func convertMinioErr(err error, optMsg ...string) error {
+func convertS3Err(err error, optMsg ...string) error {
 	if err == nil {
 		return nil
 	}
@@ -60,7 +60,7 @@ func convertMinioErr(err error, optMsg ...string) error {
 		return fmt.Errorf("%s: %w", optMsg[0], err)
 	}
 
-	errResp, ok := errors.AsType[minio.ErrorResponse](err)
+	errResp, ok := errors.AsType[s3.ErrorResponse](err)
 	if !ok {
 		return wrapErr(err)
 	}
@@ -76,24 +76,24 @@ func convertMinioErr(err error, optMsg ...string) error {
 	return wrapErr(err)
 }
 
-// NewMinioStorage returns a minio storage
-func NewMinioStorage(ctx context.Context, cfg *setting.Storage) (ObjectStorage, error) {
-	config := cfg.MinioConfig
-	log.Info("Creating minio storage at %s:%s with base path %s", config.Endpoint, config.Bucket, config.BasePath)
+// NewS3Storage returns an S3 storage
+func NewS3Storage(ctx context.Context, cfg *setting.Storage) (ObjectStorage, error) {
+	config := cfg.S3Config
+	log.Info("Creating S3 storage at %s:%s with base path %s", config.Endpoint, config.Bucket, config.BasePath)
 	if config.ChecksumAlgorithm != "" && config.ChecksumAlgorithm != "default" && config.ChecksumAlgorithm != "md5" {
-		return nil, fmt.Errorf("invalid minio checksum algorithm: %s", config.ChecksumAlgorithm)
+		return nil, fmt.Errorf("invalid S3 checksum algorithm: %s", config.ChecksumAlgorithm)
 	}
 
-	var lookup minio.BucketLookupType
+	var lookup s3.BucketLookupType
 	switch config.BucketLookUpType {
 	case "auto", "":
-		lookup = minio.BucketLookupAuto
+		lookup = s3.BucketLookupAuto
 	case "dns":
-		lookup = minio.BucketLookupDNS
+		lookup = s3.BucketLookupDNS
 	case "path":
-		lookup = minio.BucketLookupPath
+		lookup = s3.BucketLookupPath
 	default:
-		return nil, fmt.Errorf("invalid minio bucket lookup type: %s", config.BucketLookUpType)
+		return nil, fmt.Errorf("invalid S3 bucket lookup type: %s", config.BucketLookUpType)
 	}
 
 	// The request error message is something like:
@@ -103,42 +103,42 @@ func NewMinioStorage(ctx context.Context, cfg *setting.Storage) (ObjectStorage, 
 	makeErrMsg := func(hint string) string {
 		return fmt.Sprintf("ObjectStorage.%s: endpoint=%s, location=%s, bucket=%s", hint, config.Endpoint, config.Location, config.Bucket)
 	}
-	minioClient, err := minio.New(config.Endpoint, &minio.Options{
-		Creds:        buildMinioCredentials(config),
+	s3Client, err := s3.New(config.Endpoint, &s3.Options{
+		Creds:        buildS3Credentials(config),
 		Secure:       config.UseSSL,
 		Transport:    &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: config.InsecureSkipVerify}},
 		Region:       config.Location,
 		BucketLookup: lookup,
 	})
 	if err != nil {
-		return nil, convertMinioErr(err, makeErrMsg("NewClient"))
+		return nil, convertS3Err(err, makeErrMsg("NewClient"))
 	}
 
 	// Check to see if we already own this bucket
-	exists, err := minioClient.BucketExists(ctx, config.Bucket)
+	exists, err := s3Client.BucketExists(ctx, config.Bucket)
 	if err != nil {
-		return nil, convertMinioErr(err, makeErrMsg("BucketExists"))
+		return nil, convertS3Err(err, makeErrMsg("BucketExists"))
 	}
 
 	// If the bucket doesn't exist, try to create one
 	if !exists {
-		if err := minioClient.MakeBucket(ctx, config.Bucket, minio.MakeBucketOptions{
+		if err := s3Client.MakeBucket(ctx, config.Bucket, s3.MakeBucketOptions{
 			Region: config.Location,
 		}); err != nil {
-			return nil, convertMinioErr(err, makeErrMsg("MakeBucket"))
+			return nil, convertS3Err(err, makeErrMsg("MakeBucket"))
 		}
 	}
 
-	return &MinioStorage{
+	return &S3Storage{
 		cfg:      &config,
 		ctx:      ctx,
-		client:   minioClient,
+		client:   s3Client,
 		bucket:   config.Bucket,
 		basePath: config.BasePath,
 	}, nil
 }
 
-func (m *MinioStorage) buildMinioPath(p string) string {
+func (m *S3Storage) buildS3Path(p string) string {
 	p = strings.TrimPrefix(util.PathJoinRelX(m.basePath, p), "/") // object store doesn't use slash for root path
 	if p == "." {
 		p = "" // object store doesn't use dot as relative path
@@ -146,30 +146,25 @@ func (m *MinioStorage) buildMinioPath(p string) string {
 	return p
 }
 
-func (m *MinioStorage) buildMinioDirPrefix(p string) string {
+func (m *S3Storage) buildS3DirPrefix(p string) string {
 	// ending slash is required for avoiding matching like "foo/" and "foobar/" with prefix "foo"
-	p = m.buildMinioPath(p) + "/"
+	p = m.buildS3Path(p) + "/"
 	if p == "/" {
 		p = "" // object store doesn't use slash for root path
 	}
 	return p
 }
 
-func buildMinioCredentials(config setting.MinioStorageConfig) *credentials.Credentials {
+func buildS3Credentials(config setting.S3StorageConfig) *credentials.Credentials {
 	// If static credentials are provided, use those
 	if config.AccessKeyID != "" {
 		return credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, "")
 	}
 
-	// Otherwise, fallback to a credentials chain for S3 access
+	// Otherwise, fall back to the standard AWS credential chain for S3 access
 	chain := []credentials.Provider{
-		// configure based upon MINIO_ prefixed environment variables
-		&credentials.EnvMinio{},
 		// configure based upon AWS_ prefixed environment variables
 		&credentials.EnvAWS{},
-		// read credentials from MINIO_SHARED_CREDENTIALS_FILE
-		// environment variable, or default json config files
-		&credentials.FileMinioClient{},
 		// read credentials from AWS_SHARED_CREDENTIALS_FILE
 		// environment variable, or default credentials file
 		&credentials.FileAWSCredentials{},
@@ -187,24 +182,24 @@ func buildMinioCredentials(config setting.MinioStorageConfig) *credentials.Crede
 }
 
 // Open opens a file
-func (m *MinioStorage) Open(path string) (Object, error) {
-	opts := minio.GetObjectOptions{}
-	object, err := m.client.GetObject(m.ctx, m.bucket, m.buildMinioPath(path), opts)
+func (m *S3Storage) Open(path string) (Object, error) {
+	opts := s3.GetObjectOptions{}
+	object, err := m.client.GetObject(m.ctx, m.bucket, m.buildS3Path(path), opts)
 	if err != nil {
-		return nil, convertMinioErr(err)
+		return nil, convertS3Err(err)
 	}
-	return &minioObject{object}, nil
+	return &s3Object{object}, nil
 }
 
-// Save saves a file to minio
-func (m *MinioStorage) Save(path string, r io.Reader, size int64) (int64, error) {
+// Save saves a file to S3
+func (m *S3Storage) Save(path string, r io.Reader, size int64) (int64, error) {
 	uploadInfo, err := m.client.PutObject(
 		m.ctx,
 		m.bucket,
-		m.buildMinioPath(path),
+		m.buildS3Path(path),
 		r,
 		size,
-		minio.PutObjectOptions{
+		s3.PutObjectOptions{
 			ContentType: "application/octet-stream",
 			// some storages like:
 			// * https://developers.cloudflare.com/r2/api/s3/api/
@@ -214,65 +209,65 @@ func (m *MinioStorage) Save(path string, r io.Reader, size int64) (int64, error)
 		},
 	)
 	if err != nil {
-		return 0, convertMinioErr(err)
+		return 0, convertS3Err(err)
 	}
 	return uploadInfo.Size, nil
 }
 
-type minioFileInfo struct {
-	minio.ObjectInfo
+type s3FileInfo struct {
+	s3.ObjectInfo
 }
 
-func (m minioFileInfo) Name() string {
+func (m s3FileInfo) Name() string {
 	return path.Base(m.ObjectInfo.Key)
 }
 
-func (m minioFileInfo) Size() int64 {
+func (m s3FileInfo) Size() int64 {
 	return m.ObjectInfo.Size
 }
 
-func (m minioFileInfo) ModTime() time.Time {
+func (m s3FileInfo) ModTime() time.Time {
 	return m.LastModified
 }
 
-func (m minioFileInfo) IsDir() bool {
+func (m s3FileInfo) IsDir() bool {
 	return strings.HasSuffix(m.ObjectInfo.Key, "/")
 }
 
-func (m minioFileInfo) Mode() os.FileMode {
+func (m s3FileInfo) Mode() os.FileMode {
 	return os.ModePerm
 }
 
-func (m minioFileInfo) Sys() any {
+func (m s3FileInfo) Sys() any {
 	return nil
 }
 
 // Stat returns the stat information of the object
-func (m *MinioStorage) Stat(path string) (os.FileInfo, error) {
+func (m *S3Storage) Stat(path string) (os.FileInfo, error) {
 	info, err := m.client.StatObject(
 		m.ctx,
 		m.bucket,
-		m.buildMinioPath(path),
-		minio.StatObjectOptions{},
+		m.buildS3Path(path),
+		s3.StatObjectOptions{},
 	)
 	if err != nil {
-		return nil, convertMinioErr(err)
+		return nil, convertS3Err(err)
 	}
-	return &minioFileInfo{info}, nil
+	return &s3FileInfo{info}, nil
 }
 
 // Delete delete a file
-func (m *MinioStorage) Delete(path string) error {
-	err := m.client.RemoveObject(m.ctx, m.bucket, m.buildMinioPath(path), minio.RemoveObjectOptions{})
+func (m *S3Storage) Delete(path string) error {
+	err := m.client.RemoveObject(m.ctx, m.bucket, m.buildS3Path(path), s3.RemoveObjectOptions{})
 
-	return convertMinioErr(err)
+	return convertS3Err(err)
 }
 
-func (m *MinioStorage) ServeDirectURL(storePath, name, method string, opt *ServeDirectOptions) (*url.URL, error) {
+func (m *S3Storage) ServeDirectURL(storePath, name, method string, opt *ServeDirectOptions) (*url.URL, error) {
 	reqParams := url.Values{}
 
 	param := prepareServeDirectOptions(opt, name)
-	// minio does not ignore empty params
+	// S3 presigning does not ignore empty params
 	if param.ContentType != "" {
 		reqParams.Set("response-content-type", param.ContentType)
 	}
@@ -282,35 +277,35 @@ func (m *MinioStorage) ServeDirectURL(storePath, name, method string, opt *Serve
 
 	expires := 5 * time.Minute
 	if method == http.MethodHead {
-		u, err := m.client.PresignedHeadObject(m.ctx, m.bucket, m.buildMinioPath(storePath), expires, reqParams)
-		return u, convertMinioErr(err)
+		u, err := m.client.PresignedHeadObject(m.ctx, m.bucket, m.buildS3Path(storePath), expires, reqParams)
+		return u, convertS3Err(err)
 	}
-	u, err := m.client.PresignedGetObject(m.ctx, m.bucket, m.buildMinioPath(storePath), expires, reqParams)
-	return u, convertMinioErr(err)
+	u, err := m.client.PresignedGetObject(m.ctx, m.bucket, m.buildS3Path(storePath), expires, reqParams)
+	return u, convertS3Err(err)
 }
 
-// IterateObjects iterates across the objects in the miniostorage
-func (m *MinioStorage) IterateObjects(dirName string, fn func(path string, obj Object) error) error {
-	opts := minio.GetObjectOptions{}
+// IterateObjects iterates across the objects in the S3 storage
+func (m *S3Storage) IterateObjects(dirName string, fn func(path string, obj Object) error) error {
+	opts := s3.GetObjectOptions{}
 	// FIXME: this loop is not right and causes resource leaking, see the comment of ListObjects
-	for mObjInfo := range m.client.ListObjects(m.ctx, m.bucket, minio.ListObjectsOptions{
-		Prefix:    m.buildMinioDirPrefix(dirName),
+	for mObjInfo := range m.client.ListObjects(m.ctx, m.bucket, s3.ListObjectsOptions{
+		Prefix:    m.buildS3DirPrefix(dirName),
 		Recursive: true,
 	}) {
 		object, err := m.client.GetObject(m.ctx, m.bucket, mObjInfo.Key, opts)
 		if err != nil {
-			return convertMinioErr(err)
+			return convertS3Err(err)
 		}
-		if err := func(object *minio.Object, fn func(path string, obj Object) error) error {
+		if err := func(object *s3.Object, fn func(path string, obj Object) error) error {
 			defer object.Close()
-			return fn(strings.TrimPrefix(mObjInfo.Key, m.basePath), &minioObject{object})
+			return fn(strings.TrimPrefix(mObjInfo.Key, m.basePath), &s3Object{object})
 		}(object, fn); err != nil {
-			return convertMinioErr(err)
+			return convertS3Err(err)
 		}
 	}
 	return nil
 }
 
 func init() {
-	RegisterStorageType(setting.MinioStorageType, NewMinioStorage)
+	RegisterStorageType(setting.S3StorageType, NewS3Storage)
 }

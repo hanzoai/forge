@@ -19,7 +19,7 @@ When a Gitea action is running, the Gitea action server should collect and store
 
 The requirements are:
 * The running logs must be stored across the cluster if the Gitea servers are deployed as a cluster.
-* The logs will be archived to Object Storage (S3/MinIO, etc.) after a period of time.
+* The logs will be archived to Object Storage (S3, etc.) after a period of time.
 * The Gitea action UI should be able to render the running logs and the archived logs.
 
 Some possible solutions for the running logs:
