@@ -1,0 +1,19 @@
+# Canonical CI/CD config for hanzoai/git — read by the hanzoai/ci reusable
+# workflow (.github/workflows/cicd.yml) and platform.hanzo.ai. Builds Hanzo Git
+# (our Gitea fork: Hanzo-branded, IAM-native) from the multi-stage root
+# Dockerfile — pnpm frontend + Go backend → one static binary under the upstream
+# s6 supervisor. The config contract is unchanged (GITEA__<section>__<KEY>), so
+# the image is a drop-in for the live git.hanzo.ai deployment; deploy happens via
+# the hanzoai/universe manifests (infra/k8s/git), not an operator Service CR.
+images:
+  - name: git
+    context: .
+    dockerfile: Dockerfile
+    repo: ghcr.io/hanzoai/git
+
+# Minimal gate: modules/setting carries the GITEA__ env-injection contract the
+# deployment depends on — run its unit tests. The full frontend + backend compile
+# is the image build itself.
+test:
+  - name: setting-tests
+    run: go test ./modules/setting/...
