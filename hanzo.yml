@@ -1,0 +1,20 @@
+# Canonical CI/CD config for hanzoai/git — read by both the hanzoai/ci reusable
+# workflow (.github/workflows/cicd.yml) and platform.hanzo.ai. One image: the
+# multi-stage root Dockerfile builds the web frontend and the `gitea` binary and
+# bakes in the Hanzo Git branding (logo, favicon, app name, footer). git.hanzo.ai
+# runs this image via the `git` operator App CR in hanzoai/universe; config is
+# injected via the GIT__<section>__<KEY> env contract. No deploy: here — the App
+# CR pins a semver tag, bumped by a reviewed universe change, not auto-rolled.
+images:
+  - name: git
+    context: .
+    dockerfile: Dockerfile
+    repo: ghcr.io/hanzoai/git
+
+# The Go + frontend compile happens inside the Dockerfile, so a broken tree fails
+# the image build already. This gate stays light and targeted: the setting unit
+# tests exercise the config-env prefix + work/custom path resolution the running
+# deploy depends on.
+test:
+  - name: go-test-setting
+    run: go test ./modules/setting/...
