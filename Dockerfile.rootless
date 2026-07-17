@@ -11,7 +11,7 @@ RUN make frontend
 # Build backend for each target platform
 FROM docker.io/library/golang:1.26-alpine3.24 AS build-env
 
-ARG GIT_VERSION
+ARG GITEA_VERSION
 ARG TAGS=""
 ENV TAGS="bindata timetzdata $TAGS"
 ARG CGO_EXTRA_CFLAGS
@@ -72,13 +72,13 @@ COPY --from=build-env --chown=root:root /go/src/gitea.dev/gitea /app/gitea/gitea
 
 # git:git
 USER 1000:1000
-ENV GIT_WORK_DIR=/var/lib/gitea
-ENV GIT_CUSTOM=/var/lib/gitea/custom
-ENV GIT_TEMP=/tmp/gitea
+ENV GITEA_WORK_DIR=/var/lib/gitea
+ENV GITEA_CUSTOM=/var/lib/gitea/custom
+ENV GITEA_TEMP=/tmp/gitea
 ENV TMPDIR=/tmp/gitea
 
 # TODO add to docs the ability to define the ini to load (useful to test and revert a config)
-ENV GIT_APP_INI=/etc/gitea/app.ini
+ENV GITEA_APP_INI=/etc/gitea/app.ini
 ENV HOME="/var/lib/gitea/git"
 VOLUME ["/var/lib/gitea", "/etc/gitea"]
 WORKDIR /var/lib/gitea

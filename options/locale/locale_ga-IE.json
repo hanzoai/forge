@@ -3703,7 +3703,7 @@
   "secrets.description": "Cuirfear rúin ar aghaidh chuig gníomhartha áirithe agus ní féidir iad a léamh ar mhalairt.",
   "secrets.none": "Níl aon rúin ann fós.",
   "secrets.creation.description": "Cur síos",
-  "secrets.creation.name_placeholder": "carachtair alfanumair nó íoslaghda amháin nach féidir a thosú le GIT_ nó GITHUB_",
+  "secrets.creation.name_placeholder": "carachtair alfanumair nó íoslaghda amháin nach féidir a thosú le GITEA_ nó GITHUB_",
   "secrets.creation.value_placeholder": "Ionchur ábhar ar bith. Fágfar spás bán ag tús agus ag deireadh ar lár.",
   "secrets.creation.description_placeholder": "Cuir isteach cur síos gairid (roghnach).",
   "secrets.save_success": "Tá an rún \"%s\" sábháilte.",
@@ -3921,7 +3921,7 @@
   "actions.general.token_permissions.fork_pr_note": "Mura gcuirtear tús le post trí iarratas tarraingthe ó fhorc, ní rachaidh a cheadanna éifeachtacha thar na ceadanna léite amháin.",
   "actions.general.token_permissions.customize_max_permissions": "Saincheap na ceadanna uasta",
   "actions.general.cross_repo": "Rochtain Tras-Stórtha",
-  "actions.general.cross_repo_desc": "Ceadaigh rochtain (léamh amháin) a bheith ag na stórtha uile san úinéir seo ar na stórtha roghnaithe le GIT_TOKEN agus poist Gníomhartha á reáchtáil.",
+  "actions.general.cross_repo_desc": "Ceadaigh rochtain (léamh amháin) a bheith ag na stórtha uile san úinéir seo ar na stórtha roghnaithe le GITEA_TOKEN agus poist Gníomhartha á reáchtáil.",
   "actions.general.cross_repo_selected": "Stórtha roghnaithe",
   "actions.general.cross_repo_target_repos": "Stórtha Spriocdhírithe",
   "actions.general.cross_repo_add": "Cuir Stór Sprioc leis"

@@ -157,10 +157,10 @@ func GetSecretsOfTask(ctx context.Context, task *actions_model.ActionTask) (map[
 	baseSecrets := map[string]string{}
 
 	baseSecrets["GITHUB_TOKEN"] = task.Token
-	baseSecrets["GIT_TOKEN"] = task.Token
+	baseSecrets["GITEA_TOKEN"] = task.Token
 
 	if task.Job.Run.IsForkPullRequest && task.Job.Run.TriggerEvent != actions_module.GithubEventPullRequestTarget {
-		// ignore secrets for fork pull request, except GITHUB_TOKEN and GIT_TOKEN which are automatically generated.
+		// ignore secrets for fork pull request, except GITHUB_TOKEN and GITEA_TOKEN which are automatically generated.
 		// for the tasks triggered by pull_request_target event, they could access the secrets because they will run in the context of the base branch
 		// see the documentation: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target
 		return baseSecrets, nil
@@ -217,7 +217,7 @@ func getScopedSecretsForJob(ctx context.Context, job *actions_model.ActionRunJob
 	// Empty or explicit-mapping path: only auto-tokens + (any) mapped aliases are exposed.
 	scoped := map[string]string{
 		"GITHUB_TOKEN": baseSecrets["GITHUB_TOKEN"],
-		"GIT_TOKEN":  baseSecrets["GIT_TOKEN"],
+		"GITEA_TOKEN":  baseSecrets["GITEA_TOKEN"],
 	}
 	if caller.CallSecrets == "" {
 		return scoped, nil

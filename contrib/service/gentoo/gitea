@@ -3,12 +3,12 @@
 DIR=/var/lib/gitea
 USER=git
 HOME=/home/${USER}
-GIT_WORK_DIR=${DIR}
+GITEA_WORK_DIR=${DIR}
 EXECUTABLE=/usr/local/bin/gitea
 
 export USER
 export HOME
-export GIT_WORK_DIR
+export GITEA_WORK_DIR
 
 name=$RC_SVCNAME
 cfgfile="/etc/$RC_SVCNAME/app.ini"

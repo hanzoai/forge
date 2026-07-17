@@ -12,10 +12,10 @@ export function randomString(length: number): string {
   return result;
 }
 
-export const timeoutFactor = Number(env.GIT_TEST_E2E_TIMEOUT_FACTOR) || 1;
+export const timeoutFactor = Number(env.GITEA_TEST_E2E_TIMEOUT_FACTOR) || 1;
 
 export function baseUrl() {
-  return env.GIT_TEST_E2E_URL?.replace(/\/$/g, '');
+  return env.GITEA_TEST_E2E_URL?.replace(/\/$/g, '');
 }
 
 function apiAuthHeader(username: string, password: string) {
@@ -23,7 +23,7 @@ function apiAuthHeader(username: string, password: string) {
 }
 
 export function apiHeaders() {
-  return apiAuthHeader(env.GIT_TEST_E2E_USER, env.GIT_TEST_E2E_PASSWORD);
+  return apiAuthHeader(env.GITEA_TEST_E2E_USER, env.GITEA_TEST_E2E_PASSWORD);
 }
 
 async function apiRetry(fn: () => Promise<{ok: () => boolean; status: () => number; text: () => Promise<string>}>, label: string) {
@@ -132,7 +132,7 @@ export function apiUserHeaders(username: string) {
 export async function apiCreateUser(requestContext: APIRequestContext, username: string) {
   await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/admin/users`, {
     headers: apiHeaders(),
-    data: {username, password: testUserPassword, email: `${username}@${env.GIT_TEST_E2E_DOMAIN}`, must_change_password: false},
+    data: {username, password: testUserPassword, email: `${username}@${env.GITEA_TEST_E2E_DOMAIN}`, must_change_password: false},
   }), 'apiCreateUser');
 }
 
@@ -203,7 +203,7 @@ export async function loginUser(page: Page, username: string) {
   return login(page, username, testUserPassword);
 }
 
-export async function login(page: Page, username = env.GIT_TEST_E2E_USER, password = env.GIT_TEST_E2E_PASSWORD) {
+export async function login(page: Page, username = env.GITEA_TEST_E2E_USER, password = env.GITEA_TEST_E2E_PASSWORD) {
   const response = await page.request.post('/user/login', {
     form: {user_name: username, password},
     maxRedirects: 0,

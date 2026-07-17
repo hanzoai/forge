@@ -19,7 +19,7 @@ import (
 )
 
 func TestGiteaDownloadRepo(t *testing.T) {
-	token := os.Getenv("GIT_TEST_OFFICIAL_SITE_TOKEN")
+	token := os.Getenv("GITEA_TEST_OFFICIAL_SITE_TOKEN")
 	liveMode := token != ""
 
 	_, callerFile, _, _ := runtime.Caller(0)

@@ -3164,7 +3164,7 @@
   "secrets.description": "Tejné klíče budou předány určitým akcím a nelze je přečíst jinak.",
   "secrets.none": "Zatím zde nejsou žádné tajné klíče.",
   "secrets.creation.description": "Popis",
-  "secrets.creation.name_placeholder": "nerozlišovat velká a malá písmena, pouze alfanumerické znaky nebo podtržítka, nemohou začínat na GIT_ nebo GITHUB_",
+  "secrets.creation.name_placeholder": "nerozlišovat velká a malá písmena, pouze alfanumerické znaky nebo podtržítka, nemohou začínat na GITEA_ nebo GITHUB_",
   "secrets.creation.value_placeholder": "Vložte jakýkoliv obsah. Mezery na začátku a konci budou vynechány.",
   "secrets.deletion": "Odstranit tajný klíč",
   "secrets.deletion.description": "Odstranění tajného klíče je trvalé a nelze ho vrátit zpět. Pokračovat?",

@@ -56,7 +56,7 @@ func TestAPIRepoSecrets(t *testing.T) {
 				ExpectedStatus: http.StatusBadRequest,
 			},
 			{
-				Name:           "GIT_secret",
+				Name:           "GITEA_secret",
 				ExpectedStatus: http.StatusBadRequest,
 			},
 			{

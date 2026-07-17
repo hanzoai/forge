@@ -21,15 +21,15 @@ import (
 
 func initGlobalRunnerToken(ctx context.Context) error {
 	// use the same env name as the runner, for consistency
-	token := os.Getenv("GIT_RUNNER_REGISTRATION_TOKEN")
-	tokenFile := os.Getenv("GIT_RUNNER_REGISTRATION_TOKEN_FILE")
+	token := os.Getenv("GITEA_RUNNER_REGISTRATION_TOKEN")
+	tokenFile := os.Getenv("GITEA_RUNNER_REGISTRATION_TOKEN_FILE")
 	if token != "" && tokenFile != "" {
-		return errors.New("both GIT_RUNNER_REGISTRATION_TOKEN and GIT_RUNNER_REGISTRATION_TOKEN_FILE are set, only one can be used")
+		return errors.New("both GITEA_RUNNER_REGISTRATION_TOKEN and GITEA_RUNNER_REGISTRATION_TOKEN_FILE are set, only one can be used")
 	}
 	if tokenFile != "" {
 		file, err := os.ReadFile(tokenFile)
 		if err != nil {
-			return fmt.Errorf("unable to read GIT_RUNNER_REGISTRATION_TOKEN_FILE: %w", err)
+			return fmt.Errorf("unable to read GITEA_RUNNER_REGISTRATION_TOKEN_FILE: %w", err)
 		}
 		token = strings.TrimSpace(string(file))
 	}
@@ -38,7 +38,7 @@ func initGlobalRunnerToken(ctx context.Context) error {
 	}
 
 	if len(token) < 32 {
-		return errors.New("GIT_RUNNER_REGISTRATION_TOKEN must be at least 32 random characters")
+		return errors.New("GITEA_RUNNER_REGISTRATION_TOKEN must be at least 32 random characters")
 	}
 
 	existing, err := actions_model.GetRunnerToken(ctx, token)
@@ -47,7 +47,7 @@ func initGlobalRunnerToken(ctx context.Context) error {
 	}
 	if existing != nil {
 		if !existing.IsActive {
-			log.Warn("The token defined by GIT_RUNNER_REGISTRATION_TOKEN is already invalidated, please use the latest one from web UI")
+			log.Warn("The token defined by GITEA_RUNNER_REGISTRATION_TOKEN is already invalidated, please use the latest one from web UI")
 		}
 		return nil
 	}

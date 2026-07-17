@@ -3572,7 +3572,7 @@
   "secrets.description": "Gizlilikler belirli işlemlere aktarılacaktır, bunun dışında okunamaz.",
   "secrets.none": "Henüz gizlilik yok.",
   "secrets.creation.description": "Açıklama",
-  "secrets.creation.name_placeholder": "küçük-büyük harfe duyarlı değil, alfanümerik karakterler veya sadece alt tire, GIT_ veya GITHUB_ ile başlayamaz",
+  "secrets.creation.name_placeholder": "küçük-büyük harfe duyarlı değil, alfanümerik karakterler veya sadece alt tire, GITEA_ veya GITHUB_ ile başlayamaz",
   "secrets.creation.value_placeholder": "Herhangi bir içerik girin. Baştaki ve sondaki boşluklar ihmal edilecektir.",
   "secrets.creation.description_placeholder": "Kısa açıklama girin (isteğe bağlı).",
   "secrets.save_success": "Gizlilik \"%s\" kaydedildi.",

@@ -113,13 +113,13 @@ func Test_UpdateCommentsMigrationsByType(t *testing.T) {
 }
 
 // setupGiteaMockServer creates a mock HTTP server that replays API responses from fixture files.
-// If a GIT_TOKEN environment variable is set, the mock server proxies requests to the live
+// If a GITEA_TOKEN environment variable is set, the mock server proxies requests to the live
 // gitea.com instance and saves the responses as fixture files for future test runs.
-// Example: GIT_TOKEN=your_token go test -run Test_MigrateFromGiteaToGitea
+// Example: GITEA_TOKEN=your_token go test -run Test_MigrateFromGiteaToGitea
 func setupGiteaMockServer(t *testing.T) *httptest.Server {
 	t.Helper()
 
-	giteaToken := os.Getenv("GIT_TOKEN")
+	giteaToken := os.Getenv("GITEA_TOKEN")
 	liveMode := giteaToken != ""
 
 	// fast-import data creates deterministic commits (fixed author/committer/timestamps),

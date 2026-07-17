@@ -16,21 +16,21 @@ import (
 
 // env keys for git hooks need
 const (
-	EnvRepoName      = "GIT_REPO_NAME"
-	EnvRepoUsername  = "GIT_REPO_USER_NAME"
-	EnvRepoID        = "GIT_REPO_ID"
-	EnvRepoIsWiki    = "GIT_REPO_IS_WIKI"
-	EnvPusherName    = "GIT_PUSHER_NAME"
-	EnvPusherEmail   = "GIT_PUSHER_EMAIL"
-	EnvPusherID      = "GIT_PUSHER_ID"
-	EnvKeyID         = "GIT_KEY_ID" // public key ID
-	EnvDeployKeyID   = "GIT_DEPLOY_KEY_ID"
-	EnvPRID          = "GIT_PR_ID"
-	EnvPRIndex       = "GIT_PR_INDEX" // not used by Gitea at the moment, it is for custom git hooks
-	EnvPushTrigger   = "GIT_PUSH_TRIGGER"
-	EnvIsInternal    = "GIT_INTERNAL_PUSH"
-	EnvAppURL        = "GIT_ROOT_URL"
-	EnvActionsTaskID = "GIT_ACTIONS_TASK_ID"
+	EnvRepoName      = "GITEA_REPO_NAME"
+	EnvRepoUsername  = "GITEA_REPO_USER_NAME"
+	EnvRepoID        = "GITEA_REPO_ID"
+	EnvRepoIsWiki    = "GITEA_REPO_IS_WIKI"
+	EnvPusherName    = "GITEA_PUSHER_NAME"
+	EnvPusherEmail   = "GITEA_PUSHER_EMAIL"
+	EnvPusherID      = "GITEA_PUSHER_ID"
+	EnvKeyID         = "GITEA_KEY_ID" // public key ID
+	EnvDeployKeyID   = "GITEA_DEPLOY_KEY_ID"
+	EnvPRID          = "GITEA_PR_ID"
+	EnvPRIndex       = "GITEA_PR_INDEX" // not used by Gitea at the moment, it is for custom git hooks
+	EnvPushTrigger   = "GITEA_PUSH_TRIGGER"
+	EnvIsInternal    = "GITEA_INTERNAL_PUSH"
+	EnvAppURL        = "GITEA_ROOT_URL"
+	EnvActionsTaskID = "GITEA_ACTIONS_TASK_ID"
 )
 
 type PushTrigger string

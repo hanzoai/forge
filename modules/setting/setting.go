@@ -61,7 +61,7 @@ func IsRunUserMatchCurrentUser(runUser string) (string, bool) {
 }
 
 func IsInE2eTesting() bool {
-	return os.Getenv("GIT_TEST_E2E") == "true"
+	return os.Getenv("GITEA_TEST_E2E") == "true"
 }
 
 // PrepareAppDataPath creates app data directory if necessary
@@ -166,7 +166,7 @@ func loadRunModeFrom(rootCfg ConfigProvider) {
 	rootSec := rootCfg.Section("")
 	mustNotRunAsRoot(rootSec)
 
-	runModeValue := os.Getenv("GIT_RUN_MODE")
+	runModeValue := os.Getenv("GITEA_RUN_MODE")
 	runModeValue = util.IfZero(runModeValue, rootSec.Key("RUN_MODE").String())
 	// non-dev mode is treated as prod mode, to protect users from accidentally running in dev mode if there is a typo in this value.
 	IsProd = !strings.EqualFold(runModeValue, "dev") // TODO: can use case-sensitive comparing in the future
@@ -189,7 +189,7 @@ func mustNotRunAsRoot(rootSec ConfigSection) {
 	// The following is a purposefully undocumented option. Please do not run Gitea as root. It will only cause future headaches.
 	// Please don't use root as a bandaid to "fix" something that is broken, instead the broken thing should instead be fixed properly.
 	allowRunAsRoot := ConfigSectionKeyBool(rootSec, "I_AM_BEING_UNSAFE_RUNNING_AS_ROOT") || // check gitea config
-		optional.ParseBool(os.Getenv("GIT_I_AM_BEING_UNSAFE_RUNNING_AS_ROOT")).Value() // check gitea env var
+		optional.ParseBool(os.Getenv("GITEA_I_AM_BEING_UNSAFE_RUNNING_AS_ROOT")).Value() // check gitea env var
 
 	if !allowRunAsRoot {
 		// Special thanks to VLC which inspired the wording of this messaging.

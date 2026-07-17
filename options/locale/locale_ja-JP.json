@@ -3703,7 +3703,7 @@
   "secrets.description": "シークレットは特定のActionsに渡されます。 それ以外で読み出されることはありません。",
   "secrets.none": "シークレットはまだありません。",
   "secrets.creation.description": "説明",
-  "secrets.creation.name_placeholder": "大文字小文字の区別なし、英数字とアンダースコアのみ、GIT_ や GITHUB_ で始まるものは不可",
+  "secrets.creation.name_placeholder": "大文字小文字の区別なし、英数字とアンダースコアのみ、GITEA_ や GITHUB_ で始まるものは不可",
   "secrets.creation.value_placeholder": "内容を入力してください。前後の空白は除去されます。",
   "secrets.creation.description_placeholder": "簡単な説明を入力してください。 (オプション)",
   "secrets.save_success": "シークレット \"%s\" を保存しました。",
@@ -3921,7 +3921,7 @@
   "actions.general.token_permissions.fork_pr_note": "フォークからのプルリクエストによってジョブが開始された場合は、実効権限は読み取り専用までとなります。",
   "actions.general.token_permissions.customize_max_permissions": "権限の上限をカスタマイズする",
   "actions.general.cross_repo": "クロスリポジトリ アクセス",
-  "actions.general.cross_repo_desc": "Actionsジョブの実行時に、このオーナーのすべてのリポジトリから選択したリポジトリへ、GIT_TOKENを使用して(読み取り専用で)アクセスすることを許可します。",
+  "actions.general.cross_repo_desc": "Actionsジョブの実行時に、このオーナーのすべてのリポジトリから選択したリポジトリへ、GITEA_TOKENを使用して(読み取り専用で)アクセスすることを許可します。",
   "actions.general.cross_repo_selected": "選択したリポジトリ",
   "actions.general.cross_repo_target_repos": "対象リポジトリ",
   "actions.general.cross_repo_add": "対象リポジトリの追加"

@@ -3157,7 +3157,7 @@
   "secrets.description": "Os segredos serão passados a certas ações e não poderão ser lidos de outra forma.",
   "secrets.none": "Não há segredos ainda.",
   "secrets.creation.description": "Descrição",
-  "secrets.creation.name_placeholder": "apenas caracteres alfanuméricos ou underline (_), não pode começar com GIT_ ou GITHUB_",
+  "secrets.creation.name_placeholder": "apenas caracteres alfanuméricos ou underline (_), não pode começar com GITEA_ ou GITHUB_",
   "secrets.creation.value_placeholder": "Insira qualquer conteúdo. Espaços em branco no início e no fim serão omitidos.",
   "secrets.add_secret": "Adicionar segredo",
   "secrets.edit_secret": "Editar segredo",

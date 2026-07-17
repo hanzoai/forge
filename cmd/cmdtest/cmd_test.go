@@ -144,17 +144,17 @@ func TestCliCmd(t *testing.T) {
 			exp: makePathOutput(defaultWorkPath, defaultCustomPath, "/tmp/app.ini"),
 		},
 		{
-			env: map[string]string{"GIT_WORK_DIR": "/tmp"},
+			env: map[string]string{"GITEA_WORK_DIR": "/tmp"},
 			cmd: "./gitea test-cmd",
 			exp: makePathOutput("/tmp", "/tmp/custom", "/tmp/custom/conf/app.ini"),
 		},
 		{
-			env: map[string]string{"GIT_WORK_DIR": "/tmp"},
+			env: map[string]string{"GITEA_WORK_DIR": "/tmp"},
 			cmd: "./gitea test-cmd --work-path /tmp/other",
 			exp: makePathOutput("/tmp/other", "/tmp/other/custom", "/tmp/other/custom/conf/app.ini"),
 		},
 		{
-			env: map[string]string{"GIT_WORK_DIR": "/tmp"},
+			env: map[string]string{"GITEA_WORK_DIR": "/tmp"},
 			cmd: "./gitea test-cmd --config /tmp/app-other.ini",
 			exp: makePathOutput("/tmp", "/tmp/custom", "/tmp/app-other.ini"),
 		},

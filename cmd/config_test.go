@@ -28,7 +28,7 @@ k1=in-template
 k3=v3
 `), os.ModePerm)
 
-	t.Setenv("GIT__EnV__KeY", "val")
+	t.Setenv("GITEA__EnV__KeY", "val")
 
 	t.Run("OutputToNewWithEnv", func(t *testing.T) {
 		configNew := tmpDir + "/app-new.ini"

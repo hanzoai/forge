@@ -279,13 +279,13 @@ func TestParseCallerSecrets(t *testing.T) {
 
 	t.Run("mapping of secrets-style references is parsed", func(t *testing.T) {
 		inherit, mapping, err := ParseCallerSecrets(secretYAMLNode(t, `
-DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+DEPLOY_KEY: ${{ secrets.GITEA_DEPLOY_KEY }}
 DB_PASS:    ${{ secrets.PROD_DB_PASS }}
 `))
 		require.NoError(t, err)
 		assert.False(t, inherit)
 		assert.Equal(t, map[string]string{
-			"DEPLOY_KEY": "GIT_DEPLOY_KEY",
+			"DEPLOY_KEY": "GITEA_DEPLOY_KEY",
 			"DB_PASS":    "PROD_DB_PASS",
 		}, mapping)
 	})
@@ -296,7 +296,7 @@ deploy_key: ${{ secrets.gitea_deploy_key }}
 `))
 		require.NoError(t, err)
 		assert.False(t, inherit)
-		assert.Equal(t, map[string]string{"DEPLOY_KEY": "GIT_DEPLOY_KEY"}, mapping)
+		assert.Equal(t, map[string]string{"DEPLOY_KEY": "GITEA_DEPLOY_KEY"}, mapping)
 	})
 
 	t.Run("mapping value not in ${{ secrets.NAME }} form is rejected", func(t *testing.T) {

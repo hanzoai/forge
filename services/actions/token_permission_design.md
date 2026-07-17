@@ -15,7 +15,7 @@ This ensures that workflows cannot bypass organizational or repository-level sec
 
 ## Terminology
 
-### 1. `GIT_TOKEN`
+### 1. `GITEA_TOKEN`
 - The automatic token generated for each Actions job.
 - Its permissions (read/write/none) are scoped to the repository and specific features (Code, Issues, etc.).
 
@@ -45,7 +45,7 @@ This ensures that workflows cannot bypass organizational or repository-level sec
 
 ## Token Lifecycle & Permission Evaluation
 
-When a job starts, Gitea evaluates the requested permissions for the `GIT_TOKEN` through a multistep clamping process:
+When a job starts, Gitea evaluates the requested permissions for the `GITEA_TOKEN` through a multistep clamping process:
 
 ### Step 1: Determine Base Permissions From Workflow
 - If the job explicitly specifies a valid `permissions:` block, Gitea parses it.

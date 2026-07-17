@@ -229,7 +229,7 @@ been added to each release, please refer to the [blog](https://blog.gitea.com).
   * Disable matchBrackets in monaco (#36089)
   * Use GitHub-style commit message for squash merge (#35987)
   * Make composer registry support tar.gz and tar.bz2 and fix bugs (#35958)
-  * Add GIT_PR_INDEX env variable to githooks (#35938)
+  * Add GITEA_PR_INDEX env variable to githooks (#35938)
   * Add proper error message if session provider can not be created (#35520)
   * Add button to copy file name in PR files (#35509)
   * Move `X_FRAME_OPTIONS` setting from `cors` to `security` section (#30256)
@@ -1623,7 +1623,7 @@ been added to each release, please refer to the [blog](https://blog.gitea.com).
   * GitHub like repo home page (#32213 & #32847)
   * Rearrange Clone Panel (#31142)
   * Enhancing Gitea OAuth2 Provider with Granular Scopes for Resource Access (#32573)
-  * Use env GIT_RUNNER_REGISTRATION_TOKEN as global runner token (#32946) #32964
+  * Use env GITEA_RUNNER_REGISTRATION_TOKEN as global runner token (#32946) #32964
   * Update i18n.go - Language Picker (#32933) #32935
 
 * PERFORMANCE
@@ -3265,7 +3265,7 @@ Key highlights of this release encompass significant changes categorized under `
   * Redirect from `{repo}/issues/new` to `{repo}/issues/new/choose` when blank issues are disabled (#26813) (#26847)
   * Sync tags when adopting repos (#26816) (#26834)
   * Fix verifyCommits error when push a new branch (#26664) (#26810)
-  * Include the GITHUB_TOKEN/GIT_TOKEN secret for fork pull requests (#26759) (#26806)
+  * Include the GITHUB_TOKEN/GITEA_TOKEN secret for fork pull requests (#26759) (#26806)
   * Fix some slice append usages (#26778) (#26798)
   * Add fix incorrect can_create_org_repo for org owner team (#26683) (#26791)
   * Fix bug for ctx usage (#26763)
@@ -3375,7 +3375,7 @@ Key highlights of this release encompass significant changes categorized under `
   * Make pending commit status yellow again (#25935) (#25968)
 * BUGFIXES
   * Fix version in rpm repodata/primary.xml.gz (#26009) (#26048)
-  * Fix env config parsing for "GIT____APP_NAME" (#26001) (#26013)
+  * Fix env config parsing for "GITEA____APP_NAME" (#26001) (#26013)
   * ParseScope with owner/repo always sets owner to zero (#25987) (#25989)
   * Fix SSPI auth panic (#25955) (#25969)
   * Avoid creating directories when loading config (#25944) (#25957)
@@ -5588,7 +5588,7 @@ Key highlights of this release encompass significant changes categorized under `
   * Prevent panic on prohibited user login with oauth2 (#18562) (#18563)
   * Collaborator trust model should trust collaborators (#18539) (#18557)
   * Detect conflicts with 3way merge (#18536) (#18537)
-  * In docker rootless use $GIT_APP_INI if provided (#18524) (#18535)
+  * In docker rootless use $GITEA_APP_INI if provided (#18524) (#18535)
   * Add `GetUserTeams` (#18499) (#18531)
   * Fix review excerpt (#18502) (#18530)
   * Fix for AvatarURL database type (#18487) (#18529)

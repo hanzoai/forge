@@ -20,8 +20,8 @@
 		  <method_context>
 		    <method_credential user="git" group="git" />
 		    <method_environment>
-		      <envvar name='GIT_WORK_DIR' value='/opt/local/share/gitea'/>
-		      <envvar name='GIT_CUSTOM' value='/opt/local/etc/gitea'/>
+		      <envvar name='GITEA_WORK_DIR' value='/opt/local/share/gitea'/>
+		      <envvar name='GITEA_CUSTOM' value='/opt/local/etc/gitea'/>
 		      <envvar name='HOME' value='/var/db/gitea'/>
 		      <envvar name='PATH' value='/opt/local/bin:${PATH}'/>
 		      <envvar name='USER' value='git'/>

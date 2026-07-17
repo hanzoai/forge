@@ -24,7 +24,7 @@ import (
 const (
 	listenFDsEnv = "LISTEN_FDS"
 	startFD      = 3
-	unlinkFDsEnv = "GIT_UNLINK_FDS"
+	unlinkFDsEnv = "GITEA_UNLINK_FDS"
 
 	notifySocketEnv    = "NOTIFY_SOCKET"
 	watchdogTimeoutEnv = "WATCHDOG_USEC"

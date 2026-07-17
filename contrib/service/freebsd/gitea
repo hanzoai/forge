@@ -33,7 +33,7 @@ gitea_start() {
 	cd ${gitea_directory}
 	export USER=${gitea_user}
 	export HOME=/usr/home/${gitea_user}
-	export GIT_WORK_DIR=${gitea_directory}
+	export GITEA_WORK_DIR=${gitea_directory}
 	/usr/sbin/daemon -f -u ${gitea_user} -p ${pidfile} $command
 }
 

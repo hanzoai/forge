@@ -36,7 +36,7 @@ MAKE_EVIDENCE_DIR := .make_evidence
 # CI should explicitly set the database to avoid unexpected results.
 ifneq ($(findstring test-,$(MAKECMDGOALS)),)
 	ifeq ($(CI),)
-		GIT_TEST_DATABASE ?= sqlite
+		GITEA_TEST_DATABASE ?= sqlite
 	endif
 endif
 
@@ -88,7 +88,7 @@ GITHUB_REF_NAME ?= $(shell git rev-parse --abbrev-ref HEAD)
 
 ifneq ($(GITHUB_REF_TYPE),branch)
 	VERSION ?= $(subst v,,$(GITHUB_REF_NAME))
-	GIT_VERSION ?= $(VERSION)
+	GITEA_VERSION ?= $(VERSION)
 else
 	ifneq ($(GITHUB_REF_NAME),)
 		VERSION ?= $(subst release/v,,$(GITHUB_REF_NAME))-nightly
@@ -98,9 +98,9 @@ else
 
 	STORED_VERSION=$(shell cat $(STORED_VERSION_FILE) 2>/dev/null)
 	ifneq ($(STORED_VERSION),)
-		GIT_VERSION ?= $(STORED_VERSION)
+		GITEA_VERSION ?= $(STORED_VERSION)
 	else
-		GIT_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
+		GITEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 	endif
 endif
 
@@ -109,7 +109,7 @@ ifeq ($(VERSION),main)
 	VERSION := main-nightly
 endif
 
-LDFLAGS := $(LDFLAGS) -X "main.Version=$(GIT_VERSION)" -X "main.Tags=$(TAGS)"
+LDFLAGS := $(LDFLAGS) -X "main.Version=$(GITEA_VERSION)" -X "main.Tags=$(TAGS)"
 
 LINUX_ARCHS ?= linux/amd64,linux/386,linux/arm-5,linux/arm-6,linux/arm64,linux/riscv64
 
@@ -176,7 +176,7 @@ ifneq ("$(wildcard Makefile.local)","")
 endif
 
 $(foreach v, $(filter TEST_%, $(.VARIABLES)), $(eval MAKEFILE_VARS+=$v=$($v)))
-$(foreach v, $(filter GIT_TEST_%, $(.VARIABLES)), $(eval MAKEFILE_VARS+=$v=$($v)))
+$(foreach v, $(filter GITEA_TEST_%, $(.VARIABLES)), $(eval MAKEFILE_VARS+=$v=$($v)))
 export MAKEFILE_VARS
 
 .PHONY: all
@@ -187,7 +187,7 @@ help: Makefile ## print Makefile help information.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m[TARGETS] default target: build\033[0m\n\n\033[35mTargets:\033[0m\n"} /^[0-9A-Za-z._-]+:.*?##/ { printf "  \033[36m%-45s\033[0m %s\n", $$1, $$2 }' Makefile #$(MAKEFILE_LIST)
 	@printf "  \033[36m%-46s\033[0m %s\n" "test-e2e" "test end to end using playwright"
 	@printf "  \033[36m%-46s\033[0m %s\n" "test-backend[#TestSpecificName]" "run unit test (sqlite only)"
-	@printf "  \033[36m%-46s\033[0m %s\n" "test-integration[#TestSpecificName]" "run integration test for GIT_TEST_DATABASE (sqlite, mysql, pgsql, mssql)"
+	@printf "  \033[36m%-46s\033[0m %s\n" "test-integration[#TestSpecificName]" "run integration test for GITEA_TEST_DATABASE (sqlite, mysql, pgsql, mssql)"
 
 .PHONY: clean-all
 clean-all: clean ## delete backend, frontend and integration files
@@ -383,7 +383,7 @@ watch-frontend: node_modules ## start vite dev server for frontend
 
 .PHONY: watch-backend
 watch-backend: ## watch backend files and continuously rebuild
-	GIT_RUN_MODE=dev $(GO) run $(AIR_PACKAGE) -c .air.toml
+	GITEA_RUN_MODE=dev $(GO) run $(AIR_PACKAGE) -c .air.toml
 
 .PHONY: test-backend
 test-backend: ## test backend files
@@ -452,8 +452,8 @@ test-integration:
 	@# Use a compiled binary: testlogger forwards gitea logs to t.Log, so `go test -v`
 	@# would flood output per passing test. testcache can't help these tests anyway —
 	@# they mutate the work directory, so cache inputs change between runs.
-	$(GO) test $(GOTEST_FLAGS) -tags '$(TAGS)' -c gitea.dev/tests/integration -o ./test-integration-$(GIT_TEST_DATABASE).test
-	./tools/test-integration.sh ./test-integration-$(GIT_TEST_DATABASE).test
+	$(GO) test $(GOTEST_FLAGS) -tags '$(TAGS)' -c gitea.dev/tests/integration -o ./test-integration-$(GITEA_TEST_DATABASE).test
+	./tools/test-integration.sh ./test-integration-$(GITEA_TEST_DATABASE).test
 
 .PHONY: test-integration-compile
 test-integration-compile:
@@ -485,7 +485,7 @@ playwright: deps-frontend
 
 .PHONY: test-e2e
 test-e2e: playwright frontend backend
-	@CONTAINER_RUNTIME=$(CONTAINER_RUNTIME) EXECUTABLE=$(EXECUTABLE) ./tools/test-e2e.sh run $(GIT_TEST_E2E_FLAGS)
+	@CONTAINER_RUNTIME=$(CONTAINER_RUNTIME) EXECUTABLE=$(EXECUTABLE) ./tools/test-e2e.sh run $(GITEA_TEST_E2E_FLAGS)
 
 .PHONY: build
 build: frontend backend ## build everything

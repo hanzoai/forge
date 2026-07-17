@@ -25,8 +25,8 @@ func TestInitToken(t *testing.T) {
 
 	t.Run("NoToken", func(t *testing.T) {
 		_, _ = db.Exec(t.Context(), "DELETE FROM action_runner_token")
-		t.Setenv("GIT_RUNNER_REGISTRATION_TOKEN", "")
-		t.Setenv("GIT_RUNNER_REGISTRATION_TOKEN_FILE", "")
+		t.Setenv("GITEA_RUNNER_REGISTRATION_TOKEN", "")
+		t.Setenv("GITEA_RUNNER_REGISTRATION_TOKEN_FILE", "")
 		err := initGlobalRunnerToken(t.Context())
 		require.NoError(t, err)
 		notEmpty, err := db.IsTableNotEmpty(&actions_model.ActionRunnerToken{})
@@ -36,8 +36,8 @@ func TestInitToken(t *testing.T) {
 
 	t.Run("EnvToken", func(t *testing.T) {
 		tokenValue := util.CryptoRandomString(32)
-		t.Setenv("GIT_RUNNER_REGISTRATION_TOKEN", tokenValue)
-		t.Setenv("GIT_RUNNER_REGISTRATION_TOKEN_FILE", "")
+		t.Setenv("GITEA_RUNNER_REGISTRATION_TOKEN", tokenValue)
+		t.Setenv("GITEA_RUNNER_REGISTRATION_TOKEN_FILE", "")
 		err := initGlobalRunnerToken(t.Context())
 		require.NoError(t, err)
 		token := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunnerToken{Token: tokenValue})
@@ -55,8 +55,8 @@ func TestInitToken(t *testing.T) {
 		tokenValue := util.CryptoRandomString(32)
 		f := t.TempDir() + "/token"
 		_ = os.WriteFile(f, []byte(tokenValue), 0o644)
-		t.Setenv("GIT_RUNNER_REGISTRATION_TOKEN", "")
-		t.Setenv("GIT_RUNNER_REGISTRATION_TOKEN_FILE", f)
+		t.Setenv("GITEA_RUNNER_REGISTRATION_TOKEN", "")
+		t.Setenv("GITEA_RUNNER_REGISTRATION_TOKEN_FILE", f)
 		err := initGlobalRunnerToken(t.Context())
 		require.NoError(t, err)
 		token := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunnerToken{Token: tokenValue})
@@ -70,7 +70,7 @@ func TestInitToken(t *testing.T) {
 	})
 
 	t.Run("InvalidToken", func(t *testing.T) {
-		t.Setenv("GIT_RUNNER_REGISTRATION_TOKEN", "abc")
+		t.Setenv("GITEA_RUNNER_REGISTRATION_TOKEN", "abc")
 		err := initGlobalRunnerToken(t.Context())
 		assert.ErrorContains(t, err, "must be at least")
 	})

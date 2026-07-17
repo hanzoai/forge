@@ -10,7 +10,7 @@ For prerequisites see [build-setup.md](build-setup.md); for the build workflow s
 ## Unit tests
 
 Backend unit tests live in `*_test.go` files next to the code they cover. Set
-`GIT_TEST_LOG_SQL=1` to log all SQL statements executed during the tests.
+`GITEA_TEST_LOG_SQL=1` to log all SQL statements executed during the tests.
 
 ```bash
 make test-backend
@@ -35,7 +35,7 @@ pnpm exec vitest <path-filter>
 
 Integration tests exercise Gitea against a real database. They live in
 `tests/integration/` and require [Git LFS](https://git-lfs.com/) to be installed.
-The database is selected with `GIT_TEST_DATABASE`; an empty value defaults to
+The database is selected with `GITEA_TEST_DATABASE`; an empty value defaults to
 SQLite, which needs no external service:
 
 ```bash
@@ -57,7 +57,7 @@ make clean build
 
 ### Running against other databases
 
-Set `GIT_TEST_DATABASE` together with the matching `TEST_*` connection variables.
+Set `GITEA_TEST_DATABASE` together with the matching `TEST_*` connection variables.
 The commands below start a throwaway database container (press `Ctrl-C` to stop and
 remove it) and then run the tests against it.
 
@@ -68,7 +68,7 @@ docker run -e "MYSQL_DATABASE=test" -e "MYSQL_ALLOW_EMPTY_PASSWORD=yes" -p 3306:
 ```
 
 ```bash
-GIT_TEST_DATABASE=mysql TEST_MYSQL_HOST=localhost:3306 TEST_MYSQL_DBNAME=test TEST_MYSQL_USERNAME=root TEST_MYSQL_PASSWORD='' make test-integration
+GITEA_TEST_DATABASE=mysql TEST_MYSQL_HOST=localhost:3306 TEST_MYSQL_DBNAME=test TEST_MYSQL_USERNAME=root TEST_MYSQL_PASSWORD='' make test-integration
 ```
 
 #### PostgreSQL
@@ -81,7 +81,7 @@ docker run --rm -p 9000:9000 -e MINIO_ROOT_USER=123456 -e MINIO_ROOT_PASSWORD=12
 ```
 
 ```bash
-GIT_TEST_DATABASE=pgsql TEST_MINIO_ENDPOINT=localhost:9000 TEST_PGSQL_HOST=localhost:5432 TEST_PGSQL_DBNAME=postgres TEST_PGSQL_USERNAME=postgres TEST_PGSQL_PASSWORD=postgres make test-integration
+GITEA_TEST_DATABASE=pgsql TEST_MINIO_ENDPOINT=localhost:9000 TEST_PGSQL_HOST=localhost:5432 TEST_PGSQL_DBNAME=postgres TEST_PGSQL_USERNAME=postgres TEST_PGSQL_PASSWORD=postgres make test-integration
 ```
 
 #### MSSQL
@@ -91,7 +91,7 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_PID=Standard" -e "SA_PASSWORD=MwantsaSec
 ```
 
 ```bash
-GIT_TEST_DATABASE=mssql TEST_MSSQL_HOST=localhost:1433 TEST_MSSQL_DBNAME=gitea_test TEST_MSSQL_USERNAME=sa TEST_MSSQL_PASSWORD=MwantsaSecurePassword1 make test-integration
+GITEA_TEST_DATABASE=mssql TEST_MSSQL_HOST=localhost:1433 TEST_MSSQL_DBNAME=gitea_test TEST_MSSQL_USERNAME=sa TEST_MSSQL_PASSWORD=MwantsaSecurePassword1 make test-integration
 ```
 
 ### Running the database test workflow with Gitea Runner
@@ -119,19 +119,19 @@ End-to-end tests drive a running Gitea instance with [Playwright](https://playwr
 make test-e2e
 ```
 
-To run a single e2e test file, pass it via `GIT_TEST_E2E_FLAGS`:
+To run a single e2e test file, pass it via `GITEA_TEST_E2E_FLAGS`:
 
 ```bash
-GIT_TEST_E2E_FLAGS='<filepath>' make test-e2e
+GITEA_TEST_E2E_FLAGS='<filepath>' make test-e2e
 ```
 
 Useful environment variables:
 
 | Variable | Description |
 | :--- | :--- |
-| `GIT_TEST_E2E_DEBUG` | When set, show the Gitea server output. |
-| `GIT_TEST_E2E_FLAGS` | Additional flags passed to Playwright, e.g. `--ui`. |
-| `GIT_TEST_E2E_TIMEOUT_FACTOR` | Timeout multiplier (default: 4 on CI, 1 locally). |
+| `GITEA_TEST_E2E_DEBUG` | When set, show the Gitea server output. |
+| `GITEA_TEST_E2E_FLAGS` | Additional flags passed to Playwright, e.g. `--ui`. |
+| `GITEA_TEST_E2E_TIMEOUT_FACTOR` | Timeout multiplier (default: 4 on CI, 1 locally). |
 
 ## Migration tests
 

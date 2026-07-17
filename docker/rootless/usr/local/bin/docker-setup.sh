@@ -5,19 +5,19 @@ mkdir -p "${HOME}" && chmod 0700 "${HOME}"
 if [ ! -w "${HOME}" ]; then echo "${HOME} is not writable"; exit 1; fi
 
 # Prepare custom folder
-mkdir -p "${GIT_CUSTOM}" && chmod 0700 "${GIT_CUSTOM}"
+mkdir -p "${GITEA_CUSTOM}" && chmod 0700 "${GITEA_CUSTOM}"
 
 # Prepare temp folder
-mkdir -p "${GIT_TEMP}" && chmod 0700 "${GIT_TEMP}"
-if [ ! -w "${GIT_TEMP}" ]; then echo "${GIT_TEMP} is not writable"; exit 1; fi
+mkdir -p "${GITEA_TEMP}" && chmod 0700 "${GITEA_TEMP}"
+if [ ! -w "${GITEA_TEMP}" ]; then echo "${GITEA_TEMP} is not writable"; exit 1; fi
 
 #Prepare config file
-if [ ! -f "${GIT_APP_INI}" ]; then
+if [ ! -f "${GITEA_APP_INI}" ]; then
 
     #Prepare config file folder
-    GIT_APP_INI_DIR=$(dirname "${GIT_APP_INI}")
-    mkdir -p "${GIT_APP_INI_DIR}" && chmod 0700 "${GIT_APP_INI_DIR}"
-    if [ ! -w "${GIT_APP_INI_DIR}" ]; then echo "${GIT_APP_INI_DIR} is not writable"; exit 1; fi
+    GITEA_APP_INI_DIR=$(dirname "${GITEA_APP_INI}")
+    mkdir -p "${GITEA_APP_INI_DIR}" && chmod 0700 "${GITEA_APP_INI_DIR}"
+    if [ ! -w "${GITEA_APP_INI_DIR}" ]; then echo "${GITEA_APP_INI_DIR} is not writable"; exit 1; fi
 
     # Set INSTALL_LOCK to true only if SECRET_KEY is not empty and
     # INSTALL_LOCK is empty
@@ -44,8 +44,8 @@ if [ ! -f "${GIT_APP_INI}" ]; then
     DISABLE_REGISTRATION=${DISABLE_REGISTRATION:-"false"} \
     REQUIRE_SIGNIN_VIEW=${REQUIRE_SIGNIN_VIEW:-"false"} \
     SECRET_KEY=${SECRET_KEY:-""} \
-    envsubst < /etc/templates/app.ini > "${GIT_APP_INI}"
+    envsubst < /etc/templates/app.ini > "${GITEA_APP_INI}"
 fi
 
-# Replace app.ini settings with env variables in the form GIT__SECTION_NAME__KEY_NAME
-environment-to-ini --config "${GIT_APP_INI}"
+# Replace app.ini settings with env variables in the form GITEA__SECTION_NAME__KEY_NAME
+environment-to-ini --config "${GITEA_APP_INI}"

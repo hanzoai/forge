@@ -4,7 +4,7 @@ import {login, apiCreateRepo, apiCreateFile, randomString} from './utils.ts';
 
 test('create a pull request from the compare page', async ({page, request}) => {
   const repoName = `e2e-pr-create-${randomString(8)}`;
-  const owner = env.GIT_TEST_E2E_USER;
+  const owner = env.GITEA_TEST_E2E_USER;
   await apiCreateRepo(request, {name: repoName});
   await Promise.all([
     apiCreateFile(request, owner, repoName, 'feat.txt', 'feature content\n', {branch: 'main', newBranch: 'feat'}),

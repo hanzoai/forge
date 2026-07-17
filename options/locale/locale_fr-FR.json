@@ -3703,7 +3703,7 @@
   "secrets.description": "Les secrets seront transmis à certaines actions et ne pourront pas être lus autrement.",
   "secrets.none": "Il n'y a pas encore de secrets.",
   "secrets.creation.description": "Description",
-  "secrets.creation.name_placeholder": "Caractères alphanumériques ou tirets bas uniquement, insensibles à la casse, ne peut commencer par GIT_ ou GITHUB_.",
+  "secrets.creation.name_placeholder": "Caractères alphanumériques ou tirets bas uniquement, insensibles à la casse, ne peut commencer par GITEA_ ou GITHUB_.",
   "secrets.creation.value_placeholder": "Entrez n’importe quoi. Les blancs cernant seront taillés.",
   "secrets.creation.description_placeholder": "Décrire brièvement votre dépôt (optionnel).",
   "secrets.save_success": "Le secret « %s » a été enregistré.",
@@ -3921,7 +3921,7 @@
   "actions.general.token_permissions.fork_pr_note": "Lorsqu’une mission est initiée par une demande d’ajout depuis une bifurcation, ses restrictions effectives ne peuvent dépasser la lecture seule.",
   "actions.general.token_permissions.customize_max_permissions": "Affiner les restrictions",
   "actions.general.cross_repo": "Accès inter-dépôt",
-  "actions.general.cross_repo_desc": "Permet aux dépôts de ce propriétaire de consulter (en lecture seule) les dépôts listés ci-dessous pendant l’exécution des missions d’Actions (nécessite un jeton GIT_TOKEN).",
+  "actions.general.cross_repo_desc": "Permet aux dépôts de ce propriétaire de consulter (en lecture seule) les dépôts listés ci-dessous pendant l’exécution des missions d’Actions (nécessite un jeton GITEA_TOKEN).",
   "actions.general.cross_repo_selected": "Dépôts sélectionnés",
   "actions.general.cross_repo_target_repos": "Dépôts cibles",
   "actions.general.cross_repo_add": "Ajouter un dépôt cible"

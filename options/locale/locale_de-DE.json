@@ -3703,7 +3703,7 @@
   "secrets.description": "Secrets werden an bestimmte Aktionen weitergegeben und können nicht anderweitig ausgelesen werden.",
   "secrets.none": "Noch keine Secrets vorhanden.",
   "secrets.creation.description": "Beschreibung",
-  "secrets.creation.name_placeholder": "Groß-/Kleinschreibung wird ignoriert, nur alphanumerische Zeichen oder Unterstriche, darf nicht mit GIT_ oder GITHUB_ beginnen",
+  "secrets.creation.name_placeholder": "Groß-/Kleinschreibung wird ignoriert, nur alphanumerische Zeichen oder Unterstriche, darf nicht mit GITEA_ oder GITHUB_ beginnen",
   "secrets.creation.value_placeholder": "Beliebigen Inhalt eingeben. Leerzeichen am Anfang und Ende werden weggelassen.",
   "secrets.creation.description_placeholder": "Gib eine Kurzbeschreibung ein (optional).",
   "secrets.save_success": "Das Secret \"%s\" wurde gespeichert.",
@@ -3921,7 +3921,7 @@
   "actions.general.token_permissions.fork_pr_note": "Wenn ein Job mit einer Pull Requests von einer Fork gestartet wird, überschreiten seine effektiven Berechtigungen nicht die schreibgeschützten Berechtigungen.",
   "actions.general.token_permissions.customize_max_permissions": "Maximale Berechtigungen anpassen",
   "actions.general.cross_repo": "Repository übergreifender Zugriff",
-  "actions.general.cross_repo_desc": "Erlaube den Zugriff auf die ausgewählten Repositories (schreibgeschützt) aller Repositories in diesem Eigentümer mit GIT_TOKEN beim Ausführen von Actions Jobs.",
+  "actions.general.cross_repo_desc": "Erlaube den Zugriff auf die ausgewählten Repositories (schreibgeschützt) aller Repositories in diesem Eigentümer mit GITEA_TOKEN beim Ausführen von Actions Jobs.",
   "actions.general.cross_repo_selected": "Ausgewählte Repositories",
   "actions.general.cross_repo_target_repos": "Ziel Repositorys",
   "actions.general.cross_repo_add": "Ziel Repository hinzufügen"
