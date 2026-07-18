@@ -64,6 +64,7 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/s3-go v1.0.0
+	github.com/hanzoai/sqlite v0.3.1
 	github.com/hashicorp/go-version v1.9.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/huandu/xstrings v1.5.0
@@ -74,7 +75,6 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/markbates/goth v1.82.0
 	github.com/mattn/go-isatty v0.0.22
-	github.com/mattn/go-sqlite3 v1.14.47
 	github.com/meilisearch/meilisearch-go v0.36.3
 	github.com/mholt/archives v0.1.5
 	github.com/microcosm-cc/bluemonday v1.0.27
@@ -114,18 +114,21 @@ require (
 	google.golang.org/grpc v1.82.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/ini.v1 v1.67.3
-	modernc.org/sqlite v1.53.0
 	mvdan.cc/xurls/v2 v2.6.0
 	strk.kbt.io/projects/go/libravatar v0.0.0-20260301104140-add494e31dab
 )
 
 require (
 	github.com/go-ini/ini v1.67.0 // indirect
+	github.com/hanzoai/csqlite v0.1.0 // indirect
+	github.com/hanzoai/sqlcipher v0.1.0 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.47 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	modernc.org/sqlite v1.53.0 // indirect
 )
 
 require (
@@ -276,9 +279,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260610212136-7ab31c22f7ad // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.73.4 // indirect
-	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.11.0 // indirect
 )
 
 ignore (

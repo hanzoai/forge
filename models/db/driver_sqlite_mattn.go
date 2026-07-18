@@ -10,7 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3"
+	// CGO build path: hanzoai/sqlite's cgo backend (csqlite) registers the
+	// "sqlite" driver and parses mattn-style DSN params, so the connstr maker
+	// below keeps _busy_timeout=/_journal_mode= form (NOT the pure-Go _pragma()).
+	_ "github.com/hanzoai/sqlite"
 )
 
 func init() {

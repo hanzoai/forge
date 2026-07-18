@@ -3,26 +3,24 @@
 
 //go:build !sqlite_mattn
 
-// modernc driver is chosen as the default one (compared to mattn, ncruces)
-// * mattn was used as default, but it requires CGO
-// * the CI times are almost the same for these three (race detector must be disabled)
-// * modernc increases the binary size about 2MB, ncruces increases about 7MB
-// * compiling time: modernc is slightly slower than mattn, ncruces is the slowest
+// hanzoai/sqlite is the default driver: a pure-Go (CGO-free) SQLite engine that
+// self-registers the "sqlite" database/sql driver name on import. It is the
+// default because it needs no CGO; the optional mattn build path (sqlite_mattn
+// tag) remains for CGO builds that need sqlite_unlock_notify.
 
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"strings"
 
-	"modernc.org/sqlite"
+	// blank import registers the "sqlite" database/sql driver (pure-Go backend).
+	_ "github.com/hanzoai/sqlite"
 )
 
 func init() {
 	// this driver contains huge amount of Golang code, so it is much slower when "-race" check is enabled.
 	registerSQLiteConnStrMaker(makeSQLiteConnStrModerncCCGO)
-	sql.Register(sqlDriverSQLite3, &sqlite.Driver{})
 }
 
 func makeSQLiteConnStrModerncCCGO(opts SQLiteConnStrOptions) (string, string, error) {

@@ -57,7 +57,7 @@ func GlobalConnOptions() ConnOptions {
 
 const (
 	sqlDriverPostgresSchema = "postgresschema"
-	sqlDriverSQLite3        = "sqlite3" // although database type also has "sqlite3", they are different, for different purposes
+	sqlDriverSQLite3        = "sqlite" // database/sql driver name registered by github.com/hanzoai/sqlite (distinct from the "sqlite3" DB type)
 )
 
 var makeSQLiteConnStr = func(opts SQLiteConnStrOptions) (string, string, error) {
