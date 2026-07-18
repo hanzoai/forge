@@ -8,6 +8,8 @@ import (
 	"slices"
 
 	"github.com/hanzoai/git/models/db"
+
+	"github.com/hanzoai/xorm"
 )
 
 func AddBranchProtectionCanPushAndEnableWhitelist(x db.EngineMigration) error {
@@ -132,7 +134,7 @@ func AddBranchProtectionCanPushAndEnableWhitelist(x db.EngineMigration) error {
 	}
 
 	// getUserRepoPermission static function based on issues_model.IsOfficialReviewer at 5d78792385
-	getUserRepoPermission := func(sess db.Session, repo *Repository, user *User) (Permission, error) {
+	getUserRepoPermission := func(sess *xorm.Session, repo *Repository, user *User) (Permission, error) {
 		var perm Permission
 
 		repoOwner := new(User)
@@ -305,7 +307,7 @@ func AddBranchProtectionCanPushAndEnableWhitelist(x db.EngineMigration) error {
 	}
 
 	// isOfficialReviewer static function based on 5d78792385
-	isOfficialReviewer := func(sess db.Session, issueID int64, reviewer *User) (bool, error) {
+	isOfficialReviewer := func(sess *xorm.Session, issueID int64, reviewer *User) (bool, error) {
 		pr := new(PullRequest)
 		has, err := sess.ID(issueID).Get(pr)
 		if err != nil {
