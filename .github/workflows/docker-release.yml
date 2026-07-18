@@ -50,8 +50,12 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # GH_PAT (hanzo-dev, write:packages) — the automatic GITHUB_TOKEN is
+          # scoped to this repo only, so it cannot write the shared git-cache
+          # package nor fetch the private hanzoai/* modules. Same login as
+          # hanzoai/iam2 and hanzoai/cloud.
+          username: hanzo-dev
+          password: ${{ secrets.GH_PAT }}
 
       - name: Extract metadata
         id: meta
@@ -76,6 +80,10 @@ jobs:
           # bind-mount so the binary reports the exact tag).
           build-args: |
             GIT_VERSION=${{ steps.meta.outputs.version }}
+          # Mounted into `go mod download` (Dockerfile) to fetch the private
+          # hanzoai/* modules over authenticated git. Never lands in the image.
+          secrets: |
+            GIT_AUTH_TOKEN=${{ secrets.GH_PAT }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=ghcr.io/hanzoai/git-cache:amd64

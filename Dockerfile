@@ -22,8 +22,17 @@ RUN apk --no-cache add \
     git
 
 WORKDIR ${GOPATH}/src/gitea.dev
+# Sources private hanzoai modules (xorm, builder): mark them private
+# (direct VCS fetch, no proxy/sumdb) and, when a GIT_AUTH_TOKEN is mounted, rewrite
+# github.com to an authenticated fetch so `go mod download` can read them. No-op
+# without the token, so public-only builds still work. Same pattern as hanzoai/iam2.
+ENV GOPRIVATE=github.com/hanzoai/*
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=secret,id=GIT_AUTH_TOKEN \
+    if [ -s /run/secrets/GIT_AUTH_TOKEN ]; then \
+      git config --global url."https://x-access-token:$(cat /run/secrets/GIT_AUTH_TOKEN)@github.com/".insteadOf "https://github.com/"; \
+    fi && \
+    go mod download
 # Use COPY instead of bind mount as read-only one breaks makefile state tracking and read-write one needs binary to be moved as it's discarded.
 # ".git" directory is mounted separately later only for version data extraction.
 COPY --exclude=.git/ . .
