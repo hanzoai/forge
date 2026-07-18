@@ -28,8 +28,78 @@ var (
 	registeredInitFuncs []func() error
 )
 
-// SQLSession represents a common interface for engine and session to execute SQLs
+// SQLSession is the ORM-agnostic query surface shared by an engine and a session.
+// Fluent builders return the Session interface (not a concrete engine type) so the
+// backend can be swapped without touching call sites; backed today by *xorm.Session
+// through the session wrapper.
 type SQLSession interface {
+	Count(...any) (int64, error)
+	Decr(column string, arg ...any) Session
+	Delete(...any) (int64, error)
+	Truncate(...any) (int64, error)
+	Exec(...any) (sql.Result, error)
+	Find(any, ...any) error
+	FindAndCount(any, ...any) (int64, error)
+	Get(beans ...any) (bool, error)
+	ID(any) Session
+	In(string, ...any) Session
+	Incr(column string, arg ...any) Session
+	Insert(...any) (int64, error)
+	Iterate(any, xorm.IterFunc) error
+	Join(joinOperator string, tablename, condition any, args ...any) Session
+	SQL(any, ...any) Session
+	Where(any, ...any) Session
+	Asc(colNames ...string) Session
+	Desc(colNames ...string) Session
+	Limit(limit int, start ...int) Session
+	NoAutoTime() Session
+	SumInt(bean any, columnName string) (res int64, err error)
+	Select(string) Session
+	SetExpr(string, any) Session
+	NotIn(string, ...any) Session
+	OrderBy(any, ...any) Session
+	Exist(...any) (bool, error)
+	Distinct(...string) Session
+	Query(...any) ([]map[string][]byte, error)
+	Cols(...string) Session
+	Table(tableNameOrBean any) Session
+	Context(ctx context.Context) Session
+	QueryInterface(sqlOrArgs ...any) ([]map[string]any, error)
+	IsTableExist(tableNameOrBean any) (bool, error)
+}
+
+// Engine is the ORM-agnostic engine surface returned by GetEngine.
+type Engine interface {
+	SQLSession
+	Sync(...any) error
+	Ping() error
+}
+
+// Session is the ORM-agnostic session surface. Second-level fluent builders used by
+// call sites are declared here so the whole chain stays backend-independent.
+type Session interface {
+	Engine
+	And(query any, args ...any) Session
+	AllCols() Session
+	GroupBy(keys string) Session
+	Having(conditions string) Session
+	MustCols(columns ...string) Session
+	Or(query any, args ...any) Session
+	NoAutoCondition(...bool) Session
+	UseBool(columns ...string) Session
+	Update(bean any, condiBean ...any) (int64, error)
+	Rows(bean any) (*xorm.Rows, error)
+	Begin() error
+	Close() error
+	Commit() error
+	IsInTx() bool
+	Rollback() error
+}
+
+// xormQuerier is the concrete xorm query surface used only by the migration plane.
+// Migrations manipulate the schema through xorm-specific types (Dialect, DBMetas,
+// SyncResult), so this surface stays xorm-typed; abstracting it is a later cut.
+type xormQuerier interface {
 	Count(...any) (int64, error)
 	Decr(column string, arg ...any) *xorm.Session
 	Delete(...any) (int64, error)
@@ -65,30 +135,11 @@ type SQLSession interface {
 	IsTableExist(tableNameOrBean any) (bool, error)
 }
 
-// Engine represents a xorm engine
-type Engine interface {
-	SQLSession
+// EngineMigration is the xorm engine surface used by the migration packages.
+type EngineMigration interface {
+	xormQuerier
 	Sync(...any) error
 	Ping() error
-}
-
-// Session represents a xorm session interface
-type Session interface {
-	Engine
-	And(query any, args ...any) *xorm.Session
-	Begin() error
-	Close() error
-	Commit() error
-	IsInTx() bool
-	Rollback() error
-	Engine() *xorm.Engine
-}
-
-// EngineMigration is a xorm engine interface used for migrations.
-// It extends Engine with additional methods that are only available on the engine (not on the session)
-// and are needed by the migration packages.
-type EngineMigration interface {
-	Engine
 	Close() error
 	DB() *core.DB
 	DBMetas() ([]*schemas.Table, error)
@@ -101,10 +152,52 @@ type EngineMigration interface {
 	TableName(bean any, includeSchema ...bool) string
 }
 
+// session adapts *xorm.Session to the ORM-agnostic Session interface. xorm's fluent
+// builders mutate the statement in place and return the same *xorm.Session, so each
+// override discards that return and hands back the receiver: no extra allocation,
+// identical behavior. Terminal and tx methods are promoted from the embedded session.
+type session struct{ *xorm.Session }
+
+func (s *session) Decr(column string, arg ...any) Session { s.Session.Decr(column, arg...); return s }
+func (s *session) ID(id any) Session                      { s.Session.ID(id); return s }
+func (s *session) In(column string, args ...any) Session  { s.Session.In(column, args...); return s }
+func (s *session) Incr(column string, arg ...any) Session { s.Session.Incr(column, arg...); return s }
+func (s *session) Join(op string, tableName, condition any, args ...any) Session {
+	s.Session.Join(op, tableName, condition, args...)
+	return s
+}
+func (s *session) SQL(query any, args ...any) Session      { s.Session.SQL(query, args...); return s }
+func (s *session) Where(query any, args ...any) Session    { s.Session.Where(query, args...); return s }
+func (s *session) Asc(colNames ...string) Session          { s.Session.Asc(colNames...); return s }
+func (s *session) Desc(colNames ...string) Session         { s.Session.Desc(colNames...); return s }
+func (s *session) Limit(limit int, start ...int) Session   { s.Session.Limit(limit, start...); return s }
+func (s *session) NoAutoTime() Session                     { s.Session.NoAutoTime(); return s }
+func (s *session) Select(str string) Session               { s.Session.Select(str); return s }
+func (s *session) SetExpr(column string, expr any) Session { s.Session.SetExpr(column, expr); return s }
+func (s *session) NotIn(column string, args ...any) Session {
+	s.Session.NotIn(column, args...)
+	return s
+}
+func (s *session) OrderBy(order any, args ...any) Session {
+	s.Session.OrderBy(order, args...)
+	return s
+}
+func (s *session) Distinct(colNames ...string) Session { s.Session.Distinct(colNames...); return s }
+func (s *session) Cols(colNames ...string) Session     { s.Session.Cols(colNames...); return s }
+func (s *session) Table(tableNameOrBean any) Session   { s.Session.Table(tableNameOrBean); return s }
+func (s *session) Context(ctx context.Context) Session { s.Session.Context(ctx); return s }
+func (s *session) And(query any, args ...any) Session  { s.Session.And(query, args...); return s }
+func (s *session) Or(query any, args ...any) Session   { s.Session.Or(query, args...); return s }
+func (s *session) AllCols() Session                    { s.Session.AllCols(); return s }
+func (s *session) GroupBy(keys string) Session         { s.Session.GroupBy(keys); return s }
+func (s *session) Having(conditions string) Session    { s.Session.Having(conditions); return s }
+func (s *session) MustCols(columns ...string) Session  { s.Session.MustCols(columns...); return s }
+func (s *session) NoAutoCondition(no ...bool) Session  { s.Session.NoAutoCondition(no...); return s }
+func (s *session) UseBool(columns ...string) Session   { s.Session.UseBool(columns...); return s }
+
 var (
-	_ Engine          = (*xorm.Engine)(nil)
-	_ Engine          = (*xorm.Session)(nil)
-	_ Session         = (*xorm.Session)(nil)
+	_ Session         = (*session)(nil)
+	_ Engine          = (*session)(nil)
 	_ EngineMigration = (*xorm.Engine)(nil)
 )
 
@@ -180,10 +273,7 @@ func GetMaxID(beanOrTableName any) (maxID int64, err error) {
 }
 
 func SetLogSQL(ctx context.Context, on bool) {
-	e := GetEngine(ctx)
-	if x, ok := e.(*xorm.Engine); ok {
-		x.ShowSQL(on)
-	} else if sess, ok := e.(*xorm.Session); ok {
-		sess.Engine().ShowSQL(on)
+	if s, ok := GetEngine(ctx).(*session); ok {
+		s.Session.Engine().ShowSQL(on)
 	}
 }

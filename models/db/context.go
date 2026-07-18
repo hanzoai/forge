@@ -77,7 +77,7 @@ func GetEngine(ctx context.Context) Engine {
 		return engine
 	}
 	// no need to do "contextSafetyCheck" because it's a new Session
-	return xormEngine.Context(ctx)
+	return &session{xormEngine.Context(ctx)}
 }
 
 func GetXORMEngineForTesting() *xorm.Engine {
@@ -130,7 +130,7 @@ func TxContext(parentCtx context.Context) (context.Context, Committer, error) {
 		return withContextEngine(parentCtx, sess), &halfCommitter{committer: sess}, nil
 	}
 
-	sess := xormEngine.NewSession()
+	sess := &session{xormEngine.NewSession()}
 	if err := sess.Begin(); err != nil {
 		_ = sess.Close()
 		return nil, nil, err
@@ -162,7 +162,7 @@ func WithTx2[T any](parentCtx context.Context, f func(ctx context.Context) (T, e
 }
 
 func txWithNoCheck(parentCtx context.Context, f func(ctx context.Context) error) error {
-	sess := xormEngine.NewSession()
+	sess := &session{xormEngine.NewSession()}
 	defer sess.Close()
 	if err := sess.Begin(); err != nil {
 		return err
@@ -311,9 +311,9 @@ func InTransaction(ctx context.Context) bool {
 	return getTransactionSession(ctx) != nil
 }
 
-func getTransactionSession(ctx context.Context) *xorm.Session {
+func getTransactionSession(ctx context.Context) *session {
 	e, _ := ctx.Value(contextKeyEngine).(Engine)
-	if sess, ok := e.(*xorm.Session); ok && sess.IsInTx() {
+	if sess, ok := e.(*session); ok && sess.IsInTx() {
 		return sess
 	}
 	return nil
