@@ -19,7 +19,7 @@ const (
 	LocalStorageType StorageType = "local"
 	// S3StorageType is the type descriptor for S3-compatible object storage.
 	// Our object substrate is hanzoai/s3 (SeaweedFS), served through the
-	// aws-sdk-go-v2 S3 client (Apache-2.0, no minio lineage), so the config surface says STORAGE_TYPE=s3.
+	// hanzoai/s3-go S3 client, so the config surface says STORAGE_TYPE=s3.
 	S3StorageType StorageType = "s3"
 	// AzureBlobStorageType is the type descriptor for azure blob storage
 	AzureBlobStorageType StorageType = "azureblob"
