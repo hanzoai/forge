@@ -6,7 +6,7 @@ package v1_7
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func ClearNonusedData(x db.EngineMigration) error {

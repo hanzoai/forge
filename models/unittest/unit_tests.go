@@ -14,7 +14,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // Code in this file is mainly used by unittest.CheckConsistencyFor, which is not in the unit test for various reasons.

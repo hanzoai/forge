@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/stretchr/testify/require"
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 var NewFixturesLoaderVendor = func(e *xorm.Engine, opts unittest.FixturesOptions) (unittest.FixturesLoader, error) {

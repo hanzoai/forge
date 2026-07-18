@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/migrations/base"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 // legacyDateTimeColumns are the persisted real datetime columns that old Gitea

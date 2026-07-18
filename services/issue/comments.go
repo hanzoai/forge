@@ -20,7 +20,7 @@ import (
 	git_service "github.com/hanzoai/git/services/git"
 	notify_service "github.com/hanzoai/git/services/notify"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // CreateRefComment creates a commit reference comment to issue.

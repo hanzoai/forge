@@ -9,7 +9,7 @@ import (
 
 	"github.com/hanzoai/git/modules/log"
 
-	xormlog "xorm.io/xorm/log"
+	xormlog "github.com/hanzoai/xorm/log"
 )
 
 // XORMLogBridge a logger bridge from Logger to xorm

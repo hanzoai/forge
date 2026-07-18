@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/translation"
 	webhook_module "github.com/hanzoai/git/modules/webhook"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type RunList []*ActionRun

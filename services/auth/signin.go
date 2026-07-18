@@ -20,7 +20,7 @@ import (
 	_ "github.com/hanzoai/git/services/auth/source/pam"  // register the pam source
 	_ "github.com/hanzoai/git/services/auth/source/sspi" // register the sspi source
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // UserSignIn validates user name and password.

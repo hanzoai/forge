@@ -15,7 +15,7 @@ import (
 	"github.com/hanzoai/git/modules/queue"
 	repo_module "github.com/hanzoai/git/modules/repository"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type TagSyncOptions struct {

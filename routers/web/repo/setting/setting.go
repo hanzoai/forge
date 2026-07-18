@@ -38,7 +38,7 @@ import (
 	repo_service "github.com/hanzoai/git/services/repository"
 	wiki_service "github.com/hanzoai/git/services/wiki"
 
-	"xorm.io/xorm/convert"
+	"github.com/hanzoai/xorm/convert"
 )
 
 const (

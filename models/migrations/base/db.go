@@ -15,7 +15,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 // RecreateTables will recreate the tables for the provided beans using the newly provided bean definition and move all data to that new table

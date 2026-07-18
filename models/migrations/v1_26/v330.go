@@ -6,7 +6,7 @@ package v1_26
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 func AddNameToWebhook(x db.EngineMigration) error {

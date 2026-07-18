@@ -8,7 +8,7 @@ import (
 	"github.com/hanzoai/git/models/migrations/base"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func UseLongTextInSomeColumnsAndFixBugs(x db.EngineMigration) error {

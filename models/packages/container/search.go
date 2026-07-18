@@ -14,7 +14,7 @@ import (
 	container_module "github.com/hanzoai/git/modules/packages/container"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 var ErrContainerBlobNotExist = util.NewNotExistErrorf("container blob does not exist")

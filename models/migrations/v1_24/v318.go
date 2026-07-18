@@ -7,7 +7,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/perm"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 func AddRepoUnitAnonymousAccessMode(x db.EngineMigration) error {

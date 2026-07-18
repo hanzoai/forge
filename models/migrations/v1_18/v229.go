@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/issues"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func UpdateOpenMilestoneCounts(x db.EngineMigration) error {

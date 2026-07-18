@@ -25,7 +25,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 
 	"github.com/dlclark/regexp2/v2"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 var ErrMustCollaborator = util.NewPermissionDeniedErrorf("user must be a collaborator")

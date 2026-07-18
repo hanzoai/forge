@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/modules/gitrepo"
 	"github.com/hanzoai/git/modules/log"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // SyncRepositoryHooks rewrites all repositories' pre-receive, update and post-receive hooks

@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/models/perm"
 	"github.com/hanzoai/git/models/unit"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // TeamRepo represents an team-repository relation.

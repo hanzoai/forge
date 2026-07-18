@@ -8,9 +8,9 @@ import (
 
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm"
-	"xorm.io/xorm/convert"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/convert"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 // ConvertDatabaseTable converts database and tables from utf8 to utf8mb4 if it's mysql and set ROW_FORMAT=dynamic

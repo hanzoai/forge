@@ -17,8 +17,8 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/builder"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 type (

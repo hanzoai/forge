@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	webhook_module "github.com/hanzoai/git/modules/webhook"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // MaxJobNumPerRun is the maximum number of jobs in a single run.

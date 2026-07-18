@@ -6,7 +6,7 @@ package v1_27
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 // AddContinueOnErrorToActionRunJob adds the ContinueOnError column to ActionRunJob,

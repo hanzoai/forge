@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm/contexts"
+	"github.com/hanzoai/xorm/contexts"
 )
 
 type EngineHook struct {

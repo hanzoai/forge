@@ -32,7 +32,7 @@ import (
 	asymkey_service "github.com/hanzoai/git/services/asymkey"
 	issue_service "github.com/hanzoai/git/services/issue"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func deleteDBRepository(ctx context.Context, repoID int64) error {

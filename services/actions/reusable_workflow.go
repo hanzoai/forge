@@ -24,7 +24,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/services/convert"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // MaxReusableCallLevels caps how deep a reusable workflow can nest:

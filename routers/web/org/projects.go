@@ -25,7 +25,7 @@ import (
 	"github.com/hanzoai/git/services/forms"
 	project_service "github.com/hanzoai/git/services/projects"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 const (

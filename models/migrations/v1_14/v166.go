@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/scrypt"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func RecalculateUserEmptyPWD(x db.EngineMigration) (err error) {

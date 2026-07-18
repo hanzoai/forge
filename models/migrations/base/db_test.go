@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/git/models/migrations/migrationtest"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/xorm/names"
+	"github.com/hanzoai/xorm/names"
 )
 
 func TestMain(m *testing.M) {

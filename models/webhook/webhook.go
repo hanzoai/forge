@@ -19,7 +19,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	webhook_module "github.com/hanzoai/git/modules/webhook"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ErrWebhookNotExist represents a "WebhookNotExist" kind of error.

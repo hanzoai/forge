@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func SetDefaultPasswordToArgon2(x db.EngineMigration) error {

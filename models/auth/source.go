@@ -16,9 +16,9 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
-	"xorm.io/xorm"
-	"xorm.io/xorm/convert"
+	"github.com/hanzoai/builder"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/convert"
 )
 
 // Type represents an login type.

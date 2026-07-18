@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/tstranex/u2f"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 // v208 migration was completely broken

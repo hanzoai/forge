@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/models/migrations/base"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 type actionRunAttempt struct {

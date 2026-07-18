@@ -15,7 +15,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/optional"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // MoveIssuesOnProjectColumn moves or keeps issues in a column and sorts them inside that column

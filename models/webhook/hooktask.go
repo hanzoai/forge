@@ -16,7 +16,7 @@ import (
 	webhook_module "github.com/hanzoai/git/modules/webhook"
 
 	gouuid "github.com/google/uuid"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 //   ___ ___                __   ___________              __

@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	user_model "github.com/hanzoai/git/models/user"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // TeamUser represents an team-user relation.

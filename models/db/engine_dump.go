@@ -6,7 +6,7 @@ package db
 import (
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 // DumpDatabase dumps all data from database according the special database SQL syntax to file system.

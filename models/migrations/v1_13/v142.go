@@ -7,7 +7,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/modules/log"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func SetIsArchivedToFalse(x db.EngineMigration) error {

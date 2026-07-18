@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // Session represents a session compatible for go-chi session

@@ -6,7 +6,7 @@ package actions
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type ScheduleList []*ActionSchedule

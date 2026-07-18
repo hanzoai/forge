@@ -8,7 +8,7 @@ import (
 
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func AddCombinedIndexToIssueUser(x db.EngineMigration) error {

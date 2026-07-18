@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/models/packages"
 	debian_module "github.com/hanzoai/git/modules/packages/debian"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type PackageSearchOptions struct {

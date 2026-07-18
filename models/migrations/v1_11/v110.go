@@ -6,7 +6,7 @@ package v1_11
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func ChangeReviewContentToText(x db.EngineMigration) error {

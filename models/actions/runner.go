@@ -22,7 +22,7 @@ import (
 	"github.com/hanzoai/git/modules/translation"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ActionRunner represents runner machines

@@ -8,7 +8,7 @@ import (
 
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // Iterate iterates all the Bean object

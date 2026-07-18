@@ -18,7 +18,7 @@ import (
 
 	_ "image/jpeg" // Needed for jpeg support
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // Init initialize model

@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func SetMustChangePassword(ctx context.Context, all, mustChangePassword bool, include, exclude []string) (int64, error) {

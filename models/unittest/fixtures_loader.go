@@ -17,8 +17,8 @@ import (
 	"github.com/hanzoai/git/models/db"
 
 	"go.yaml.in/yaml/v4"
-	"xorm.io/xorm"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 type FixtureItem struct {

@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/modules/container"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type TaskList []*ActionTask

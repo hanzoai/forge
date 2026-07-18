@@ -17,7 +17,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 var jobEmitterQueue *queue.WorkerPoolQueue[*jobUpdate]

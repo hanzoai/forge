@@ -116,7 +116,7 @@ import (
 	"github.com/hanzoai/git/services/actions"
 	"github.com/hanzoai/git/services/context"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 const ArtifactV4RouteBase = "/twirp/github.actions.results.api.v1.ArtifactService"

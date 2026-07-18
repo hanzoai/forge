@@ -25,8 +25,8 @@ import (
 	"github.com/hanzoai/git/modules/util"
 
 	"github.com/stretchr/testify/assert"
-	"xorm.io/xorm"
-	"xorm.io/xorm/names"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/names"
 )
 
 // TestOptions represents test options

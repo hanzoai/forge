@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ActionScopedWorkflowSource registers a repository as a source of scoped workflows, either for an owner (user/org) or for the whole instance.

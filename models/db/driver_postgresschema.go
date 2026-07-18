@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/lib/pq"
-	"xorm.io/xorm/dialects"
+	"github.com/hanzoai/xorm/dialects"
 )
 
 type postgresSchemaDriver struct{}

@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // FindNotificationOptions represent the filters for notifications. If an ID is 0 it will be ignored.

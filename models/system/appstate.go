@@ -8,7 +8,7 @@ import (
 
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // AppState represents a state record in database

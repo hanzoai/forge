@@ -24,7 +24,7 @@ import (
 
 	_ "image/jpeg" // Needed for jpeg support
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // deleteUser deletes models associated to a user.

@@ -14,9 +14,9 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/xorm"
-	"xorm.io/xorm/contexts"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/contexts"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 type FixturesLoader interface {

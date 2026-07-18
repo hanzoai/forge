@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // WatchMode specifies what kind of watch the user has on a repository

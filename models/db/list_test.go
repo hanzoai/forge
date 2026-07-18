@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/models/unittest"
 
 	"github.com/stretchr/testify/assert"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type mockListOptions struct {

@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func TestAPIPullReview(t *testing.T) {

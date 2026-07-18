@@ -7,7 +7,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 func AddScopedWorkflowsSchema(x db.EngineMigration) error {

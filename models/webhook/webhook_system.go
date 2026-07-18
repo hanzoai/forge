@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/modules/optional"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ListSystemWebhookOptions options for listing system or default webhooks

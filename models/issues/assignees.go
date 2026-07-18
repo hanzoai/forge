@@ -11,7 +11,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // IssueAssignees saves all issue assignees

@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/xorm/convert"
+	"github.com/hanzoai/xorm/convert"
 )
 
 // OwnerActionsConfig defines the Actions configuration for a user or organization

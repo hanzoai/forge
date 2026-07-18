@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 const LockFile = "terraform.lock"

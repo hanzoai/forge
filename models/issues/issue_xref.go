@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/references"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type crossReference struct {

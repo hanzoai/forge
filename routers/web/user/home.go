@@ -44,7 +44,7 @@ import (
 
 	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/ProtonMail/go-crypto/openpgp/armor"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 const (

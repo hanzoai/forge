@@ -6,7 +6,7 @@ package v1_10
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func RemoveLingeringIndexStatus(x db.EngineMigration) error {

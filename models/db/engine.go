@@ -15,11 +15,11 @@ import (
 	_ "github.com/lib/pq"               // Needed for the Postgresql driver
 	_ "github.com/microsoft/go-mssqldb" // Needed for the MSSQL driver
 
-	"xorm.io/xorm"
-	"xorm.io/xorm/core"
-	"xorm.io/xorm/dialects"
-	"xorm.io/xorm/names"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/core"
+	"github.com/hanzoai/xorm/dialects"
+	"github.com/hanzoai/xorm/names"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 var (

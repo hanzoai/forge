@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ArtifactStatus is the status of an artifact, uploading, expired or need-delete

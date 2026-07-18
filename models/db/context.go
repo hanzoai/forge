@@ -13,8 +13,8 @@ import (
 
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/builder"
-	"xorm.io/xorm"
+	"github.com/hanzoai/builder"
+	"github.com/hanzoai/xorm"
 )
 
 type contextKey struct{ key string }
@@ -48,7 +48,7 @@ func contextSafetyCheck(e Engine) {
 			callers := make([]uintptr, 32)
 			callerNum := runtime.Callers(1, callers)
 			for i := range callerNum {
-				if funcName := runtime.FuncForPC(callers[i]).Name(); funcName == "xorm.io/xorm.(*Session).Iterate" {
+				if funcName := runtime.FuncForPC(callers[i]).Name(); funcName == "github.com/hanzoai/xorm.(*Session).Iterate" {
 					contextSafetyDeniedFuncPCs = append(contextSafetyDeniedFuncPCs, callers[i])
 				}
 			}

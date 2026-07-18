@@ -15,8 +15,8 @@ import (
 	setting_module "github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
-	"xorm.io/xorm/convert"
+	"github.com/hanzoai/builder"
+	"github.com/hanzoai/xorm/convert"
 )
 
 // Setting is a key value store of user settings

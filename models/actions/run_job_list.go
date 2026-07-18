@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/optional"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type ActionJobList []*ActionRunJob

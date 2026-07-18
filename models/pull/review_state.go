@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ViewedState stores for a file in which state it is currently viewed

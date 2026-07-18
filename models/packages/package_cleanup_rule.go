@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 var ErrPackageCleanupRuleNotExist = util.NewNotExistErrorf("package blob does not exist")

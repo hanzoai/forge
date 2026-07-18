@@ -16,7 +16,7 @@ import (
 
 	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/ProtonMail/go-crypto/openpgp/packet"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // GPGKey represents a GPG key.

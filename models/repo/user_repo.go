@@ -14,7 +14,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/container"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type StarredReposOptions struct {

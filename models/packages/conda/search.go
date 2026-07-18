@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/models/packages"
 	conda_module "github.com/hanzoai/git/modules/packages/conda"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type FileSearchOptions struct {

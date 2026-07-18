@@ -6,7 +6,7 @@ package v1_22
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 func AddIgnoreStaleApprovalsColumnToProtectedBranchTable(x db.EngineMigration) error {

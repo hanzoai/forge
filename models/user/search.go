@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/optional"
 	"github.com/hanzoai/git/modules/structs"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // AdminUserOrderByMap represents all possible admin user search orders

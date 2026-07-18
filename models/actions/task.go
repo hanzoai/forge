@@ -24,7 +24,7 @@ import (
 
 	lru "github.com/hashicorp/golang-lru/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ActionTask represents a distribution of job

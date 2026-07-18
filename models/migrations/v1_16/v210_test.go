@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func Test_RemigrateU2FCredentials(t *testing.T) {

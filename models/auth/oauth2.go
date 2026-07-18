@@ -24,8 +24,8 @@ import (
 	uuid "github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
-	"xorm.io/builder"
-	"xorm.io/xorm"
+	"github.com/hanzoai/builder"
+	"github.com/hanzoai/xorm"
 )
 
 // Authorization codes should expire within 10 minutes per https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2

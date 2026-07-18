@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 
 	"golang.org/x/crypto/ssh"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // The database is used in checkKeyFingerprint. However, most of these functions probably belong in a module

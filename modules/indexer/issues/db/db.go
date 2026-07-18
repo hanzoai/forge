@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/indexer/issues/internal"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 var _ internal.Indexer = (*Indexer)(nil)

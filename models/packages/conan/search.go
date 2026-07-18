@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/container"
 	conan_module "github.com/hanzoai/git/modules/packages/conan"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // buildCondition creates a Like condition if a wildcard is present. Otherwise Eq is used.

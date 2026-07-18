@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/git"
 	"github.com/hanzoai/git/modules/gitrepo"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ActivityAuthorData represents statistical git commit count data

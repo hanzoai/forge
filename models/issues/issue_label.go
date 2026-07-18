@@ -12,7 +12,7 @@ import (
 	access_model "github.com/hanzoai/git/models/perm/access"
 	user_model "github.com/hanzoai/git/models/user"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // IssueLabel represents an issue-label relation.

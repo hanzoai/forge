@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/structs"
 
 	lru "github.com/hashicorp/golang-lru/v2"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func iterateRepositories(ctx context.Context, each func(*repo_model.Repository) error) error {

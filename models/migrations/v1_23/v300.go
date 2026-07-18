@@ -6,7 +6,7 @@ package v1_23
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 func AddForcePushBranchProtection(x db.EngineMigration) error {

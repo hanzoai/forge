@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/modules/optional"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // MilestoneList is a list of milestones offering additional functionality

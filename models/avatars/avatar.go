@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 
 	"strk.kbt.io/projects/go/libravatar"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 const (

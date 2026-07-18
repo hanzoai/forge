@@ -10,7 +10,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // Star represents a starred repo by a user.

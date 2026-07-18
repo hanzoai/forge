@@ -22,7 +22,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	notify_service "github.com/hanzoai/git/services/notify"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ErrForkAlreadyExist represents a "ForkAlreadyExist" kind of error.

@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/models/perm"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ________                .__                 ____  __.

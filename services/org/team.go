@@ -22,7 +22,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	repo_service "github.com/hanzoai/git/services/repository"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // NewTeam creates a record of new team.

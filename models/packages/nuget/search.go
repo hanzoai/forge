@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	packages_model "github.com/hanzoai/git/models/packages"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // SearchVersions gets all versions of packages matching the search options

@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/modules/secret"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func batchProcess[T any](x db.EngineMigration, buf []T, query func(limit, start int) db.Session, process func(db.Session, T) error) error {

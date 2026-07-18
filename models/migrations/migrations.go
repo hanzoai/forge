@@ -36,7 +36,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm/names"
+	"github.com/hanzoai/xorm/names"
 )
 
 const minDBVersion = 70 // Gitea 1.5.3

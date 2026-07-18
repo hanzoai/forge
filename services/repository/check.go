@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	repo_module "github.com/hanzoai/git/modules/repository"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // GitFsckRepos calls 'git fsck' to check repository health.

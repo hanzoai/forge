@@ -15,7 +15,7 @@ import (
 	repo_model "github.com/hanzoai/git/models/repo"
 	user_model "github.com/hanzoai/git/models/user"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func AddOrUpdateCollaborator(ctx context.Context, repo *repo_model.Repository, u *user_model.User, mode perm.AccessMode) error {

@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/storage"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // Cleanup removes expired actions logs, data, artifacts and used ephemeral runners

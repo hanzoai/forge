@@ -10,8 +10,8 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm"
-	"xorm.io/xorm/names"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/names"
 )
 
 func init() {

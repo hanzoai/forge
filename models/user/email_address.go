@@ -19,7 +19,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/modules/validation"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ErrEmailCharIsNotSupported e-mail address contains unsupported character

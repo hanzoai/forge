@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/container"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ActionList defines a list of actions

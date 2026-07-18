@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/xorm"
+	"github.com/hanzoai/xorm"
 )
 
 func expandHashReferencesToSha256(x db.EngineMigration) error {

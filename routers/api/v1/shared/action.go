@@ -22,7 +22,7 @@ import (
 	"github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/convert"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // actionsOwnerAccessibleRepoIDsSubQuery returns the sub-query restricting an owner-scoped actions

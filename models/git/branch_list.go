@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/modules/container"
 	"github.com/hanzoai/git/modules/optional"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type BranchList []*Branch

@@ -12,7 +12,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/markup/markdown"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // CodeComments represents comments on code by using this structure: FILENAME -> LINE (+ == proposed; - == previous) -> COMMENTS

@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/structs"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // Access represents the highest access level of a user to the repository. The only access type

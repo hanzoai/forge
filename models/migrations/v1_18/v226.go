@@ -6,7 +6,7 @@ package v1_18
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func FixPackageSemverField(x db.EngineMigration) error {

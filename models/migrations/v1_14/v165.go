@@ -7,7 +7,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/migrations/base"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func ConvertHookTaskTypeToVarcharAndTrim(x db.EngineMigration) error {

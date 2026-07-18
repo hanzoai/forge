@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/assert"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func TestIssue_ReplaceLabels(t *testing.T) {

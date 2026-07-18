@@ -17,7 +17,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 
 	lru "github.com/hashicorp/golang-lru/v2"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 var successfulAccessTokenCache *lru.Cache[string, any]

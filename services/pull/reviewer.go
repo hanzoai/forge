@@ -14,7 +14,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/container"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // GetReviewers get all users can be requested to review:

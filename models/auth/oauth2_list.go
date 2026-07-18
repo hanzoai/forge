@@ -6,7 +6,7 @@ package auth
 import (
 	"github.com/hanzoai/git/models/db"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type FindOAuth2ApplicationsOptions struct {

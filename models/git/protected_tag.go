@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/glob"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ProtectedTag struct

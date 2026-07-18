@@ -12,7 +12,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/log"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ________                ____ ___

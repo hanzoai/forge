@@ -17,7 +17,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ErrLFSLockNotExist represents a "LFSLockNotExist" kind of error.

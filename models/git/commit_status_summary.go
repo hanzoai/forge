@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/modules/commitstatus"
 	"github.com/hanzoai/git/modules/setting"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // CommitStatusSummary holds the latest commit Status of a single Commit

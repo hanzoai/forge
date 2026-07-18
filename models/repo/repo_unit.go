@@ -14,8 +14,8 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/xorm"
-	"xorm.io/xorm/convert"
+	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/xorm/convert"
 )
 
 // ErrUnitTypeNotExist represents a "UnitTypeNotExist" kind of error.

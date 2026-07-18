@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/git/models/migrations/migrationtest"
 
 	"github.com/stretchr/testify/assert"
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func Test_AddUniqueIndexForProjectIssue(t *testing.T) {

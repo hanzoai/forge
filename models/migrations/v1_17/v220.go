@@ -8,7 +8,7 @@ import (
 	packages_model "github.com/hanzoai/git/models/packages"
 	container_module "github.com/hanzoai/git/modules/packages/container"
 
-	"xorm.io/xorm/schemas"
+	"github.com/hanzoai/xorm/schemas"
 )
 
 func AddContainerRepositoryProperty(x db.EngineMigration) (err error) {

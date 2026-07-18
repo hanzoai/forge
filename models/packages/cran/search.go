@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/models/packages"
 	cran_module "github.com/hanzoai/git/modules/packages/cran"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 type SearchOptions struct {

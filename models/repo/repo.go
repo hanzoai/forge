@@ -33,7 +33,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ErrUserDoesNotHaveAccessToRepo represents an error where the user doesn't has access to a given repo.

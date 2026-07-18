@@ -21,7 +21,7 @@ import (
 
 	"github.com/pquerna/otp/totp"
 	"golang.org/x/crypto/pbkdf2"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 //

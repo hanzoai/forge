@@ -34,7 +34,7 @@ import (
 	notify_service "github.com/hanzoai/git/services/notify"
 	release_service "github.com/hanzoai/git/services/release"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // CreateNewBranch creates a new repository branch

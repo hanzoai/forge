@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 
 	"golang.org/x/crypto/ssh"
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // KeyType specifies the key type

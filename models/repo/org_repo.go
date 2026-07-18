@@ -12,7 +12,7 @@ import (
 	org_model "github.com/hanzoai/git/models/organization"
 	user_model "github.com/hanzoai/git/models/user"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // GetOrgRepositories get repos belonging to the given organization

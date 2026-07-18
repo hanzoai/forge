@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // BuildCaseInsensitiveLike returns a case-insensitive LIKE condition for the given key and value.

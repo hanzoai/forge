@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/modules/storage"
 	repo_service "github.com/hanzoai/git/services/repository"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 func handleDeleteOrphanedRepos(ctx context.Context, logger log.Logger, autofix bool) error {

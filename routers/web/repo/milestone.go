@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/git/services/forms"
 	"github.com/hanzoai/git/services/issue"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 const (

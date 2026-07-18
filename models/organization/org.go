@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/util"
 
-	"xorm.io/builder"
+	"github.com/hanzoai/builder"
 )
 
 // ErrOrgNotExist represents a "OrgNotExist" kind of error.

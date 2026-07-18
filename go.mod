@@ -117,8 +117,6 @@ require (
 	modernc.org/sqlite v1.53.0
 	mvdan.cc/xurls/v2 v2.6.0
 	strk.kbt.io/projects/go/libravatar v0.0.0-20260301104140-add494e31dab
-	xorm.io/builder v0.3.13
-	xorm.io/xorm v1.4.1
 )
 
 require (
@@ -201,6 +199,8 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/hanzoai/builder v0.3.13
+	github.com/hanzoai/xorm v1.4.3
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/inbucket/html2text v1.0.0 // indirect
