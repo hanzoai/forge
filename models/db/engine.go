@@ -28,6 +28,19 @@ var (
 	registeredInitFuncs []func() error
 )
 
+// IterFunc is the row callback for Session.Iterate. It mirrors the underlying
+// engine's callback shape without naming it, keeping the Session surface
+// backend-independent.
+type IterFunc = func(idx int, bean any) error
+
+// Rows is the ORM-agnostic row cursor returned by Session.Rows.
+type Rows interface {
+	Next() bool
+	Err() error
+	Scan(beans ...any) error
+	Close() error
+}
+
 // SQLSession is the ORM-agnostic query surface shared by an engine and a session.
 // Fluent builders return the Session interface (not a concrete engine type) so the
 // backend can be swapped without touching call sites; backed today by *xorm.Session
@@ -45,7 +58,7 @@ type SQLSession interface {
 	In(string, ...any) Session
 	Incr(column string, arg ...any) Session
 	Insert(...any) (int64, error)
-	Iterate(any, xorm.IterFunc) error
+	Iterate(any, IterFunc) error
 	Join(joinOperator string, tablename, condition any, args ...any) Session
 	SQL(any, ...any) Session
 	Where(any, ...any) Session
@@ -88,7 +101,7 @@ type Session interface {
 	NoAutoCondition(...bool) Session
 	UseBool(columns ...string) Session
 	Update(bean any, condiBean ...any) (int64, error)
-	Rows(bean any) (*xorm.Rows, error)
+	Rows(bean any) (Rows, error)
 	Begin() error
 	Close() error
 	Commit() error
@@ -194,6 +207,15 @@ func (s *session) Having(conditions string) Session    { s.Session.Having(condit
 func (s *session) MustCols(columns ...string) Session  { s.Session.MustCols(columns...); return s }
 func (s *session) NoAutoCondition(no ...bool) Session  { s.Session.NoAutoCondition(no...); return s }
 func (s *session) UseBool(columns ...string) Session   { s.Session.UseBool(columns...); return s }
+func (s *session) Iterate(bean any, fn IterFunc) error { return s.Session.Iterate(bean, fn) }
+
+func (s *session) Rows(bean any) (Rows, error) {
+	rows, err := s.Session.Rows(bean)
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
 
 var (
 	_ Session         = (*session)(nil)

@@ -22,10 +22,9 @@ import (
 	"github.com/hanzoai/git/modules/util"
 
 	uuid "github.com/google/uuid"
+	"github.com/hanzoai/builder"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
-	"github.com/hanzoai/builder"
-	"github.com/hanzoai/xorm"
 )
 
 // Authorization codes should expire within 10 minutes per https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2
@@ -576,7 +575,7 @@ func GetOAuth2GrantsByUserID(ctx context.Context, uid int64) ([]*OAuth2Grant, er
 		Grant       *OAuth2Grant       `xorm:"extends"`
 		Application *OAuth2Application `xorm:"extends"`
 	}
-	var results *xorm.Rows
+	var results db.Rows
 	var err error
 	if results, err = db.GetEngine(ctx).
 		Table("oauth2_grant").
