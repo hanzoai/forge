@@ -62,7 +62,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/sessions v1.4.0
-	github.com/hanzo-git/actions-proto-go v0.6.0
+	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/storage-go v1.0.0
 	github.com/hashicorp/go-version v1.9.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
