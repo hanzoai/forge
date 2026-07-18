@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
-	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/orm/relational"
 	"github.com/hanzoai/xorm/names"
 )
 
@@ -22,14 +22,14 @@ func init() {
 }
 
 // newXORMEngine returns a new XORM engine from the configuration
-func newXORMEngine() (*xorm.Engine, error) {
+func newXORMEngine() (*relational.Engine, error) {
 	connOpts := GlobalConnOptions()
 	driver, connStr, err := ConnStr(connOpts)
 	if err != nil {
 		return nil, err
 	}
 
-	engine, err := xorm.NewEngine(driver, connStr)
+	engine, err := relational.NewEngine(driver, connStr)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func newXORMEngine() (*xorm.Engine, error) {
 	return engine, nil
 }
 
-// InitEngine initializes the xorm.Engine and sets it as XORM's default context
+// InitEngine initializes the relational.Engine and sets it as XORM's default context
 func InitEngine(ctx context.Context) error {
 	xe, err := newXORMEngine()
 	if err != nil {
@@ -71,7 +71,7 @@ func InitEngine(ctx context.Context) error {
 }
 
 // SetDefaultEngine sets the default engine for db
-func SetDefaultEngine(ctx context.Context, eng *xorm.Engine) {
+func SetDefaultEngine(ctx context.Context, eng *relational.Engine) {
 	xormEngine = eng
 	xormEngine.SetDefaultContext(ctx)
 }
@@ -87,7 +87,7 @@ func UnsetDefaultEngine() {
 	}
 }
 
-// InitEngineWithMigration initializes a new xorm.Engine and sets it as the XORM's default context
+// InitEngineWithMigration initializes a new relational.Engine and sets it as the XORM's default context
 // This function must never call .Sync() if the provided migration function fails.
 // When called from the "doctor" command, the migration function is a version check
 // that prevents the doctor from fixing anything in the database if the migration level

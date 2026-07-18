@@ -15,7 +15,7 @@ import (
 	_ "github.com/lib/pq"               // Needed for the Postgresql driver
 	_ "github.com/microsoft/go-mssqldb" // Needed for the MSSQL driver
 
-	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/orm/relational"
 	"github.com/hanzoai/xorm/core"
 	"github.com/hanzoai/xorm/dialects"
 	"github.com/hanzoai/xorm/names"
@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	xormEngine          *xorm.Engine
+	xormEngine          *relational.Engine
 	registeredModels    []any
 	registeredInitFuncs []func() error
 )
@@ -43,7 +43,7 @@ type Rows interface {
 
 // SQLSession is the ORM-agnostic query surface shared by an engine and a session.
 // Fluent builders return the Session interface (not a concrete engine type) so the
-// backend can be swapped without touching call sites; backed today by *xorm.Session
+// backend can be swapped without touching call sites; backed today by *relational.Session
 // through the session wrapper.
 type SQLSession interface {
 	Count(...any) (int64, error)
@@ -114,36 +114,36 @@ type Session interface {
 // SyncResult), so this surface stays xorm-typed; abstracting it is a later cut.
 type xormQuerier interface {
 	Count(...any) (int64, error)
-	Decr(column string, arg ...any) *xorm.Session
+	Decr(column string, arg ...any) *relational.Session
 	Delete(...any) (int64, error)
 	Truncate(...any) (int64, error)
 	Exec(...any) (sql.Result, error)
 	Find(any, ...any) error
 	FindAndCount(any, ...any) (int64, error)
 	Get(beans ...any) (bool, error)
-	ID(any) *xorm.Session
-	In(string, ...any) *xorm.Session
-	Incr(column string, arg ...any) *xorm.Session
+	ID(any) *relational.Session
+	In(string, ...any) *relational.Session
+	Incr(column string, arg ...any) *relational.Session
 	Insert(...any) (int64, error)
-	Iterate(any, xorm.IterFunc) error
-	Join(joinOperator string, tablename, condition any, args ...any) *xorm.Session
-	SQL(any, ...any) *xorm.Session
-	Where(any, ...any) *xorm.Session
-	Asc(colNames ...string) *xorm.Session
-	Desc(colNames ...string) *xorm.Session
-	Limit(limit int, start ...int) *xorm.Session
-	NoAutoTime() *xorm.Session
+	Iterate(any, relational.IterFunc) error
+	Join(joinOperator string, tablename, condition any, args ...any) *relational.Session
+	SQL(any, ...any) *relational.Session
+	Where(any, ...any) *relational.Session
+	Asc(colNames ...string) *relational.Session
+	Desc(colNames ...string) *relational.Session
+	Limit(limit int, start ...int) *relational.Session
+	NoAutoTime() *relational.Session
 	SumInt(bean any, columnName string) (res int64, err error)
-	Select(string) *xorm.Session
-	SetExpr(string, any) *xorm.Session
-	NotIn(string, ...any) *xorm.Session
-	OrderBy(any, ...any) *xorm.Session
+	Select(string) *relational.Session
+	SetExpr(string, any) *relational.Session
+	NotIn(string, ...any) *relational.Session
+	OrderBy(any, ...any) *relational.Session
 	Exist(...any) (bool, error)
-	Distinct(...string) *xorm.Session
+	Distinct(...string) *relational.Session
 	Query(...any) ([]map[string][]byte, error)
-	Cols(...string) *xorm.Session
-	Table(tableNameOrBean any) *xorm.Session
-	Context(ctx context.Context) *xorm.Session
+	Cols(...string) *relational.Session
+	Table(tableNameOrBean any) *relational.Session
+	Context(ctx context.Context) *relational.Session
 	QueryInterface(sqlOrArgs ...any) ([]map[string]any, error)
 	IsTableExist(tableNameOrBean any) (bool, error)
 }
@@ -158,18 +158,18 @@ type EngineMigration interface {
 	DBMetas() ([]*schemas.Table, error)
 	Dialect() dialects.Dialect
 	DropTables(beans ...any) error
-	NewSession() *xorm.Session
+	NewSession() *relational.Session
 	SetMapper(mapper names.Mapper)
-	SyncWithOptions(opts xorm.SyncOptions, beans ...any) (*xorm.SyncResult, error)
+	SyncWithOptions(opts relational.SyncOptions, beans ...any) (*relational.SyncResult, error)
 	TableInfo(bean any) (*schemas.Table, error)
 	TableName(bean any, includeSchema ...bool) string
 }
 
-// session adapts *xorm.Session to the ORM-agnostic Session interface. xorm's fluent
-// builders mutate the statement in place and return the same *xorm.Session, so each
+// session adapts *relational.Session to the ORM-agnostic Session interface. xorm's fluent
+// builders mutate the statement in place and return the same *relational.Session, so each
 // override discards that return and hands back the receiver: no extra allocation,
 // identical behavior. Terminal and tx methods are promoted from the embedded session.
-type session struct{ *xorm.Session }
+type session struct{ *relational.Session }
 
 func (s *session) Decr(column string, arg ...any) Session { s.Session.Decr(column, arg...); return s }
 func (s *session) ID(id any) Session                      { s.Session.ID(id); return s }
@@ -220,7 +220,7 @@ func (s *session) Rows(bean any) (Rows, error) {
 var (
 	_ Session         = (*session)(nil)
 	_ Engine          = (*session)(nil)
-	_ EngineMigration = (*xorm.Engine)(nil)
+	_ EngineMigration = (*relational.Engine)(nil)
 )
 
 // RegisterModel registers model, if initFuncs provided, it will be invoked after data model sync
@@ -233,7 +233,7 @@ func RegisterModel(bean any, initFunc ...func() error) {
 
 // SyncAllTables sync the schemas of all tables, is required by unit test code
 func SyncAllTables() error {
-	_, err := xormEngine.StoreEngine("InnoDB").SyncWithOptions(xorm.SyncOptions{
+	_, err := xormEngine.StoreEngine("InnoDB").SyncWithOptions(relational.SyncOptions{
 		WarnIfDatabaseColumnMissed: true,
 	}, registeredModels...)
 	return err

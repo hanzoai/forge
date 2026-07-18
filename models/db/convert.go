@@ -8,7 +8,7 @@ import (
 
 	"github.com/hanzoai/git/modules/setting"
 
-	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/orm/relational"
 	"github.com/hanzoai/xorm/convert"
 	"github.com/hanzoai/xorm/schemas"
 )
@@ -73,8 +73,8 @@ WHERE ST.name ='varchar'`)
 	return err
 }
 
-// CellToInt converts a xorm.Cell field value to an int value
-func CellToInt[T ~int | int64](cell xorm.Cell, def T) (ret T, has bool, err error) {
+// CellToInt converts a relational.Cell field value to an int value
+func CellToInt[T ~int | int64](cell relational.Cell, def T) (ret T, has bool, err error) {
 	if *cell == nil {
 		return def, false, nil
 	}

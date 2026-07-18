@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/hanzoai/builder"
-	"github.com/hanzoai/xorm"
+	"github.com/hanzoai/orm/relational"
 )
 
 type contextKey struct{ key string }
@@ -80,7 +80,7 @@ func GetEngine(ctx context.Context) Engine {
 	return &session{xormEngine.Context(ctx)}
 }
 
-func GetXORMEngineForTesting() *xorm.Engine {
+func GetXORMEngineForTesting() *relational.Engine {
 	return xormEngine
 }
 
