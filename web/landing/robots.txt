@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /$
+Allow: /favicon.svg
+# Everything else on this host is the git smart-HTTP + dashboard surface, served
+# by the cloud binary (not this static landing) — nothing to crawl there.
+Disallow: /

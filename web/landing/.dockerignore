@@ -1,0 +1,4 @@
+# Keep /srv to the web assets only — the build tooling files never ship.
+Dockerfile
+.dockerignore
+README.md

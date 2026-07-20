@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hanzo Git — native git hosting on Hanzo Cloud</title>
+  <meta name="description" content="Hanzo Git — host your code, run CI, and publish to paas, all on your own cloud. Clone and push over native git; sign in with Hanzo IAM." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta property="og:title" content="Hanzo Git" />
+  <meta property="og:description" content="Native git hosting on Hanzo Cloud — host code, run CI, publish to paas." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #0a0a0a;
+      --muted: #5b616e;
+      --border: #e7e8ea;
+      --panel: #fafafa;
+      --code-bg: #f5f6f8;
+      --code-fg: #0a0a0a;
+      --accent-fg: #ffffff;
+      --accent-bg: #0a0a0a;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Geist", Inter, Roboto, Helvetica, Arial, sans-serif;
+      --mono: "Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0a;
+        --fg: #fafafa;
+        --muted: #9aa1ad;
+        --border: #202226;
+        --panel: #101114;
+        --code-bg: #121317;
+        --code-fg: #f0f1f3;
+        --accent-fg: #0a0a0a;
+        --accent-bg: #fafafa;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* Header */
+    header { border-bottom: 1px solid var(--border); }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; letter-spacing: -0.01em; }
+    .brand svg { width: 22px; height: 22px; display: block; }
+    .brand .sub { color: var(--muted); font-weight: 500; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 38px; padding: 0 16px; border-radius: 8px;
+      font-size: 14px; font-weight: 600; text-decoration: none;
+      border: 1px solid var(--accent-bg); background: var(--accent-bg); color: var(--accent-fg);
+      transition: opacity .15s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: .85; }
+    .btn.ghost { background: transparent; color: var(--fg); border-color: var(--border); }
+    .btn.ghost:hover { border-color: var(--fg); opacity: 1; }
+
+    /* Hero */
+    .hero { padding: 88px 0 56px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; margin-bottom: 22px;
+    }
+    .eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--fg); }
+    h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.02; letter-spacing: -0.03em; margin: 0 0 20px; font-weight: 650; }
+    .lede { font-size: clamp(17px, 2.4vw, 21px); color: var(--muted); max-width: 640px; margin: 0 0 32px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+    /* Code block */
+    .clone { margin: 40px 0 0; max-width: 680px; }
+    .clone .label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px; }
+    pre {
+      margin: 0; overflow-x: auto;
+      background: var(--code-bg); color: var(--code-fg);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 18px; font-family: var(--mono); font-size: 14px; line-height: 1.6;
+    }
+    pre code { white-space: pre; }
+    .prompt { color: var(--muted); user-select: none; }
+
+    /* Features */
+    .features { border-top: 1px solid var(--border); padding: 56px 0 8px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .card { border: 1px solid var(--border); border-radius: 12px; padding: 22px; background: var(--panel); }
+    .card .ic { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px; }
+    .card h3 { margin: 0 0 6px; font-size: 16px; letter-spacing: -0.01em; }
+    .card p { margin: 0; font-size: 14px; color: var(--muted); }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); margin-top: 64px; }
+    .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 28px 0; }
+    .foot .links { display: flex; flex-wrap: wrap; gap: 20px; }
+    .foot a { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .foot a:hover { color: var(--fg); }
+    .foot .note { color: var(--muted); font-size: 13px; }
+    svg.i { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <nav class="nav">
+        <a class="brand" href="/" aria-label="Hanzo Git home">
+          <svg viewBox="0 0 67 67" role="img" aria-label="Hanzo">
+            <path fill="currentColor" d="M22.21 67V44.6369H0V67H22.21Z"/>
+            <path fill="currentColor" d="M66.7038 22.3184H22.2534L0.0878906 44.6367H44.4634L66.7038 22.3184Z"/>
+            <path fill="currentColor" d="M22.21 0H0V22.3184H22.21V0Z"/>
+            <path fill="currentColor" d="M66.7198 0H44.5098V22.3184H66.7198V0Z"/>
+            <path fill="currentColor" d="M66.7198 67V44.6369H44.5098V67H66.7198Z"/>
+          </svg>
+          <span>Hanzo Git</span>
+        </a>
+        <a class="btn" href="https://console.hanzo.ai/git">Open dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <span class="eyebrow"><span class="dot"></span> Native git, built into Hanzo Cloud</span>
+        <h1>Hanzo Git</h1>
+        <p class="lede">
+          Host your code, run CI, and publish to paas — all in one place, on your own cloud.
+          Clone and push over native git, sign in with Hanzo IAM.
+        </p>
+        <div class="cta-row">
+          <a class="btn" href="https://console.hanzo.ai/git">Open dashboard</a>
+          <a class="btn ghost" href="https://docs.hanzo.ai/docs/git">Read the docs</a>
+        </div>
+
+        <div class="clone">
+          <p class="label">Clone a repository</p>
+          <pre><code><span class="prompt">$ </span>git clone https://git.hanzo.ai/&lt;org&gt;/&lt;repo&gt;.git</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="wrap">
+        <div class="grid">
+          <div class="card">
+            <div class="ic" aria-hidden="true">
+              <svg class="i" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="9" r="3"/><path d="M6 9v6"/><path d="M18 12a6 6 0 0 1-6 6H9"/></svg>
+            </div>
+            <h3>Native git hosting</h3>
+            <p>Clone, browse, and push over HTTPS and SSH. Per-organization repositories, isolated and IAM-native — no third-party dependency.</p>
+          </div>
+          <div class="card">
+            <div class="ic" aria-hidden="true">
+              <svg class="i" viewBox="0 0 24 24"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.9 4.9 2.9 2.9"/><path d="m16.2 16.2 2.9 2.9"/><path d="M2 12h4"/><path d="M18 12h4"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <h3>CI on every push</h3>
+            <p>A push triggers a build on Hanzo's own runners — no GitHub-hosted builders, no leaving your cloud. Tests and images, built for you.</p>
+          </div>
+          <div class="card">
+            <div class="ic" aria-hidden="true">
+              <svg class="i" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>
+            </div>
+            <h3>Publish to paas</h3>
+            <p>Build straight to deploy — a static site or an SSR runtime on Hanzo paas. Source, CI, and hosting stay in one place.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot">
+        <span class="note">Signed in with Hanzo IAM · one identity across git, CI, and cloud.</span>
+        <div class="links">
+          <a href="https://console.hanzo.ai/git">Dashboard</a>
+          <a href="https://docs.hanzo.ai/docs/git">Docs</a>
+          <a href="https://console.hanzo.ai">Hanzo Cloud</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
