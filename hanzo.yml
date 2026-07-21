@@ -10,6 +10,8 @@ images:
     context: .
     dockerfile: Dockerfile
     repo: ghcr.io/hanzoai/git
+    args:
+      GIT_VERSION: "1.26.11"
 
 # The Go + frontend compile happens inside the Dockerfile, so a broken tree fails
 # the image build already. This gate stays light and targeted: the setting unit
