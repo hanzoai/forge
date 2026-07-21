@@ -8,7 +8,7 @@ import {showGlobalErrorMessage, processWindowErrorEvent} from './modules/errors.
 // It will generate duplicate IDs (ps: don't try to use "random" to fix, it is just a real example to show the importance of "do not import a module twice")
 if (!window._globalHandlerErrors?._inited) {
   if (!window.config) {
-    showGlobalErrorMessage(`Gitea JavaScript code couldn't run correctly, please check your custom templates`);
+    showGlobalErrorMessage(`Hanzo Git JavaScript code couldn't run correctly, please check your custom templates`);
   }
   // we added an event handler for window error at the very beginning of <script> of page head the
   // handler calls `_globalHandlerErrors.push` (array method) to record all errors occur before

@@ -15,7 +15,7 @@ import (
 func Version(ctx *context.APIContext) {
 	// swagger:operation GET /version miscellaneous getVersion
 	// ---
-	// summary: Returns the version of the Gitea application
+	// summary: Returns the version of the Hanzo Git application
 	// produces:
 	// - application/json
 	// responses:
