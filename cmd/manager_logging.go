@@ -66,7 +66,7 @@ func newLoggingCommand() *cli.Command {
 		Commands: []*cli.Command{
 			{
 				Name:  "pause",
-				Usage: "Pause logging (Gitea will buffer logs up to a certain point and will drop them after that point)",
+				Usage: "Pause logging (Hanzo Git will buffer logs up to a certain point and will drop them after that point)",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name: "debug",
@@ -84,7 +84,7 @@ func newLoggingCommand() *cli.Command {
 				Action: runResumeLogging,
 			}, {
 				Name:  "release-and-reopen",
-				Usage: "Cause Gitea to release and re-open files used for logging",
+				Usage: "Cause Hanzo Git to release and re-open files used for logging",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name: "debug",

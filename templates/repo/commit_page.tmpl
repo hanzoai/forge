@@ -155,7 +155,7 @@
 				<div class="flex-text-inline">
 					<span class="tw-text-text-light">{{ctx.Locale.Tr "repo.diff.coauthored_by"}}</span>
 					{{range $participant := .CommitOtherParticipants}}
-						{{$user := $participant.GiteaUser}}
+						{{$user := $participant.User}}
 						{{$gitIdentity := $participant.GitIdentity}}
 						{{if $user}}
 							{{ctx.AvatarUtils.Avatar $user 20}}

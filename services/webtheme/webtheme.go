@@ -239,7 +239,7 @@ func getAvailableThemes() *themeCollectionStruct {
 
 	if setting.IsProd {
 		if !hasAvailableThemes {
-			setting.LogStartupProblem(1, log.ERROR, "No theme candidate in asset files, but Gitea requires there should be at least one usable theme")
+			setting.LogStartupProblem(1, log.ERROR, "No theme candidate in asset files, but Hanzo Git requires there should be at least one usable theme")
 		}
 		if themeMap[setting.UI.DefaultTheme] == nil {
 			setting.LogStartupProblem(1, log.ERROR, "Default theme %q is not available, please correct the '[ui].DEFAULT_THEME' setting in the config file", setting.UI.DefaultTheme)

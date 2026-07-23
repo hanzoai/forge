@@ -307,8 +307,8 @@ func (ut *RenderUtils) participantHref(data *user_model.AvatarStackData, partici
 	if href := renderAvatarStackViewEmailLink(data, participant.GitIdentity.Email); href != "" {
 		return href
 	}
-	if participant.GiteaUser != nil {
-		return template.URL(participant.GiteaUser.HomeLink())
+	if participant.User != nil {
+		return template.URL(participant.User.HomeLink())
 	} else if participant.GitIdentity.Email != "" {
 		return template.URL("mailto:" + participant.GitIdentity.Email)
 	}
@@ -316,15 +316,15 @@ func (ut *RenderUtils) participantHref(data *user_model.AvatarStackData, partici
 }
 
 func (ut *RenderUtils) participantAvatar(participant *user_model.CommitParticipant) template.HTML {
-	if participant.GiteaUser != nil {
-		return ut.avatarUtils.Avatar(participant.GiteaUser, 20)
+	if participant.User != nil {
+		return ut.avatarUtils.Avatar(participant.User, 20)
 	}
 	return ut.avatarUtils.AvatarByEmail(participant.GitIdentity.Email, participant.GitIdentity.Name, 20)
 }
 
 func participantName(participant *user_model.CommitParticipant) string {
-	if participant.GiteaUser != nil {
-		return participant.GiteaUser.GetDisplayName()
+	if participant.User != nil {
+		return participant.User.GetDisplayName()
 	}
 	return participant.GitIdentity.Name
 }
@@ -409,8 +409,8 @@ func (ut *RenderUtils) participantNameLink(data *user_model.AvatarStackData, par
 	if href := renderAvatarStackViewEmailLink(data, participant.GitIdentity.Email); href != "" {
 		return htmlutil.HTMLFormat(`<a class="muted" href="%s">%s</a>`, href, participantName(participant))
 	}
-	if participant.GiteaUser != nil {
-		return participant.GiteaUser.GetShortDisplayNameLinkHTML()
+	if participant.User != nil {
+		return participant.User.GetShortDisplayNameLinkHTML()
 	}
 	if participant.GitIdentity.Email != "" {
 		return htmlutil.HTMLFormat(`<a class="muted" href="mailto:%s">%s</a>`, participant.GitIdentity.Email, participant.GitIdentity.Name)

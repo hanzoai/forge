@@ -26,8 +26,8 @@ import (
 func newDumpCommand() *cli.Command {
 	return &cli.Command{
 		Name:        "dump",
-		Usage:       "Dump Gitea files and database",
-		Description: `Dump compresses all related files and database into zip file. It can be used for backup and capture Gitea server image to send to maintainer`,
+		Usage:       "Dump Hanzo Git files and database",
+		Description: `Dump compresses all related files and database into zip file. It can be used for backup and capture Hanzo Git server image to send to maintainer`,
 		Action:      runDump,
 		Flags: []cli.Flag{
 			&cli.StringFlag{

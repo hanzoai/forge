@@ -177,9 +177,9 @@ func runHookPreReceive(ctx context.Context, c *cli.Command) error {
 
 	if len(os.Getenv("SSH_ORIGINAL_COMMAND")) == 0 {
 		if setting.OnlyAllowPushIfGiteaEnvironmentSet {
-			return fail(ctx, `Rejecting changes as Gitea environment not set.
+			return fail(ctx, `Rejecting changes as Hanzo Git environment not set.
 If you are pushing over SSH you must push with a key managed by
-Gitea or set your environment appropriately.`, "")
+Hanzo Git or set your environment appropriately.`, "")
 		}
 		return nil
 	}
@@ -329,9 +329,9 @@ func runHookPostReceive(ctx context.Context, c *cli.Command) error {
 
 	if len(os.Getenv("SSH_ORIGINAL_COMMAND")) == 0 {
 		if setting.OnlyAllowPushIfGiteaEnvironmentSet {
-			return fail(ctx, `Rejecting changes as Gitea environment not set.
+			return fail(ctx, `Rejecting changes as Hanzo Git environment not set.
 If you are pushing over SSH you must push with a key managed by
-Gitea or set your environment appropriately.`, "")
+Hanzo Git or set your environment appropriately.`, "")
 		}
 		return nil
 	}
@@ -465,9 +465,9 @@ func runHookProcReceive(ctx context.Context, c *cli.Command) error {
 
 	if len(os.Getenv("SSH_ORIGINAL_COMMAND")) == 0 {
 		if setting.OnlyAllowPushIfGiteaEnvironmentSet {
-			return fail(ctx, `Rejecting changes as Gitea environment not set.
+			return fail(ctx, `Rejecting changes as Hanzo Git environment not set.
 If you are pushing over SSH you must push with a key managed by
-Gitea or set your environment appropriately.`, "")
+Hanzo Git or set your environment appropriately.`, "")
 		}
 		return nil
 	}

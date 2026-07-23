@@ -8,7 +8,7 @@
 			<div class="ui attached segment">
 				{{template "base/alert" .}}
 
-				<p>{{ctx.Locale.Tr "install.docker_helper" "https://docs.gitea.com/installation/install-with-docker"}}</p>
+				<p>{{ctx.Locale.Tr "install.docker_helper" "https://docs.hanzo.ai/installation/install-with-docker"}}</p>
 
 				<form class="ui form" action="{{AppSubUrl}}/" method="post">
 					<!-- Database Settings -->
@@ -124,7 +124,7 @@
 					</div>
 					<div class="inline required field">
 						<label for="domain">{{ctx.Locale.Tr "install.domain"}}</label>
-						<input id="domain" name="domain" value="{{.domain}}" placeholder="demo.gitea.com" required>
+						<input id="domain" name="domain" value="{{.domain}}" placeholder="git.hanzo.ai" required>
 						<span class="help">{{ctx.Locale.Tr "install.domain_helper"}}</span>
 					</div>
 					<div class="inline field">
@@ -139,7 +139,7 @@
 					</div>
 					<div class="inline required field">
 						<label for="app_url">{{ctx.Locale.Tr "install.app_url"}}</label>
-						<input id="app_url" name="app_url" value="{{.app_url}}" placeholder="https://demo.gitea.com" required>
+						<input id="app_url" name="app_url" value="{{.app_url}}" placeholder="https://git.hanzo.ai" required>
 						<span class="help">{{ctx.Locale.Tr "install.app_url_helper"}}</span>
 					</div>
 					<div class="inline required field">

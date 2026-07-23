@@ -20,7 +20,7 @@ import (
 func newGenerateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "generate",
-		Usage: "Generate Gitea's secrets/keys/tokens",
+		Usage: "Generate Hanzo Git's secrets/keys/tokens",
 		Commands: []*cli.Command{
 			newGenerateSecretCommand(),
 			newGenerateSSHCommand(),

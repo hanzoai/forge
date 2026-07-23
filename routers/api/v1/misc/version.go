@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/services/context"
 )
 
-// Version shows the version of the Gitea server
+// Version shows the version of the Hanzo Git server
 func Version(ctx *context.APIContext) {
 	// swagger:operation GET /version miscellaneous getVersion
 	// ---

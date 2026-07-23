@@ -93,7 +93,7 @@ type userInfoResponse struct {
 // InfoOAuth manages request for userinfo endpoint
 func InfoOAuth(ctx *context.Context) {
 	if ctx.Doer == nil || ctx.Data["AuthedMethod"] != (&auth_service.OAuth2{}).Name() {
-		ctx.Resp.Header().Set("WWW-Authenticate", `Bearer realm="Gitea OAuth2"`)
+		ctx.Resp.Header().Set("WWW-Authenticate", `Bearer realm="Hanzo Git OAuth2"`)
 		ctx.PlainText(http.StatusUnauthorized, "no valid authorization")
 		return
 	}
@@ -106,7 +106,7 @@ func InfoOAuth(ctx *context.Context) {
 		ctx.ServerError("HasScope", err)
 		return
 	} else if !allowed {
-		ctx.Resp.Header().Set("WWW-Authenticate", `Bearer realm="Gitea OAuth2"`)
+		ctx.Resp.Header().Set("WWW-Authenticate", `Bearer realm="Hanzo Git OAuth2"`)
 		ctx.PlainText(http.StatusForbidden, "token does not have required scope: read:user")
 		return
 	}
@@ -160,7 +160,7 @@ func IntrospectOAuth(ctx *context.Context) {
 	if introspectingApp == nil {
 		// RFC 7662 requires the caller to authenticate to the introspection endpoint.
 		// https://www.rfc-editor.org/rfc/rfc7662.html#section-2.1
-		ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Gitea OAuth2"`)
+		ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Hanzo Git OAuth2"`)
 		ctx.PlainText(http.StatusUnauthorized, "no valid authorization")
 		return
 	}
@@ -453,7 +453,7 @@ func GrantApplicationOAuth(ctx *context.Context) {
 	ctx.Redirect(redirect.String(), http.StatusSeeOther)
 }
 
-// OIDCWellKnown generates JSON so OIDC clients know Gitea's capabilities
+// OIDCWellKnown generates JSON so OIDC clients know Hanzo Git's capabilities
 func OIDCWellKnown(ctx *context.Context) {
 	if !setting.OAuth2.Enabled {
 		http.NotFound(ctx.Resp, ctx.Req)

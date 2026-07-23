@@ -389,7 +389,7 @@ func createMSTeamsPayload(r *api.Repository, s *api.User, title, text, actionTar
 		PotentialAction: []MSTeamsAction{
 			{
 				Type: "OpenUri",
-				Name: "View in Gitea",
+				Name: "View in Hanzo Git",
 				Targets: []MSTeamsActionTarget{
 					{
 						Os:  "default",

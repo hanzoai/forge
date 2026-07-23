@@ -13,10 +13,10 @@ import (
 )
 
 // CommitParticipant is one participant of a commit (its author or a co-author):
-// a git identity, optionally matched to a Gitea user.
+// a git identity, optionally matched to a user.
 type CommitParticipant struct {
 	GitIdentity *git.CommitIdentity // git identity (name/email), never nil
-	GiteaUser   *user.User          // matched Gitea user, nil if unmatched
+	User   *user.User          // matched user, nil if unmatched
 }
 
 // UserCommit represents a commit with matched of database "author" user.

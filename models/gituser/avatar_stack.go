@@ -38,7 +38,7 @@ func BuildAvatarStackData(ctx context.Context, allParticipants []*git.CommitIden
 		if emailUserMap != nil {
 			giteaUser = emailUserMap.GetByEmail(p.Email)
 		}
-		ret.Participants = append(ret.Participants, &CommitParticipant{GiteaUser: giteaUser, GitIdentity: p})
+		ret.Participants = append(ret.Participants, &CommitParticipant{User: giteaUser, GitIdentity: p})
 	}
 	return ret
 }

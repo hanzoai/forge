@@ -133,7 +133,7 @@ func APIUnauthorizedError(ctx *context.Context) {
 	requireSignIn = requireSignIn || setting.Service.RequireSignInViewStrict
 	if requireSignIn {
 		// support apple container like: container registry login <gitea-host> -u
-		ctx.Resp.Header().Add("WWW-Authenticate", `Basic realm="Gitea Container Registry"`)
+		ctx.Resp.Header().Add("WWW-Authenticate", `Basic realm="Hanzo Git Container Registry"`)
 	}
 	apiErrorDefined(ctx, errUnauthorized)
 }

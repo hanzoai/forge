@@ -127,17 +127,17 @@ func ensureGitVersion() error {
 				moreHint = "get git: https://git-scm.com/downloads/linux and https://ius.io"
 			}
 		}
-		return fmt.Errorf("installed git version %q is not supported, Gitea requires git version >= %q, %s", DefaultFeatures().gitVersion.Original(), RequiredVersion, moreHint)
+		return fmt.Errorf("installed git version %q is not supported, Hanzo Git requires git version >= %q, %s", DefaultFeatures().gitVersion.Original(), RequiredVersion, moreHint)
 	}
 
 	if err := checkGitVersionCompatibility(DefaultFeatures().gitVersion); err != nil {
-		return fmt.Errorf("installed git version %s has a known compatibility issue with Gitea: %w, please upgrade (or downgrade) git", DefaultFeatures().gitVersion.String(), err)
+		return fmt.Errorf("installed git version %s has a known compatibility issue with Hanzo Git: %w, please upgrade (or downgrade) git", DefaultFeatures().gitVersion.String(), err)
 	}
 	return nil
 }
 
 // InitSimple initializes git module with a very simple step, no config changes, no global command arguments.
-// This method doesn't change anything to filesystem. At the moment, it is only used by some Gitea sub-commands.
+// This method doesn't change anything to filesystem. At the moment, it is only used by some Hanzo Git sub-commands.
 func InitSimple() error {
 	if setting.Git.HomePath == "" {
 		return errors.New("unable to init Git's HomeDir, incorrect initialization of the setting and git modules")

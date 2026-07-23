@@ -654,7 +654,7 @@ func ShowSSHKeys(ctx *context.Context) {
 
 	var buf bytes.Buffer
 	// "authorized_keys" file format: "#" followed by comment line per key
-	buf.WriteString("# Gitea isn't a key server. The keys are exported as the user uploaded and might not have been fully verified.\n")
+	buf.WriteString("# Hanzo Git isn't a key server. The keys are exported as the user uploaded and might not have been fully verified.\n")
 	for i := range keys {
 		if keys[i].Type == asymkey_model.KeyTypePrincipal {
 			continue // SSH principal keys are not for signing or authentication
@@ -694,7 +694,7 @@ func ShowGPGKeys(ctx *context.Context) {
 
 	headers := make(map[string]string)
 	// https://www.rfc-editor.org/rfc/rfc4880
-	headers["Comment"] = "Gitea isn't a key server. The keys are exported as the user uploaded and might not have been fully verified."
+	headers["Comment"] = "Hanzo Git isn't a key server. The keys are exported as the user uploaded and might not have been fully verified."
 	if len(failedEntitiesID) > 0 { // If some key need re-import to be exported
 		headers["Note"] = "The keys with the following IDs couldn't be exported and need to be reuploaded " + strings.Join(failedEntitiesID, ", ")
 	} else if len(entities) == 0 {

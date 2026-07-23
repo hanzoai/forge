@@ -147,7 +147,7 @@ func WebhooksNew(ctx *context.Context) {
 	}
 	if hookType == "discord" {
 		ctx.Data["DiscordHook"] = map[string]any{
-			"Username": "Gitea",
+			"Username": "Hanzo Git",
 		}
 	}
 	ctx.Data["BaseLink"] = orCtx.LinkNew
@@ -315,12 +315,12 @@ func editWebhook(ctx *context.Context, params webhookParams) {
 	ctx.Redirect(fmt.Sprintf("%s/%d", orCtx.Link, w.ID))
 }
 
-// GiteaHooksNewPost response for creating Gitea webhook
+// GiteaHooksNewPost response for creating Hanzo Git webhook
 func GiteaHooksNewPost(ctx *context.Context) {
 	createWebhook(ctx, giteaHookParams(ctx))
 }
 
-// GiteaHooksEditPost response for editing Gitea webhook
+// GiteaHooksEditPost response for editing Hanzo Git webhook
 func GiteaHooksEditPost(ctx *context.Context) {
 	editWebhook(ctx, giteaHookParams(ctx))
 }

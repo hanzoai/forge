@@ -25,8 +25,8 @@ func syncGitConfig(ctx context.Context) (err error) {
 	// TODO: need to confirm whether users really need to change these values manually. It seems that these values are dummy only and not really used.
 	// If these values are not really used, then they can be set (overwritten) directly without considering about existence.
 	for configKey, defaultValue := range map[string]string{
-		"user.name":  "Gitea",
-		"user.email": "gitea@fake.local",
+		"user.name":  "Hanzo Git",
+		"user.email": "hanzo-git@fake.local",
 	} {
 		if err := configSetNonExist(ctx, configKey, defaultValue); err != nil {
 			return err
@@ -67,10 +67,10 @@ func syncGitConfig(ctx context.Context) (err error) {
 
 	// Due to CVE-2022-24765, git now denies access to git directories which are not owned by current user.
 	// However, some docker users and samba users find it difficult to configure their systems correctly,
-	// so that Gitea's git repositories are owned by the Gitea user.
+	// so that Hanzo Git's git repositories are owned by the Hanzo Git user.
 	// (Possibly Windows Service users - but ownership in this case should really be set correctly on the filesystem.)
 	// See issue: https://github.com/go-gitea/gitea/issues/19455
-	// As Gitea now always use its internal git config file, and access to the git repositories is managed through Gitea,
+	// As Hanzo Git now always use its internal git config file, and access to the git repositories is managed through Hanzo Git,
 	// it is now safe to set "safe.directory=*" for internal usage only.
 	// Although this setting is only supported by some new git versions, it is also tolerated by earlier versions
 	if err := configAddNonExist(ctx, "safe.directory", "*"); err != nil {

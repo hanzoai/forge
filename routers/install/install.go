@@ -161,7 +161,7 @@ func checkDatabase(ctx *context.Context, form *forms.InstallForm) bool {
 	}
 
 	if hasPostInstallationUser && dbMigrationVersion > 0 {
-		log.Error("The database is likely to have been used by Gitea before, database migration version=%d", dbMigrationVersion)
+		log.Error("The database is likely to have been used by Hanzo Git before, database migration version=%d", dbMigrationVersion)
 		confirmed := form.ReinstallConfirmFirst && form.ReinstallConfirmSecond && form.ReinstallConfirmThird
 		if !confirmed {
 			ctx.Data["Err_DbInstalledBefore"] = true
@@ -169,11 +169,11 @@ func checkDatabase(ctx *context.Context, form *forms.InstallForm) bool {
 			return false
 		}
 
-		log.Info("User confirmed re-installation of Gitea into a pre-existing database")
+		log.Info("User confirmed re-installation of Hanzo Git into a pre-existing database")
 	}
 
 	if hasPostInstallationUser || dbMigrationVersion > 0 {
-		log.Info("Gitea will be installed in a database with: hasPostInstallationUser=%v, dbMigrationVersion=%v", hasPostInstallationUser, dbMigrationVersion)
+		log.Info("Hanzo Git will be installed in a database with: hasPostInstallationUser=%v, dbMigrationVersion=%v", hasPostInstallationUser, dbMigrationVersion)
 	}
 
 	return true
@@ -226,7 +226,7 @@ func SubmitInstall(ctx *context.Context) {
 		return
 	}
 
-	// Prepare AppDataPath, it is very important for Gitea
+	// Prepare AppDataPath, it is very important for Hanzo Git
 	if err = setting.PrepareAppDataPath(); err != nil {
 		ctx.RenderWithErrDeprecated(ctx.Tr("install.invalid_app_data_path", err), tplInstall, &form)
 		return
@@ -523,7 +523,7 @@ func SubmitInstall(ctx *context.Context) {
 
 	go func() {
 		// Sleep for a while to make sure the user's browser has loaded the post-install page and its assets (images, css, js)
-		// What if this duration is not long enough? That's impossible -- if the user can't load the simple page in time, how could they install or use Gitea in the future ....
+		// What if this duration is not long enough? That's impossible -- if the user can't load the simple page in time, how could they install or use Hanzo Git in the future ....
 		time.Sleep(3 * time.Second)
 
 		// Now get the http.Server from this request and shut it down

@@ -16,7 +16,7 @@ import (
 func newActionsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "actions",
-		Usage: "Manage Gitea Actions",
+		Usage: "Manage Hanzo Git Actions",
 		Commands: []*cli.Command{
 			newActionsGenerateRunnerTokenCommand(),
 		},

@@ -360,7 +360,7 @@ func ResolveUses(ctx context.Context, uses string) (*jobparser.UsesRef, error) {
 		// ParseGiteaSiteURL returns nil for URLs that do not belong to this instance.
 		gsu := httplib.ParseGiteaSiteURL(ctx, uses)
 		if gsu == nil {
-			return nil, fmt.Errorf("unsupported reusable workflow URL %q: an absolute URL must point to this Gitea instance (%s)", uses, setting.AppURL)
+			return nil, fmt.Errorf("unsupported reusable workflow URL %q: an absolute URL must point to this Hanzo Git instance (%s)", uses, setting.AppURL)
 		}
 		// RoutePath is the instance-relative path (AppSubURL already stripped), e.g. "/owner/repo/.gitea/workflows/file.yml@ref".
 		uses = strings.TrimPrefix(gsu.RoutePath, "/")

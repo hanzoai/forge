@@ -77,7 +77,7 @@ func init() {
 		}))
 
 	RegisterGothProvider(NewCustomProvider(
-		"gitea", "Gitea", &CustomURLSettings{
+		"gitea", "Hanzo Git", &CustomURLSettings{
 			TokenURL:   requiredAttribute(gitea.TokenURL),
 			AuthURL:    requiredAttribute(gitea.AuthURL),
 			ProfileURL: requiredAttribute(gitea.ProfileURL),
