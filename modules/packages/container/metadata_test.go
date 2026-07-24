@@ -20,7 +20,7 @@ func TestParseImageConfig(t *testing.T) {
 	license := "MIT"
 	projectURL := "https://gitea.com"
 	repositoryURL := "https://gitea.com/gitea"
-	documentationURL := "https://docs.gitea.com"
+	documentationURL := "https://docs.hanzo.ai"
 
 	// FIXME: JSON-KEY-CASE: the test case is not right, the config fields are capitalized in the spec
 	// https://github.com/opencontainers/image-spec/blob/main/schema/config-schema.json
