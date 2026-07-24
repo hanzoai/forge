@@ -40,10 +40,10 @@ import (
 
 	_ "image/jpeg" // Needed for jpeg support
 
+	"github.com/hanzoai/builder"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
-	"github.com/hanzoai/builder"
 )
 
 // UserType defines the user type
