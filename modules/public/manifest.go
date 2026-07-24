@@ -175,7 +175,7 @@ func entryStyleURLs(jsEntrySrc, devStylesheetSrc string) []string {
 }
 
 // AssetNameFromHashedPath returns the asset entry name for a given hashed asset path.
-// Example: returns "theme-gitea-dark" for "css/theme-gitea-dark.CyAaQnn5.css".
+// Example: returns "theme-hanzo-dark" for "css/theme-hanzo-dark.CyAaQnn5.css".
 // Returns empty string if the path is not found in the manifest.
 func AssetNameFromHashedPath(hashedPath string) string {
 	return getManifestData().names[hashedPath]
