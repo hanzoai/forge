@@ -626,7 +626,8 @@ var (
 		"openapi3.v1.json",
 
 		"ghost",         // reserved name for deleted users (id: -1)
-		"gitea-actions", // gitea builtin user (id: -2)
+		"hanzo-actions", // builtin Actions bot user (id: -2)
+		"gitea-actions", // legacy reserved — keep blocked so no account can squat the old bot name
 	}
 
 	// These names are reserved for user accounts: user's keys, user's rss feed, user's avatar, etc.

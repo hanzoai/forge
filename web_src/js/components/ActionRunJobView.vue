@@ -9,7 +9,7 @@ import {copyToClipboardWithFeedback} from '../modules/clipboard.ts';
 import type {IntervalId} from '../types.ts';
 import {toggleFullScreen} from '../utils.ts';
 import {localUserSettings} from '../modules/user-settings.ts';
-import type {ActionsArtifact, ActionsJob, ActionsRun, ActionsStatus} from '../modules/gitea-actions.ts';
+import type {ActionsArtifact, ActionsJob, ActionsRun, ActionsStatus} from '../modules/actions-types.ts';
 import {
   type ActionRunViewStore,
   createLogLineMessage,
@@ -437,24 +437,24 @@ async function hashChangeListener() {
         </button>
         <div class="menu transition action-job-menu" :class="{visible: menuVisible}" v-if="menuVisible" v-cloak>
           <a class="item" @click="toggleTimeDisplay('seconds')">
-            <i class="icon"><SvgIcon :name="timeVisible['log-time-seconds'] ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+            <i class="icon"><SvgIcon :name="timeVisible['log-time-seconds'] ? 'octicon-check' : 'hanzo-empty-checkbox'"/></i>
             {{ locale.showLogSeconds }}
           </a>
           <a class="item" @click="toggleTimeDisplay('stamp')">
-            <i class="icon"><SvgIcon :name="timeVisible['log-time-stamp'] ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+            <i class="icon"><SvgIcon :name="timeVisible['log-time-stamp'] ? 'octicon-check' : 'hanzo-empty-checkbox'"/></i>
             {{ locale.showTimeStamps }}
           </a>
           <a class="item" @click="toggleFullScreenMode()">
-            <i class="icon"><SvgIcon :name="isFullScreen ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+            <i class="icon"><SvgIcon :name="isFullScreen ? 'octicon-check' : 'hanzo-empty-checkbox'"/></i>
             {{ locale.showFullScreen }}
           </a>
           <div class="divider"/>
           <a class="item" @click="optionAlwaysAutoScroll = !optionAlwaysAutoScroll">
-            <i class="icon"><SvgIcon :name="optionAlwaysAutoScroll ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+            <i class="icon"><SvgIcon :name="optionAlwaysAutoScroll ? 'octicon-check' : 'hanzo-empty-checkbox'"/></i>
             {{ locale.logsAlwaysAutoScroll }}
           </a>
           <a class="item" @click="optionAlwaysExpandRunning = !optionAlwaysExpandRunning">
-            <i class="icon"><SvgIcon :name="optionAlwaysExpandRunning ? 'octicon-check' : 'gitea-empty-checkbox'"/></i>
+            <i class="icon"><SvgIcon :name="optionAlwaysExpandRunning ? 'octicon-check' : 'hanzo-empty-checkbox'"/></i>
             {{ locale.logsAlwaysExpandRunning }}
           </a>
           <div class="divider"/>
@@ -487,7 +487,7 @@ async function hashChangeListener() {
           -->
         <SvgIcon
           v-if="isDone(run.status) && currentJobStepsStates[stepIdx].expanded && currentJobStepsStates[stepIdx].cursor === null"
-          name="gitea-running"
+          name="hanzo-running"
           class="rotate-clockwise"
         />
         <SvgIcon

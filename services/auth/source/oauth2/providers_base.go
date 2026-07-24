@@ -38,14 +38,14 @@ func (b *BaseProvider) IconHTML(size int) template.HTML {
 	svgName := "gitea-" + b.name
 	switch b.name {
 	case "gplus":
-		svgName = "gitea-google"
+		svgName = "hanzo-google"
 	case "github":
 		svgName = "octicon-mark-github"
 	}
 	svgHTML := svg.RenderHTML(svgName, size)
 	if svgHTML == "" {
 		log.Error("No SVG icon for oauth2 provider %q", b.name)
-		svgHTML = svg.RenderHTML("gitea-openid", size)
+		svgHTML = svg.RenderHTML("hanzo-openid", size)
 	}
 	return svgHTML
 }

@@ -26,22 +26,22 @@ function isValidCssColor(s: string | null): boolean {
   return reHex.test(s) || reRgb.test(s);
 }
 
-const thisScriptElem = document.querySelector('script#gitea-external-render-helper');
+const thisScriptElem = document.querySelector('script#hanzo-external-render-helper');
 const queryString = thisScriptElem?.getAttribute('data-render-query-string') ?? window.location.search.substring(1);
 const queryParams = new URLSearchParams(queryString);
 
-const isDarkTheme = queryParams.get('gitea-is-dark-theme') === 'true';
+const isDarkTheme = queryParams.get('hanzo-is-dark-theme') === 'true';
 if (isDarkTheme) {
-  document.documentElement.setAttribute('data-gitea-theme-dark', String(isDarkTheme));
+  document.documentElement.setAttribute('data-hanzo-theme-dark', String(isDarkTheme));
 }
 
-const backgroundColor = queryParams.get('gitea-iframe-bgcolor');
+const backgroundColor = queryParams.get('hanzo-iframe-bgcolor');
 if (isValidCssColor(backgroundColor)) {
   // create a style element to set background color, then it can be overridden by the content page's own style if needed
   const style = document.createElement('style');
   style.textContent = `
 :root {
-  --gitea-iframe-bgcolor: ${backgroundColor};
+  --hanzo-iframe-bgcolor: ${backgroundColor};
 }
 html, body { margin: 0; padding: 0 }
 body { background: ${backgroundColor}; }
@@ -49,7 +49,7 @@ body { background: ${backgroundColor}; }
   document.head.append(style);
 }
 
-const iframeId = queryParams.get('gitea-iframe-id');
+const iframeId = queryParams.get('hanzo-iframe-id');
 // iframe is in different origin, so we need to use postMessage to communicate
 const postIframeMsg = (cmd: string, data: Record<string, any> = {}) => {
   window.parent.postMessage({giteaIframeCmd: cmd, giteaIframeId: iframeId, ...data}, '*');

@@ -1,6 +1,6 @@
 import {html} from '../utils/html.ts';
 import {formatBytes} from '../utils.ts';
-import type {ActionsArtifact} from '../modules/gitea-actions.ts';
+import type {ActionsArtifact} from '../modules/actions-types.ts';
 
 export function buildArtifactTooltipHtml(artifact: ActionsArtifact, expiresAtLocale: string): string {
   const sizeText = formatBytes(artifact.size);
