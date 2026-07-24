@@ -1,13 +1,15 @@
 name: CI/CD
 
+# The canonical build/deploy pipeline is native: Hanzo Git push -> act_runner
+# (in-cluster) -> BuildKit builds the Dockerfile -> ghcr.io/hanzoai/git:<sha>
+# -> kubectl patch app -> operator reconcile. See .hanzo/workflows/deploy.yml.
+# GitHub is a mirror; this workflow no longer builds or publishes the image.
+
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
-  pull_request:
   workflow_dispatch:
 
 jobs:
-  cicd:
-    uses: hanzoai/ci/.github/workflows/build.yml@v1
-    secrets: inherit
+  sync-notice:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "native pipeline is .hanzo/workflows/deploy.yml; GitHub is a mirror"
