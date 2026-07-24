@@ -113,9 +113,10 @@ func Test_WorkflowDirs(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name:     "default",
-			iniStr:   `[actions]`,
-			wantDirs: []string{".gitea/workflows", ".github/workflows"},
+			name:   "default",
+			iniStr: `[actions]`,
+			// .hanzo/workflows leads: the native dir wins over mirrored upstream dirs
+			wantDirs: []string{".hanzo/workflows", ".gitea/workflows", ".github/workflows"},
 		},
 		{
 			name:     "single dir",
