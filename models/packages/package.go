@@ -138,51 +138,51 @@ func (pt Type) Name() string {
 func (pt Type) SVGName() string {
 	switch pt {
 	case TypeAlpine:
-		return "gitea-alpine"
+		return "hanzo-alpine"
 	case TypeArch:
-		return "gitea-arch"
+		return "hanzo-arch"
 	case TypeCargo:
-		return "gitea-cargo"
+		return "hanzo-cargo"
 	case TypeChef:
-		return "gitea-chef"
+		return "hanzo-chef"
 	case TypeComposer:
-		return "gitea-composer"
+		return "hanzo-composer"
 	case TypeConan:
-		return "gitea-conan"
+		return "hanzo-conan"
 	case TypeConda:
-		return "gitea-conda"
+		return "hanzo-conda"
 	case TypeContainer:
 		return "octicon-container"
 	case TypeCran:
-		return "gitea-cran"
+		return "hanzo-cran"
 	case TypeDebian:
-		return "gitea-debian"
+		return "hanzo-debian"
 	case TypeGeneric:
 		return "octicon-package"
 	case TypeGo:
-		return "gitea-go"
+		return "hanzo-go"
 	case TypeHelm:
-		return "gitea-helm"
+		return "hanzo-helm"
 	case TypeMaven:
-		return "gitea-maven"
+		return "hanzo-maven"
 	case TypeNpm:
-		return "gitea-npm"
+		return "hanzo-npm"
 	case TypeNuGet:
-		return "gitea-nuget"
+		return "hanzo-nuget"
 	case TypePub:
-		return "gitea-pub"
+		return "hanzo-pub"
 	case TypePyPI:
-		return "gitea-python"
+		return "hanzo-python"
 	case TypeRpm:
-		return "gitea-rpm"
+		return "hanzo-rpm"
 	case TypeRubyGems:
-		return "gitea-rubygems"
+		return "hanzo-rubygems"
 	case TypeSwift:
-		return "gitea-swift"
+		return "hanzo-swift"
 	case TypeTerraformState:
-		return "gitea-terraform"
+		return "hanzo-terraform"
 	case TypeVagrant:
-		return "gitea-vagrant"
+		return "hanzo-vagrant"
 	}
 	panic("unknown package type: " + string(pt))
 }

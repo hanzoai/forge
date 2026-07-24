@@ -44,7 +44,7 @@ function getRealBackgroundColor(el: HTMLElement) {
 
 export async function initExternalRenderIframe(iframe: HTMLIFrameElement) {
   const iframeSrcUrl = iframe.getAttribute('data-src')!;
-  if (!iframe.id) iframe.id = generateElemId('gitea-iframe-');
+  if (!iframe.id) iframe.id = generateElemId('hanzo-iframe-');
 
   window.addEventListener('message', (e) => {
     if (e.source !== iframe.contentWindow) return;
@@ -60,9 +60,9 @@ export async function initExternalRenderIframe(iframe: HTMLIFrameElement) {
   });
 
   const u = new URL(iframeSrcUrl, window.location.origin);
-  u.searchParams.set('gitea-is-dark-theme', String(isDarkTheme()));
-  u.searchParams.set('gitea-iframe-id', iframe.id);
-  u.searchParams.set('gitea-iframe-bgcolor', getRealBackgroundColor(iframe));
+  u.searchParams.set('hanzo-is-dark-theme', String(isDarkTheme()));
+  u.searchParams.set('hanzo-iframe-id', iframe.id);
+  u.searchParams.set('hanzo-iframe-bgcolor', getRealBackgroundColor(iframe));
 
   // There are 3 kinds of external render modes:
   // * external frontend render:

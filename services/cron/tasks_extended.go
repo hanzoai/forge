@@ -146,11 +146,14 @@ func registerUpdateGiteaChecker() {
 	}
 	RegisterTaskFatal("update_checker", &UpdateCheckerConfig{
 		BaseConfig: BaseConfig{
-			Enabled:    true,
+			// Off by default: our releases ship via the hanzoai/git CR pipeline,
+			// not upstream's dl.gitea.com feed — phoning it would compare against
+			// the WRONG product's versions (and leak telemetry upstream).
+			Enabled:    false,
 			RunAtStart: false,
 			Schedule:   "@every 168h",
 		},
-		HTTPEndpoint: "https://dl.gitea.com/gitea/version.json",
+		HTTPEndpoint: "https://github.com/hanzoai/git/releases.atom",
 	}, func(ctx context.Context, _ *user_model.User, config Config) error {
 		updateCheckerConfig := config.(*UpdateCheckerConfig)
 		return updatechecker.GiteaUpdateChecker(updateCheckerConfig.HTTPEndpoint)

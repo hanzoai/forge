@@ -1,9 +1,9 @@
 import {getActionStatusIcon} from './action-status-icon.ts';
-import type {ActionsStatus} from './gitea-actions.ts';
+import type {ActionsStatus} from './actions-types.ts';
 import {svgParseOuterInner} from '../svg.ts';
 import {html, htmlRaw} from '../utils/html.ts';
 
-const {svgOuter, svgInnerHtml: giteaFaviconInner} = svgParseOuterInner('gitea-favicon');
+const {svgOuter, svgInnerHtml: giteaFaviconInner} = svgParseOuterInner('hanzo-favicon');
 const faviconViewBox = svgOuter.getAttribute('viewBox')!;
 const [, , faviconViewBoxWidth, faviconViewBoxHeight] = faviconViewBox.split(/\s+/).map(Number);
 

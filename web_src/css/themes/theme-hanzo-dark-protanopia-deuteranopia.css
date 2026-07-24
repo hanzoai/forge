@@ -1,6 +1,6 @@
 @import "./theme-hanzo-dark.css";
 
-gitea-theme-meta-info {
+hanzo-theme-meta-info {
   --theme-display-name: "Dark";
   --theme-colorblind-type: "red-green";
   --theme-color-scheme: "dark";

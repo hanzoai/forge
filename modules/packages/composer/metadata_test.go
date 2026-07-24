@@ -178,7 +178,7 @@ func TestParsePackage(t *testing.T) {
 
 	t.Run("ValidZip", func(t *testing.T) {
 		data := createArchive(map[string]string{"composer.json": buildComposerContent(""), "README.md": readme})
-		assertValidPackage(t, data, "", "gitea-composer-package.zip")
+		assertValidPackage(t, data, "", "hanzo-composer-package.zip")
 	})
 
 	t.Run("ValidTarBz2", func(t *testing.T) {
@@ -186,13 +186,13 @@ func TestParsePackage(t *testing.T) {
 			bz2Writer, _ := bzip2.NewWriter(w, nil)
 			return bz2Writer
 		}, map[string]string{"composer.json": buildComposerContent("1.0"), "README.md": readme})
-		assertValidPackage(t, data, "1.0", "gitea-composer-package.1.0.tar.bz2")
+		assertValidPackage(t, data, "1.0", "hanzo-composer-package.1.0.tar.bz2")
 	})
 
 	t.Run("ValidTarGz", func(t *testing.T) {
 		data := createArchiveTar(func(w io.Writer) io.WriteCloser {
 			return gzip.NewWriter(w)
 		}, map[string]string{"composer.json": buildComposerContent(""), "README.md": readme})
-		assertValidPackage(t, data, "", "gitea-composer-package.tar.gz")
+		assertValidPackage(t, data, "", "hanzo-composer-package.tar.gz")
 	})
 }
