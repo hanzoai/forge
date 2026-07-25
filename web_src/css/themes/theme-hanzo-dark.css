@@ -335,3 +335,64 @@ hanzo-theme-meta-info {
 .emoji[aria-label="musical notes"] {
   filter: invert(100%) hue-rotate(180deg);
 }
+
+/* ---------------------------------------------------------------------------
+   Hanzo estate alignment — true-black monochrome (zero hue by construction),
+   the same design law as hanzo.ai / hanzo.app / console. Appended override
+   block: surfaces + the primary ramp only. Every SEMANTIC color above (diff
+   green/red, CI states, badges, warnings) keeps its hue and meaning.
+   The colorblind variants @import this file, so they inherit the black too;
+   their own overrides load after and still win. */
+:root {
+  /* primary = white action-on-black; ramps stay zero-chroma neutrals.
+     dark-N ascend toward near-white, light-N descend toward near-black —
+     mirroring the upstream ramp's luminance direction so every consumer
+     (buttons, editor selection, reactions) keeps its relative contrast. */
+  --color-primary: #ffffff;
+  --color-primary-contrast: #000000;
+  --color-primary-dark-1: #f0f0f0;
+  --color-primary-dark-2: #f3f3f3;
+  --color-primary-dark-3: #f5f5f5;
+  --color-primary-dark-4: #f7f7f7;
+  --color-primary-dark-5: #fafafa;
+  --color-primary-dark-6: #fcfcfc;
+  --color-primary-dark-7: #fefefe;
+  --color-primary-light-1: #999999;
+  --color-primary-light-2: #808080;
+  --color-primary-light-3: #666666;
+  --color-primary-light-4: #4d4d4d;
+  --color-primary-light-5: #333333;
+  --color-primary-light-6: #1a1a1a;
+  --color-primary-light-7: #0d0d0d;
+  --color-primary-alpha-10: #ffffff19;
+  --color-primary-alpha-20: #ffffff33;
+  --color-primary-alpha-30: #ffffff4b;
+  --color-primary-alpha-40: #ffffff66;
+  --color-primary-alpha-50: #ffffff80;
+  --color-primary-alpha-60: #ffffff99;
+  --color-primary-alpha-70: #ffffffb3;
+  --color-primary-alpha-80: #ffffffcc;
+  --color-primary-alpha-90: #ffffffe6;
+
+  /* surfaces: #000 body, #0a0a0a panels, neutral gray layering */
+  --color-body: #000000;
+  --color-nav-bg: #000000;
+  --color-secondary-nav-bg: #050505;
+  --color-box-header: #0a0a0a;
+  --color-box-body: #050505;
+  --color-box-body-highlight: #111111;
+  --color-input-background: #0a0a0a;
+  --color-input-toggle-background: #262626;
+  --color-menu: #0a0a0a;
+  --color-card: #0a0a0a;
+  --color-button: #0a0a0a;
+  --color-code-bg: #050505;
+  --color-secondary-bg: #161616;
+  --color-expand-button: #1f1f1f;
+  --color-hover-opaque: #141414;
+  --color-timeline: #262626;
+  --color-tooltip-bg: #000000f0;
+
+  /* the git mark follows the monochrome law (non-semantic hue → neutral) */
+  --color-git: #ffffff;
+}
