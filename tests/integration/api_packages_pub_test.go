@@ -55,7 +55,7 @@ description: ` + packageDescription
 	zw.Close()
 	content := buf.Bytes()
 
-	root := fmt.Sprintf("/api/packages/%s/pub", user.Name)
+	root := fmt.Sprintf("/v1/packages/%s/pub", user.Name)
 
 	t.Run("Upload", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()

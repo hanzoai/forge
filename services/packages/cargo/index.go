@@ -233,8 +233,8 @@ type Config struct {
 
 func BuildConfig(owner *user_model.User, isPrivate bool) *Config {
 	return &Config{
-		DownloadURL:  setting.AppURL + "api/packages/" + owner.Name + "/cargo/api/v1/crates",
-		APIURL:       setting.AppURL + "api/packages/" + owner.Name + "/cargo",
+		DownloadURL:  setting.PackageRegistryURL(owner.Name, "cargo") + "/api/v1/crates",
+		APIURL:       setting.PackageRegistryURL(owner.Name, "cargo"),
 		AuthRequired: isPrivate,
 	}
 }

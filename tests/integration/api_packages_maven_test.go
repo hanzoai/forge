@@ -33,7 +33,7 @@ func TestPackageMaven(t *testing.T) {
 	packageVersion := "1.0.1"
 	packageDescription := "Test Description"
 
-	root := "/api/packages/user2/maven/com/gitea/test-project"
+	root := "/v1/packages/user2/maven/com/gitea/test-project"
 	filename := "any-name.jar"
 
 	putFile := func(t *testing.T, path, content string, expectedStatus int) {
@@ -80,7 +80,7 @@ func TestPackageMaven(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
 		// try to upload a package with legacy package name (will be saved as "GroupID-ArtifactID")
-		legacyRootLink := "/api/packages/user2/maven/com/gitea/legacy-project"
+		legacyRootLink := "/v1/packages/user2/maven/com/gitea/legacy-project"
 		req := NewRequestWithBody(t, "PUT", legacyRootLink+"/1.0.2/any-file-name?use_legacy_package_name=1", strings.NewReader("test-content")).AddBasicAuth(user.Name)
 		MakeRequest(t, req, http.StatusCreated)
 		p, err := packages.GetPackageByName(t.Context(), user.ID, packages.TypeMaven, "com.gitea-legacy-project")
@@ -309,7 +309,7 @@ func TestPackageMavenConcurrent(t *testing.T) {
 	artifactID := "test-project"
 	packageVersion := "1.0.1"
 
-	root := fmt.Sprintf("/api/packages/%s/maven/%s/%s", user.Name, strings.ReplaceAll(groupID, ".", "/"), artifactID)
+	root := fmt.Sprintf("/v1/packages/%s/maven/%s/%s", user.Name, strings.ReplaceAll(groupID, ".", "/"), artifactID)
 
 	putFile := func(t *testing.T, path, content string, expectedStatus int) {
 		req := NewRequestWithBody(t, "PUT", root+path, strings.NewReader(content)).AddBasicAuth(user.Name)

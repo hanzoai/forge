@@ -145,7 +145,7 @@ func EnumeratePackageVersions(ctx *context.Context) {
 		return pds[i].SemVer.LessThan(pds[j].SemVer)
 	})
 
-	baseURL := fmt.Sprintf("%sapi/packages/%s/swift/%s/%s/", setting.AppURL, ctx.Package.Owner.LowerName, packageScope, packageName)
+	baseURL := fmt.Sprintf("%s/%s/%s/", setting.PackageRegistryURL(ctx.Package.Owner.LowerName, "swift"), packageScope, packageName)
 
 	releases := make(map[string]Release)
 	for _, pd := range pds {
@@ -282,7 +282,7 @@ func DownloadManifest(ctx *context.Context) {
 	if !ok {
 		setResponseHeaders(ctx.Resp, &headers{
 			Status:   http.StatusSeeOther,
-			Location: fmt.Sprintf("%sapi/packages/%s/swift/%s/%s/%s/Package.swift", setting.AppURL, ctx.Package.Owner.LowerName, packageScope, packageName, packageVersion),
+			Location: fmt.Sprintf("%s/%s/%s/%s/Package.swift", setting.PackageRegistryURL(ctx.Package.Owner.LowerName, "swift"), packageScope, packageName, packageVersion),
 		})
 		return
 	}

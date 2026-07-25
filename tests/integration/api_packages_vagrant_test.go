@@ -53,7 +53,7 @@ func TestPackageVagrant(t *testing.T) {
 	zw.Close()
 	content := buf.Bytes()
 
-	root := fmt.Sprintf("/api/packages/%s/vagrant", user.Name)
+	root := fmt.Sprintf("/v1/packages/%s/vagrant", user.Name)
 
 	t.Run("Authenticate", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()

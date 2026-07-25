@@ -66,7 +66,7 @@ func apiError(ctx *context.Context, status int, obj any) {
 }
 
 func baseURL(ctx *context.Context) string {
-	return setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/conan"
+	return setting.PackageRegistryURL(ctx.Package.Owner.Name, "conan")
 }
 
 // ExtractPathParameters is a middleware to extract common parameters from path

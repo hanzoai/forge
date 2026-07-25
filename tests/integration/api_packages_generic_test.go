@@ -33,7 +33,7 @@ func TestPackageGeneric(t *testing.T) {
 	filename := "fi-le_na.me"
 	content := []byte{1, 2, 3}
 
-	url := fmt.Sprintf("/api/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)
+	url := fmt.Sprintf("/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)
 
 	t.Run("Upload", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
@@ -87,15 +87,15 @@ func TestPackageGeneric(t *testing.T) {
 		t.Run("InvalidParameter", func(t *testing.T) {
 			defer tests.PrintCurrentTest(t)()
 
-			req := NewRequestWithBody(t, "PUT", fmt.Sprintf("/api/packages/%s/generic/%s/%s/%s", user.Name, "invalid package name", packageVersion, filename), bytes.NewReader(content)).
+			req := NewRequestWithBody(t, "PUT", fmt.Sprintf("/v1/packages/%s/generic/%s/%s/%s", user.Name, "invalid package name", packageVersion, filename), bytes.NewReader(content)).
 				AddBasicAuth(user.Name)
 			MakeRequest(t, req, http.StatusBadRequest)
 
-			req = NewRequestWithBody(t, "PUT", fmt.Sprintf("/api/packages/%s/generic/%s/%s/%s", user.Name, packageName, "%20test ", filename), bytes.NewReader(content)).
+			req = NewRequestWithBody(t, "PUT", fmt.Sprintf("/v1/packages/%s/generic/%s/%s/%s", user.Name, packageName, "%20test ", filename), bytes.NewReader(content)).
 				AddBasicAuth(user.Name)
 			MakeRequest(t, req, http.StatusBadRequest)
 
-			req = NewRequestWithBody(t, "PUT", fmt.Sprintf("/api/packages/%s/generic/%s/%s/%s", user.Name, packageName, packageVersion, "inva|id.name"), bytes.NewReader(content)).
+			req = NewRequestWithBody(t, "PUT", fmt.Sprintf("/v1/packages/%s/generic/%s/%s/%s", user.Name, packageName, packageVersion, "inva|id.name"), bytes.NewReader(content)).
 				AddBasicAuth(user.Name)
 			MakeRequest(t, req, http.StatusBadRequest)
 		})
@@ -271,7 +271,7 @@ func TestPackageGenericPublicOnlyTokenLimitedOwner(t *testing.T) {
 
 	// user33 has limited visibility (visible only to authenticated users, not public)
 	owner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 33})
-	base := fmt.Sprintf("/api/packages/%s/generic/pkg/1.0.0", owner.Name)
+	base := fmt.Sprintf("/v1/packages/%s/generic/pkg/1.0.0", owner.Name)
 
 	// upload a package into the limited owner's namespace
 	req := NewRequestWithBody(t, "PUT", base+"/file.bin", bytes.NewReader([]byte{1, 2, 3})).

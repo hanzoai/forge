@@ -43,7 +43,7 @@ func TestPackageCran(t *testing.T) {
 		return buf.Bytes()
 	}
 
-	url := fmt.Sprintf("/api/packages/%s/cran", user.Name)
+	url := fmt.Sprintf("/v1/packages/%s/cran", user.Name)
 
 	t.Run("Source", func(t *testing.T) {
 		createArchive := func(filename string, content []byte) *bytes.Buffer {

@@ -26,7 +26,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/test"
-	"github.com/hanzoai/git/routers/api/packages/nuget"
+	"github.com/hanzoai/git/routers/v1/packages/nuget"
 	packageService "github.com/hanzoai/git/services/packages"
 	"github.com/hanzoai/git/tests"
 
@@ -162,7 +162,7 @@ func TestPackageNuGet(t *testing.T) {
 
 	content := createPackage(packageName, packageVersion).Bytes()
 
-	url := fmt.Sprintf("/api/packages/%s/nuget", user.Name)
+	url := fmt.Sprintf("/v1/packages/%s/nuget", user.Name)
 
 	t.Run("ServiceIndex", func(t *testing.T) {
 		t.Run("v2", func(t *testing.T) {
@@ -190,7 +190,7 @@ func TestPackageNuGet(t *testing.T) {
 
 			for _, c := range cases {
 				t.Run(c.Owner, func(t *testing.T) {
-					url := fmt.Sprintf("/api/packages/%s/nuget", c.Owner)
+					url := fmt.Sprintf("/v1/packages/%s/nuget", c.Owner)
 
 					req := NewRequest(t, "GET", url)
 					if c.UseBasicAuth {
@@ -237,7 +237,7 @@ func TestPackageNuGet(t *testing.T) {
 
 			for _, c := range cases {
 				t.Run(c.Owner, func(t *testing.T) {
-					url := fmt.Sprintf("/api/packages/%s/nuget", c.Owner)
+					url := fmt.Sprintf("/v1/packages/%s/nuget", c.Owner)
 
 					req := NewRequest(t, "GET", url+"/index.json")
 					if c.UseBasicAuth {

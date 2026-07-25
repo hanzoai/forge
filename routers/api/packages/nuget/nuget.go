@@ -43,7 +43,7 @@ func xmlResponse(ctx *context.Context, status int, obj any) { //nolint:unparam /
 
 // https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Protocol/LegacyFeed/V2FeedQueryBuilder.cs
 func ServiceIndexV2(ctx *context.Context) {
-	base := setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget"
+	base := setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget")
 
 	xmlResponse(ctx, http.StatusOK, &ServiceIndexResponseV2{
 		Base:      base,
@@ -67,7 +67,7 @@ func ServiceIndexV2(ctx *context.Context) {
 
 // https://docs.microsoft.com/en-us/nuget/api/service-index
 func ServiceIndexV3(ctx *context.Context) {
-	root := setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget"
+	root := setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget")
 
 	ctx.JSON(http.StatusOK, &ServiceIndexResponseV3{
 		Version: "3.0.0",
@@ -164,7 +164,7 @@ func SearchServiceV2(ctx *context.Context) {
 	}
 
 	resp := createFeedResponse(
-		&linkBuilder{Base: setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget", Next: next},
+		&linkBuilder{Base: setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget"), Next: next},
 		total,
 		pds,
 	)
@@ -210,7 +210,7 @@ func SearchServiceV3(ctx *context.Context) {
 	}
 
 	resp := createSearchResultResponse(
-		&linkBuilder{Base: setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget"},
+		&linkBuilder{Base: setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget")},
 		count,
 		pds,
 	)
@@ -239,7 +239,7 @@ func RegistrationIndex(ctx *context.Context) {
 	}
 
 	resp := createRegistrationIndexResponse(
-		&linkBuilder{Base: setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget"},
+		&linkBuilder{Base: setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget")},
 		pds,
 	)
 
@@ -268,7 +268,7 @@ func RegistrationLeafV2(ctx *context.Context) {
 	}
 
 	resp := createEntryResponse(
-		&linkBuilder{Base: setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget"},
+		&linkBuilder{Base: setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget")},
 		pd,
 	)
 
@@ -297,7 +297,7 @@ func RegistrationLeafV3(ctx *context.Context) {
 	}
 
 	resp := createRegistrationLeafResponse(
-		&linkBuilder{Base: setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget"},
+		&linkBuilder{Base: setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget")},
 		pd,
 	)
 
@@ -346,7 +346,7 @@ func EnumeratePackageVersionsV2(ctx *context.Context) {
 	}
 
 	resp := createFeedResponse(
-		&linkBuilder{Base: setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/nuget", Next: next},
+		&linkBuilder{Base: setting.PackageRegistryURL(ctx.Package.Owner.Name, "nuget"), Next: next},
 		total,
 		pds,
 	)

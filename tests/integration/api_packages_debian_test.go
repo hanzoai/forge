@@ -65,7 +65,7 @@ func TestPackageDebian(t *testing.T) {
 	components := []string{"main", "stable"}
 	architectures := []string{"all", "amd64"}
 
-	rootURL := fmt.Sprintf("/api/packages/%s/debian", user.Name)
+	rootURL := fmt.Sprintf("/v1/packages/%s/debian", user.Name)
 
 	t.Run("RepositoryKey", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()

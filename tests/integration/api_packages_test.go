@@ -41,7 +41,7 @@ func TestPackageAPI(t *testing.T) {
 	packageVersion := "1.0.3"
 	filename := "file.bin"
 
-	url := fmt.Sprintf("/api/packages/%s/generic/%s/%s/%s", user.Name, packageName, packageVersion, filename)
+	url := fmt.Sprintf("/v1/packages/%s/generic/%s/%s/%s", user.Name, packageName, packageVersion, filename)
 	req := NewRequestWithBody(t, "PUT", url, bytes.NewReader([]byte{})).
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusCreated)
@@ -88,7 +88,7 @@ func TestPackageAPI(t *testing.T) {
 
 		packageName := "test-package-entire-delete"
 		for _, version := range []string{"1.0.1", "1.0.2"} {
-			url := fmt.Sprintf("/api/packages/%s/generic/%s/%s/file.bin", user.Name, packageName, version)
+			url := fmt.Sprintf("/v1/packages/%s/generic/%s/%s/file.bin", user.Name, packageName, version)
 			req := NewRequestWithBody(t, "PUT", url, bytes.NewReader([]byte{1})).
 				AddBasicAuth(user.Name)
 			MakeRequest(t, req, http.StatusCreated)
@@ -108,7 +108,7 @@ func TestPackageAPI(t *testing.T) {
 
 		packageName := "test-package-version-delete"
 		for _, version := range []string{"1.0.1", "1.0.2"} {
-			url := fmt.Sprintf("/api/packages/%s/generic/%s/%s/file.bin", user.Name, packageName, version)
+			url := fmt.Sprintf("/v1/packages/%s/generic/%s/%s/file.bin", user.Name, packageName, version)
 			req := NewRequestWithBody(t, "PUT", url, bytes.NewReader([]byte{1})).
 				AddBasicAuth(user.Name)
 			MakeRequest(t, req, http.StatusCreated)
@@ -267,7 +267,7 @@ func TestPackageAccess(t *testing.T) {
 	publicOrgNoMember := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 17})
 
 	uploadPackage := func(doer, owner *user_model.User, filename string, expectedStatus int) {
-		url := fmt.Sprintf("/api/packages/%s/generic/test-package/1.0/%s.bin", owner.Name, filename)
+		url := fmt.Sprintf("/v1/packages/%s/generic/test-package/1.0/%s.bin", owner.Name, filename)
 		req := NewRequestWithBody(t, "PUT", url, bytes.NewReader([]byte{1}))
 		if doer != nil {
 			req.AddBasicAuth(doer.Name)
@@ -276,7 +276,7 @@ func TestPackageAccess(t *testing.T) {
 	}
 
 	downloadPackage := func(doer, owner *user_model.User, expectedStatus int) {
-		url := fmt.Sprintf("/api/packages/%s/generic/test-package/1.0/admin.bin", owner.Name)
+		url := fmt.Sprintf("/v1/packages/%s/generic/test-package/1.0/admin.bin", owner.Name)
 		req := NewRequest(t, "GET", url)
 		if doer != nil {
 			req.AddBasicAuth(doer.Name)
@@ -496,7 +496,7 @@ func TestPackageQuota(t *testing.T) {
 		limitSizeGeneric := setting.Packages.LimitSizeGeneric
 
 		uploadPackage := func(doer *user_model.User, version string, expectedStatus int) {
-			url := fmt.Sprintf("/api/packages/%s/generic/test-package/%s/file.bin", user.Name, version)
+			url := fmt.Sprintf("/v1/packages/%s/generic/test-package/%s/file.bin", user.Name, version)
 			req := NewRequestWithBody(t, "PUT", url, bytes.NewReader([]byte{1})).
 				AddBasicAuth(doer.Name)
 			MakeRequest(t, req, expectedStatus)
@@ -554,7 +554,7 @@ func TestPackageCleanup(t *testing.T) {
 
 		// Upload and delete a generic package and upload a container blob
 		data := util.CryptoRandomBytes(5)
-		url := fmt.Sprintf("/api/packages/%s/generic/cleanup-test/1.1.1/file.bin", user.Name)
+		url := fmt.Sprintf("/v1/packages/%s/generic/cleanup-test/1.1.1/file.bin", user.Name)
 		req := NewRequestWithBody(t, "PUT", url, bytes.NewReader(data)).
 			AddBasicAuth(user.Name)
 		MakeRequest(t, req, http.StatusCreated)
@@ -696,7 +696,7 @@ func TestPackageCleanup(t *testing.T) {
 				defer tests.PrintCurrentTest(t)()
 
 				for _, v := range c.Versions {
-					url := fmt.Sprintf("/api/packages/%s/generic/package/%s/file.bin", user.Name, v.Version)
+					url := fmt.Sprintf("/v1/packages/%s/generic/package/%s/file.bin", user.Name, v.Version)
 					req := NewRequestWithBody(t, "PUT", url, bytes.NewReader([]byte{1})).
 						AddBasicAuth(user.Name)
 					MakeRequest(t, req, http.StatusCreated)

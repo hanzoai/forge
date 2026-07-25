@@ -71,7 +71,7 @@ func PackageMetadata(ctx *context.Context) {
 	}
 
 	resp := createPackageMetadataResponse(
-		setting.AppURL+"api/packages/"+ctx.Package.Owner.Name+"/npm",
+		setting.PackageRegistryURL(ctx.Package.Owner.Name, "npm"),
 		pds,
 	)
 

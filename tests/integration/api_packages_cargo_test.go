@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/git/modules/json"
 	cargo_module "github.com/hanzoai/git/modules/packages/cargo"
 	"github.com/hanzoai/git/modules/setting"
-	cargo_router "github.com/hanzoai/git/routers/api/packages/cargo"
+	cargo_router "github.com/hanzoai/git/routers/v1/packages/cargo"
 	cargo_service "github.com/hanzoai/git/services/packages/cargo"
 	"github.com/hanzoai/git/tests"
 

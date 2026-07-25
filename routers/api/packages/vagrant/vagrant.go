@@ -5,7 +5,6 @@ package vagrant
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -121,7 +120,7 @@ func EnumeratePackageVersions(ctx *context.Context) {
 		return pds[i].SemVer.LessThan(pds[j].SemVer)
 	})
 
-	baseURL := fmt.Sprintf("%sapi/packages/%s/vagrant/%s", setting.AppURL, url.PathEscape(ctx.Package.Owner.Name), url.PathEscape(pds[0].Package.Name))
+	baseURL := setting.PackageRegistryURL(url.PathEscape(ctx.Package.Owner.Name), "vagrant") + "/" + url.PathEscape(pds[0].Package.Name)
 
 	versions := make([]*versionMetadata, 0, len(pds))
 	for _, pd := range pds {

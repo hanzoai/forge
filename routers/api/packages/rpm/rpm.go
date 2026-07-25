@@ -41,7 +41,7 @@ func GetRepositoryConfig(ctx *context.Context) {
 		groupParts = strings.Split(group, "/")
 	}
 
-	url := fmt.Sprintf("%sapi/packages/%s/rpm", setting.AppURL, ctx.Package.Owner.Name)
+	url := setting.PackageRegistryURL(ctx.Package.Owner.Name, "rpm")
 
 	ctx.PlainText(http.StatusOK, `[gitea-`+strings.Join(append([]string{ctx.Package.Owner.LowerName}, groupParts...), "-")+`]
 name=`+strings.Join(append([]string{ctx.Package.Owner.Name, setting.AppName}, groupParts...), " - ")+`

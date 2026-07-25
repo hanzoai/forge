@@ -89,7 +89,7 @@ AACAX/AKARNTyAAoAAA=`
 	branches := []string{"v3.16", "v3.17"}
 	repositories := []string{"main", "testing"}
 
-	rootURL := fmt.Sprintf("/api/packages/%s/alpine", user.Name)
+	rootURL := fmt.Sprintf("/v1/packages/%s/alpine", user.Name)
 
 	t.Run("RepositoryKey", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()

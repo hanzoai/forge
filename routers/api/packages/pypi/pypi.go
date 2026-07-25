@@ -69,7 +69,7 @@ func PackageMetadata(ctx *context.Context) {
 		return strings.Compare(pds[i].Version.Version, pds[j].Version.Version) < 0
 	})
 
-	ctx.Data["RegistryURL"] = setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/pypi"
+	ctx.Data["RegistryURL"] = setting.PackageRegistryURL(ctx.Package.Owner.Name, "pypi")
 	ctx.Data["PackageDescriptor"] = pds[0]
 	ctx.Data["PackageDescriptors"] = pds
 	ctx.HTML(http.StatusOK, "api/packages/pypi/simple")

@@ -884,7 +884,7 @@ func Test_WebhookPackage(t *testing.T) {
 
 		// 2. trigger the webhook
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeAll)
-		url := fmt.Sprintf("/api/packages/%s/generic/%s/%s", "org3", "gitea", "v1.24.0")
+		url := fmt.Sprintf("/v1/packages/%s/generic/%s/%s", "org3", "gitea", "v1.24.0")
 		req := NewRequestWithBody(t, "PUT", url+"/gitea", strings.NewReader("This is a dummy file")).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)

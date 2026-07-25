@@ -17,7 +17,7 @@ import (
 	composer_module "github.com/hanzoai/git/modules/packages/composer"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/test"
-	"github.com/hanzoai/git/routers/api/packages/composer"
+	"github.com/hanzoai/git/routers/v1/packages/composer"
 	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"

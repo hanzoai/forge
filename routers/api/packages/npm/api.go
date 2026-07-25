@@ -101,7 +101,7 @@ func createPackageSearchResponse(pds []*packages_model.PackageDescriptor, total 
 				Maintainers: []npm_module.User{}, // npm cli needs this field
 				Keywords:    metadata.Keywords,
 				Links: &npm_module.PackageSearchPackageLinks{
-					Registry: setting.AppURL + "api/packages/" + pd.Owner.Name + "/npm",
+					Registry: setting.PackageRegistryURL(pd.Owner.Name, "npm"),
 					Homepage: metadata.ProjectURL,
 				},
 			},

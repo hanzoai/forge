@@ -115,7 +115,7 @@ func verifyAuth(r *web.Router, authMethods []auth.Method, opts verifyAuthOptions
 }
 
 // CommonRoutes provide endpoints for most package managers (except containers - see below)
-// These are mounted on `/api/packages` (not `/api/v1/packages`)
+// These are mounted on `/v1/packages`
 func CommonRoutes() *web.Router {
 	r := web.NewRouter()
 

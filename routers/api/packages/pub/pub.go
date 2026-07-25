@@ -72,7 +72,7 @@ func packageDescriptorToMetadata(baseURL string, pd *packages_model.PackageDescr
 }
 
 func baseURL(ctx *context.Context) string {
-	return setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/pub/api/packages"
+	return setting.PackageRegistryURL(ctx.Package.Owner.Name, "pub") + "/api/packages"
 }
 
 // https://github.com/dart-lang/pub/blob/master/doc/repository-spec-v2.md#list-all-versions-of-a-package

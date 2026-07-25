@@ -18,7 +18,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	conan_module "github.com/hanzoai/git/modules/packages/conan"
 	"github.com/hanzoai/git/modules/setting"
-	conan_router "github.com/hanzoai/git/routers/api/packages/conan"
+	conan_router "github.com/hanzoai/git/routers/v1/packages/conan"
 	package_service "github.com/hanzoai/git/services/packages"
 	"github.com/hanzoai/git/tests"
 

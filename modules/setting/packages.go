@@ -6,6 +6,7 @@ package setting
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/dustin/go-humanize"
 )
@@ -15,6 +16,15 @@ var (
 	Packages = struct {
 		Storage *Storage
 		Enabled bool
+
+		// BaseURL is where package clients are told to fetch from. Package
+		// metadata carries absolute URLs -- an npm tarball, a Cargo download,
+		// a NuGet page -- and by default those name this server. Set it when
+		// clients reach the registry through a different host than the web UI,
+		// so the URLs handed out point at the host the client can actually
+		// use. Expects the base that owner/ecosystem hangs off, e.g.
+		// "https://api.example.com/v1/packages". Empty means "use my own URL".
+		BaseURL string
 
 		LimitTotalOwnerCount    int64
 		LimitTotalOwnerSize     int64
@@ -90,7 +100,21 @@ func loadPackagesFrom(rootCfg ConfigProvider) (err error) {
 	Packages.LimitSizeTerraformState = mustBytes(sec, "LIMIT_SIZE_TERRAFORM_STATE")
 	Packages.LimitSizeVagrant = mustBytes(sec, "LIMIT_SIZE_VAGRANT")
 	Packages.DefaultRPMSignEnabled = sec.Key("DEFAULT_RPM_SIGN_ENABLED").MustBool(false)
+	Packages.BaseURL = strings.TrimSuffix(sec.Key("BASE_URL").MustString(""), "/")
 	return nil
+}
+
+// PackageRegistryURL is the base URL a client should use for owner's ecosystem
+// registry. Every package handler builds its absolute URLs from this, so the
+// host clients are pointed at is decided in exactly one place.
+//
+// Callers pass owner already escaped or lower-cased as their ecosystem
+// requires; this only joins.
+func PackageRegistryURL(owner, ecosystem string) string {
+	if Packages.BaseURL != "" {
+		return Packages.BaseURL + "/" + owner + "/" + ecosystem
+	}
+	return AppURL + "v1/packages/" + owner + "/" + ecosystem
 }
 
 func mustBytes(section ConfigSection, key string) int64 {

@@ -60,7 +60,7 @@ func PackagesUniverse(ctx *context.Context) {
 		Dependencies map[string]string `json:"dependencies"`
 	}
 
-	baseURL := setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/chef/api/v1"
+	baseURL := setting.PackageRegistryURL(ctx.Package.Owner.Name, "chef") + "/api/v1"
 
 	universe := make(map[string]map[string]*VersionInfo)
 	for _, pd := range pds {
@@ -124,7 +124,7 @@ func EnumeratePackages(ctx *context.Context) {
 		Items []*Item `json:"items"`
 	}
 
-	baseURL := setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/chef/api/v1/cookbooks/"
+	baseURL := setting.PackageRegistryURL(ctx.Package.Owner.Name, "chef") + "/api/v1/cookbooks/"
 
 	items := make([]*Item, 0, len(pds))
 	for _, pd := range pds {
@@ -184,7 +184,7 @@ func PackageMetadata(ctx *context.Context) {
 		Versions      []string  `json:"versions"`
 	}
 
-	baseURL := fmt.Sprintf("%sapi/packages/%s/chef/api/v1/cookbooks/%s/versions/", setting.AppURL, ctx.Package.Owner.Name, url.PathEscape(packageName))
+	baseURL := fmt.Sprintf("%s/api/v1/cookbooks/%s/versions/", setting.PackageRegistryURL(ctx.Package.Owner.Name, "chef"), url.PathEscape(packageName))
 
 	versions := make([]string, 0, len(pds))
 	for _, pd := range pds {
@@ -239,7 +239,7 @@ func PackageVersionMetadata(ctx *context.Context) {
 		Dependencies    map[string]string `json:"dependencies"`
 	}
 
-	baseURL := fmt.Sprintf("%sapi/packages/%s/chef/api/v1/cookbooks/%s", setting.AppURL, ctx.Package.Owner.Name, url.PathEscape(pd.Package.Name))
+	baseURL := fmt.Sprintf("%s/api/v1/cookbooks/%s", setting.PackageRegistryURL(ctx.Package.Owner.Name, "chef"), url.PathEscape(pd.Package.Name))
 
 	metadata := pd.Metadata.(*chef_module.Metadata)
 

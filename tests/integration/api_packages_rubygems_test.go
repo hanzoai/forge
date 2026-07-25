@@ -181,7 +181,7 @@ func TestPackageRubyGems(t *testing.T) {
 	testAnotherGemName := "gitea-another"
 	testAnotherGemVersion := "0.99"
 
-	root := fmt.Sprintf("/api/packages/%s/rubygems", user.Name)
+	root := fmt.Sprintf("/v1/packages/%s/rubygems", user.Name)
 
 	uploadFile := func(t *testing.T, content []byte, expectedStatus int) {
 		req := NewRequestWithBody(t, "POST", root+"/api/v1/gems", bytes.NewReader(content)).

@@ -74,8 +74,8 @@ func TestPackageTerraform(t *testing.T) {
 		}`, uuid)
 	}
 
-	url := fmt.Sprintf("/api/packages/%s/terraform/state/%s", user.Name, packageName)
-	lockURL := fmt.Sprintf("/api/packages/%s/terraform/state/%s/lock", user.Name, packageName)
+	url := fmt.Sprintf("/v1/packages/%s/terraform/state/%s", user.Name, packageName)
+	lockURL := fmt.Sprintf("/v1/packages/%s/terraform/state/%s/lock", user.Name, packageName)
 
 	// Covers non-existing package retrieval and deletion
 	t.Run("GetOrDeleteNonExisting", func(t *testing.T) {

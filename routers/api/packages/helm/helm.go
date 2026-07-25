@@ -48,7 +48,7 @@ func Index(ctx *context.Context) {
 		return
 	}
 
-	baseURL := setting.AppURL + "api/packages/" + url.PathEscape(ctx.Package.Owner.Name) + "/helm"
+	baseURL := setting.PackageRegistryURL(url.PathEscape(ctx.Package.Owner.Name), "helm")
 
 	type ChartVersion struct {
 		helm_module.Metadata `yaml:",inline"`

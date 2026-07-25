@@ -30,7 +30,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	chef_module "github.com/hanzoai/git/modules/packages/chef"
 	"github.com/hanzoai/git/modules/setting"
-	chef_router "github.com/hanzoai/git/routers/api/packages/chef"
+	chef_router "github.com/hanzoai/git/routers/v1/packages/chef"
 	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
@@ -268,7 +268,7 @@ nwIDAQAB
 	packageDescription := "Test Description"
 	packageAuthor := "KN4CK3R"
 
-	root := fmt.Sprintf("/api/packages/%s/chef/api/v1", user.Name)
+	root := fmt.Sprintf("/v1/packages/%s/chef/api/v1", user.Name)
 
 	uploadPackage := func(t *testing.T, version string, expectedStatus int) {
 		var body bytes.Buffer

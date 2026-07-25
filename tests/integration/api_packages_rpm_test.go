@@ -89,7 +89,7 @@ Mu0UFYgZ/bYnuvn/vz4wtCz8qMwsHUvP0PX3tbYFUctAPdrY6tiiDtcCddDECahx7SuVNP5dpmb5
 		assert.NoError(t, xml.NewDecoder(zr).Decode(v))
 	}
 
-	rootURL := fmt.Sprintf("/api/packages/%s/rpm", user.Name)
+	rootURL := fmt.Sprintf("/v1/packages/%s/rpm", user.Name)
 
 	for _, group := range []string{"", "el9", "el9/stable"} {
 		t.Run(fmt.Sprintf("[Group:%s]", group), func(t *testing.T) {

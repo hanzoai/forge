@@ -93,8 +93,8 @@ func TestPackageNpm(t *testing.T) {
 		  }`
 	}
 
-	root := fmt.Sprintf("/api/packages/%s/npm/%s", user.Name, url.QueryEscape(packageName))
-	tagsRoot := fmt.Sprintf("/api/packages/%s/npm/-/package/%s/dist-tags", user.Name, url.QueryEscape(packageName))
+	root := fmt.Sprintf("/v1/packages/%s/npm/%s", user.Name, url.QueryEscape(packageName))
+	tagsRoot := fmt.Sprintf("/v1/packages/%s/npm/-/package/%s/dist-tags", user.Name, url.QueryEscape(packageName))
 	filename := fmt.Sprintf("%s-%s.tgz", strings.Split(packageName, "/")[1], packageVersion)
 
 	t.Run("Upload", func(t *testing.T) {
@@ -162,7 +162,7 @@ func TestPackageNpm(t *testing.T) {
 	t.Run("PackageMetadata", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/packages/%s/npm/%s", user.Name, "does-not-exist")).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/npm/%s", user.Name, "does-not-exist")).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNotFound)
 
@@ -266,7 +266,7 @@ func TestPackageNpm(t *testing.T) {
 	t.Run("Search", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		url := fmt.Sprintf("/api/packages/%s/npm/-/v1/search", user.Name)
+		url := fmt.Sprintf("/v1/packages/%s/npm/-/v1/search", user.Name)
 
 		cases := []struct {
 			Query           string

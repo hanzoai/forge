@@ -32,7 +32,7 @@ func TestPackageConda(t *testing.T) {
 	packageVersion := "1.0.1"
 
 	channel := "test-channel"
-	root := fmt.Sprintf("/api/packages/%s/conda", user.Name)
+	root := fmt.Sprintf("/v1/packages/%s/conda", user.Name)
 
 	t.Run("Upload", func(t *testing.T) {
 		tarContent := func() []byte {

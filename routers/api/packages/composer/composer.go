@@ -40,7 +40,7 @@ func apiError(ctx *context.Context, status int, obj any) {
 
 // ServiceIndex displays registry endpoints
 func ServiceIndex(ctx *context.Context) {
-	resp := createServiceIndexResponse(setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/composer")
+	resp := createServiceIndexResponse(setting.PackageRegistryURL(ctx.Package.Owner.Name, "composer"))
 
 	ctx.JSON(http.StatusOK, resp)
 }
@@ -76,7 +76,7 @@ func SearchPackages(ctx *context.Context) {
 
 	nextLink := ""
 	if len(pvs) == paginator.PageSize {
-		u, err := url.Parse(setting.AppURL + "api/packages/" + ctx.Package.Owner.Name + "/composer/search.json")
+		u, err := url.Parse(setting.PackageRegistryURL(ctx.Package.Owner.Name, "composer") + "/search.json")
 		if err != nil {
 			apiError(ctx, http.StatusInternalServerError, err)
 			return
@@ -147,7 +147,7 @@ func PackageMetadata(ctx *context.Context) {
 
 	resp := createPackageMetadataResponse(
 		ctx,
-		setting.AppURL+"api/packages/"+ctx.Package.Owner.Name+"/composer",
+		setting.PackageRegistryURL(ctx.Package.Owner.Name, "composer"),
 		pds,
 	)
 

@@ -83,7 +83,7 @@ license = MIT`)
 	compressions := []string{"gz", "xz", "zst"}
 	repositories := []string{"main", "testing", "with/slash", ""}
 
-	rootURL := fmt.Sprintf("/api/packages/%s/arch", user.Name)
+	rootURL := fmt.Sprintf("/v1/packages/%s/arch", user.Name)
 
 	t.Run("RepositoryKey", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()

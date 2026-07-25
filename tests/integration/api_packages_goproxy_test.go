@@ -29,7 +29,7 @@ func TestPackageGo(t *testing.T) {
 	packageVersion2 := "v0.0.2"
 	goModContent := `module "gitea.com/go-gitea/gitea"`
 
-	url := fmt.Sprintf("/api/packages/%s/go", user.Name)
+	url := fmt.Sprintf("/v1/packages/%s/go", user.Name)
 
 	t.Run("Upload", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()

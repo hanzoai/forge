@@ -18,7 +18,7 @@ import (
 	swift_module "github.com/hanzoai/git/modules/packages/swift"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/test"
-	swift_router "github.com/hanzoai/git/routers/api/packages/swift"
+	swift_router "github.com/hanzoai/git/routers/v1/packages/swift"
 	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
@@ -58,7 +58,7 @@ func TestPackageSwift(t *testing.T) {
 	contentManifest1 := "// swift-tools-version:5.7\n//\n//  Package.swift"
 	contentManifest2 := "// swift-tools-version:5.6\n//\n//  Package@swift-5.6.swift"
 
-	url := fmt.Sprintf("/api/packages/%s/swift", user.Name)
+	url := fmt.Sprintf("/v1/packages/%s/swift", user.Name)
 
 	t.Run("CheckLogin", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
