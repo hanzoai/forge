@@ -119,12 +119,6 @@ func GetPushMirrorsByRepoID(ctx context.Context, repoID int64, listOptions db.Li
 	})
 }
 
-// GetAllPushMirrors returns every push mirror on the instance, for the
-// estate-wide outbound sync (POST /v1/sync).
-func GetAllPushMirrors(ctx context.Context) ([]*PushMirror, error) {
-	return db.Find[PushMirror](ctx, findPushMirrorOptions{})
-}
-
 func GetPushMirrorByIDAndRepoID(ctx context.Context, id, repoID int64) (*PushMirror, bool, error) {
 	var pushMirror PushMirror
 	has, err := db.GetEngine(ctx).Where("id = ?", id).And("repo_id = ?", repoID).Get(&pushMirror)
