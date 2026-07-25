@@ -6,6 +6,7 @@ package misc
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/hex"
 	"encoding/json"
 	"io"
@@ -91,6 +92,42 @@ func MirrorGitHubWebhook(w http.ResponseWriter, req *http.Request) {
 	mirror_service.AddPullMirrorToQueue(repo.ID)
 	log.Trace("mirror webhook: queued pull for %s", repo.FullName())
 	_, _ = w.Write([]byte("queued"))
+}
+
+// SyncOut is the OUTBOUND half of the hub: it queues every push mirror on the
+// instance for an immediate sync, so what we hold is handed to the platforms we
+// mirror to instead of waiting out each mirror's interval. Steady state does
+// not need it — a pull-mirror sync already fans out on its own (see
+// services/mirror) — so this is the bootstrap-and-force verb, and the only one
+// the software lacks: upstream exposes sync for ONE repo
+// (POST /api/v1/repos/{owner}/{repo}/push_mirrors-sync), never for the estate.
+//
+// Bearer-authenticated with [mirror] SYNC_TOKEN, fail-closed when unset.
+func SyncOut(w http.ResponseWriter, req *http.Request) {
+	token := setting.Mirror.SyncToken
+	if token == "" {
+		http.Error(w, "sync is not configured", http.StatusServiceUnavailable)
+		return
+	}
+
+	sent, ok := strings.CutPrefix(req.Header.Get("Authorization"), "Bearer ")
+	if !ok || subtle.ConstantTimeCompare([]byte(sent), []byte(token)) != 1 {
+		http.Error(w, "invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	pushMirrors, err := repo_model.GetAllPushMirrors(req.Context())
+	if err != nil {
+		log.Error("sync out: unable to GetAllPushMirrors: %v", err)
+		http.Error(w, "cannot read push mirrors", http.StatusInternalServerError)
+		return
+	}
+	for _, pushMirror := range pushMirrors {
+		mirror_service.AddPushMirrorToQueue(pushMirror.ID)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]int{"queued": len(pushMirrors)})
 }
 
 // validMirrorSignature reports whether sigHeader is GitHub's

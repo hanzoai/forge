@@ -421,6 +421,19 @@ func SyncPullMirror(ctx context.Context, repoID int64) bool {
 		return false
 	}
 
+	// Hand the update straight on to the platforms this repo mirrors TO. An
+	// upstream sync IS new commits arriving, so it honours the same
+	// sync_on_commit opt-in a local push does — no second policy, and the hub
+	// fans out in one hop instead of sitting on the change until each push
+	// mirror's interval elapses.
+	if pushMirrors, err := repo_model.GetPushMirrorsSyncedOnCommit(ctx, m.RepoID); err != nil {
+		log.Error("SyncMirrors [repo: %-v]: unable to GetPushMirrorsSyncedOnCommit: %v", m.Repo, err)
+	} else {
+		for _, pushMirror := range pushMirrors {
+			AddPushMirrorToQueue(pushMirror.ID)
+		}
+	}
+
 	log.Trace("SyncMirrors [repo: %-v]: Successfully updated", m.Repo)
 
 	return true

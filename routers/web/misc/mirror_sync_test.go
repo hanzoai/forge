@@ -66,6 +66,34 @@ func TestMirrorGitHubWebhookRejectsUnsigned(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, post(t, body+" ", sign(secret, body)).Code, "tampered body")
 }
 
+func postSync(t *testing.T, authHeader string) *httptest.ResponseRecorder {
+	t.Helper()
+	req := httptest.NewRequest(http.MethodPost, "/v1/sync", nil)
+	if authHeader != "" {
+		req.Header.Set("Authorization", authHeader)
+	}
+	w := httptest.NewRecorder()
+	SyncOut(w, req)
+	return w
+}
+
+func TestSyncOutFailsClosed(t *testing.T) {
+	defer test.MockVariableValue(&setting.Mirror.SyncToken, "")()
+	// Unset token refuses everything — including an empty Bearer, which must
+	// never be allowed to match the empty config.
+	assert.Equal(t, http.StatusServiceUnavailable, postSync(t, "Bearer ").Code)
+	assert.Equal(t, http.StatusServiceUnavailable, postSync(t, "").Code)
+}
+
+func TestSyncOutRejectsWrongToken(t *testing.T) {
+	defer test.MockVariableValue(&setting.Mirror.SyncToken, "t0ken")()
+
+	assert.Equal(t, http.StatusUnauthorized, postSync(t, "").Code, "no header")
+	assert.Equal(t, http.StatusUnauthorized, postSync(t, "Bearer nope").Code, "wrong token")
+	assert.Equal(t, http.StatusUnauthorized, postSync(t, "token t0ken").Code, "wrong scheme")
+	assert.Equal(t, http.StatusUnauthorized, postSync(t, "t0ken").Code, "bare value")
+}
+
 func TestMirrorGitHubWebhookPingIsBenign(t *testing.T) {
 	// A signed event that names no repository (GitHub's ping on hook
 	// creation) must be a 200 no-op, so the hook shows healthy upstream.
