@@ -294,6 +294,10 @@ func Routes() *web.Router {
 	routes.Methods("GET,HEAD", "/robots.txt", append(mid, misc.RobotsTxt)...)
 	routes.Get("/ssh_info", misc.SSHInfo)
 	routes.Get("/api/healthz", healthcheck.Check)
+	// Mirror freshness, push half: an upstream org webhook syncs the matching
+	// pull mirror at once. Mounted here — ahead of the session middleware —
+	// because its credential is the payload HMAC, not a session.
+	routes.Post("/v1/mirror/github", misc.MirrorGitHubWebhook)
 
 	mid = append(mid, common.MustInitSessioner(), context.Contexter())
 
