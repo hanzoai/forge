@@ -1,12 +1,12 @@
 import {defineComponent, h, type PropType} from 'vue';
 import {parseDom, serializeXml} from './utils.ts';
 import {html, htmlRaw} from './utils/html.ts';
-import giteaDoubleChevronLeft from '../../public/assets/img/svg/hanzo-double-chevron-left.svg';
-import giteaDoubleChevronRight from '../../public/assets/img/svg/hanzo-double-chevron-right.svg';
-import giteaEmptyCheckbox from '../../public/assets/img/svg/hanzo-empty-checkbox.svg';
-import giteaExclamation from '../../public/assets/img/svg/hanzo-exclamation.svg';
-import giteaFavicon from '../../public/assets/img/favicon.svg';
-import giteaRunning from '../../public/assets/img/svg/hanzo-running.svg';
+import hanzoDoubleChevronLeft from '../../public/assets/img/svg/hanzo-double-chevron-left.svg';
+import hanzoDoubleChevronRight from '../../public/assets/img/svg/hanzo-double-chevron-right.svg';
+import hanzoEmptyCheckbox from '../../public/assets/img/svg/hanzo-empty-checkbox.svg';
+import hanzoExclamation from '../../public/assets/img/svg/hanzo-exclamation.svg';
+import hanzoFavicon from '../../public/assets/img/favicon.svg';
+import hanzoRunning from '../../public/assets/img/svg/hanzo-running.svg';
 import octiconArchive from '../../public/assets/img/svg/octicon-archive.svg';
 import octiconArrowLeft from '../../public/assets/img/svg/octicon-arrow-left.svg';
 import octiconArrowSwitch from '../../public/assets/img/svg/octicon-arrow-switch.svg';
@@ -90,12 +90,12 @@ import octiconZoomIn from '../../public/assets/img/svg/octicon-zoom-in.svg';
 import octiconZoomOut from '../../public/assets/img/svg/octicon-zoom-out.svg';
 
 const svgs = {
-  'hanzo-double-chevron-left': giteaDoubleChevronLeft,
-  'hanzo-double-chevron-right': giteaDoubleChevronRight,
-  'hanzo-empty-checkbox': giteaEmptyCheckbox,
-  'hanzo-exclamation': giteaExclamation,
-  'hanzo-favicon': giteaFavicon,
-  'hanzo-running': giteaRunning,
+  'hanzo-double-chevron-left': hanzoDoubleChevronLeft,
+  'hanzo-double-chevron-right': hanzoDoubleChevronRight,
+  'hanzo-empty-checkbox': hanzoEmptyCheckbox,
+  'hanzo-exclamation': hanzoExclamation,
+  'hanzo-favicon': hanzoFavicon,
+  'hanzo-running': hanzoRunning,
   'octicon-archive': octiconArchive,
   'octicon-arrow-left': octiconArrowLeft,
   'octicon-arrow-switch': octiconArrowSwitch,

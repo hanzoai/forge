@@ -3,7 +3,7 @@ import type {ActionsStatus} from './actions-types.ts';
 import {svgParseOuterInner} from '../svg.ts';
 import {html, htmlRaw} from '../utils/html.ts';
 
-const {svgOuter, svgInnerHtml: giteaFaviconInner} = svgParseOuterInner('hanzo-favicon');
+const {svgOuter, svgInnerHtml: hanzoFaviconInner} = svgParseOuterInner('hanzo-favicon');
 const faviconViewBox = svgOuter.getAttribute('viewBox')!;
 const [, , faviconViewBoxWidth, faviconViewBoxHeight] = faviconViewBox.split(/\s+/).map(Number);
 
@@ -52,7 +52,7 @@ function buildStatusIconMarkup(status: ActionsStatus): string {
 }
 
 export function buildStatusFaviconSvg(status: ActionsStatus): string {
-  return html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${faviconViewBox}">${htmlRaw(giteaFaviconInner)}${htmlRaw(buildStatusIconMarkup(status))}</svg>`;
+  return html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${faviconViewBox}">${htmlRaw(hanzoFaviconInner)}${htmlRaw(buildStatusIconMarkup(status))}</svg>`;
 }
 
 function buildStatusFaviconDataUrl(status: ActionsStatus): string {

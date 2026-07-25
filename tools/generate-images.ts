@@ -37,7 +37,6 @@ async function generate(svg: string, path: string, {size, bg}: {size: number, bg
 }
 
 async function main() {
-  const gitea = argv.slice(2).includes('gitea');
   const logoSvg = await readFile(new URL('../assets/logo.svg', import.meta.url), 'utf8');
   const faviconSvg = await readFile(new URL('../assets/favicon.svg', import.meta.url), 'utf8');
   await initWasm(await readFile(new URL(import.meta.resolve('@resvg/resvg-wasm/index_bg.wasm'))));
@@ -49,7 +48,6 @@ async function main() {
     generate(faviconSvg, '../public/assets/img/favicon.png', {size: 180}),
     generate(logoSvg, '../public/assets/img/avatar_default.png', {size: 200}),
     generate(logoSvg, '../public/assets/img/apple-touch-icon.png', {size: 180, bg: true}),
-    gitea && generate(logoSvg, '../public/assets/img/gitea.svg', {size: 32}),
   ]);
 }
 
