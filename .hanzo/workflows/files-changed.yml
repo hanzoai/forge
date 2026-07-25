@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   detect:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-linux-amd64
     timeout-minutes: 3
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
@@ -90,6 +90,7 @@ jobs:
               - "pnpm-workspace.yaml"
 
             actions:
+              - ".hanzo/workflows/*"
               - ".github/workflows/*"
               - ".github/actions/**"
               - "Makefile"
@@ -101,7 +102,7 @@ jobs:
               - "uv.lock"
 
             docker:
-              - ".github/workflows/pull-docker-dryrun.yml"
+              - ".hanzo/workflows/pull-docker-dryrun.yml"
               - ".github/actions/docker-dryrun/**"
               - "Dockerfile"
               - "Dockerfile.rootless"

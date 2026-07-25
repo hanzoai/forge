@@ -1,5 +1,14 @@
 self-hosted-runner:
   labels:
+    # Our pools. `<org>-<os>-<arch>` is the canonical form every native workflow
+    # in .hanzo/workflows asks for; `hanzo-build-linux-amd64` is the legacy
+    # purpose label the GitHub-side sync nudge asks for (that runner is
+    # registered against github.com, a different registry with its own label
+    # set). Both route to the same capability — hanzoai/.github RUNNERS.md is the
+    # source of truth for the taxonomy.
+    - hanzo-linux-amd64
+    - hanzo-build-linux-amd64
+    # Upstream go-gitea's own pools, kept so a rebase onto upstream lints clean.
     - actuated-4cpu-8gb
     - actuated-4cpu-16gb
     - nscloud

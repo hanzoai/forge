@@ -1,0 +1,30 @@
+# ~7-line canonical caller — all real config lives in /hanzo.yml, which
+# platform.hanzo.ai reads too. It replaces the hand-rolled build.yml, which
+# shelled `buildctl-daemonless.sh`: that binary is not in the image this fleet
+# serves for its amd64 pool (every label maps to catthehacker/ubuntu:act-24.04 —
+# universe:infra/k8s/git-runner/statefulset.yaml), so the one builder this repo
+# had could not run. The shared builder uses docker buildx, which is there, and
+# publishes the standard immutable `sha-<sha7>-amd64` per main push (bare semver
+# only on a v* tag) instead of the ad-hoc `:<sha8>`.
+#
+# It does NOT roll out: git.hanzo.ai is pinned to an explicit tag in
+# hanzoai/universe (the `git` operator App CR), rolled by a reviewed change
+# there — which is what hanzo.yml means by having no `deploy:` section. A
+# `kubectl patch` of the App used to live in build.yml and never took:
+# cd.hanzo.ai runs with selfHeal, so it restores the CR from the universe pin on
+# the next poll. Recording the tag in universe is the only durable path, and for
+# the service that hosts this repo that is deliberately a human decision.
+name: CI/CD
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  # The sync (sync-from-github.yml) dispatches this by name after a fast-forward:
+  # a push made with the workflow token triggers no workflows, so without this a
+  # synced commit would build nothing.
+  workflow_dispatch:
+jobs:
+  cicd:
+    uses: hanzoai/ci/.github/workflows/build.yml@v1
+    secrets: inherit

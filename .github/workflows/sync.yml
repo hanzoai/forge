@@ -1,0 +1,58 @@
+name: Sync to Hanzo Git
+# The ONLY GitHub Actions workflow in this repo — and it runs ZERO CI.
+#
+# THE LAW: all CI/CD is NATIVE. Build, lint, the db/e2e suites and the release
+# live in `.hanzo/workflows` and run on our own runners against git.hanzo.ai.
+# GitHub is a remote humans and agents also push to; GitHub Actions' single job
+# is to tell native git that a push happened.
+#
+# This fork is also what ENFORCES that law for every other repo:
+# modules/actions/workflows.go `listWorkflowsInDirs` walks
+# `setting.Actions.WorkflowDirs` (.hanzo/workflows, .gitea/workflows,
+# .github/workflows) and BREAKS at the first directory that exists. So the
+# moment a repo has `.hanzo/workflows`, its `.github/workflows` is invisible to
+# the forge — including this file. One dir wins; there is no merging, and no way
+# for a stray GitHub workflow to also run natively.
+#
+# ONE implementation of the sync: `.hanzo/workflows/sync-from-github.yml`
+# (in-cluster fast-forward, fail-loud on divergence, dispatches the build). This
+# workflow does not re-implement it — it just fires it NOW instead of waiting for
+# the next timer tick. If this nudge fails (or GitHub Actions is down for the
+# org), the timer still converges: the sync is idempotent by construction.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+concurrency:
+  group: sync-to-hanzo-git
+  cancel-in-progress: true
+jobs:
+  nudge:
+    # OUR pool, not ubuntu-latest: GitHub-hosted minutes are billing-blocked for
+    # this org ("recent account payments have failed or your spending limit needs
+    # to be increased" — measured on hanzoai/commerce, 2026-07-25).
+    runs-on: hanzo-build-linux-amd64
+    timeout-minutes: 5
+    steps:
+      - name: Tell git.hanzo.ai to pull main now
+        env:
+          # Instance token for git.hanzo.ai (repo secret; the value lives in KMS
+          # at hanzo/prod:/git/admin-token). Absent ⇒ the timer tick still syncs.
+          HANZO_GIT_TOKEN: ${{ secrets.HANZO_GIT_TOKEN }}
+        run: |
+          set -uo pipefail
+          if [ -z "${HANZO_GIT_TOKEN:-}" ]; then
+            echo "HANZO_GIT_TOKEN unset — native sync picks this push up on its next tick."
+            exit 0
+          fi
+          # This host's own software API is /api/v1 (the upstream forge surface
+          # we ship, kept verbatim) — the /v1-only law governs Hanzo services.
+          if curl -fsS --max-time 20 --retry 2 --retry-delay 3 -X POST \
+               -H "Authorization: token ${HANZO_GIT_TOKEN}" \
+               -H "Content-Type: application/json" \
+               "https://git.hanzo.ai/api/v1/repos/hanzoai/git/actions/workflows/sync-from-github.yml/dispatches" \
+               -d '{"ref":"main"}'; then
+            echo "native sync dispatched — build + suites run on our runners"
+          else
+            echo "dispatch failed (non-fatal) — the 10-minute timer tick converges"
+          fi

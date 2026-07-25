@@ -13,9 +13,9 @@ rather than local accounts, and the product is branded Hanzo Git.
 ## Build & deploy
 
 One way, like every Hanzo repo: the root [`hanzo.yml`](hanzo.yml) declares the
-image and tests; a ~7-line [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml)
+image and tests; a ~7-line [`.hanzo/workflows/cicd.yml`](.hanzo/workflows/cicd.yml)
 imports [`hanzoai/ci`](https://github.com/hanzoai/ci), which builds and pushes
-`ghcr.io/hanzoai/git` on the arc pool. Never build the image locally.
+`ghcr.io/hanzoai/git` on our own runners against git.hanzo.ai. Never build the image locally.
 
 The running service is defined in `hanzoai/universe` (the `git` operator App CR):
 a single-writer SQLite deployment, config injected via the `GIT__<section>__<KEY>`

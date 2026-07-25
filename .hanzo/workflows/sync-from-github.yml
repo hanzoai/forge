@@ -1,0 +1,49 @@
+name: Sync from GitHub
+# git.hanzo.ai is canonical for this fork (the forge reports mirror=false — it is
+# not a pull mirror of GitHub, it owns main); development also lands on
+# github.com/hanzoai/git. ONE deterministic direction: an in-cluster PULL. The
+# runner reaches both ends (GitHub outbound, this instance via the URL
+# actions/checkout already uses), so the sync has no ingress dependency.
+#
+# Fast-forward ONLY: a divergence fails loudly here instead of force-pushing
+# either side.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+concurrency:
+  group: sync-from-github
+  cancel-in-progress: false
+jobs:
+  ff-main:
+    runs-on: [hanzo-linux-amd64]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Fast-forward main from github.com/hanzoai/git
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -euo pipefail
+          git fetch --quiet "https://x-access-token:${GH_PAT}@github.com/hanzoai/git.git" main
+          LOCAL="$(git rev-parse HEAD)"; REMOTE="$(git rev-parse FETCH_HEAD)"
+          if [ "$LOCAL" = "$REMOTE" ]; then echo "in sync at $LOCAL"; exit 0; fi
+          if git merge-base --is-ancestor "$LOCAL" "$REMOTE"; then
+            echo "fast-forwarding $LOCAL -> $REMOTE"
+            git push origin "$REMOTE:refs/heads/main"
+            # A push made with the workflow token does not trigger workflows, so
+            # synced commits would never build. Dispatch the build explicitly.
+            curl -fsS --max-time 20 -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              "${{ github.server_url }}/api/v1/repos/${{ github.repository }}/actions/workflows/cicd.yml/dispatches" \
+              -d '{"ref":"main"}' \
+              && echo "CI/CD dispatched" || echo "CI/CD dispatch failed (non-fatal — next direct push builds)"
+          elif git merge-base --is-ancestor "$REMOTE" "$LOCAL"; then
+            echo "canonical is AHEAD of GitHub — nothing to pull (never force from here)."
+          else
+            echo "::error::main DIVERGED between GitHub ($REMOTE) and canonical ($LOCAL) — refusing to force. Reconcile manually."
+            exit 1
+          fi

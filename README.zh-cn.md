@@ -12,7 +12,7 @@ GitHub Actions 的 CI/CD，并通过 hanzo.id OIDC 原生集成 IAM。服务位�
 ## 构建与部署
 
 如同每个 Hanzo 仓库，只有一种方式：根目录的 `hanzo.yml` 声明镜像与测试；
-约七行的 `.github/workflows/cicd.yml` 导入 `hanzoai/ci`，在 arc pool 构建并推送
+约七行的 `.hanzo/workflows/cicd.yml` 导入 `hanzoai/ci`，在我们自己的 runner 上构建并推送
 `ghcr.io/hanzoai/git`。切勿在本地构建镜像。
 
 运行中的服务定义于 `hanzoai/universe`（`git` operator App CR）：单写入者 SQLite
