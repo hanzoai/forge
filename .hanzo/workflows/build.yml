@@ -1,9 +1,18 @@
-name: deploy
+# Builds the image. It does NOT roll it out: git.hanzo.ai is pinned to an
+# explicit tag in hanzoai/universe (crs/git.yaml) and rolled by a reviewed
+# change there, which is what hanzo.yml means by having no `deploy:` section.
+#
+# A `kubectl patch` of the App used to live here. It never took: ArgoCD's
+# universe-crs Application runs with selfHeal, so it restores the CR from the
+# universe pin on the next poll and the patch is undone. Recording the tag in
+# universe is the only durable path, and for this service that is deliberately
+# a human decision.
+name: build
 on:
   push:
     branches: [main]
 jobs:
-  deploy:
+  build:
     runs-on: hanzo-linux-amd64
     steps:
       - uses: actions/checkout@v4
@@ -17,8 +26,3 @@ jobs:
             --output "type=image,name=ghcr.io/hanzoai/git:${SHA},push=true" --progress=plain
         env:
           GIT_AUTH_TOKEN: ${{ secrets.GIT_CLONE_TOKEN }}
-      - name: Deploy — declare tag to operator
-        run: |
-          for app in hanzo-git; do
-            kubectl -n hanzo patch app "$app" --type=merge -p "{\"spec\":{\"image\":{\"repository\":\"ghcr.io/hanzoai/git\",\"tag\":\"${GITHUB_SHA::8}\"}}}"
-          done
