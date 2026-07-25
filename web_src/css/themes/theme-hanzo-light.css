@@ -311,3 +311,35 @@ hanzo-theme-meta-info {
   accent-color: var(--color-accent);
   color-scheme: light;
 }
+
+/* ---------------------------------------------------------------------------
+   Hanzo estate alignment (light) — black action-on-white, zero-chroma primary
+   ramp; semantic colors untouched. Mirrors the dark theme's appended block. */
+:root {
+  --color-primary: #000000;
+  --color-primary-contrast: #ffffff;
+  --color-primary-dark-1: #0d0d0d;
+  --color-primary-dark-2: #1a1a1a;
+  --color-primary-dark-3: #262626;
+  --color-primary-dark-4: #333333;
+  --color-primary-dark-5: #4d4d4d;
+  --color-primary-dark-6: #808080;
+  --color-primary-dark-7: #b3b3b3;
+  --color-primary-light-1: #333333;
+  --color-primary-light-2: #4d4d4d;
+  --color-primary-light-3: #666666;
+  --color-primary-light-4: #999999;
+  --color-primary-light-5: #cccccc;
+  --color-primary-light-6: #e6e6e6;
+  --color-primary-light-7: #f2f2f2;
+  --color-primary-alpha-10: #00000019;
+  --color-primary-alpha-20: #00000033;
+  --color-primary-alpha-30: #0000004b;
+  --color-primary-alpha-40: #00000066;
+  --color-primary-alpha-50: #00000080;
+  --color-primary-alpha-60: #00000099;
+  --color-primary-alpha-70: #000000b3;
+  --color-primary-alpha-80: #000000cc;
+  --color-primary-alpha-90: #000000e6;
+  --color-git: #000000;
+}
