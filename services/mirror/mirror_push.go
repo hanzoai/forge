@@ -9,11 +9,13 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/hanzoai/git/models/db"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/modules/git"
+	giturl "github.com/hanzoai/git/modules/git/url"
 	"github.com/hanzoai/git/modules/gitrepo"
 	"github.com/hanzoai/git/modules/lfs"
 	"github.com/hanzoai/git/modules/log"
@@ -29,8 +31,51 @@ import (
 
 var stripExitStatus = regexp.MustCompile(`exit status \d+ - `)
 
+// sameRemote reports whether two remote addresses name the same repository,
+// ignoring credentials, scheme and a trailing .git — the forms the same target
+// is spelled in.
+func sameRemote(a, b string) bool {
+	parse := func(s string) (string, bool) {
+		u, err := giturl.ParseGitURL(s)
+		if err != nil || u.Host == "" {
+			return "", false
+		}
+		return strings.ToLower(u.Host + "/" + strings.Trim(strings.TrimSuffix(u.Path, ".git"), "/")), true
+	}
+	ka, oka := parse(a)
+	kb, okb := parse(b)
+	return oka && okb && ka == kb
+}
+
+// refuseUpstreamCycle rejects a push mirror that targets the repo's own pull
+// upstream. Both directions are force-mirrors with no merge step, so a cycle is
+// a clobber race: each side overwrites the other with whatever it last saw and
+// the loser's commits are gone. The illegal state is refused rather than
+// documented.
+func refuseUpstreamCycle(ctx context.Context, repo *repo_model.Repository, addr string) error {
+	if !repo.IsMirror {
+		return nil
+	}
+	pullMirror, err := repo_model.GetMirrorByRepoID(ctx, repo.ID)
+	if err != nil {
+		return nil // no upstream to cycle with
+	}
+	upstream, err := gitrepo.GitRemoteGetURL(ctx, repo, pullMirror.GetRemoteName())
+	if err != nil {
+		return nil
+	}
+	if sameRemote(upstream.String(), addr) {
+		return util.NewInvalidArgumentErrorf("push mirror target is this repository's pull upstream: mirroring both ways force-overwrites in both directions and loses commits")
+	}
+	return nil
+}
+
 // AddPushMirrorRemote registers the push mirror remote.
 func AddPushMirrorRemote(ctx context.Context, m *repo_model.PushMirror, addr string) error {
+	if err := refuseUpstreamCycle(ctx, m.Repo, addr); err != nil {
+		return err
+	}
+
 	addRemoteAndConfig := func(storageRepo gitrepo.Repository, addr string) error {
 		if err := gitrepo.GitRemoteAdd(ctx, storageRepo, m.RemoteName, addr, gitrepo.RemoteOptionMirrorPush); err != nil {
 			return err
