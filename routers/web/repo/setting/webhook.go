@@ -147,7 +147,7 @@ func WebhooksNew(ctx *context.Context) {
 	}
 	if hookType == "discord" {
 		ctx.Data["DiscordHook"] = map[string]any{
-			"Username": "Gitea",
+			"Username": "Hanzo Git",
 		}
 	}
 	ctx.Data["BaseLink"] = orCtx.LinkNew

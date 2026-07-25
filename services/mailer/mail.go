@@ -185,7 +185,7 @@ func generateMetadataHeaders(repo *repo_model.Repository) map[string]string {
 		// https://datatracker.ietf.org/doc/html/rfc2369
 		"List-Archive": fmt.Sprintf("<%s>", repo.HTMLURL()),
 
-		"X-Mailer": "Gitea",
+		"X-Mailer": "Hanzo Git",
 
 		"X-Gitea-Repository":      repo.Name,
 		"X-Gitea-Repository-Path": repo.FullName(),
