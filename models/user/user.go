@@ -625,6 +625,7 @@ var (
 		"swagger.v1.json",
 		"openapi3.v1.json",
 
+		"v1",            // Hanzo-native top-level routes (e.g. /v1/mirror/github)
 		"ghost",         // reserved name for deleted users (id: -1)
 		"hanzo-actions", // builtin Actions bot user (id: -2)
 		"gitea-actions", // legacy reserved — keep blocked so no account can squat the old bot name

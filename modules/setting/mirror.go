@@ -16,6 +16,11 @@ var Mirror = struct {
 	DisableNewPush  bool
 	DefaultInterval time.Duration
 	MinInterval     time.Duration
+
+	// GithubWebhookSecret keys the HMAC on POST /v1/mirror/github — the PUSH
+	// half of mirror freshness (an upstream push syncs its mirror at once
+	// instead of waiting out the interval). Empty disables that endpoint.
+	GithubWebhookSecret string
 }{
 	Enabled:         true,
 	DisableNewPull:  false,
@@ -37,6 +42,10 @@ func loadMirrorFrom(rootCfg ConfigProvider) {
 	if err := rootCfg.Section("mirror").MapTo(&Mirror); err != nil {
 		log.Fatal("Failed to map Mirror settings: %v", err)
 	}
+
+	// Read explicitly rather than through MapTo: the struct-name mapper would
+	// split "GitHub" and expect GIT_HUB_WEBHOOK_SECRET.
+	Mirror.GithubWebhookSecret = rootCfg.Section("mirror").Key("GITHUB_WEBHOOK_SECRET").String()
 
 	if !Mirror.Enabled {
 		Mirror.DisableNewPull = true
