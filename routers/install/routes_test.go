@@ -29,7 +29,7 @@ func TestRoutes(t *testing.T) {
 	assert.Equal(t, 404, w.Code)
 
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest(http.MethodGet, "/assets/img/gitea.svg", nil)
+	req = httptest.NewRequest(http.MethodGet, "/assets/img/logo.svg", nil)
 	r.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
