@@ -54,14 +54,13 @@ var (
 
 		DefaultRPMSignEnabled bool
 
-		// GoProxyUpstream turns the Go registry into a READ-THROUGH CACHE of the
-		// public module ecosystem. On a miss the server fetches the module from
-		// this proxy ONCE, stores it as an ordinary package version, and serves
-		// every later request from our own disk.
+		// GoProxyUpstream makes the Go registry a READ-THROUGH CACHE of the public
+		// module ecosystem: on a miss the server fetches the module ONCE, stores
+		// it as an ordinary package version, and serves every later request from
+		// our own disk. ON by default, because a cache nobody remembered to
+		// enable is just a slower registry.
 		//
-		// Empty (the default) keeps the registry publish-only, which is the
-		// behaviour every existing deployment already has -- turning this on is
-		// an explicit act, never a surprise.
+		// Set it empty to go back to publish-only.
 		//
 		// It caches, it does not gate: nothing is pinned, vetted or approved
 		// here, so adding a dependency never needs permission and nobody has a
@@ -71,10 +70,24 @@ var (
 		// The checksum database still verifies every module, so a cached copy
 		// cannot become a place where a tampered module hides.
 		GoProxyUpstream string
+
+		// GoProxyPrivate is the real safety property, and it is why turning the
+		// cache on is safe. A PRIVATE module is not published to the public
+		// ecosystem, so a local miss on one would otherwise send its import path
+		// -- github.com/hanzoai/<unreleased-thing> -- to proxy.golang.org, which
+		// logs it. The path alone leaks a repository name that may not be public
+		// yet.
+		//
+		// Any module whose path matches one of these comma-separated prefixes is
+		// NEVER fetched upstream: a miss stays a miss. Same spirit as GOPRIVATE,
+		// enforced server-side so it does not depend on every client being
+		// configured correctly.
+		GoProxyPrivate string
 	}{
 		Enabled:              true,
 		LimitTotalOwnerCount: -1,
-		GoProxyUpstream:      "",
+		GoProxyUpstream:      "https://proxy.golang.org",
+		GoProxyPrivate:       "github.com/hanzoai/,github.com/luxfi/,github.com/zooai/,git.hanzo.ai/",
 	}
 )
 

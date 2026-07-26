@@ -43,6 +43,27 @@ func TestUpstreamEnabled(t *testing.T) {
 	assert.True(t, upstreamEnabled())
 }
 
+func TestIsPrivateModule(t *testing.T) {
+	defer func(v string) { setting.Packages.GoProxyPrivate = v }(setting.Packages.GoProxyPrivate)
+	setting.Packages.GoProxyPrivate = "github.com/hanzoai/,github.com/luxfi/,git.hanzo.ai/"
+
+	// Private paths must never reach a public proxy -- the path alone leaks a
+	// repo name that may not be public yet.
+	assert.True(t, isPrivateModule("github.com/hanzoai/git"))
+	assert.True(t, isPrivateModule("github.com/luxfi/node"))
+	assert.True(t, isPrivateModule("git.hanzo.ai/hanzoai/cloud"))
+
+	// Public modules still cache.
+	assert.False(t, isPrivateModule("github.com/stretchr/testify"))
+	assert.False(t, isPrivateModule("golang.org/x/net"))
+	// A near-miss must NOT be treated as private (no accidental over-blocking).
+	assert.False(t, isPrivateModule("github.com/hanzoai-community/thing"))
+
+	// Empty config blocks nothing.
+	setting.Packages.GoProxyPrivate = ""
+	assert.False(t, isPrivateModule("github.com/hanzoai/git"))
+}
+
 func TestUpstreamFetch(t *testing.T) {
 	defer func(v string) { setting.Packages.GoProxyUpstream = v }(setting.Packages.GoProxyUpstream)
 

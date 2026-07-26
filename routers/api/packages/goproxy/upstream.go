@@ -45,9 +45,29 @@ import (
 const upstreamTimeout = 60 * time.Second
 
 // upstreamEnabled reports whether read-through caching is configured. Empty
-// means publish-only, which is what every deployment has until someone opts in.
+// means publish-only.
 func upstreamEnabled() bool {
 	return strings.TrimSpace(setting.Packages.GoProxyUpstream) != ""
+}
+
+// isPrivateModule reports whether a module path must NEVER be fetched upstream.
+//
+// This is what makes caching-by-default safe. A private module is not published
+// publicly, so a local miss would otherwise send its import path -- e.g.
+// github.com/hanzoai/<unreleased> -- to proxy.golang.org, which logs it. The
+// path alone leaks a repository name that may not be public yet. For these, a
+// miss stays a miss.
+//
+// Enforced server-side rather than trusting every client to set GOPRIVATE
+// correctly: one machine with a stale env would otherwise leak for everyone.
+func isPrivateModule(name string) bool {
+	for _, p := range strings.Split(setting.Packages.GoProxyPrivate, ",") {
+		p = strings.TrimSpace(p)
+		if p != "" && strings.HasPrefix(name, p) {
+			return true
+		}
+	}
+	return false
 }
 
 // upstreamFetch GETs one file from the configured module proxy. `elem` is the
@@ -102,6 +122,10 @@ func cacheFromUpstream(ctx *context.Context, name, version string) (*packages_mo
 	// "latest" is a resolution question, not a fetchable artifact; only a
 	// concrete version can be cached.
 	if version == "" || version == "latest" {
+		return nil, packages_model.ErrPackageNotExist
+	}
+	// Never hand a private import path to a public proxy.
+	if isPrivateModule(name) {
 		return nil, packages_model.ErrPackageNotExist
 	}
 
