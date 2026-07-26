@@ -53,9 +53,28 @@ var (
 		LimitSizeVagrant        int64
 
 		DefaultRPMSignEnabled bool
+
+		// GoProxyUpstream turns the Go registry into a READ-THROUGH CACHE of the
+		// public module ecosystem. On a miss the server fetches the module from
+		// this proxy ONCE, stores it as an ordinary package version, and serves
+		// every later request from our own disk.
+		//
+		// Empty (the default) keeps the registry publish-only, which is the
+		// behaviour every existing deployment already has -- turning this on is
+		// an explicit act, never a surprise.
+		//
+		// It caches, it does not gate: nothing is pinned, vetted or approved
+		// here, so adding a dependency never needs permission and nobody has a
+		// reason to route around the cache. Supply-chain PINNING is a different
+		// concern and belongs in a different mechanism.
+		//
+		// The checksum database still verifies every module, so a cached copy
+		// cannot become a place where a tampered module hides.
+		GoProxyUpstream string
 	}{
 		Enabled:              true,
 		LimitTotalOwnerCount: -1,
+		GoProxyUpstream:      "",
 	}
 )
 

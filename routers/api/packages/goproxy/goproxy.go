@@ -49,7 +49,9 @@ func EnumeratePackageVersions(ctx *context.Context) {
 }
 
 func PackageVersionMetadata(ctx *context.Context) {
-	pv, err := resolvePackage(ctx, ctx.Package.Owner.ID, ctx.PathParam("name"), ctx.PathParam("version"))
+	// resolveOrCache: serve what we have, else fetch it once from the configured
+	// upstream and serve that. With no upstream set this is exactly resolvePackage.
+	pv, err := resolveOrCache(ctx, ctx.PathParam("name"), ctx.PathParam("version"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			apiError(ctx, http.StatusNotFound, err)
@@ -69,7 +71,9 @@ func PackageVersionMetadata(ctx *context.Context) {
 }
 
 func PackageVersionGoModContent(ctx *context.Context) {
-	pv, err := resolvePackage(ctx, ctx.Package.Owner.ID, ctx.PathParam("name"), ctx.PathParam("version"))
+	// resolveOrCache: serve what we have, else fetch it once from the configured
+	// upstream and serve that. With no upstream set this is exactly resolvePackage.
+	pv, err := resolveOrCache(ctx, ctx.PathParam("name"), ctx.PathParam("version"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			apiError(ctx, http.StatusNotFound, err)
@@ -89,7 +93,9 @@ func PackageVersionGoModContent(ctx *context.Context) {
 }
 
 func DownloadPackageFile(ctx *context.Context) {
-	pv, err := resolvePackage(ctx, ctx.Package.Owner.ID, ctx.PathParam("name"), ctx.PathParam("version"))
+	// resolveOrCache: serve what we have, else fetch it once from the configured
+	// upstream and serve that. With no upstream set this is exactly resolvePackage.
+	pv, err := resolveOrCache(ctx, ctx.PathParam("name"), ctx.PathParam("version"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			apiError(ctx, http.StatusNotFound, err)
