@@ -20,7 +20,7 @@ import (
 
 // ListPackages gets all packages of an owner
 func ListPackages(ctx *context.APIContext) {
-	// swagger:operation GET /packages/{owner} package listPackages
+	// swagger:operation GET /owners/{owner}/packages package listPackages
 	// ---
 	// summary: Gets all packages of an owner
 	// produces:
@@ -75,7 +75,7 @@ func ListPackages(ctx *context.APIContext) {
 
 // GetPackage gets a package
 func GetPackage(ctx *context.APIContext) {
-	// swagger:operation GET /packages/{owner}/{type}/{name}/{version} package getPackage
+	// swagger:operation GET /owners/{owner}/packages/{type}/{name}/{version} package getPackage
 	// ---
 	// summary: Gets a package
 	// produces:
@@ -118,7 +118,7 @@ func GetPackage(ctx *context.APIContext) {
 
 // DeletePackage deletes a package
 func DeletePackage(ctx *context.APIContext) {
-	// swagger:operation DELETE /packages/{owner}/{type}/{name} package deletePackage
+	// swagger:operation DELETE /owners/{owner}/packages/{type}/{name} package deletePackage
 	// ---
 	// summary: Delete a package
 	// parameters:
@@ -153,7 +153,7 @@ func DeletePackage(ctx *context.APIContext) {
 
 // DeletePackageVersion deletes a package version
 func DeletePackageVersion(ctx *context.APIContext) {
-	// swagger:operation DELETE /packages/{owner}/{type}/{name}/{version} package deletePackageVersion
+	// swagger:operation DELETE /owners/{owner}/packages/{type}/{name}/{version} package deletePackageVersion
 	// ---
 	// summary: Delete a package version
 	// parameters:
@@ -193,7 +193,7 @@ func DeletePackageVersion(ctx *context.APIContext) {
 
 // ListPackageFiles gets all files of a package
 func ListPackageFiles(ctx *context.APIContext) {
-	// swagger:operation GET /packages/{owner}/{type}/{name}/{version}/files package listPackageFiles
+	// swagger:operation GET /owners/{owner}/packages/{type}/{name}/{version}/files package listPackageFiles
 	// ---
 	// summary: Gets all files of a package
 	// produces:
@@ -235,7 +235,7 @@ func ListPackageFiles(ctx *context.APIContext) {
 
 // ListPackageVersions gets all versions of a package
 func ListPackageVersions(ctx *context.APIContext) {
-	// swagger:operation GET /packages/{owner}/{type}/{name} package listPackageVersions
+	// swagger:operation GET /owners/{owner}/packages/{type}/{name} package listPackageVersions
 	// ---
 	// summary: Gets all versions of a package
 	// produces:
@@ -291,7 +291,7 @@ func ListPackageVersions(ctx *context.APIContext) {
 
 // GetLatestPackageVersion gets the latest version of a package
 func GetLatestPackageVersion(ctx *context.APIContext) {
-	// swagger:operation GET /packages/{owner}/{type}/{name}/-/latest package getLatestPackageVersion
+	// swagger:operation GET /owners/{owner}/packages/{type}/{name}/-/latest package getLatestPackageVersion
 	// ---
 	// summary: Gets the latest version of a package
 	// produces:
@@ -350,7 +350,7 @@ func GetLatestPackageVersion(ctx *context.APIContext) {
 
 // LinkPackage sets a repository link for a package
 func LinkPackage(ctx *context.APIContext) {
-	// swagger:operation POST /packages/{owner}/{type}/{name}/-/link/{repo_name} package linkPackage
+	// swagger:operation POST /owners/{owner}/packages/{type}/{name}/-/link/{repo_name} package linkPackage
 	// ---
 	// summary: Link a package to a repository
 	// parameters:
@@ -417,7 +417,7 @@ func LinkPackage(ctx *context.APIContext) {
 
 // UnlinkPackage sets a repository link for a package
 func UnlinkPackage(ctx *context.APIContext) {
-	// swagger:operation POST /packages/{owner}/{type}/{name}/-/unlink package unlinkPackage
+	// swagger:operation POST /owners/{owner}/packages/{type}/{name}/-/unlink package unlinkPackage
 	// ---
 	// summary: Unlink a package from a repository
 	// parameters:

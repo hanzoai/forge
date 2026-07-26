@@ -1683,8 +1683,24 @@ func Routes() *web.Router {
 			}, repoAssignment(), checkTokenPublicOnly())
 		}, tokenRequiresScopes(auth_model.AccessTokenScopeCategoryIssue))
 
-		// NOTE: these are Gitea package management API - see packages.CommonRoutes and packages.DockerContainerRoutes for endpoints that implement package manager APIs
-		m.Group("/packages/{username}", func() {
+		// Package MANAGEMENT (ours: list/inspect/delete/link). Distinct from the
+		// package REGISTRY, which serves the ecosystem protocols and is mounted
+		// separately at /v1/packages (see packages.CommonRoutes /
+		// packages.ContainerRoutes).
+		//
+		// It lives under /owners/{username}/packages, NOT /packages/{username},
+		// because those two would occupy the same path. The registry's shape is
+		// /v1/packages/{owner}/{ecosystem}/... and management's was
+		// /v1/packages/{username}/{type}/{name} — {ecosystem} and {type} are the
+		// SAME segment, so the two are genuinely ambiguous and no mount ordering
+		// can separate them. The /api prefix used to hide that; dropping it made
+		// the overlap real and 404'd this entire subtree.
+		//
+		// The registry path is the one that cannot move: go, cargo and conan
+		// clients hardcode it. So management moved, and it moved to a resource
+		// path that can never collide again rather than a differently-spelled
+		// prefix that could.
+		m.Group("/owners/{username}/packages", func() {
 			m.Group("/{type}/{name}", func() {
 				m.Get("/", packages.ListPackageVersions)
 				m.Delete("", reqPackageAccess(perm.AccessModeWrite), packages.DeletePackage)
