@@ -62,6 +62,7 @@ cpu.out
 /custom/*
 !/custom/conf/app.example.ini
 /data
+/dump.rdb
 /indexers
 /log
 /public/assets/img/avatar

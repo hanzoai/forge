@@ -50,7 +50,9 @@ func loadCacheFrom(rootCfg ConfigProvider) {
 		log.Fatal("Failed to map Cache settings: %v", err)
 	}
 
-	CacheService.Adapter = sec.Key("ADAPTER").In("memory", []string{"memory", "kv", "memcache", "twoqueue"})
+	// the switch below is the only list of valid adapters; Key.In would clamp an unknown one to the
+	// default and silently downgrade a shared cache to per-process memory
+	CacheService.Adapter = sec.Key("ADAPTER").MustString("memory")
 	switch CacheService.Adapter {
 	case "memory":
 	case "kv", "memcache":
