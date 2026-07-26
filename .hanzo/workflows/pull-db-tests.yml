@@ -17,7 +17,7 @@ jobs:
   test-pgsql-shard-1:
     if: needs.files-changed.outputs.backend == 'true'
     needs: files-changed
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     timeout-minutes: 50
     services:
       pgsql:
@@ -53,7 +53,7 @@ jobs:
   test-pgsql-shard-2:
     if: needs.files-changed.outputs.backend == 'true'
     needs: files-changed
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     timeout-minutes: 50
     services:
       pgsql:
@@ -88,7 +88,7 @@ jobs:
   test-sqlite:
     if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.actions == 'true'
     needs: files-changed
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - uses: ./.github/actions/go-setup
@@ -112,7 +112,7 @@ jobs:
   test-unit:
     if: needs.files-changed.outputs.backend == 'true'
     needs: files-changed
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.19.15
@@ -178,7 +178,7 @@ jobs:
   test-mysql:
     if: needs.files-changed.outputs.backend == 'true'
     needs: files-changed
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     services:
       mysql:
         # the bitnami mysql image has more options than the official one, it's easier to customize
@@ -226,7 +226,7 @@ jobs:
   test-mssql:
     if: needs.files-changed.outputs.backend == 'true'
     needs: files-changed
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:2019-latest

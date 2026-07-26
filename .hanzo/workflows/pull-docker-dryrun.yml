@@ -19,7 +19,7 @@ jobs:
   container-amd64:
     if: needs.files-changed.outputs.docker == 'true'
     needs: [files-changed]
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - uses: ./.github/actions/docker-dryrun
@@ -29,7 +29,7 @@ jobs:
   container-arm64:
     if: needs.files-changed.outputs.dockerfile == 'true'
     needs: [files-changed]
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - uses: ./.github/actions/docker-dryrun
@@ -39,7 +39,7 @@ jobs:
   container-riscv64:
     if: needs.files-changed.outputs.dockerfile == 'true'
     needs: [files-changed]
-    runs-on: hanzo-linux-amd64
+    runs-on: hanzo-build-linux-amd64
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - uses: ./.github/actions/docker-dryrun
