@@ -1,6 +1,6 @@
 # Canonical CI/CD config for hanzoai/git — read by both the hanzoai/ci reusable
 # workflow (.hanzo/workflows/cicd.yml) and platform.hanzo.ai. One image: the
-# multi-stage root Dockerfile builds the web frontend and the `gitea` binary and
+# multi-stage root Dockerfile builds the web frontend and the `gitd` daemon and
 # bakes in the Hanzo Git branding (logo, favicon, app name, footer). git.hanzo.ai
 # runs this image via the `git` operator App CR in hanzoai/universe; config is
 # injected via the GIT__<section>__<KEY> env contract. No deploy: here — the App

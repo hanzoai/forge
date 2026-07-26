@@ -1,0 +1,18 @@
+#!/bin/bash
+
+##############################################################
+# This script sets defaults for gitd to run in the container #
+##############################################################
+
+# It is installed as gitd in /usr/local/bin; the real binary lives in /app/gitd.
+# `exec -a "$0"` makes the daemon see /usr/local/bin/gitd as its argv[0], which
+# is what setting.AppPath resolves to — and AppPath is written into every
+# repository's hooks/<hook>.d/gitd delegate. Moving this path is therefore a
+# migration, not a rename: the server rewrites every repo's hooks on the first
+# boot after it changes (routers.syncAppConfForGit) before the listener opens.
+GITD="/app/gitd/gitd"
+WORK_DIR="/data/gitea"
+CUSTOM_PATH="/data/gitea"
+
+# Provide docker defaults
+GIT_WORK_DIR="${GIT_WORK_DIR:-$WORK_DIR}" GIT_CUSTOM="${GIT_CUSTOM:-$CUSTOM_PATH}" exec -a "$0" "$GITD" $CONF_ARG "$@"

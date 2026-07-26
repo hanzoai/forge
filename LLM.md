@@ -7,8 +7,22 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 
 - **Base:** Gitea **1.26.4** (upstream `go-gitea/gitea`; see `CHANGELOG.md` top
   entry). Module path forked to `github.com/hanzoai/git`; the Actions proto is
-  `github.com/hanzo-git/actions-proto-go`. Binary is still `gitea`
-  (`/app/gitea/gitea`), CLI subcommands intact (`gitea admin auth …`).
+  `github.com/hanzo-git/actions-proto-go`. The daemon is **`gitd`**
+  (`/app/gitd/gitd`, wrapper `/usr/local/bin/gitd`); upstream's CLI subcommands
+  are intact under the new name (`gitd admin auth …`, `gitd migrate`).
+
+  **`/usr/local/bin/gitd` is load-bearing, not cosmetic.** It is what
+  `setting.AppPath` resolves to, and AppPath is written verbatim into every
+  repository's `hooks/<hook>.d/gitd` delegate. The outer `hooks/<hook>` script
+  runs EVERY executable in `<hook>.d/` and rejects the push if any exits
+  non-zero, so moving that path — or leaving a delegate from an older binary
+  name behind — breaks pushes. Both are handled automatically:
+  `routers.syncAppConfForGit` re-runs `SyncRepositoryHooks` over every repo when
+  AppPath changes, *before* the web listener opens, and `createDelegateHooks`
+  deletes `legacyDelegateHookNames`. `gitd admin regenerate hooks` is the manual
+  lever. Anything outside this repo that invokes the binary by absolute path —
+  notably the `oauth-sync` init container in `hanzoai/universe` — must be
+  updated in the SAME change that bumps the image tag.
 - **`[actions]` intact:** `services/actions`, `models/actions`,
   `routers/api/actions/runner` — full act_runner registration + job API. Enabled
   via `GITEA__actions__ENABLED=true`.

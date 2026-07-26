@@ -13,5 +13,5 @@ fi
 if [ $# -gt 0 ]; then
     exec "$@"
 else
-    exec /usr/local/bin/gitea -c "${GIT_APP_INI}" web
+    exec /usr/local/bin/gitd -c "${GIT_APP_INI}" web
 fi

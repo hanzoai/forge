@@ -16,7 +16,7 @@ _test
 
 # Goland's output filename can not be set manually
 /go_build_*
-/gitea_*
+/gitd_*
 
 # MS VSCode
 .vscode
@@ -54,7 +54,7 @@ cpu.out
 *.log
 *.log.*.gz
 
-/gitea
+/gitd
 /debug
 
 /bin
@@ -85,15 +85,6 @@ cpu.out
 /vendor
 /VERSION
 /.air
-
-
-# Snapcraft
-/gitea_a*.txt
-snap/.snapcraft/
-parts/
-stage/
-prime/
-*.snap
 *.snap-build
 *_source.tar.bz2
 .DS_Store

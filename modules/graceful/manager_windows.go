@@ -21,7 +21,7 @@ import (
 )
 
 // WindowsServiceName is the name of the Windows service
-var WindowsServiceName = "gitea"
+var WindowsServiceName = "gitd"
 
 const (
 	hammerCode       = 128

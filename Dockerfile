@@ -21,7 +21,7 @@ RUN apk --no-cache add \
     build-base \
     git
 
-WORKDIR ${GOPATH}/src/gitea.dev
+WORKDIR ${GOPATH}/src/hanzo-git
 # Sources private hanzoai modules (xorm, builder): mark them private
 # (direct VCS fetch, no proxy/sumdb) and, when gh_token is mounted, rewrite
 # github.com to an authenticated fetch so `go mod download` can read them. No-op
@@ -39,7 +39,7 @@ RUN --mount=type=secret,id=gh_token \
 COPY --exclude=.git/ . .
 COPY --from=frontend-build /src/public/assets public/assets
 
-# Build gitea, .git mount is required for version data
+# Build gitd, .git mount is required for version data
 RUN --mount=type=cache,target="/root/.cache/go-build" \
     --mount=type=bind,source=".git/",target=".git/" \
     make backend
@@ -49,12 +49,12 @@ COPY docker/root /tmp/local
 # Set permissions for builds that made under windows which strips the executable bit from file
 RUN chmod 755 /tmp/local/usr/bin/entrypoint \
               /tmp/local/usr/local/bin/* \
-              /tmp/local/etc/s6/gitea/* \
+              /tmp/local/etc/s6/gitd/* \
               /tmp/local/etc/s6/openssh/* \
               /tmp/local/etc/s6/.s6-svscan/* \
-              /go/src/gitea.dev/gitea
+              /go/src/hanzo-git/gitd
 
-FROM docker.io/library/alpine:3.24 AS gitea
+FROM docker.io/library/alpine:3.24 AS hanzo-git
 
 EXPOSE 22 3000
 
@@ -84,7 +84,7 @@ RUN addgroup \
   echo "git:*" | chpasswd -e
 
 COPY --from=build-env /tmp/local /
-COPY --from=build-env /go/src/gitea.dev/gitea /app/gitea/gitea
+COPY --from=build-env /go/src/hanzo-git/gitd /app/gitd/gitd
 
 ENV USER=git
 ENV GIT_CUSTOM=/data/gitea

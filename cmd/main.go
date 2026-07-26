@@ -23,13 +23,13 @@ func init() {
 }
 
 // cliHelpPrinterNew helps to print "DEFAULT CONFIGURATION" for the following cases ( "-c" can apper in any position):
-// * ./gitea -c /dev/null -h
-// * ./gitea -c help /dev/null help
-// * ./gitea help -c /dev/null
-// * ./gitea help -c /dev/null web
-// * ./gitea help web -c /dev/null
-// * ./gitea web help -c /dev/null
-// * ./gitea web -h -c /dev/null
+// * ./gitd -c /dev/null -h
+// * ./gitd -c help /dev/null help
+// * ./gitd help -c /dev/null
+// * ./gitd help -c /dev/null web
+// * ./gitd help web -c /dev/null
+// * ./gitd web help -c /dev/null
+// * ./gitd web -h -c /dev/null
 func cliHelpPrinterNew(out io.Writer, templ string, data any) {
 	cmd, _ := data.(*cli.Command)
 	if cmd != nil {
@@ -86,7 +86,7 @@ type AppVersion struct {
 
 func NewMainApp(appVer AppVersion) *cli.Command {
 	app := &cli.Command{}
-	app.Name = "gitea" // must be lower-cased because it appears in the "USAGE" section like "gitea doctor [command [command options]]"
+	app.Name = "gitd" // must be lower-cased because it appears in the "USAGE" section like "gitd doctor [command [command options]]"
 	app.Usage = "A painless self-hosted Git service"
 	app.Description = `Hanzo Git program contains "web" and other subcommands. If no subcommand is given, it starts the web server by default. Use "web" subcommand for more web server arguments, use other subcommands for other purposes.`
 	app.Version = appVer.Version + appVer.Extra

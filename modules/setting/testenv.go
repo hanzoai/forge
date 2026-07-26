@@ -64,9 +64,9 @@ func SetupGiteaTestEnv() {
 	initGiteaPaths := func() {
 		// need to load assets (options, public) from the source code directory for testing
 		StaticRootPath = giteaRoot
-		// during testing, the AppPath must point to the pre-built Gitea binary in the source root
-		// it needs to be called by git hooks
-		AppPath = filepath.Join(giteaRoot, "gitea") + util.Iif(IsWindows, ".exe", "")
+		// during testing, the AppPath must point to the pre-built daemon in the source root
+		// it needs to be called by git hooks, so it must match the Makefile's EXECUTABLE
+		AppPath = filepath.Join(giteaRoot, "gitd") + util.Iif(IsWindows, ".exe", "")
 	}
 
 	initGiteaConf := func() string {
