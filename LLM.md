@@ -90,14 +90,20 @@ breaks any receiver verifying signatures on it.
 
 - Published as **`ghcr.io/hanzoai/git`** — v1-only, semver-pinned, never `:latest`.
   First release **`1.26.5`** (next patch over the upstream base 1.26.4).
-- `.github/workflows/docker-release.yml` is THE lane: on a `v1.*` tag it builds
-  `linux/amd64` on the self-hosted **`hanzo-build-linux-amd64`** ARC pool and pushes
-  to GHCR with `GITHUB_TOKEN` (semver tag via `docker/metadata-action`). NO
-  GitHub-hosted builders. It REPLACES upstream Gitea's release workflows
-  (Namespace.so runners / Docker Hub / `go-gitea/gitea` / S3 + GPG), which were
-  removed — they targeted infra we do not have and would fail on every tag/push.
-- Cut a release: `git tag v1.26.5 && git push origin v1.26.5` → image
-  `ghcr.io/hanzoai/git:1.26.5`.
+- **The git tag IS the version.** `.hanzo/workflows/cicd.yml` (native CI, on the
+  self-hosted `hanzo-build-linux-amd64` pool) delegates to
+  `hanzoai/ci/.github/workflows/build.yml@v1`, which reads `hanzo.yml` and, on a
+  `v*` ref, tags the image from the ref itself — `ghcr.io/hanzoai/git:v1.26.22`
+  plus the v-stripped `1.26.22`. A branch push gets only `sha-<sha7>-amd64`. The
+  Makefile derives `main.Version` from the same tag (`git describe` over the
+  checkout), so the tag, the image tag and `gitd --version` are one fact.
+- **Cut a release: `git tag -a v1.26.22 && git push canonical v1.26.22`.**
+  `canonical` is `git.hanzo.ai/hanzoai/git`. Pushing a tag to the GitHub mirror
+  builds NOTHING: `sync-from-github.yml` fast-forwards `main` and nothing else,
+  by design — releases are declared where CI runs.
+- Do **not** `crane copy` a `sha-` image onto a semver name. `v1.26.19` and
+  `v1.26.20` were made that way while the tag lane was red, and both carry a
+  binary that reports its commit instead of its version.
 
 ## Where it runs
 
