@@ -178,9 +178,13 @@ func Clone(ctx context.Context, from, to string, opts CloneRepoOptions) error {
 
 // PushOptions options when push to remote
 type PushOptions struct {
-	Remote         string
-	LocalRefName   string
-	Branch         string
+	Remote       string
+	LocalRefName string
+	Branch       string
+	// Refspecs pushes an explicit set of refs, e.g. refs/heads/*:refs/heads/*.
+	// Unlike Mirror it never deletes a ref the remote has and we do not, so it
+	// carries work outward without granting authority over the remote's history.
+	Refspecs       []string
 	Force          bool
 	ForceWithLease string
 	Mirror         bool
@@ -209,6 +213,7 @@ func Push(ctx context.Context, repoPath string, opts PushOptions) error {
 		}
 		remoteBranchArgs = append(remoteBranchArgs, refspec)
 	}
+	remoteBranchArgs = append(remoteBranchArgs, opts.Refspecs...)
 	cmd.AddDashesAndList(remoteBranchArgs...)
 
 	stdout, stderr, err := cmd.WithEnv(opts.Env).WithTimeout(opts.Timeout).WithDir(repoPath).RunStdString(ctx)
