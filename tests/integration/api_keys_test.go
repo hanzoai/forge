@@ -23,13 +23,13 @@ import (
 
 func TestViewDeployKeysNoLogin(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
-	req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/keys")
+	req := NewRequest(t, "GET", "/v1/repos/user2/repo1/keys")
 	MakeRequest(t, req, http.StatusUnauthorized)
 }
 
 func TestCreateDeployKeyNoLogin(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/keys", api.CreateKeyOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/keys", api.CreateKeyOption{
 		Title: "title",
 		Key:   "key",
 	})
@@ -38,13 +38,13 @@ func TestCreateDeployKeyNoLogin(t *testing.T) {
 
 func TestGetDeployKeyNoLogin(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
-	req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/keys/1")
+	req := NewRequest(t, "GET", "/v1/repos/user2/repo1/keys/1")
 	MakeRequest(t, req, http.StatusUnauthorized)
 }
 
 func TestDeleteDeployKeyNoLogin(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
-	req := NewRequest(t, "DELETE", "/api/v1/repos/user2/repo1/keys/1")
+	req := NewRequest(t, "DELETE", "/v1/repos/user2/repo1/keys/1")
 	MakeRequest(t, req, http.StatusUnauthorized)
 }
 
@@ -55,7 +55,7 @@ func TestCreateReadOnlyDeployKey(t *testing.T) {
 
 	session := loginUser(t, repoOwner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-	keysURL := fmt.Sprintf("/api/v1/repos/%s/%s/keys", repoOwner.Name, repo.Name)
+	keysURL := fmt.Sprintf("/v1/repos/%s/%s/keys", repoOwner.Name, repo.Name)
 	rawKeyBody := api.CreateKeyOption{
 		Title:    "read-only",
 		Key:      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4cn+iXnA4KvcQYSV88vGn0Yi91vG47t1P7okprVmhNTkipNRIHWr6WdCO4VDr/cvsRkuVJAsLO2enwjGWWueOO6BodiBgyAOZ/5t5nJNMCNuLGT5UIo/RI1b0WRQwxEZTRjt6mFNw6lH14wRd8ulsr9toSWBPMOGWoYs1PDeDL0JuTjL+tr1SZi/EyxCngpYszKdXllJEHyI79KQgeD0Vt3pTrkbNVTOEcCNqZePSVmUH8X8Vhugz3bnE0/iE9Pb5fkWO9c4AnM1FgI/8Bvp27Fw2ShryIXuR6kKvUqhVMTuOSDHwu6A8jLE5Owt3GAYugDpDYuwTVNGrHLXKpPzrGGPE/jPmaLCMZcsdkec95dYeU3zKODEm8UQZFhmJmDeWVJ36nGrGZHL4J5aTTaeFUJmmXDaJYiJ+K2/ioKgXqnXvltu0A9R8/LGy4nrTJRr4JMLuJFoUXvGm1gXQ70w2LSpk6yl71RNC0hCtsBe8BP8IhYCM0EP5jh7eCMQZNvM= nocomment\n",
@@ -75,13 +75,13 @@ func TestCreateReadOnlyDeployKey(t *testing.T) {
 
 	// Using the ID of a key that does not belong to the repository must fail
 	{
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/keys/%d", repoOwner.Name, repo.Name, newDeployKey.ID)).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/keys/%d", repoOwner.Name, repo.Name, newDeployKey.ID)).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusOK)
 
 		session5 := loginUser(t, "user5")
 		token5 := getTokenForLoggedInUser(t, session5, auth_model.AccessTokenScopeWriteRepository)
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/user5/repo4/keys/%d", newDeployKey.ID)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/user5/repo4/keys/%d", newDeployKey.ID)).
 			AddTokenAuth(token5)
 		MakeRequest(t, req, http.StatusNotFound)
 	}
@@ -94,7 +94,7 @@ func TestCreateReadWriteDeployKey(t *testing.T) {
 
 	session := loginUser(t, repoOwner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-	keysURL := fmt.Sprintf("/api/v1/repos/%s/%s/keys", repoOwner.Name, repo.Name)
+	keysURL := fmt.Sprintf("/v1/repos/%s/%s/keys", repoOwner.Name, repo.Name)
 	rawKeyBody := api.CreateKeyOption{
 		Title: "read-write",
 		Key:   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4cn+iXnA4KvcQYSV88vGn0Yi91vG47t1P7okprVmhNTkipNRIHWr6WdCO4VDr/cvsRkuVJAsLO2enwjGWWueOO6BodiBgyAOZ/5t5nJNMCNuLGT5UIo/RI1b0WRQwxEZTRjt6mFNw6lH14wRd8ulsr9toSWBPMOGWoYs1PDeDL0JuTjL+tr1SZi/EyxCngpYszKdXllJEHyI79KQgeD0Vt3pTrkbNVTOEcCNqZePSVmUH8X8Vhugz3bnE0/iE9Pb5fkWO9c4AnM1FgI/8Bvp27Fw2ShryIXuR6kKvUqhVMTuOSDHwu6A8jLE5Owt3GAYugDpDYuwTVNGrHLXKpPzrGGPE/jPmaLCMZcsdkec95dYeU3zKODEm8UQZFhmJmDeWVJ36nGrGZHL4J5aTTaeFUJmmXDaJYiJ+K2/ioKgXqnXvltu0A9R8/LGy4nrTJRr4JMLuJFoUXvGm1gXQ70w2LSpk6yl71RNC0hCtsBe8BP8IhYCM0EP5jh7eCMQZNvM= nocomment\n",
@@ -124,7 +124,7 @@ func TestCreateUserKey(t *testing.T) {
 		Title: "test-key",
 		Key:   keyType + " " + keyContent,
 	}
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/keys", rawKeyBody).
+	req := NewRequestWithJSON(t, "POST", "/v1/user/keys", rawKeyBody).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusCreated)
 
@@ -140,7 +140,7 @@ func TestCreateUserKey(t *testing.T) {
 	})
 
 	// Search by fingerprint
-	req = NewRequest(t, "GET", "/api/v1/user/keys?fingerprint="+newPublicKey.Fingerprint).
+	req = NewRequest(t, "GET", "/v1/user/keys?fingerprint="+newPublicKey.Fingerprint).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 
@@ -149,7 +149,7 @@ func TestCreateUserKey(t *testing.T) {
 	assert.Equal(t, newPublicKey.ID, fingerprintPublicKeys[0].ID)
 	assert.Equal(t, user.ID, fingerprintPublicKeys[0].Owner.ID)
 
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/keys?fingerprint=%s", user.Name, newPublicKey.Fingerprint)).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/keys?fingerprint=%s", user.Name, newPublicKey.Fingerprint)).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 
@@ -159,7 +159,7 @@ func TestCreateUserKey(t *testing.T) {
 	assert.Equal(t, user.ID, fingerprintPublicKeys[0].Owner.ID)
 
 	// Fail search by fingerprint
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/user/keys?fingerprint=%sA", newPublicKey.Fingerprint)).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/user/keys?fingerprint=%sA", newPublicKey.Fingerprint)).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 
@@ -167,7 +167,7 @@ func TestCreateUserKey(t *testing.T) {
 	assert.Empty(t, fingerprintPublicKeys)
 
 	// Fail searching for wrong users key
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/keys?fingerprint=%s", "user2", newPublicKey.Fingerprint)).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/keys?fingerprint=%s", "user2", newPublicKey.Fingerprint)).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 
@@ -179,7 +179,7 @@ func TestCreateUserKey(t *testing.T) {
 	token2 := getTokenForLoggedInUser(t, session2, auth_model.AccessTokenScopeWriteUser)
 
 	// Should find key even though not ours, but we shouldn't know whose it is
-	req = NewRequest(t, "GET", "/api/v1/user/keys?fingerprint="+newPublicKey.Fingerprint).
+	req = NewRequest(t, "GET", "/v1/user/keys?fingerprint="+newPublicKey.Fingerprint).
 		AddTokenAuth(token2)
 	resp = MakeRequest(t, req, http.StatusOK)
 
@@ -189,7 +189,7 @@ func TestCreateUserKey(t *testing.T) {
 	assert.Nil(t, fingerprintPublicKeys[0].Owner)
 
 	// Should find key even though not ours, but we shouldn't know whose it is
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/keys?fingerprint=%s", user.Name, newPublicKey.Fingerprint)).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/keys?fingerprint=%s", user.Name, newPublicKey.Fingerprint)).
 		AddTokenAuth(token2)
 	resp = MakeRequest(t, req, http.StatusOK)
 
@@ -199,7 +199,7 @@ func TestCreateUserKey(t *testing.T) {
 	assert.Nil(t, fingerprintPublicKeys[0].Owner)
 
 	// Fail when searching for key if it is not ours
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/keys?fingerprint=%s", "user2", newPublicKey.Fingerprint)).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/keys?fingerprint=%s", "user2", newPublicKey.Fingerprint)).
 		AddTokenAuth(token2)
 	resp = MakeRequest(t, req, http.StatusOK)
 

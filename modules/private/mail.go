@@ -5,8 +5,6 @@ package private
 
 import (
 	"context"
-
-	"github.com/hanzoai/git/modules/setting"
 )
 
 // Email structure holds a data for sending general emails
@@ -21,7 +19,7 @@ type Email struct {
 // If DB contains these users it will send the email to them.
 // If to list == nil, it's supposed to send emails to every user present in DB
 func SendEmail(ctx context.Context, subject, message string, to []string) (*ResponseText, ResponseExtra) {
-	reqURL := setting.LocalURL + "api/internal/mail/send"
+	reqURL := internalURL("mail/send")
 
 	req := newInternalRequestAPI(ctx, reqURL, "POST", Email{
 		Subject: subject,

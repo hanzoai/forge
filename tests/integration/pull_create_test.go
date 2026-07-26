@@ -270,7 +270,7 @@ func TestCreatePullRequestFromNestedOrgForks(t *testing.T) {
 		)
 
 		createOrg := func(name string) {
-			req := NewRequestWithJSON(t, "POST", "/api/v1/orgs", &api.CreateOrgOption{
+			req := NewRequestWithJSON(t, "POST", "/v1/orgs", &api.CreateOrgOption{
 				UserName:   name,
 				Visibility: "public",
 			}).AddTokenAuth(token)
@@ -281,7 +281,7 @@ func TestCreatePullRequestFromNestedOrgForks(t *testing.T) {
 		createOrg(midForkOrg)
 		createOrg(leafForkOrg)
 
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/orgs/%s/repos", baseOrg), &api.CreateRepoOption{
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/orgs/%s/repos", baseOrg), &api.CreateRepoOption{
 			Name:          repoName,
 			AutoInit:      true,
 			DefaultBranch: "main",
@@ -293,7 +293,7 @@ func TestCreatePullRequestFromNestedOrgForks(t *testing.T) {
 		assert.Equal(t, "main", baseRepo.DefaultBranch)
 
 		forkIntoOrg := func(srcOrg, dstOrg string) api.Repository {
-			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/forks", srcOrg, repoName), &api.CreateForkOption{
+			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/forks", srcOrg, repoName), &api.CreateForkOption{
 				Organization: new(dstOrg),
 			}).AddTokenAuth(token)
 			resp := MakeRequest(t, req, http.StatusAccepted)
@@ -308,7 +308,7 @@ func TestCreatePullRequestFromNestedOrgForks(t *testing.T) {
 		forkIntoOrg(baseOrg, midForkOrg)
 		forkIntoOrg(midForkOrg, leafForkOrg)
 
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", leafForkOrg, repoName, "patch-from-org3.txt"), &api.CreateFileOptions{
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", leafForkOrg, repoName, "patch-from-org3.txt"), &api.CreateFileOptions{
 			FileOptions: api.FileOptions{
 				BranchName:    "main",
 				NewBranchName: patchBranch,
@@ -323,7 +323,7 @@ func TestCreatePullRequestFromNestedOrgForks(t *testing.T) {
 			"base":  "main",
 			"title": "test creating pull from test-fork-org3 to test-fork-org1",
 		}
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/pulls", baseOrg, repoName), prPayload).AddTokenAuth(token)
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/pulls", baseOrg, repoName), prPayload).AddTokenAuth(token)
 		resp = MakeRequest(t, req, http.StatusCreated)
 		pr := DecodeJSON(t, resp, &api.PullRequest{})
 		assert.Equal(t, prPayload["title"], pr.Title)
@@ -433,10 +433,10 @@ func TestCreatePullWhenBlocked(t *testing.T) {
 		// sessionBase := loginUser(t, "user2")
 		token := getUserToken(t, RepoOwner, auth_model.AccessTokenScopeWriteUser)
 
-		req := NewRequest(t, "GET", "/api/v1/user/blocks/"+ForkOwner).
+		req := NewRequest(t, "GET", "/v1/user/blocks/"+ForkOwner).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNotFound)
-		req = NewRequest(t, "PUT", "/api/v1/user/blocks/"+ForkOwner).
+		req = NewRequest(t, "PUT", "/v1/user/blocks/"+ForkOwner).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNoContent)
 
@@ -448,7 +448,7 @@ func TestCreatePullWhenBlocked(t *testing.T) {
 
 		// Teardown
 		// Unblock user
-		req = NewRequest(t, "DELETE", "/api/v1/user/blocks/"+ForkOwner).
+		req = NewRequest(t, "DELETE", "/v1/user/blocks/"+ForkOwner).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNoContent)
 	})

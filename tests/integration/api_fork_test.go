@@ -28,7 +28,7 @@ func TestAPIFork(t *testing.T) {
 }
 
 func testCreateForkNoLogin(t *testing.T) {
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/forks", &api.CreateForkOption{})
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/forks", &api.CreateForkOption{})
 	MakeRequest(t, req, http.StatusUnauthorized)
 }
 
@@ -41,7 +41,7 @@ func testCreateForkOrgNoCreatePermission(t *testing.T) {
 	assert.False(t, canCreate)
 
 	user4Token := getTokenForLoggedInUser(t, user4Sess, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteOrganization)
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/forks", &api.CreateForkOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/forks", &api.CreateForkOption{
 		Organization: &org.Name,
 	}).AddTokenAuth(user4Token)
 	MakeRequest(t, req, http.StatusForbidden)
@@ -59,7 +59,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, org_service.AddTeamMember(t.Context(), ownerTeam1, user1))
 	user1Token := getTokenForLoggedInUser(t, user1Sess, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteOrganization)
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/forks", &api.CreateForkOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/forks", &api.CreateForkOption{
 		Organization: &limitedOrg.Name,
 	}).AddTokenAuth(user1Token)
 	MakeRequest(t, req, http.StatusAccepted)
@@ -74,7 +74,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, org_service.AddTeamMember(t.Context(), ownerTeam2, user4))
 	user4Token := getTokenForLoggedInUser(t, user4Sess, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteOrganization)
-	req = NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/forks", &api.CreateForkOption{
+	req = NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/forks", &api.CreateForkOption{
 		Organization: &privateOrg.Name,
 	}).AddTokenAuth(user4Token)
 	MakeRequest(t, req, http.StatusAccepted)
@@ -82,7 +82,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 	t.Run("Anonymous", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/forks")
+		req := NewRequest(t, "GET", "/v1/repos/user2/repo1/forks")
 		resp := MakeRequest(t, req, http.StatusOK)
 		forks := DecodeJSON(t, resp, []*api.Repository{})
 		assert.Empty(t, forks)
@@ -92,7 +92,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 	t.Run("LoggedIn", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/forks").AddTokenAuth(user1Token)
+		req := NewRequest(t, "GET", "/v1/repos/user2/repo1/forks").AddTokenAuth(user1Token)
 		resp := MakeRequest(t, req, http.StatusOK)
 
 		forks := DecodeJSON(t, resp, []*api.Repository{})
@@ -101,7 +101,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 
 		assert.NoError(t, org_service.AddTeamMember(t.Context(), ownerTeam2, user1))
 
-		req = NewRequest(t, "GET", "/api/v1/repos/user2/repo1/forks").AddTokenAuth(user1Token)
+		req = NewRequest(t, "GET", "/v1/repos/user2/repo1/forks").AddTokenAuth(user1Token)
 		resp = MakeRequest(t, req, http.StatusOK)
 		forks = DecodeJSON(t, resp, []*api.Repository{})
 		assert.Len(t, forks, 2)
@@ -112,7 +112,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 		t.Run("Page1", func(t *testing.T) {
 			defer tests.PrintCurrentTest(t)()
 
-			req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/forks?page=1&limit=1").AddTokenAuth(user1Token)
+			req := NewRequest(t, "GET", "/v1/repos/user2/repo1/forks?page=1&limit=1").AddTokenAuth(user1Token)
 			resp := MakeRequest(t, req, http.StatusOK)
 			assert.Equal(t, "2", resp.Header().Get("X-Total-Count"))
 
@@ -120,7 +120,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 			assert.NotEmpty(t, linkHeader, "Link header should not be empty")
 			assert.Contains(t, linkHeader, `rel="next"`)
 			assert.Contains(t, linkHeader, `rel="last"`)
-			assert.Contains(t, linkHeader, `/api/v1/repos/user2/repo1/forks?limit=1&page=2>`)
+			assert.Contains(t, linkHeader, `/v1/repos/user2/repo1/forks?limit=1&page=2>`)
 
 			forks := DecodeJSON(t, resp, []*api.Repository{})
 			assert.Len(t, forks, 1)
@@ -129,7 +129,7 @@ func testAPIForkListLimitedAndPrivateRepos(t *testing.T) {
 		t.Run("Page2", func(t *testing.T) {
 			defer tests.PrintCurrentTest(t)()
 
-			req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/forks?page=2&limit=1").AddTokenAuth(user1Token)
+			req := NewRequest(t, "GET", "/v1/repos/user2/repo1/forks?page=2&limit=1").AddTokenAuth(user1Token)
 			resp := MakeRequest(t, req, http.StatusOK)
 			assert.Equal(t, "2", resp.Header().Get("X-Total-Count"))
 
@@ -146,14 +146,14 @@ func testGetPrivateReposForks(t *testing.T) {
 	user1Token := getTokenForLoggedInUser(t, user1Sess, auth_model.AccessTokenScopeWriteRepository)
 
 	// create fork from a private repository
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/"+repo2.FullName()+"/forks", &api.CreateForkOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/"+repo2.FullName()+"/forks", &api.CreateForkOption{
 		Organization: &privateOrg.Name,
 		Name:         new("forked-repo"),
 	}).AddTokenAuth(user1Token)
 	MakeRequest(t, req, http.StatusAccepted)
 
 	// test get a private fork without clear permissions
-	req = NewRequest(t, "GET", "/api/v1/repos/"+repo2.FullName()+"/forks").AddTokenAuth(user1Token)
+	req = NewRequest(t, "GET", "/v1/repos/"+repo2.FullName()+"/forks").AddTokenAuth(user1Token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	forks := DecodeJSON(t, resp, []*api.Repository{})

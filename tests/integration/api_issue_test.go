@@ -46,7 +46,7 @@ func testAPIListIssues(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadIssue)
-	link, _ := url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/issues", owner.Name, repo.Name))
+	link, _ := url.Parse(fmt.Sprintf("/v1/repos/%s/%s/issues", owner.Name, repo.Name))
 
 	link.RawQuery = url.Values{"token": {token}, "state": {"all"}}.Encode()
 	resp := MakeRequest(t, NewRequest(t, "GET", link.String()), http.StatusOK)
@@ -93,7 +93,7 @@ func testAPIListIssuesPublicOnly(t *testing.T) {
 
 	session := loginUser(t, owner1.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadIssue)
-	link, _ := url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/issues", owner1.Name, repo1.Name))
+	link, _ := url.Parse(fmt.Sprintf("/v1/repos/%s/%s/issues", owner1.Name, repo1.Name))
 	link.RawQuery = url.Values{"state": {"all"}}.Encode()
 	req := NewRequest(t, "GET", link.String()).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
@@ -103,7 +103,7 @@ func testAPIListIssuesPublicOnly(t *testing.T) {
 
 	session = loginUser(t, owner2.Name)
 	token = getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadIssue)
-	link, _ = url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/issues", owner2.Name, repo2.Name))
+	link, _ = url.Parse(fmt.Sprintf("/v1/repos/%s/%s/issues", owner2.Name, repo2.Name))
 	link.RawQuery = url.Values{"state": {"all"}}.Encode()
 	req = NewRequest(t, "GET", link.String()).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
@@ -121,7 +121,7 @@ func testAPICreateIssue(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues", owner.Name, repoBefore.Name)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues", owner.Name, repoBefore.Name)
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.CreateIssueOption{
 		Body:     body,
 		Title:    title,
@@ -169,7 +169,7 @@ func testAPICreateIssueParallel(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues", owner.Name, repoBefore.Name)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues", owner.Name, repoBefore.Name)
 
 	var wg sync.WaitGroup
 	for i := range 10 {
@@ -217,7 +217,7 @@ func testAPIEditIssue(t *testing.T) {
 	body := "new content!"
 	title := "new title from api set"
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d", owner.Name, repoBefore.Name, issueBefore.Index)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d", owner.Name, repoBefore.Name, issueBefore.Index)
 	req := NewRequestWithJSON(t, "PATCH", urlStr, api.EditIssueOption{
 		State:          &issueState,
 		RemoveDeadline: &removeDeadline,
@@ -266,7 +266,7 @@ func testAPISearchIssues(t *testing.T) {
 	defer test.MockVariableValue(&setting.API.DefaultPagingNum, 20)()
 	expectedIssueCount := 20 // 20 is from the fixtures
 
-	link, _ := url.Parse("/api/v1/repos/issues/search")
+	link, _ := url.Parse("/v1/repos/issues/search")
 	token := getUserToken(t, "user1", auth_model.AccessTokenScopeReadIssue)
 	query := url.Values{}
 	var apiIssues []*api.Issue
@@ -393,7 +393,7 @@ func testAPISearchIssuesWithLabels(t *testing.T) {
 	// as this API was used in the frontend, it uses UI page size
 	expectedIssueCount := min(20, setting.UI.IssuePagingNum) // 20 is from the fixtures
 
-	link, _ := url.Parse("/api/v1/repos/issues/search")
+	link, _ := url.Parse("/v1/repos/issues/search")
 	token := getUserToken(t, "user1", auth_model.AccessTokenScopeReadIssue)
 	query := url.Values{}
 	var apiIssues []*api.Issue
@@ -452,7 +452,7 @@ func testAPIIssueContentVersion(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d", owner.Name, repo.Name, issue.Index)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d", owner.Name, repo.Name, issue.Index)
 
 	t.Run("ResponseIncludesContentVersion", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
@@ -505,7 +505,7 @@ func testAPIIssueAssignees(t *testing.T) {
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/assignees", owner.Name, repo.Name, issue.Index)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/assignees", owner.Name, repo.Name, issue.Index)
 	getAssigneeIDs := func(issueID int64) []int64 {
 		assigneeIDs, err := issues_model.GetAssigneeIDsByIssue(t.Context(), issueID)
 		assert.NoError(t, err)
@@ -519,7 +519,7 @@ func testAPIIssueAssignees(t *testing.T) {
 	})
 
 	t.Run("MissingIssue", func(t *testing.T) {
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/issues/99999/assignees", owner.Name, repo.Name), &api.IssueAssigneesOption{Assignees: []string{"user40"}}).
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/issues/99999/assignees", owner.Name, repo.Name), &api.IssueAssigneesOption{Assignees: []string{"user40"}}).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNotFound)
 	})
@@ -543,7 +543,7 @@ func testAPIIssueAssignees(t *testing.T) {
 
 	t.Run("BlockedAssigneeIsAtomic", func(t *testing.T) {
 		blockedIssue := unittest.AssertExistsAndLoadBean(t, &issues_model.Issue{ID: 5})
-		blockedURL := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/assignees", owner.Name, repo.Name, blockedIssue.Index)
+		blockedURL := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/assignees", owner.Name, repo.Name, blockedIssue.Index)
 		blockedToken := getUserToken(t, "user40", auth_model.AccessTokenScopeWriteIssue)
 
 		assert.Empty(t, getAssigneeIDs(blockedIssue.ID))
@@ -588,7 +588,7 @@ func testAPIIssueProjects(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues", owner.Name, repo.Name)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues", owner.Name, repo.Name)
 
 	// Create issue with a project
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.CreateIssueOption{

@@ -22,7 +22,7 @@ import (
 
 func testAPIGetBranch(t *testing.T, branchName string, exists bool) {
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadRepository)
-	req := NewRequestf(t, "GET", "/api/v1/repos/user2/repo1/branches/%s", branchName).
+	req := NewRequestf(t, "GET", "/v1/repos/user2/repo1/branches/%s", branchName).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, NoExpectedStatus)
 	if !exists {
@@ -38,7 +38,7 @@ func testAPIGetBranch(t *testing.T, branchName string, exists bool) {
 
 func testAPIGetBranchProtection(t *testing.T, branchName string, expectedHTTPStatus int) *api.BranchProtection {
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadRepository)
-	req := NewRequestf(t, "GET", "/api/v1/repos/user2/repo1/branch_protections/%s", branchName).
+	req := NewRequestf(t, "GET", "/v1/repos/user2/repo1/branch_protections/%s", branchName).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, expectedHTTPStatus)
 
@@ -52,7 +52,7 @@ func testAPIGetBranchProtection(t *testing.T, branchName string, expectedHTTPSta
 
 func testAPICreateBranchProtection(t *testing.T, branchName string, expectedPriority, expectedHTTPStatus int) {
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/branch_protections", &api.BranchProtection{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/branch_protections", &api.BranchProtection{
 		RuleName: branchName,
 	}).AddTokenAuth(token)
 	resp := MakeRequest(t, req, expectedHTTPStatus)
@@ -66,7 +66,7 @@ func testAPICreateBranchProtection(t *testing.T, branchName string, expectedPrio
 
 func testAPIEditBranchProtection(t *testing.T, branchName string, body *api.BranchProtection, expectedHTTPStatus int) {
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequestWithJSON(t, "PATCH", "/api/v1/repos/user2/repo1/branch_protections/"+branchName, body).
+	req := NewRequestWithJSON(t, "PATCH", "/v1/repos/user2/repo1/branch_protections/"+branchName, body).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, expectedHTTPStatus)
 
@@ -78,14 +78,14 @@ func testAPIEditBranchProtection(t *testing.T, branchName string, body *api.Bran
 
 func testAPIDeleteBranchProtection(t *testing.T, branchName string, expectedHTTPStatus int) {
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequestf(t, "DELETE", "/api/v1/repos/user2/repo1/branch_protections/%s", branchName).
+	req := NewRequestf(t, "DELETE", "/v1/repos/user2/repo1/branch_protections/%s", branchName).
 		AddTokenAuth(token)
 	MakeRequest(t, req, expectedHTTPStatus)
 }
 
 func testAPIDeleteBranch(t *testing.T, branchName string, expectedHTTPStatus int) {
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequestf(t, "DELETE", "/api/v1/repos/user2/repo1/branches/%s", branchName).
+	req := NewRequestf(t, "DELETE", "/v1/repos/user2/repo1/branches/%s", branchName).
 		AddTokenAuth(token)
 	MakeRequest(t, req, expectedHTTPStatus)
 }
@@ -169,7 +169,7 @@ func testAPICreateBranches(t *testing.T, giteaURL *url.URL) {
 
 func testAPICreateBranch(t testing.TB, session *TestSession, user, repo, oldBranch, newBranch string, status int) bool {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/"+user+"/"+repo+"/branches", &api.CreateBranchRepoOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/"+user+"/"+repo+"/branches", &api.CreateBranchRepoOption{
 		BranchName:    newBranch,
 		OldBranchName: oldBranch,
 	}).AddTokenAuth(token)
@@ -208,7 +208,7 @@ func TestAPIRenameBranch(t *testing.T) {
 
 			// don't allow protected branch renaming
 			token := getUserToken(t, "user2", auth_model.AccessTokenScopeWriteRepository)
-			req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/branches", &api.CreateBranchRepoOption{
+			req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/branches", &api.CreateBranchRepoOption{
 				BranchName: "protected-branch",
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusCreated)
@@ -219,14 +219,14 @@ func TestAPIRenameBranch(t *testing.T) {
 		t.Run("RenameBranchWithGlobedBasedProtectionRulesAndAdminAccess", func(t *testing.T) {
 			// don't allow branch that falls under glob-based protection rules to be renamed
 			token := getUserToken(t, "user2", auth_model.AccessTokenScopeWriteRepository)
-			req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/branch_protections", &api.BranchProtection{
+			req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/branch_protections", &api.BranchProtection{
 				RuleName:   "protected/**",
 				EnablePush: true,
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusCreated)
 
 			from := "protected/1"
-			req = NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/branches", &api.CreateBranchRepoOption{
+			req = NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/branches", &api.CreateBranchRepoOption{
 				BranchName: from,
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusCreated)
@@ -251,7 +251,7 @@ func TestAPIRenameBranch(t *testing.T) {
 			ownerName := "user2"
 			pushWhitelist := []string{ownerName}
 			token := getUserToken(t, "user2", auth_model.AccessTokenScopeWriteRepository)
-			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/branch_protections", ownerName, repoName),
+			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/branch_protections", ownerName, repoName),
 				&api.BranchProtection{
 					RuleName:               "owner-protected/**",
 					PushWhitelistUsernames: pushWhitelist,
@@ -285,7 +285,7 @@ func TestAPIUpdateBranchReference(t *testing.T) {
 			defaultBranch = repo.DefaultBranch
 		}))
 
-		createBranchReq := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/branches", ctx.Username, ctx.Reponame), &api.CreateBranchRepoOption{
+		createBranchReq := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/branches", ctx.Username, ctx.Reponame), &api.CreateBranchRepoOption{
 			BranchName: "feature",
 			OldRefName: defaultBranch,
 		}).AddTokenAuth(ctx.Token)
@@ -311,7 +311,7 @@ func TestAPIUpdateBranchReference(t *testing.T) {
 			assert.NotEmpty(t, newCommit)
 		})(t)
 
-		updateReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
+		updateReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
 			NewCommitID: newCommit,
 			OldCommitID: featureInitialCommit,
 		}).AddTokenAuth(ctx.Token)
@@ -321,19 +321,19 @@ func TestAPIUpdateBranchReference(t *testing.T) {
 			assert.Equal(t, newCommit, branch.Commit.ID)
 		}))
 
-		staleReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
+		staleReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
 			NewCommitID: newCommit,
 			OldCommitID: featureInitialCommit,
 		}).AddTokenAuth(ctx.Token)
 		ctx.Session.MakeRequest(t, staleReq, http.StatusUnprocessableEntity)
 
-		nonFFReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
+		nonFFReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
 			NewCommitID: featureInitialCommit,
 			OldCommitID: newCommit,
 		}).AddTokenAuth(ctx.Token)
 		ctx.Session.MakeRequest(t, nonFFReq, http.StatusUnprocessableEntity)
 
-		forceReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
+		forceReq := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/branches/%s", ctx.Username, ctx.Reponame, "feature"), &api.UpdateBranchRepoOption{
 			NewCommitID: featureInitialCommit,
 			OldCommitID: newCommit,
 			Force:       true,
@@ -348,7 +348,7 @@ func TestAPIUpdateBranchReference(t *testing.T) {
 
 func testAPIRenameBranch(t *testing.T, doerName, ownerName, repoName, from, to string, expectedHTTPStatus int) *httptest.ResponseRecorder {
 	token := getUserToken(t, doerName, auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequestWithJSON(t, "PATCH", "/api/v1/repos/"+ownerName+"/"+repoName+"/branches/"+from, &api.RenameBranchRepoOption{
+	req := NewRequestWithJSON(t, "PATCH", "/v1/repos/"+ownerName+"/"+repoName+"/branches/"+from, &api.RenameBranchRepoOption{
 		Name: to,
 	}).AddTokenAuth(token)
 	return MakeRequest(t, req, expectedHTTPStatus)
@@ -415,7 +415,7 @@ func testAPIBranchProtectionBypassAllowlistValidation(t *testing.T) {
 
 	t.Run("IgnoreInvalidBypassUsernamesWhenDisabled", func(t *testing.T) {
 		ruleName := "bypass-disabled-invalid-user"
-		req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/branch_protections", &api.CreateBranchProtectionOption{
+		req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/branch_protections", &api.CreateBranchProtectionOption{
 			RuleName:                 ruleName,
 			EnableBypassAllowlist:    false,
 			BypassAllowlistUsernames: []string{"nonexistent-user"},
@@ -426,14 +426,14 @@ func testAPIBranchProtectionBypassAllowlistValidation(t *testing.T) {
 
 	t.Run("IgnoreInvalidBypassTeamsWhenDisabled", func(t *testing.T) {
 		ruleName := "bypass-disabled-invalid-team"
-		req := NewRequestWithJSON(t, "POST", "/api/v1/repos/org3/repo3/branch_protections", &api.CreateBranchProtectionOption{
+		req := NewRequestWithJSON(t, "POST", "/v1/repos/org3/repo3/branch_protections", &api.CreateBranchProtectionOption{
 			RuleName:              ruleName,
 			EnableBypassAllowlist: false,
 			BypassAllowlistTeams:  []string{"nonexistent-team"},
 		}).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)
 
-		deleteReq := NewRequestf(t, "DELETE", "/api/v1/repos/org3/repo3/branch_protections/%s", ruleName).
+		deleteReq := NewRequestf(t, "DELETE", "/v1/repos/org3/repo3/branch_protections/%s", ruleName).
 			AddTokenAuth(token)
 		MakeRequest(t, deleteReq, http.StatusNoContent)
 	})

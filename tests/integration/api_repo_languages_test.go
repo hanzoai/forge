@@ -40,7 +40,7 @@ func TestRepoLanguages(t *testing.T) {
 		time.Sleep(time.Second)
 
 		// Save new file to master branch
-		req = NewRequest(t, "GET", "/api/v1/repos/user2/repo1/languages")
+		req = NewRequest(t, "GET", "/v1/repos/user2/repo1/languages")
 		resp = MakeRequest(t, req, http.StatusOK)
 
 		languages := DecodeJSON(t, resp, map[string]int64{})

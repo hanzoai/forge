@@ -379,7 +379,7 @@ func (repo *Repository) CommitLink(commitID string) (result string) {
 // APIURL returns the repository API URL
 func (repo *Repository) APIURL(ctxOpt ...context.Context) string {
 	ctx := util.OptionalArg(ctxOpt, context.TODO())
-	return httplib.MakeAbsoluteURL(ctx, setting.AppSubURL+"/api/v1/repos/"+url.PathEscape(repo.OwnerName)+"/"+url.PathEscape(repo.Name))
+	return httplib.MakeAbsoluteURL(ctx, setting.AppSubURL+"/v1/repos/"+url.PathEscape(repo.OwnerName)+"/"+url.PathEscape(repo.Name))
 }
 
 // GetCommitsCountCacheKey returns cache key used for commits count caching.

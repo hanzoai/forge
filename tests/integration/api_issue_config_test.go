@@ -28,7 +28,7 @@ func createIssueConfig(t *testing.T, user *user_model.User, repo *repo_model.Rep
 }
 
 func getIssueConfig(t *testing.T, owner, repo string) api.IssueConfig {
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issue_config", owner, repo)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issue_config", owner, repo)
 	req := NewRequest(t, "GET", urlStr)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -150,7 +150,7 @@ func TestAPIRepoValidateIssueConfig(t *testing.T) {
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 49})
 	owner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: repo.OwnerID})
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issue_config/validate", owner.Name, repo.Name)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issue_config/validate", owner.Name, repo.Name)
 
 	t.Run("Valid", func(t *testing.T) {
 		req := NewRequest(t, "GET", urlStr)
@@ -186,8 +186,8 @@ func TestAPIRepoIssueConfigRequiresCodeUnit(t *testing.T) {
 	token := getUserToken(t, user.Name, auth_model.AccessTokenScopeReadRepository)
 
 	for _, path := range []string{
-		fmt.Sprintf("/api/v1/repos/%s/issue_config", repo.FullName()),
-		fmt.Sprintf("/api/v1/repos/%s/issue_config/validate", repo.FullName()),
+		fmt.Sprintf("/v1/repos/%s/issue_config", repo.FullName()),
+		fmt.Sprintf("/v1/repos/%s/issue_config/validate", repo.FullName()),
 	} {
 		req := NewRequest(t, "GET", path).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusForbidden)

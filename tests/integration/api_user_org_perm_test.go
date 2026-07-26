@@ -38,7 +38,7 @@ type apiUserOrgPermTestCase struct {
 }
 
 func testTokenNeeded(t *testing.T) {
-	req := NewRequest(t, "GET", "/api/v1/users/user1/orgs/org6/permissions")
+	req := NewRequest(t, "GET", "/v1/users/user1/orgs/org6/permissions")
 	MakeRequest(t, req, http.StatusUnauthorized)
 }
 
@@ -46,7 +46,7 @@ func sampleTest(t *testing.T, auoptc apiUserOrgPermTestCase) {
 	session := loginUser(t, auoptc.LoginUser)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadUser)
 
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/orgs/%s/permissions", auoptc.User, auoptc.Organization)).
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/orgs/%s/permissions", auoptc.User, auoptc.Organization)).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -137,7 +137,7 @@ func testUnknownUser(t *testing.T) {
 	session := loginUser(t, "user1")
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadOrganization)
 
-	req := NewRequest(t, "GET", "/api/v1/users/unknown/orgs/org25/permissions").
+	req := NewRequest(t, "GET", "/v1/users/unknown/orgs/org25/permissions").
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusNotFound)
 
@@ -149,7 +149,7 @@ func testUnknownOrganization(t *testing.T) {
 	session := loginUser(t, "user1")
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadOrganization)
 
-	req := NewRequest(t, "GET", "/api/v1/users/user1/orgs/unknown/permissions").
+	req := NewRequest(t, "GET", "/v1/users/user1/orgs/unknown/permissions").
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -158,14 +158,14 @@ func testHiddenMemberPermissionsForbidden(t *testing.T) {
 	session := loginUser(t, "user8")
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadOrganization)
 
-	req := NewRequest(t, "GET", "/api/v1/users/user5/orgs/privated_org/permissions").
+	req := NewRequest(t, "GET", "/v1/users/user5/orgs/privated_org/permissions").
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 
 	adminSession := loginUser(t, "user1")
 	adminToken := getTokenForLoggedInUser(t, adminSession, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadOrganization)
 
-	adminReq := NewRequest(t, "GET", "/api/v1/users/user5/orgs/privated_org/permissions").
+	adminReq := NewRequest(t, "GET", "/v1/users/user5/orgs/privated_org/permissions").
 		AddTokenAuth(adminToken)
 	resp := MakeRequest(t, adminReq, http.StatusOK)
 
@@ -183,7 +183,7 @@ func testPrivateOrgPermissionsNotFound(t *testing.T) {
 	session := loginUser(t, "user8")
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadOrganization)
 
-	req := NewRequest(t, "GET", "/api/v1/users/user5/orgs/privated_org/permissions").
+	req := NewRequest(t, "GET", "/v1/users/user5/orgs/privated_org/permissions").
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }

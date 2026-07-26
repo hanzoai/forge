@@ -19,6 +19,11 @@ import (
 	"github.com/charmbracelet/git-lfs-transfer/transfer"
 )
 
+// internalRepoRoutePath is the repo branch of the internal API, relative to
+// setting.LocalURL — derived from private.RoutePrefix so a mount change reaches
+// both the URL builder and the matcher below.
+var internalRepoRoutePath = private.RoutePrefix[1:] + "/repo/"
+
 // HTTP headers
 const (
 	headerAccept            = "Accept"
@@ -104,7 +109,7 @@ func toInternalLFSURL(s string) string {
 	if len(fields) < 3 || !strings.HasPrefix(fields[2], "info/lfs") {
 		return ""
 	}
-	return setting.LocalURL + "api/internal/repo/" + routePath
+	return setting.LocalURL + internalRepoRoutePath + routePath
 }
 
 func isInternalLFSURL(s string) bool {
@@ -116,7 +121,7 @@ func isInternalLFSURL(s string) bool {
 		return false
 	}
 	routePath := util.PathJoinRelX(u.Path)
-	subRoutePath, cut := strings.CutPrefix(routePath, "api/internal/repo/")
+	subRoutePath, cut := strings.CutPrefix(routePath, internalRepoRoutePath)
 	if !cut {
 		return false
 	}

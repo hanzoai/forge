@@ -50,7 +50,7 @@ func testLinksNoLogin(t *testing.T) {
 		"/user2/repo1/projects",
 		"/user2/repo1/projects/1",
 		"/user2/repo1/releases/tag/delete-tag", // It's the only one existing record on release.yml which has is_tag: true
-		"/api/swagger",
+		"/swagger",
 	}
 	for _, link := range links {
 		assertLinkPageComplete(t, nil, link)
@@ -69,7 +69,7 @@ func testLinksRedirectsNoLogin(t *testing.T) {
 		{"/user2/repo1/blob/123456/%20?a=1", "/user2/repo1/src/commit/123456/%20?a=1"},
 		{"/user/avatar/GhosT/-1", "/assets/img/avatar_default.png"},
 		{"/user/avatar/Gitea-ActionS/0", "/assets/img/avatar_default.png"},
-		{"/api/v1/swagger", "/api/swagger"},
+		{"/v1/swagger", "/swagger"},
 	}
 	for _, c := range redirects {
 		req := NewRequest(t, "GET", c.from)
@@ -101,7 +101,7 @@ func testLinksAsUser(t *testing.T) {
 		"/explore/organizations?q=test",
 		"/",
 		"/user/forgot_password",
-		"/api/swagger",
+		"/swagger",
 		"/issues",
 		"/issues?type=your_repositories&repos=[0]&sort=&state=open",
 		"/issues?type=assigned&repos=[0]&sort=&state=open",
@@ -143,7 +143,7 @@ func testLinksAsUser(t *testing.T) {
 		assertLinkPageComplete(t, session, link)
 	}
 
-	reqAPI := NewRequestf(t, "GET", "/api/v1/users/user2/repos")
+	reqAPI := NewRequestf(t, "GET", "/v1/users/user2/repos")
 	respAPI := MakeRequest(t, reqAPI, http.StatusOK)
 	apiRepos := DecodeJSON(t, respAPI, []*api.Repository{})
 	repoLinks := []string{

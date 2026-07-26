@@ -36,7 +36,7 @@ func TestAPITeam(t *testing.T) {
 
 	session := loginUser(t, user.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadOrganization)
-	req := NewRequestf(t, "GET", "/api/v1/teams/%d", teamUser.TeamID).
+	req := NewRequestf(t, "GET", "/v1/teams/%d", teamUser.TeamID).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -51,11 +51,11 @@ func TestAPITeam(t *testing.T) {
 
 	session = loginUser(t, user2.Name)
 	token = getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadOrganization)
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d", teamUser.TeamID).
+	req = NewRequestf(t, "GET", "/v1/teams/%d", teamUser.TeamID).
 		AddTokenAuth(token)
 	_ = MakeRequest(t, req, http.StatusForbidden)
 
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d", teamUser.TeamID)
+	req = NewRequestf(t, "GET", "/v1/teams/%d", teamUser.TeamID)
 	_ = MakeRequest(t, req, http.StatusUnauthorized)
 
 	// Get an admin user able to create, update and delete teams.
@@ -73,7 +73,7 @@ func TestAPITeam(t *testing.T) {
 		Permission:              "write",
 		Units:                   []string{"repo.code", "repo.issues"},
 	}
-	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/orgs/%s/teams", org.Name), teamToCreate).
+	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/orgs/%s/teams", org.Name), teamToCreate).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusCreated)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -94,7 +94,7 @@ func TestAPITeam(t *testing.T) {
 		Units:                   []string{"repo.code", "repo.pulls", "repo.releases"},
 	}
 
-	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/teams/%d", teamID), teamToEdit).
+	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/teams/%d", teamID), teamToEdit).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -106,7 +106,7 @@ func TestAPITeam(t *testing.T) {
 	// Edit team Description only
 	editDescription = "first team"
 	teamToEditDesc := api.EditTeamOption{Description: &editDescription}
-	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/teams/%d", teamID), teamToEditDesc).
+	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/teams/%d", teamID), teamToEditDesc).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -118,7 +118,7 @@ func TestAPITeam(t *testing.T) {
 	// Read team.
 	teamRead := unittest.AssertExistsAndLoadBean(t, &organization.Team{ID: teamID})
 	assert.NoError(t, teamRead.LoadUnits(t.Context()))
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d", teamID).
+	req = NewRequestf(t, "GET", "/v1/teams/%d", teamID).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -126,7 +126,7 @@ func TestAPITeam(t *testing.T) {
 		api.AccessLevelName(teamRead.AccessMode.ToString()), teamRead.GetUnitNames(), teamRead.GetUnitsMap())
 
 	// Delete team.
-	req = NewRequestf(t, "DELETE", "/api/v1/teams/%d", teamID).
+	req = NewRequestf(t, "DELETE", "/v1/teams/%d", teamID).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 	unittest.AssertNotExistsBean(t, &organization.Team{ID: teamID})
@@ -140,7 +140,7 @@ func TestAPITeam(t *testing.T) {
 		Permission:              "write",
 		UnitsMap:                map[string]string{"repo.code": "read", "repo.issues": "write", "repo.wiki": "none"},
 	}
-	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/orgs/%s/teams", org.Name), teamToCreate).
+	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/orgs/%s/teams", org.Name), teamToCreate).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusCreated)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -161,7 +161,7 @@ func TestAPITeam(t *testing.T) {
 		UnitsMap:                map[string]string{"repo.code": "read", "repo.pulls": "read", "repo.releases": "write"},
 	}
 
-	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/teams/%d", teamID), teamToEdit).
+	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/teams/%d", teamID), teamToEdit).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -173,7 +173,7 @@ func TestAPITeam(t *testing.T) {
 	// Edit team Description only
 	editDescription = "second team"
 	teamToEditDesc = api.EditTeamOption{Description: &editDescription}
-	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/teams/%d", teamID), teamToEditDesc).
+	req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/teams/%d", teamID), teamToEditDesc).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -184,7 +184,7 @@ func TestAPITeam(t *testing.T) {
 
 	// Read team.
 	teamRead = unittest.AssertExistsAndLoadBean(t, &organization.Team{ID: teamID})
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d", teamID).
+	req = NewRequestf(t, "GET", "/v1/teams/%d", teamID).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -193,7 +193,7 @@ func TestAPITeam(t *testing.T) {
 		api.AccessLevelName(teamRead.AccessMode.ToString()), teamRead.GetUnitNames(), teamRead.GetUnitsMap())
 
 	// Delete team.
-	req = NewRequestf(t, "DELETE", "/api/v1/teams/%d", teamID).
+	req = NewRequestf(t, "DELETE", "/v1/teams/%d", teamID).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 	unittest.AssertNotExistsBean(t, &organization.Team{ID: teamID})
@@ -205,7 +205,7 @@ func TestAPITeam(t *testing.T) {
 		IncludesAllRepositories: true,
 		Permission:              "admin",
 	}
-	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/orgs/%s/teams", org.Name), teamToCreate).
+	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/orgs/%s/teams", org.Name), teamToCreate).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusCreated)
 	apiTeam = DecodeJSON(t, resp, &api.Team{})
@@ -224,7 +224,7 @@ func TestAPITeam(t *testing.T) {
 	teamID = apiTeam.ID
 
 	// Delete team.
-	req = NewRequestf(t, "DELETE", "/api/v1/teams/%d", teamID).
+	req = NewRequestf(t, "DELETE", "/v1/teams/%d", teamID).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 	unittest.AssertNotExistsBean(t, &organization.Team{ID: teamID})
@@ -267,7 +267,7 @@ func TestAPITeamSearch(t *testing.T) {
 	org := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 17})
 
 	token := getUserToken(t, user.Name, auth_model.AccessTokenScopeReadOrganization)
-	req := NewRequestf(t, "GET", "/api/v1/orgs/%s/teams/search?q=%s", org.Name, "_team").
+	req := NewRequestf(t, "GET", "/v1/orgs/%s/teams/search?q=%s", org.Name, "_team").
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	results := DecodeJSON(t, resp, &TeamSearchResults{})
@@ -279,7 +279,7 @@ func TestAPITeamSearch(t *testing.T) {
 	user5 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 5})
 	token5 := getUserToken(t, user5.Name, auth_model.AccessTokenScopeReadOrganization)
 
-	req = NewRequestf(t, "GET", "/api/v1/orgs/%s/teams/search?q=%s", org.Name, "team").
+	req = NewRequestf(t, "GET", "/v1/orgs/%s/teams/search?q=%s", org.Name, "team").
 		AddTokenAuth(token5)
 	MakeRequest(t, req, http.StatusForbidden)
 }
@@ -292,7 +292,7 @@ func TestAPIGetTeamRepo(t *testing.T) {
 	team := unittest.AssertExistsAndLoadBean(t, &organization.Team{ID: 5})
 
 	token := getUserToken(t, user.Name, auth_model.AccessTokenScopeReadOrganization)
-	req := NewRequestf(t, "GET", "/api/v1/teams/%d/repos/%s/", team.ID, teamRepo.FullName()).
+	req := NewRequestf(t, "GET", "/v1/teams/%d/repos/%s/", team.ID, teamRepo.FullName()).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	DecodeJSON(t, resp, &api.Repository{})
@@ -302,7 +302,7 @@ func TestAPIGetTeamRepo(t *testing.T) {
 	user5 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 5})
 	token5 := getUserToken(t, user5.Name, auth_model.AccessTokenScopeReadOrganization)
 
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d/repos/%s/", team.ID, teamRepo.FullName()).
+	req = NewRequestf(t, "GET", "/v1/teams/%d/repos/%s/", team.ID, teamRepo.FullName()).
 		AddTokenAuth(token5)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -318,7 +318,7 @@ func TestAPIAddRemoveTeamRepositoryRequiresOrgOwnerOrSetting(t *testing.T) {
 	assert.NoError(t, repo_service.AddOrUpdateCollaborator(t.Context(), targetRepo, user, perm.AccessModeAdmin))
 
 	token := getUserToken(t, user.Name, auth_model.AccessTokenScopeWriteOrganization)
-	url := fmt.Sprintf("/api/v1/teams/%d/repos/%s", team.ID, targetRepo.FullName())
+	url := fmt.Sprintf("/v1/teams/%d/repos/%s", team.ID, targetRepo.FullName())
 
 	req := NewRequest(t, "PUT", url).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusForbidden)
@@ -351,7 +351,7 @@ func TestAPITeamVisibilityAccess(t *testing.T) {
 	// Org member who can read a limited team must not mutate its repos without membership.
 	user4 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4})
 	token := getUserToken(t, user4.Name, auth_model.AccessTokenScopeWriteOrganization)
-	req := NewRequestf(t, "PUT", "/api/v1/teams/%d/repos/org3/repo3", limitedTeam.ID).
+	req := NewRequestf(t, "PUT", "/v1/teams/%d/repos/org3/repo3", limitedTeam.ID).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusForbidden)
 
@@ -360,12 +360,12 @@ func TestAPITeamVisibilityAccess(t *testing.T) {
 	// Public team in a private org must not be readable by outsiders.
 	outsider := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 	token = getUserToken(t, outsider.Name, auth_model.AccessTokenScopeReadOrganization)
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d", publicTeam.ID).
+	req = NewRequestf(t, "GET", "/v1/teams/%d", publicTeam.ID).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 
 	// Member lookup must require org membership even for public teams.
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d/members/%s", publicTeam.ID, outsider.Name).
+	req = NewRequestf(t, "GET", "/v1/teams/%d/members/%s", publicTeam.ID, outsider.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 
@@ -376,7 +376,7 @@ func TestAPITeamVisibilityAccess(t *testing.T) {
 	user28 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 28})
 	token28 := getUserToken(t, user28.Name, auth_model.AccessTokenScopeReadOrganization)
 
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d/repos", limitedTeam.ID).AddTokenAuth(token28)
+	req = NewRequestf(t, "GET", "/v1/teams/%d/repos", limitedTeam.ID).AddTokenAuth(token28)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var repos []*api.Repository
 	DecodeJSON(t, resp, &repos)
@@ -385,6 +385,6 @@ func TestAPITeamVisibilityAccess(t *testing.T) {
 	}
 
 	// The single-repo lookup must not confirm an inaccessible repo's existence.
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d/repos/org3/repo3", limitedTeam.ID).AddTokenAuth(token28)
+	req = NewRequestf(t, "GET", "/v1/teams/%d/repos/org3/repo3", limitedTeam.ID).AddTokenAuth(token28)
 	MakeRequest(t, req, http.StatusNotFound)
 }

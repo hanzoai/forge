@@ -24,13 +24,13 @@ func TestAPITeamUser(t *testing.T) {
 	user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteOrganization)
 
 	t.Run("User2ReadUser1", func(t *testing.T) {
-		req := NewRequest(t, "GET", "/api/v1/teams/1/members/user1").AddTokenAuth(user2Token)
+		req := NewRequest(t, "GET", "/v1/teams/1/members/user1").AddTokenAuth(user2Token)
 		MakeRequest(t, req, http.StatusNotFound)
 	})
 
 	t.Run("User2ReadSelf", func(t *testing.T) {
 		// read self user
-		req := NewRequest(t, "GET", "/api/v1/teams/1/members/user2").AddTokenAuth(user2Token)
+		req := NewRequest(t, "GET", "/v1/teams/1/members/user2").AddTokenAuth(user2Token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		user2 := DecodeJSON(t, resp, &api.User{})
 		user2.Created = user2.Created.In(time.Local)

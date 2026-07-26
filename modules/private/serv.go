@@ -11,7 +11,6 @@ import (
 	asymkey_model "github.com/hanzoai/git/models/asymkey"
 	"github.com/hanzoai/git/models/perm"
 	user_model "github.com/hanzoai/git/models/user"
-	"github.com/hanzoai/git/modules/setting"
 )
 
 // KeyAndOwner is the response from ServNoCommand
@@ -22,7 +21,7 @@ type KeyAndOwner struct {
 
 // ServNoCommand returns information about the provided key
 func ServNoCommand(ctx context.Context, keyID int64) (*asymkey_model.PublicKey, *user_model.User, error) {
-	reqURL := setting.LocalURL + fmt.Sprintf("api/internal/serv/none/%d", keyID)
+	reqURL := internalURL(fmt.Sprintf("serv/none/%d", keyID))
 	req := newInternalRequestAPI(ctx, reqURL, "GET")
 	keyAndOwner, extra := requestJSONResp(req, &KeyAndOwner{})
 	if extra.HasError() {
@@ -47,12 +46,12 @@ type ServCommandResults struct {
 
 // ServCommand preps for a serv call
 func ServCommand(ctx context.Context, keyID int64, ownerName, repoName string, mode perm.AccessMode, verb, lfsVerb string) (*ServCommandResults, ResponseExtra) {
-	reqURL := setting.LocalURL + fmt.Sprintf("api/internal/serv/command/%d/%s/%s?mode=%d",
+	reqURL := internalURL(fmt.Sprintf("serv/command/%d/%s/%s?mode=%d",
 		keyID,
 		url.PathEscape(ownerName),
 		url.PathEscape(repoName),
 		mode,
-	)
+	))
 	reqURL += "&verb=" + url.QueryEscape(verb)
 	// reqURL += "&lfs_verb=" + url.QueryEscape(lfsVerb) // TODO: actually there is no use of this parameter. In the future, the URL construction should be more flexible
 	_ = lfsVerb

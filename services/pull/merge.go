@@ -410,7 +410,7 @@ func doMergeAndPush(ctx context.Context, pr *issues_model.PullRequest, doer *use
 	pushCmd := gitcmd.NewCommand("push", "origin").AddDynamicArguments(tmpRepoBaseBranch + ":" + git.BranchPrefix + pr.BaseBranch)
 
 	// Push back to upstream.
-	// This cause an api call to "/api/internal/hook/post-receive/...",
+	// This cause an api call to "/v1/internal/hook/post-receive/...",
 	// If it's merge, all db transaction and operations should be there but not here to prevent deadlock.
 	if err := mergeCtx.PrepareGitCmd(pushCmd).RunWithStderr(ctx); err != nil {
 		if strings.Contains(err.Stderr(), "non-fast-forward") {

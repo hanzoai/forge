@@ -27,7 +27,7 @@ func TestAPIUserSearchLoggedIn(t *testing.T) {
 	session := loginUser(t, adminUsername)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser)
 	query := "user2"
-	req := NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query).
+	req := NewRequestf(t, "GET", "/v1/users/search?q=%s", query).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -39,7 +39,7 @@ func TestAPIUserSearchLoggedIn(t *testing.T) {
 	}
 
 	publicToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopePublicOnly)
-	req = NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query).
+	req = NewRequestf(t, "GET", "/v1/users/search?q=%s", query).
 		AddTokenAuth(publicToken)
 	resp = MakeRequest(t, req, http.StatusOK)
 	results = DecodeJSON(t, resp, &SearchResults{})
@@ -54,7 +54,7 @@ func TestAPIUserSearchLoggedIn(t *testing.T) {
 func TestAPIUserSearchNotLoggedIn(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	query := "user2"
-	req := NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query)
+	req := NewRequestf(t, "GET", "/v1/users/search?q=%s", query)
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	results := DecodeJSON(t, resp, &SearchResults{})
@@ -74,7 +74,7 @@ func TestAPIUserSearchSystemUsers(t *testing.T) {
 		user_model.NewActionsUser(),
 	} {
 		t.Run(systemUser.Name, func(t *testing.T) {
-			req := NewRequestf(t, "GET", "/api/v1/users/search?uid=%d", systemUser.ID)
+			req := NewRequestf(t, "GET", "/v1/users/search?uid=%d", systemUser.ID)
 			resp := MakeRequest(t, req, http.StatusOK)
 
 			results := DecodeJSON(t, resp, &SearchResults{})
@@ -94,7 +94,7 @@ func TestAPIUserSearchAdminLoggedInUserHidden(t *testing.T) {
 	session := loginUser(t, adminUsername)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser)
 	query := "user31"
-	req := NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query).
+	req := NewRequestf(t, "GET", "/v1/users/search?q=%s", query).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -110,7 +110,7 @@ func TestAPIUserSearchAdminLoggedInUserHidden(t *testing.T) {
 func TestAPIUserSearchNotLoggedInUserHidden(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	query := "user31"
-	req := NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query)
+	req := NewRequestf(t, "GET", "/v1/users/search?q=%s", query)
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	results := DecodeJSON(t, resp, &SearchResults{})
@@ -125,7 +125,7 @@ func TestAPIUserSearchByEmail(t *testing.T) {
 	session := loginUser(t, adminUsername)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser)
 	query := "user2@example.com"
-	req := NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query).
+	req := NewRequestf(t, "GET", "/v1/users/search?q=%s", query).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -134,7 +134,7 @@ func TestAPIUserSearchByEmail(t *testing.T) {
 	assert.Equal(t, query, results.Data[0].Email)
 
 	// no login user can not search user with private email
-	req = NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query)
+	req = NewRequestf(t, "GET", "/v1/users/search?q=%s", query)
 	resp = MakeRequest(t, req, http.StatusOK)
 	results = DecodeJSON(t, resp, &SearchResults{})
 	assert.Empty(t, results.Data)
@@ -143,7 +143,7 @@ func TestAPIUserSearchByEmail(t *testing.T) {
 	user2 := "user2"
 	session = loginUser(t, user2)
 	token = getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser)
-	req = NewRequestf(t, "GET", "/api/v1/users/search?q=%s", query).
+	req = NewRequestf(t, "GET", "/v1/users/search?q=%s", query).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 

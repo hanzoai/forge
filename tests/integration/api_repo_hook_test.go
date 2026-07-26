@@ -27,7 +27,7 @@ func TestAPICreateHook(t *testing.T) {
 	// user1 is an admin user
 	session := loginUser(t, "user1")
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/%s", owner.Name, repo.Name, "hooks"), api.CreateHookOption{
+	req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/%s", owner.Name, repo.Name, "hooks"), api.CreateHookOption{
 		Type: "gitea",
 		Config: api.CreateHookOptionConfig{
 			"content_type": "json",
@@ -46,20 +46,20 @@ func TestAPICreateHook(t *testing.T) {
 
 	// a read-scoped token must not be able to read back the authorization header
 	readToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
-	getReq := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/hooks/%d", owner.Name, repo.Name, apiHook.ID)).
+	getReq := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/hooks/%d", owner.Name, repo.Name, apiHook.ID)).
 		AddTokenAuth(readToken)
 	getResp := MakeRequest(t, getReq, http.StatusOK)
 	assert.NotContains(t, getResp.Body.String(), "s3cr3t")
 
 	newName := "Deploy hook"
-	patchReq := NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s/hooks/%d", owner.Name, repo.Name, apiHook.ID), api.EditHookOption{
+	patchReq := NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s/hooks/%d", owner.Name, repo.Name, apiHook.ID), api.EditHookOption{
 		Name: &newName,
 	}).AddTokenAuth(token)
 	patchResp := MakeRequest(t, patchReq, http.StatusOK)
 	patched := DecodeJSON(t, patchResp, &api.Hook{})
 	assert.Equal(t, newName, patched.Name)
 
-	hooksURL := fmt.Sprintf("/api/v1/repos/%s/%s/hooks", owner.Name, repo.Name)
+	hooksURL := fmt.Sprintf("/v1/repos/%s/%s/hooks", owner.Name, repo.Name)
 
 	// Create with Name field omitted: Name should be ""
 	req2 := NewRequestWithJSON(t, "POST", hooksURL, api.CreateHookOption{
@@ -73,7 +73,7 @@ func TestAPICreateHook(t *testing.T) {
 	created := DecodeJSON(t, resp2, &api.Hook{})
 	assert.Empty(t, created.Name)
 
-	hookURL := fmt.Sprintf("/api/v1/repos/%s/%s/hooks/%d", owner.Name, repo.Name, created.ID)
+	hookURL := fmt.Sprintf("/v1/repos/%s/%s/hooks/%d", owner.Name, repo.Name, created.ID)
 
 	// PATCH with Name set: existing Name must be updated
 	setName := "original"

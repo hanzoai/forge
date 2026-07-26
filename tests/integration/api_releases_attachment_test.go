@@ -31,7 +31,7 @@ func testAPIEditReleaseAttachmentWithUnallowedFile(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	filename := "file.bad"
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/releases/%d/assets/%d", repoOwner.Name, repo.Name, release.ID, attachment.ID)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/releases/%d/assets/%d", repoOwner.Name, repo.Name, release.ID, attachment.ID)
 	req := NewRequestWithValues(t, "PATCH", urlStr, map[string]string{
 		"name": filename,
 	}).AddTokenAuth(token)
@@ -46,8 +46,8 @@ func testAPIDraftReleaseAttachmentAccess(t *testing.T) {
 	repoOwner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: repo.OwnerID})
 	reader := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 
-	listURL := fmt.Sprintf("/api/v1/repos/%s/%s/releases/%d/assets", repoOwner.Name, repo.Name, release.ID)
-	getURL := fmt.Sprintf("/api/v1/repos/%s/%s/releases/%d/assets/%d", repoOwner.Name, repo.Name, release.ID, attachment.ID)
+	listURL := fmt.Sprintf("/v1/repos/%s/%s/releases/%d/assets", repoOwner.Name, repo.Name, release.ID)
+	getURL := fmt.Sprintf("/v1/repos/%s/%s/releases/%d/assets/%d", repoOwner.Name, repo.Name, release.ID, attachment.ID)
 
 	MakeRequest(t, NewRequest(t, "GET", listURL), http.StatusNotFound)
 	MakeRequest(t, NewRequest(t, "GET", getURL), http.StatusNotFound)

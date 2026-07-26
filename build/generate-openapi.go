@@ -77,7 +77,7 @@ func main() {
 	}
 
 	oas3.Servers = openapi3.Servers{
-		{URL: appSubUrlPlaceholder + "/api/v1"},
+		{URL: appSubUrlPlaceholder + "/v1"},
 	}
 
 	out, err := json.MarshalIndent(oas3, "", "  ")

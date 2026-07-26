@@ -48,40 +48,40 @@ func TestAPIApplyDiffPatchFileOptions(t *testing.T) {
 		session4 := loginUser(t, user4.Name)
 		token4 := getTokenForLoggedInUser(t, session4, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
 
-		req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user2/repo1/diffpatch", getApplyDiffPatchFileOptions()).AddTokenAuth(token2)
+		req := NewRequestWithJSON(t, "POST", "/v1/repos/user2/repo1/diffpatch", getApplyDiffPatchFileOptions()).AddTokenAuth(token2)
 		resp := MakeRequest(t, req, http.StatusCreated)
 		fileResponse := DecodeJSON(t, resp, &api.FileResponse{})
 		assert.Nil(t, fileResponse.Content)
 		assert.NotEmpty(t, fileResponse.Commit.HTMLURL)
-		req = NewRequest(t, "GET", "/api/v1/repos/user2/repo1/raw/patch-file-1.txt")
+		req = NewRequest(t, "GET", "/v1/repos/user2/repo1/raw/patch-file-1.txt")
 		resp = MakeRequest(t, req, http.StatusOK)
 		assert.Equal(t, "File 1\n", resp.Body.String())
 
 		// Test creating a file in repo1 by user4 who does not have write access
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/diffpatch", user2.Name, repo16.Name), getApplyDiffPatchFileOptions()).
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/diffpatch", user2.Name, repo16.Name), getApplyDiffPatchFileOptions()).
 			AddTokenAuth(token4)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// Tests a repo with no token given so will fail
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/diffpatch", user2.Name, repo16.Name), getApplyDiffPatchFileOptions())
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/diffpatch", user2.Name, repo16.Name), getApplyDiffPatchFileOptions())
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// Test using access token for a private repo that the user of the token owns
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/diffpatch", user2.Name, repo16.Name), getApplyDiffPatchFileOptions()).
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/diffpatch", user2.Name, repo16.Name), getApplyDiffPatchFileOptions()).
 			AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusCreated)
 
 		// Test using org repo "org3/repo3" where user2 is a collaborator
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/diffpatch", org3.Name, repo3.Name), getApplyDiffPatchFileOptions()).
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/diffpatch", org3.Name, repo3.Name), getApplyDiffPatchFileOptions()).
 			AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusCreated)
 
 		// Test using org repo "org3/repo3" with no user token
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/diffpatch", org3.Name, repo3.Name), getApplyDiffPatchFileOptions())
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/diffpatch", org3.Name, repo3.Name), getApplyDiffPatchFileOptions())
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// Test using repo "user2/repo1" where user4 is a NOT collaborator
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/diffpatch", user2.Name, repo1.Name), getApplyDiffPatchFileOptions()).
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/diffpatch", user2.Name, repo1.Name), getApplyDiffPatchFileOptions()).
 			AddTokenAuth(token4)
 		MakeRequest(t, req, http.StatusForbidden)
 	})

@@ -18,7 +18,7 @@ import (
 func TestAPIListGitignoresTemplates(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	req := NewRequest(t, "GET", "/api/v1/gitignore/templates")
+	req := NewRequest(t, "GET", "/v1/gitignore/templates")
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	templateList := DecodeJSON(t, resp, []string{}) // this is a very long list
@@ -37,7 +37,7 @@ func TestAPIGetGitignoreTemplateInfo(t *testing.T) {
 	// Use the first template for the test
 	templateName := repo_module.Gitignores[0]
 
-	urlStr := "/api/v1/gitignore/templates/" + templateName
+	urlStr := "/v1/gitignore/templates/" + templateName
 	req := NewRequest(t, "GET", urlStr)
 	resp := MakeRequest(t, req, http.StatusOK)
 

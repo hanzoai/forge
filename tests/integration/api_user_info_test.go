@@ -30,24 +30,24 @@ func TestAPIUserInfo(t *testing.T) {
 	t.Run("GetInfo", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", "/api/v1/users/"+user2).
+		req := NewRequest(t, "GET", "/v1/users/"+user2).
 			AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 
 		u := DecodeJSON(t, resp, &api.User{})
 		assert.Equal(t, user2, u.UserName)
 
-		req = NewRequest(t, "GET", "/api/v1/users/"+user2)
+		req = NewRequest(t, "GET", "/v1/users/"+user2)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// test if the placaholder Mail is returned if a User is not logged in
-		req = NewRequest(t, "GET", "/api/v1/users/"+org3.Name)
+		req = NewRequest(t, "GET", "/v1/users/"+org3.Name)
 		resp = MakeRequest(t, req, http.StatusOK)
 		u = DecodeJSON(t, resp, &api.User{})
 		assert.Equal(t, org3.GetPlaceholderEmail(), u.Email)
 
 		// Test if the correct Mail is returned if a User is logged in
-		req = NewRequest(t, "GET", "/api/v1/users/"+org3.Name).
+		req = NewRequest(t, "GET", "/v1/users/"+org3.Name).
 			AddTokenAuth(token)
 		resp = MakeRequest(t, req, http.StatusOK)
 		u = DecodeJSON(t, resp, &api.User{})
@@ -57,7 +57,7 @@ func TestAPIUserInfo(t *testing.T) {
 	t.Run("GetAuthenticatedUser", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", "/api/v1/user").
+		req := NewRequest(t, "GET", "/v1/user").
 			AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 

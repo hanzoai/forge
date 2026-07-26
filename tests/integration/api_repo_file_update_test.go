@@ -49,9 +49,9 @@ func getExpectedFileResponseForUpdate(info apiFileResponseInfo) *api.FileRespons
 	sha := "08bd14b2e2852529157324de9c226b3364e76136"
 	encoding := "base64"
 	content := "VGhpcyBpcyB1cGRhdGVkIHRleHQ="
-	selfURL := setting.AppURL + "api/v1/repos/user2/repo1/contents/" + info.treePath + "?ref=master"
+	selfURL := setting.AppURL + "v1/repos/user2/repo1/contents/" + info.treePath + "?ref=master"
 	htmlURL := setting.AppURL + "user2/repo1/src/branch/master/" + info.treePath
-	gitURL := setting.AppURL + "api/v1/repos/user2/repo1/git/blobs/" + sha
+	gitURL := setting.AppURL + "v1/repos/user2/repo1/git/blobs/" + sha
 	downloadURL := setting.AppURL + "user2/repo1/raw/branch/master/" + info.treePath
 	ret := &api.FileResponse{
 		Content: &api.ContentsResponse{
@@ -77,7 +77,7 @@ func getExpectedFileResponseForUpdate(info apiFileResponseInfo) *api.FileRespons
 		},
 		Commit: &api.FileCommitResponse{
 			CommitMeta: api.CommitMeta{
-				URL: setting.AppURL + "api/v1/repos/user2/repo1/git/commits/" + info.commitID,
+				URL: setting.AppURL + "v1/repos/user2/repo1/git/commits/" + info.commitID,
 				SHA: info.commitID,
 			},
 			HTMLURL: setting.AppURL + "user2/repo1/commit/" + info.commitID,
@@ -133,7 +133,7 @@ func TestAPIUpdateFile(t *testing.T) {
 			createFile(user2, repo1, treePath)
 			updateFileOptions := getUpdateFileOptions()
 			updateFileOptions.BranchName = branch
-			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
+			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
 				AddTokenAuth(token2)
 			resp := MakeRequest(t, req, http.StatusOK)
 			gitRepo, _ := gitrepo.OpenRepository(t.Context(), repo1)
@@ -163,7 +163,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		fileID++
 		treePath := fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(user2, repo1, treePath)
-		req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
+		req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token2)
 		resp := MakeRequest(t, req, http.StatusOK)
 		fileResponse := DecodeJSON(t, resp, &api.FileResponse{})
@@ -178,7 +178,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		// Test updating a file without SHA (should create the file)
 		updateFileOptions = getUpdateFileOptions()
 		updateFileOptions.SHA = ""
-		req = NewRequestWithJSON(t, "PUT", "/api/v1/repos/user2/repo1/contents/update-create.txt", &updateFileOptions).AddTokenAuth(token2)
+		req = NewRequestWithJSON(t, "PUT", "/v1/repos/user2/repo1/contents/update-create.txt", &updateFileOptions).AddTokenAuth(token2)
 		resp = MakeRequest(t, req, http.StatusCreated)
 		fileResponse = DecodeJSON(t, resp, &api.FileResponse{})
 		assert.Equal(t, "08bd14b2e2852529157324de9c226b3364e76136", fileResponse.Content.SHA)
@@ -192,7 +192,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		createFile(user2, repo1, treePath)
 		updateFileOptions.FromPath = treePath
 		treePath = "rename/" + treePath
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token2)
 		resp = MakeRequest(t, req, http.StatusOK)
 		fileResponse = DecodeJSON(t, resp, &api.FileResponse{})
@@ -210,7 +210,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		fileID++
 		treePath = fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(user2, repo1, treePath)
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token2)
 		resp = MakeRequest(t, req, http.StatusOK)
 		fileResponse = DecodeJSON(t, resp, &api.FileResponse{})
@@ -224,7 +224,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		updateFileOptions = getUpdateFileOptions()
 		correctSHA := updateFileOptions.SHA
 		updateFileOptions.SHA = "badsha"
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token2)
 		resp = MakeRequest(t, req, http.StatusUnprocessableEntity)
 		expectedAPIError := &context.APIError{
@@ -239,7 +239,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		treePath = fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(user2, repo16, treePath)
 		updateFileOptions = getUpdateFileOptions()
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo16.Name, treePath), &updateFileOptions).
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo16.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token4)
 		MakeRequest(t, req, http.StatusNotFound)
 
@@ -248,7 +248,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		treePath = fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(user2, repo16, treePath)
 		updateFileOptions = getUpdateFileOptions()
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo16.Name, treePath), &updateFileOptions)
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo16.Name, treePath), &updateFileOptions)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// Test using access token for a private repo that the user of the token owns
@@ -256,7 +256,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		treePath = fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(user2, repo16, treePath)
 		updateFileOptions = getUpdateFileOptions()
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo16.Name, treePath), &updateFileOptions).
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo16.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusOK)
 
@@ -265,7 +265,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		treePath = fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(org3, repo3, treePath)
 		updateFileOptions = getUpdateFileOptions()
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", org3.Name, repo3.Name, treePath), &updateFileOptions).
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", org3.Name, repo3.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusOK)
 
@@ -274,7 +274,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		treePath = fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(org3, repo3, treePath)
 		updateFileOptions = getUpdateFileOptions()
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", org3.Name, repo3.Name, treePath), &updateFileOptions)
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", org3.Name, repo3.Name, treePath), &updateFileOptions)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// Test using repo "user2/repo1" where user4 is a NOT collaborator
@@ -282,7 +282,7 @@ func TestAPIUpdateFile(t *testing.T) {
 		treePath = fmt.Sprintf("update/file%d.txt", fileID)
 		createFile(user2, repo1, treePath)
 		updateFileOptions = getUpdateFileOptions()
-		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
+		req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", user2.Name, repo1.Name, treePath), &updateFileOptions).
 			AddTokenAuth(token4)
 		MakeRequest(t, req, http.StatusForbidden)
 	})

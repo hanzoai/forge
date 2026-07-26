@@ -11,7 +11,6 @@ import (
 	"github.com/hanzoai/git/modules/git"
 	"github.com/hanzoai/git/modules/httplib"
 	"github.com/hanzoai/git/modules/repository"
-	"github.com/hanzoai/git/modules/setting"
 )
 
 // Git environment variables
@@ -81,7 +80,7 @@ type HookProcReceiveRefResult struct {
 }
 
 func newInternalRequestAPIForHooks(ctx context.Context, hookName, ownerName, repoName string, opts HookOptions) *httplib.Request {
-	reqURL := setting.LocalURL + fmt.Sprintf("api/internal/hook/%s/%s/%s", hookName, url.PathEscape(ownerName), url.PathEscape(repoName))
+	reqURL := internalURL(fmt.Sprintf("hook/%s/%s/%s", hookName, url.PathEscape(ownerName), url.PathEscape(repoName)))
 	req := newInternalRequestAPI(ctx, reqURL, "POST", opts)
 	// This "timeout" applies to http.Client's timeout: A Timeout of zero means no timeout.
 	// This "timeout" was previously set to `time.Duration(60+len(opts.OldCommitIDs))` seconds, but it caused unnecessary timeout failures.
@@ -111,11 +110,11 @@ func HookProcReceive(ctx context.Context, ownerName, repoName string, opts HookO
 
 // SetDefaultBranch will set the default branch to the provided branch for the provided repository
 func SetDefaultBranch(ctx context.Context, ownerName, repoName, branch string) ResponseExtra {
-	reqURL := setting.LocalURL + fmt.Sprintf("api/internal/hook/set-default-branch/%s/%s/%s",
+	reqURL := internalURL(fmt.Sprintf("hook/set-default-branch/%s/%s/%s",
 		url.PathEscape(ownerName),
 		url.PathEscape(repoName),
 		url.PathEscape(branch),
-	)
+	))
 	req := newInternalRequestAPI(ctx, reqURL, "POST")
 	_, extra := requestJSONResp(req, &ResponseText{})
 	return extra
@@ -123,7 +122,7 @@ func SetDefaultBranch(ctx context.Context, ownerName, repoName, branch string) R
 
 // SSHLog sends ssh error log response
 func SSHLog(ctx context.Context, isErr bool, msg string) error {
-	reqURL := setting.LocalURL + "api/internal/ssh/log"
+	reqURL := internalURL("ssh/log")
 	req := newInternalRequestAPI(ctx, reqURL, "POST", &SSHLogOption{IsError: isErr, Message: msg})
 	_, extra := requestJSONResp(req, &ResponseText{})
 	return extra.Error

@@ -18,6 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/markup"
 	"github.com/hanzoai/git/modules/markup/external"
+	private_module "github.com/hanzoai/git/modules/private"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/ssh"
 	"github.com/hanzoai/git/modules/storage"
@@ -33,6 +34,8 @@ import (
 	"github.com/hanzoai/git/routers/common"
 	"github.com/hanzoai/git/routers/private"
 	web_routers "github.com/hanzoai/git/routers/web"
+	"github.com/hanzoai/git/routers/web/healthcheck"
+	"github.com/hanzoai/git/routers/web/misc"
 	actions_service "github.com/hanzoai/git/services/actions"
 	asymkey_service "github.com/hanzoai/git/services/asymkey"
 	"github.com/hanzoai/git/services/auth"
@@ -180,9 +183,20 @@ func NormalRoutes() *web.Router {
 
 	r.AfterRouting(common.MaintenanceModeHandler())
 
+	// The whole top-level URL namespace is allocated here and nowhere else:
+	// "/" is the browser, "/v1" is every machine surface, "/v2" is the OCI spec.
+	// chi routes the most specific mount first, so a "/v1/…" route registered on
+	// the web router below would be swallowed by the "/v1" mount — /v1/sync and
+	// /v1/healthz therefore live here, not in routers/web.
 	r.Mount("/", web_routers.Routes())
-	r.Mount("/api/v1", apiv1.Routes())
-	r.Mount("/api/internal", private.Routes())
+	r.Mount("/v1", apiv1.Routes())
+	r.Mount(private_module.RoutePrefix, private.Routes())
+
+	// Machine endpoints that authenticate themselves and must skip the session
+	// and API-token middleware: sync's credential is the payload HMAC, and a
+	// health probe must not touch auth or the database.
+	r.Post("/v1/sync", misc.Sync)
+	r.Get("/v1/healthz", healthcheck.Check)
 
 	r.Post("/-/fetch-redirect", common.FetchRedirectDelegate)
 
@@ -195,6 +209,10 @@ func NormalRoutes() *web.Router {
 	}
 
 	if setting.Actions.Enabled {
+		// "/api/actions*" is the act_runner wire protocol, not our API: the runner
+		// hardcodes this prefix client-side (and builds ACTIONS_RUNTIME_URL from
+		// "/api/actions_pipeline" itself), so it is as fixed as "/v2" above until
+		// the runner is changed in lockstep.
 		prefix := "/api/actions"
 		r.Mount(prefix, actions_router.Routes(prefix))
 

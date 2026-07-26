@@ -6,8 +6,6 @@ package private
 import (
 	"context"
 	"fmt"
-
-	"github.com/hanzoai/git/modules/setting"
 )
 
 // RestoreParams structure holds a data for restore repository
@@ -21,7 +19,7 @@ type RestoreParams struct {
 
 // RestoreRepo calls the internal RestoreRepo function
 func RestoreRepo(ctx context.Context, repoDir, ownerName, repoName string, units []string, validation bool) ResponseExtra {
-	reqURL := setting.LocalURL + "api/internal/restore_repo"
+	reqURL := internalURL("restore_repo")
 
 	req := newInternalRequestAPI(ctx, reqURL, "POST", RestoreParams{
 		RepoDir:    repoDir,

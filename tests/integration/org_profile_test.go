@@ -47,7 +47,7 @@ func createTestProfile(t *testing.T, orgName, profileRepoName, readmeContent str
 
 	// create readme
 	createFileOptions := getCreateProfileReadmeFileOptions(readmeContent)
-	req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", orgName, profileRepoName, "README.md"), &createFileOptions).
+	req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", orgName, profileRepoName, "README.md"), &createFileOptions).
 		AddTokenAuth(tokenAdmin)
 	MakeRequest(t, req, http.StatusCreated)
 }

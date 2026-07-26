@@ -293,7 +293,7 @@ func testGitSigning(t *testing.T) {
 				ContentBase64: content,
 			}))
 
-			req := NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update?style=rebase", testCtx.Username, testCtx.Reponame, pr.Index).
+			req := NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update?style=rebase", testCtx.Username, testCtx.Reponame, pr.Index).
 				AddTokenAuth(testCtx.Token)
 			testCtx.Session.MakeRequest(t, req, http.StatusOK)
 

@@ -23,13 +23,13 @@ func TestCORS(t *testing.T) {
 
 		t.Run("API with CORS", func(t *testing.T) {
 			// GET api with no CORS header
-			req := NewRequest(t, "GET", "/api/v1/version")
+			req := NewRequest(t, "GET", "/v1/version")
 			resp := MakeRequest(t, req, http.StatusOK)
 			assert.Empty(t, resp.Header().Get("Access-Control-Allow-Origin"))
 			assert.Contains(t, resp.Header().Values("Vary"), "Origin")
 
 			// OPTIONS api for CORS
-			req = NewRequest(t, "OPTIONS", "/api/v1/version").
+			req = NewRequest(t, "OPTIONS", "/v1/version").
 				SetHeader("Origin", "https://example.com").
 				SetHeader("Access-Control-Request-Method", "GET")
 			resp = MakeRequest(t, req, http.StatusOK)
@@ -64,12 +64,12 @@ func TestCORS(t *testing.T) {
 		defer test.MockVariableValue(&testWebRoutes, routers.NormalRoutes())()
 
 		t.Run("API without CORS", func(t *testing.T) {
-			req := NewRequest(t, "GET", "/api/v1/version")
+			req := NewRequest(t, "GET", "/v1/version")
 			resp := MakeRequest(t, req, http.StatusOK)
 			assert.Empty(t, resp.Header().Get("Access-Control-Allow-Origin"))
 			assert.Empty(t, resp.Header().Values("Vary"))
 
-			req = NewRequest(t, "OPTIONS", "/api/v1/version").
+			req = NewRequest(t, "OPTIONS", "/v1/version").
 				SetHeader("Origin", "https://example.com").
 				SetHeader("Access-Control-Request-Method", "GET")
 			resp = MakeRequest(t, req, http.StatusMethodNotAllowed)

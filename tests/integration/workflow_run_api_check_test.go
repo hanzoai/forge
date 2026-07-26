@@ -22,16 +22,16 @@ import (
 
 func TestAPIWorkflowRun(t *testing.T) {
 	t.Run("AdminRuns", func(t *testing.T) {
-		testAPIWorkflowRunBasic(t, "/api/v1/admin/actions", "User1", 802, auth_model.AccessTokenScopeReadAdmin, auth_model.AccessTokenScopeReadRepository)
+		testAPIWorkflowRunBasic(t, "/v1/admin/actions", "User1", 802, auth_model.AccessTokenScopeReadAdmin, auth_model.AccessTokenScopeReadRepository)
 	})
 	t.Run("UserRuns", func(t *testing.T) {
-		testAPIWorkflowRunBasic(t, "/api/v1/user/actions", "User2", 803, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadRepository)
+		testAPIWorkflowRunBasic(t, "/v1/user/actions", "User2", 803, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadRepository)
 	})
 	t.Run("OrgRuns", func(t *testing.T) {
-		testAPIWorkflowRunBasic(t, "/api/v1/orgs/org3/actions", "User1", 802, auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadRepository)
+		testAPIWorkflowRunBasic(t, "/v1/orgs/org3/actions", "User1", 802, auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadRepository)
 	})
 	t.Run("RepoRuns", func(t *testing.T) {
-		testAPIWorkflowRunBasic(t, "/api/v1/repos/org3/repo5/actions", "User2", 802, auth_model.AccessTokenScopeReadRepository)
+		testAPIWorkflowRunBasic(t, "/v1/repos/org3/repo5/actions", "User2", 802, auth_model.AccessTokenScopeReadRepository)
 	})
 	t.Run("RepoWorkflowRuns", func(t *testing.T) {
 		testAPIWorkflowRunsByWorkflowID(t, "org3", "repo5", "test.yaml", "User2", 802, auth_model.AccessTokenScopeReadRepository)
@@ -61,7 +61,7 @@ func testAPIWorkflowRunsPullRequestsField(t *testing.T) {
 	require.NoError(t, db.Insert(ctx, run))
 
 	token := getUserToken(t, "User2", auth_model.AccessTokenScopeReadRepository)
-	runsURL := "/api/v1/repos/user2/repo1/actions/workflows/pr-assoc.yaml/runs"
+	runsURL := "/v1/repos/user2/repo1/actions/workflows/pr-assoc.yaml/runs"
 
 	req := NewRequest(t, "GET", runsURL).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
@@ -97,7 +97,7 @@ func testAPIWorkflowRunsByWorkflowID(t *testing.T, owner, repo, workflowID, user
 	defer tests.PrepareTestEnv(t)()
 	token := getUserToken(t, userUsername, scope...)
 
-	workflowRunsURL := fmt.Sprintf("/api/v1/repos/%s/%s/actions/workflows/%s/runs", owner, repo, workflowID)
+	workflowRunsURL := fmt.Sprintf("/v1/repos/%s/%s/actions/workflows/%s/runs", owner, repo, workflowID)
 
 	req := NewRequest(t, "GET", workflowRunsURL).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
@@ -128,7 +128,7 @@ func testAPIWorkflowRunsByWorkflowID(t *testing.T, owner, repo, workflowID, user
 	}
 	assert.True(t, excludedFound, "expected to find run with ID %d when excluding pull requests", expectedRunID)
 
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/workflows/nonexistent.yaml/runs", owner, repo)).AddTokenAuth(token)
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/workflows/nonexistent.yaml/runs", owner, repo)).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
 

@@ -151,11 +151,11 @@ func TestRepushTag(t *testing.T) {
 		assert.NoError(t, err)
 
 		// query the release by API with no auth and it should be 404
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/releases/tags/%s", owner.Name, repo.Name, "v2.0"))
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/releases/tags/%s", owner.Name, repo.Name, "v2.0"))
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// query the release by API and it should be a draft
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/releases/tags/%s", owner.Name, repo.Name, "v2.0")).AddTokenAuth(token)
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/releases/tags/%s", owner.Name, repo.Name, "v2.0")).AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		respRelease := DecodeJSON(t, resp, &api.Release{})
 		assert.True(t, respRelease.IsDraft)
@@ -164,7 +164,7 @@ func TestRepushTag(t *testing.T) {
 		_, _, err = gitcmd.NewCommand("push", "origin", "--tags", "v2.0").WithDir(dstPath).RunStdString(t.Context())
 		assert.NoError(t, err)
 		// query the release by API and it should not be a draft
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/releases/tags/%s", owner.Name, repo.Name, "v2.0"))
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/releases/tags/%s", owner.Name, repo.Name, "v2.0"))
 		resp = MakeRequest(t, req, http.StatusOK)
 		respRelease = DecodeJSON(t, resp, &api.Release{})
 		assert.False(t, respRelease.IsDraft)

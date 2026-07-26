@@ -179,7 +179,7 @@ func testOrgRestrictedUser(t *testing.T) {
 		Units:                   []string{"repo.code"},
 	}
 
-	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/orgs/%s/teams", orgName), teamToCreate).
+	req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/orgs/%s/teams", orgName), teamToCreate).
 		AddTokenAuth(token)
 
 	resp := adminSession.MakeRequest(t, req, http.StatusCreated)
@@ -191,7 +191,7 @@ func testOrgRestrictedUser(t *testing.T) {
 	// teamID := apiTeam.ID
 
 	// Now we need to add the restricted user to the team
-	req = NewRequest(t, "PUT", fmt.Sprintf("/api/v1/teams/%d/members/%s", apiTeam.ID, restrictedUser)).
+	req = NewRequest(t, "PUT", fmt.Sprintf("/v1/teams/%d/members/%s", apiTeam.ID, restrictedUser)).
 		AddTokenAuth(token)
 	_ = adminSession.MakeRequest(t, req, http.StatusNoContent)
 

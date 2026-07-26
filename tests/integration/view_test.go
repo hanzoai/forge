@@ -86,7 +86,7 @@ func testSecurityHeadersDefaults(t *testing.T) {
 		assert.Equal(t, "SAMEORIGIN", resp.Header().Get("X-Frame-Options"))
 	}
 	assertSecurityHeaders(t, "/")
-	assertSecurityHeaders(t, "/api/v1/version")
+	assertSecurityHeaders(t, "/v1/version")
 	assertSecurityHeaders(t, "/assets/img/favicon.png")
 }
 

@@ -48,7 +48,7 @@ func testRenderMarkup(t *testing.T, mode string, wiki bool, filePath, text, expe
 		Wiki:     wiki,
 		FilePath: filePath,
 	}
-	ctx, resp := contexttest.MockAPIContext(t, "POST /api/v1/markup")
+	ctx, resp := contexttest.MockAPIContext(t, "POST /v1/markup")
 	ctx.Repo = &context_service.Repository{}
 	ctx.Repo.Repository = unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 	web.SetForm(ctx, &options)
@@ -71,7 +71,7 @@ func testRenderMarkdown(t *testing.T, mode string, wiki bool, text, responseBody
 		Context: context,
 		Wiki:    wiki,
 	}
-	ctx, resp := contexttest.MockAPIContext(t, "POST /api/v1/markdown")
+	ctx, resp := contexttest.MockAPIContext(t, "POST /v1/markdown")
 	web.SetForm(ctx, &options)
 	Markdown(ctx)
 	assert.Equal(t, responseBody, resp.Body.String())
@@ -202,7 +202,7 @@ func TestAPI_RenderSimple(t *testing.T) {
 		Text:    "",
 		Context: "/user2/repo1",
 	}
-	ctx, resp := contexttest.MockAPIContext(t, "POST /api/v1/markdown")
+	ctx, resp := contexttest.MockAPIContext(t, "POST /v1/markdown")
 	for i := 0; i < len(simpleCases); i += 2 {
 		options.Text = simpleCases[i]
 		web.SetForm(ctx, &options)
@@ -215,7 +215,7 @@ func TestAPI_RenderSimple(t *testing.T) {
 func TestAPI_RenderRaw(t *testing.T) {
 	setting.AppURL = AppURL
 	markup.RenderBehaviorForTesting.DisableAdditionalAttributes = true
-	ctx, resp := contexttest.MockAPIContext(t, "POST /api/v1/markdown")
+	ctx, resp := contexttest.MockAPIContext(t, "POST /v1/markdown")
 	for i := 0; i < len(simpleCases); i += 2 {
 		ctx.Req.Body = io.NopCloser(strings.NewReader(simpleCases[i]))
 		MarkdownRaw(ctx)

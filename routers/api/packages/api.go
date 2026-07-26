@@ -153,6 +153,8 @@ func CommonRoutes() *web.Router {
 			})
 		}, reqPackageAccess(perm.AccessModeRead))
 		r.Group("/cargo", func() {
+			// "/api/v1/…" here is the crates.io registry protocol cargo speaks, not our
+			// API — same status as "/v2" for OCI. Ditto chef and rubygems below.
 			r.Group("/api/v1/crates", func() {
 				r.Get("", cargo.SearchPackages)
 				r.Put("/new", reqPackageAccess(perm.AccessModeWrite), cargo.UploadPackage)

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hanzoai/git/modules/container"
+	"github.com/hanzoai/git/modules/private"
 	"github.com/hanzoai/git/modules/setting"
 )
 
@@ -22,14 +23,14 @@ func MaintenanceModeHandler() func(h http.Handler) http.Handler {
 		"/-/",
 
 		// internal APIs
-		"/api/internal/",
+		private.RoutePrefix + "/",
 
 		// user login (for admin to login): "/user/login", "/user/logout", "/catpcha/..."
 		"/user/",
 		"/captcha/",
 	}
 	allowedPaths := container.SetOf(
-		"/api/healthz",
+		"/v1/healthz",
 	)
 	isMaintenanceModeAllowedRequest := func(req *http.Request) bool {
 		for _, prefix := range allowedPrefixes {

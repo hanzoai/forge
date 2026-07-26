@@ -16,23 +16,23 @@ import (
 func TestGenAPILinks(t *testing.T) {
 	setting.AppURL = "http://localhost:3000/"
 	kases := map[string][]string{
-		"api/v1/repos/jerrykan/example-repo/issues?state=all": {
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=2&state=all>; rel="next"`,
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=5&state=all>; rel="last"`,
+		"v1/repos/jerrykan/example-repo/issues?state=all": {
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=2&state=all>; rel="next"`,
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=5&state=all>; rel="last"`,
 		},
-		"api/v1/repos/jerrykan/example-repo/issues?state=all&page=1": {
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=2&state=all>; rel="next"`,
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=5&state=all>; rel="last"`,
+		"v1/repos/jerrykan/example-repo/issues?state=all&page=1": {
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=2&state=all>; rel="next"`,
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=5&state=all>; rel="last"`,
 		},
-		"api/v1/repos/jerrykan/example-repo/issues?state=all&page=2": {
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=3&state=all>; rel="next"`,
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=5&state=all>; rel="last"`,
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=1&state=all>; rel="first"`,
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=1&state=all>; rel="prev"`,
+		"v1/repos/jerrykan/example-repo/issues?state=all&page=2": {
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=3&state=all>; rel="next"`,
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=5&state=all>; rel="last"`,
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=1&state=all>; rel="first"`,
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=1&state=all>; rel="prev"`,
 		},
-		"api/v1/repos/jerrykan/example-repo/issues?state=all&page=5": {
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=1&state=all>; rel="first"`,
-			`<http://localhost:3000/api/v1/repos/jerrykan/example-repo/issues?page=4&state=all>; rel="prev"`,
+		"v1/repos/jerrykan/example-repo/issues?state=all&page=5": {
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=1&state=all>; rel="first"`,
+			`<http://localhost:3000/v1/repos/jerrykan/example-repo/issues?page=4&state=all>; rel="prev"`,
 		},
 	}
 

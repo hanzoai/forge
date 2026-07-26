@@ -31,7 +31,7 @@ func ListLicenseTemplates(ctx *context.APIContext) {
 		response[i] = api.LicensesTemplateListEntry{
 			Key:  license,
 			Name: license,
-			URL:  fmt.Sprintf("%sapi/v1/licenses/%s", setting.AppURL, url.PathEscape(license)),
+			URL:  fmt.Sprintf("%sv1/licenses/%s", setting.AppURL, url.PathEscape(license)),
 		}
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -65,7 +65,7 @@ func GetLicenseTemplateInfo(ctx *context.APIContext) {
 	response := api.LicenseTemplateInfo{
 		Key:  name,
 		Name: name,
-		URL:  fmt.Sprintf("%sapi/v1/licenses/%s", setting.AppURL, url.PathEscape(name)),
+		URL:  fmt.Sprintf("%sv1/licenses/%s", setting.AppURL, url.PathEscape(name)),
 		Body: string(text),
 		// This is for combatibilty with the GitHub API. This Text is for some reason added to each License response.
 		Implementation: "Create a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file",

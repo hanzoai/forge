@@ -30,20 +30,20 @@ func TestAPIDownloadArchive(t *testing.T) {
 	session := loginUser(t, user2.LowerName)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
-	link, _ := url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/archive/master.zip", user2.Name, repo.Name))
+	link, _ := url.Parse(fmt.Sprintf("/v1/repos/%s/%s/archive/master.zip", user2.Name, repo.Name))
 	resp := MakeRequest(t, NewRequest(t, "GET", link.String()).AddTokenAuth(token), http.StatusOK)
 	bs, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 	assert.Len(t, bs, 320)
 
-	link, _ = url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/archive/master.tar.gz", user2.Name, repo.Name))
+	link, _ = url.Parse(fmt.Sprintf("/v1/repos/%s/%s/archive/master.tar.gz", user2.Name, repo.Name))
 	resp = MakeRequest(t, NewRequest(t, "GET", link.String()).AddTokenAuth(token), http.StatusOK)
 	bs, err = io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 	assert.Len(t, bs, 266)
 
 	// Must return a link to a commit ID as the "immutable" archive link
-	linkHeaderRe := regexp.MustCompile(`^<(https?://.*/api/v1/repos/user2/repo1/archive/[a-f0-9]+\.tar\.gz.*)>; rel="immutable"$`)
+	linkHeaderRe := regexp.MustCompile(`^<(https?://.*/v1/repos/user2/repo1/archive/[a-f0-9]+\.tar\.gz.*)>; rel="immutable"$`)
 	m := linkHeaderRe.FindStringSubmatch(resp.Header().Get("Link"))
 	assert.NotEmpty(t, m[1])
 	resp = MakeRequest(t, NewRequest(t, "GET", m[1]).AddTokenAuth(token), http.StatusOK)
@@ -52,13 +52,13 @@ func TestAPIDownloadArchive(t *testing.T) {
 	// The locked URL should give the same bytes as the non-locked one
 	assert.Equal(t, bs, bs2)
 
-	link, _ = url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/archive/master.bundle", user2.Name, repo.Name))
+	link, _ = url.Parse(fmt.Sprintf("/v1/repos/%s/%s/archive/master.bundle", user2.Name, repo.Name))
 	resp = MakeRequest(t, NewRequest(t, "GET", link.String()).AddTokenAuth(token), http.StatusOK)
 	bs, err = io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 	assert.Len(t, bs, 382)
 
-	link, _ = url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/archive/master", user2.Name, repo.Name))
+	link, _ = url.Parse(fmt.Sprintf("/v1/repos/%s/%s/archive/master", user2.Name, repo.Name))
 	MakeRequest(t, NewRequest(t, "GET", link.String()).AddTokenAuth(token), http.StatusBadRequest)
 
 	t.Run("GitHubStyle", testAPIDownloadArchiveGitHubStyle)
@@ -73,20 +73,20 @@ func testAPIDownloadArchiveGitHubStyle(t *testing.T) {
 	session := loginUser(t, user2.LowerName)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
-	link, _ := url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/zipball/master", user2.Name, repo.Name))
+	link, _ := url.Parse(fmt.Sprintf("/v1/repos/%s/%s/zipball/master", user2.Name, repo.Name))
 	resp := MakeRequest(t, NewRequest(t, "GET", link.String()).AddTokenAuth(token), http.StatusOK)
 	bs, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 	assert.Len(t, bs, 320)
 
-	link, _ = url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/tarball/master", user2.Name, repo.Name))
+	link, _ = url.Parse(fmt.Sprintf("/v1/repos/%s/%s/tarball/master", user2.Name, repo.Name))
 	resp = MakeRequest(t, NewRequest(t, "GET", link.String()).AddTokenAuth(token), http.StatusOK)
 	bs, err = io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 	assert.Len(t, bs, 266)
 
 	// Must return a link to a commit ID as the "immutable" archive link
-	linkHeaderRe := regexp.MustCompile(`^<(https?://.*/api/v1/repos/user2/repo1/archive/[a-f0-9]+\.tar\.gz.*)>; rel="immutable"$`)
+	linkHeaderRe := regexp.MustCompile(`^<(https?://.*/v1/repos/user2/repo1/archive/[a-f0-9]+\.tar\.gz.*)>; rel="immutable"$`)
 	m := linkHeaderRe.FindStringSubmatch(resp.Header().Get("Link"))
 	assert.NotEmpty(t, m[1])
 	resp = MakeRequest(t, NewRequest(t, "GET", m[1]).AddTokenAuth(token), http.StatusOK)
@@ -95,7 +95,7 @@ func testAPIDownloadArchiveGitHubStyle(t *testing.T) {
 	// The locked URL should give the same bytes as the non-locked one
 	assert.Equal(t, bs, bs2)
 
-	link, _ = url.Parse(fmt.Sprintf("/api/v1/repos/%s/%s/bundle/master", user2.Name, repo.Name))
+	link, _ = url.Parse(fmt.Sprintf("/v1/repos/%s/%s/bundle/master", user2.Name, repo.Name))
 	resp = MakeRequest(t, NewRequest(t, "GET", link.String()).AddTokenAuth(token), http.StatusOK)
 	bs, err = io.ReadAll(resp.Body)
 	assert.NoError(t, err)
@@ -104,9 +104,9 @@ func testAPIDownloadArchiveGitHubStyle(t *testing.T) {
 
 func testAPIDownloadArchivePrivateRepo(t *testing.T) {
 	_ = repo_model.UpdateRepositoryColsNoAutoTime(t.Context(), &repo_model.Repository{ID: 1, IsPrivate: true}, "is_private")
-	MakeRequest(t, NewRequest(t, "HEAD", "/api/v1/repos/user2/repo1/archive/master.zip"), http.StatusNotFound)
-	MakeRequest(t, NewRequest(t, "HEAD", "/api/v1/repos/user2/repo1/zipball/master"), http.StatusNotFound)
+	MakeRequest(t, NewRequest(t, "HEAD", "/v1/repos/user2/repo1/archive/master.zip"), http.StatusNotFound)
+	MakeRequest(t, NewRequest(t, "HEAD", "/v1/repos/user2/repo1/zipball/master"), http.StatusNotFound)
 	_ = repo_model.UpdateRepoUnitPublicAccess(t.Context(), &repo_model.RepoUnit{RepoID: 1, Type: unit.TypeCode, AnonymousAccessMode: perm.AccessModeRead})
-	MakeRequest(t, NewRequest(t, "HEAD", "/api/v1/repos/user2/repo1/archive/master.zip"), http.StatusOK)
-	MakeRequest(t, NewRequest(t, "HEAD", "/api/v1/repos/user2/repo1/zipball/master"), http.StatusOK)
+	MakeRequest(t, NewRequest(t, "HEAD", "/v1/repos/user2/repo1/archive/master.zip"), http.StatusOK)
+	MakeRequest(t, NewRequest(t, "HEAD", "/v1/repos/user2/repo1/zipball/master"), http.StatusOK)
 }

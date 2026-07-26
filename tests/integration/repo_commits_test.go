@@ -151,7 +151,7 @@ func TestRepoCommitsWithStatus(t *testing.T) {
 			require.NotNil(t, status)
 
 			assert.Equal(t, state, statuses[0].State)
-			assert.Equal(t, setting.AppURL+"api/v1/repos/user2/repo1/statuses/"+commitID, statuses[0].URL)
+			assert.Equal(t, setting.AppURL+"v1/repos/user2/repo1/statuses/"+commitID, statuses[0].URL)
 			assert.Equal(t, "http://test.ci/", statuses[0].TargetURL)
 			assert.Empty(t, statuses[0].Description)
 			assert.Equal(t, "testci", statuses[0].Context)
@@ -161,13 +161,13 @@ func TestRepoCommitsWithStatus(t *testing.T) {
 			assert.Equal(t, commitID, status.SHA)
 		}
 		// By SHA
-		testRepoCommitsWithStatus(t, "/api/v1/repos/user2/repo1/commits/"+commitID+"/statuses", "/api/v1/repos/user2/repo1/commits/"+commitID+"/status", state)
+		testRepoCommitsWithStatus(t, "/v1/repos/user2/repo1/commits/"+commitID+"/statuses", "/v1/repos/user2/repo1/commits/"+commitID+"/status", state)
 		// By short SHA
-		testRepoCommitsWithStatus(t, "/api/v1/repos/user2/repo1/commits/"+commitID[:7]+"/statuses", "/api/v1/repos/user2/repo1/commits/"+commitID[:7]+"/status", state)
+		testRepoCommitsWithStatus(t, "/v1/repos/user2/repo1/commits/"+commitID[:7]+"/statuses", "/v1/repos/user2/repo1/commits/"+commitID[:7]+"/status", state)
 		// By Ref
-		testRepoCommitsWithStatus(t, "/api/v1/repos/user2/repo1/commits/master/statuses", "/api/v1/repos/user2/repo1/commits/master/status", state)
+		testRepoCommitsWithStatus(t, "/v1/repos/user2/repo1/commits/master/statuses", "/v1/repos/user2/repo1/commits/master/status", state)
 		// Tag "v1.1" points to master
-		testRepoCommitsWithStatus(t, "/api/v1/repos/user2/repo1/commits/v1.1/statuses", "/api/v1/repos/user2/repo1/commits/v1.1/status", state)
+		testRepoCommitsWithStatus(t, "/v1/repos/user2/repo1/commits/v1.1/statuses", "/v1/repos/user2/repo1/commits/v1.1/status", state)
 	}
 
 	t.Run("pending", func(t *testing.T) { testRefMaster(t, "pending", "octicon-dot-fill", "tw-text-yellow") })
@@ -178,7 +178,7 @@ func TestRepoCommitsWithStatus(t *testing.T) {
 	t.Run("BranchWithSlash", func(t *testing.T) {
 		_ = db.TruncateBeans(t.Context(), &git_model.CommitStatus{})
 
-		linkList, linkCombined := "/api/v1/repos/user2/repo1/commits/feature%2F1/statuses", "/api/v1/repos/user2/repo1/commits/feature/1/status"
+		linkList, linkCombined := "/v1/repos/user2/repo1/commits/feature%2F1/statuses", "/v1/repos/user2/repo1/commits/feature/1/status"
 		statuses, status := requestCommitStatuses(t, linkList, linkCombined)
 		assert.Empty(t, statuses)
 		assert.Empty(t, status.Statuses)

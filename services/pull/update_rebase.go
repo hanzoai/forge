@@ -68,7 +68,7 @@ func updateHeadByRebaseOnToBase(ctx context.Context, pr *issues_model.PullReques
 		AddDynamicArguments(tmpRepoStagingBranch + ":" + git.BranchPrefix + pr.HeadBranch)
 
 	// Push back to the head repository.
-	// TODO: this cause an api call to "/api/internal/hook/post-receive/...",
+	// TODO: this cause an api call to "/v1/internal/hook/post-receive/...",
 	//       that prevents us from doint the whole merge in one db transaction
 	mergeCtx.outbuf.Reset()
 

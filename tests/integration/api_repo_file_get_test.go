@@ -18,7 +18,7 @@ func TestAPIGetRawFileOrLFS(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
 	// Test with raw file
-	req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/media/README.md")
+	req := NewRequest(t, "GET", "/v1/repos/user2/repo1/media/README.md")
 	resp := MakeRequest(t, req, http.StatusOK)
 	assert.Equal(t, "# repo1\n\nDescription for repo1", resp.Body.String())
 
@@ -41,7 +41,7 @@ func TestAPIGetRawFileOrLFS(t *testing.T) {
 
 			lfs := lfsCommitAndPushTest(t, dstPath, testFileSizeSmall)[0]
 
-			reqLFS := NewRequest(t, "GET", "/api/v1/repos/user2/repo-lfs-test/media/"+lfs).AddTokenAuth(httpContext.Token)
+			reqLFS := NewRequest(t, "GET", "/v1/repos/user2/repo-lfs-test/media/"+lfs).AddTokenAuth(httpContext.Token)
 			respLFS := MakeRequest(t, reqLFS, http.StatusOK)
 			assert.Equal(t, testFileSizeSmall, respLFS.Body.Len())
 		})

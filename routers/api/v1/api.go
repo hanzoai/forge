@@ -1015,7 +1015,7 @@ func Routes() *web.Router {
 		// Miscellaneous (no scope required)
 		if setting.API.EnableSwagger {
 			m.Get("/swagger", func(ctx *context.APIContext) {
-				ctx.Redirect(setting.AppSubURL + "/api/swagger")
+				ctx.Redirect(setting.AppSubURL + "/swagger")
 			})
 		}
 

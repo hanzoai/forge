@@ -216,7 +216,7 @@ func TestAPIRepoEdit(t *testing.T) {
 		assert.True(t, *origRepoEditOption.HasReleases)
 		assert.True(t, *origRepoEditOption.HasActions)
 		repoEditOption := getNewRepoEditOption(origRepoEditOption)
-		req := NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo1.Name), &repoEditOption).
+		req := NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo1.Name), &repoEditOption).
 			AddTokenAuth(token2)
 		resp := MakeRequest(t, req, http.StatusOK)
 		repo := DecodeJSON(t, resp, &api.Repository{})
@@ -251,7 +251,7 @@ func TestAPIRepoEdit(t *testing.T) {
 		}
 		*repoEditOption.HasWiki = true
 		repoEditOption.ExternalWiki = nil
-		url := fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, *repoEditOption.Name)
+		url := fmt.Sprintf("/v1/repos/%s/%s", user2.Name, *repoEditOption.Name)
 		req = NewRequestWithJSON(t, "PATCH", url, &repoEditOption).
 			AddTokenAuth(token2)
 		resp = MakeRequest(t, req, http.StatusOK)
@@ -347,37 +347,37 @@ func TestAPIRepoEdit(t *testing.T) {
 		assert.False(t, *repo1editedOption.HasActions)
 
 		// reset repo in db
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, *repoEditOption.Name), &origRepoEditOption).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, *repoEditOption.Name), &origRepoEditOption).
 			AddTokenAuth(token2)
 		_ = MakeRequest(t, req, http.StatusOK)
 
 		// Test editing a non-existing repo
 		name := "repodoesnotexist"
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, name), &api.EditRepoOption{Name: &name}).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, name), &api.EditRepoOption{Name: &name}).
 			AddTokenAuth(token2)
 		_ = MakeRequest(t, req, http.StatusNotFound)
 
 		// Test editing repo16 by user4 who does not have write access
 		origRepoEditOption = getRepoEditOptionFromRepo(repo16)
 		repoEditOption = getNewRepoEditOption(origRepoEditOption)
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo16.Name), &repoEditOption).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo16.Name), &repoEditOption).
 			AddTokenAuth(token4)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// Tests a repo with no token given so will fail
 		origRepoEditOption = getRepoEditOptionFromRepo(repo16)
 		repoEditOption = getNewRepoEditOption(origRepoEditOption)
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo16.Name), &repoEditOption)
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo16.Name), &repoEditOption)
 		_ = MakeRequest(t, req, http.StatusNotFound)
 
 		// Test using access token for a private repo that the user of the token owns
 		origRepoEditOption = getRepoEditOptionFromRepo(repo16)
 		repoEditOption = getNewRepoEditOption(origRepoEditOption)
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo16.Name), &repoEditOption).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo16.Name), &repoEditOption).
 			AddTokenAuth(token2)
 		_ = MakeRequest(t, req, http.StatusOK)
 		// reset repo in db
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, *repoEditOption.Name), &origRepoEditOption).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, *repoEditOption.Name), &origRepoEditOption).
 			AddTokenAuth(token2)
 		_ = MakeRequest(t, req, http.StatusOK)
 
@@ -387,7 +387,7 @@ func TestAPIRepoEdit(t *testing.T) {
 		repoEditOption = &api.EditRepoOption{
 			Private: &bFalse,
 		}
-		url = fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo16.Name)
+		url = fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo16.Name)
 		req = NewRequestWithJSON(t, "PATCH", url, &repoEditOption).
 			AddTokenAuth(token2)
 		_ = MakeRequest(t, req, http.StatusOK)
@@ -401,7 +401,7 @@ func TestAPIRepoEdit(t *testing.T) {
 
 		// Test to change empty repo
 		assert.False(t, repo15.IsArchived)
-		url = fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo15.Name)
+		url = fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo15.Name)
 		req = NewRequestWithJSON(t, "PATCH", url, &api.EditRepoOption{
 			Archived: &bTrue,
 		}).AddTokenAuth(token2)
@@ -416,30 +416,30 @@ func TestAPIRepoEdit(t *testing.T) {
 		// Test using org repo "org3/repo3" where user2 is a collaborator
 		origRepoEditOption = getRepoEditOptionFromRepo(repo3)
 		repoEditOption = getNewRepoEditOption(origRepoEditOption)
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", org3.Name, repo3.Name), &repoEditOption).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", org3.Name, repo3.Name), &repoEditOption).
 			AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusOK)
 		// reset repo in db
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", org3.Name, *repoEditOption.Name), &origRepoEditOption).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", org3.Name, *repoEditOption.Name), &origRepoEditOption).
 			AddTokenAuth(token2)
 		_ = MakeRequest(t, req, http.StatusOK)
 
 		// Test using org repo "org3/repo3" with no user token
 		origRepoEditOption = getRepoEditOptionFromRepo(repo3)
 		repoEditOption = getNewRepoEditOption(origRepoEditOption)
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", org3.Name, repo3.Name), &repoEditOption)
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", org3.Name, repo3.Name), &repoEditOption)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// Test using repo "user2/repo1" where user4 is a NOT collaborator
 		origRepoEditOption = getRepoEditOptionFromRepo(repo1)
 		repoEditOption = getNewRepoEditOption(origRepoEditOption)
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo1.Name), &repoEditOption).
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo1.Name), &repoEditOption).
 			AddTokenAuth(token4)
 		MakeRequest(t, req, http.StatusForbidden)
 
 		// Test updating pull request settings without setting has_pull_requests
 		repo1 = unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
-		url = fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo1.Name)
+		url = fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo1.Name)
 		req = NewRequestWithJSON(t, "PATCH", url, &api.EditRepoOption{
 			DefaultDeleteBranchAfterMerge: &bTrue,
 		}).AddTokenAuth(token2)
@@ -460,7 +460,7 @@ func TestAPIRepoEdit(t *testing.T) {
 
 		require.NoError(t, mirror_service.UpdateAddress(ctx, mirror, "https://existing-user:existing-password@example.com/user2/repo1.git"))
 
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", mirrorRepo.OwnerName, mirrorRepo.Name), &api.EditRepoOption{
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", mirrorRepo.OwnerName, mirrorRepo.Name), &api.EditRepoOption{
 			MirrorPassword: &newPassword,
 		}).AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusOK)
@@ -484,7 +484,7 @@ func TestAPIRepoEdit(t *testing.T) {
 
 		require.NoError(t, mirror_service.UpdateAddress(ctx, mirror, "https://example.com/user2/repo1.git"))
 
-		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/api/v1/repos/%s/%s", mirrorRepo.OwnerName, mirrorRepo.Name), &api.EditRepoOption{
+		req = NewRequestWithJSON(t, "PATCH", fmt.Sprintf("/v1/repos/%s/%s", mirrorRepo.OwnerName, mirrorRepo.Name), &api.EditRepoOption{
 			MirrorToken: &token,
 		}).AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusOK)
@@ -513,7 +513,7 @@ func TestAPIRepoEditPullUpdateSettingsValidation(t *testing.T) {
 
 	session := loginUser(t, user2.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-	repoURL := fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo1.Name)
+	repoURL := fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo1.Name)
 
 	allowMergeUpdate := false
 	allowRebaseUpdate := false

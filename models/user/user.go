@@ -596,6 +596,8 @@ var (
 
 		"api",     // gitea api
 		"metrics", // prometheus metrics api
+		"swagger", // api reference page
+		"v1",      // rest api, packages, internal api
 		"v2",      // container registry api
 
 		"assets",      // static asset files

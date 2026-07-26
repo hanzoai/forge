@@ -23,7 +23,7 @@ func TestAPIUserReposPublicOnly(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadRepository, auth_model.AccessTokenScopePublicOnly)
-	req := NewRequest(t, "GET", "/api/v1/user/repos").
+	req := NewRequest(t, "GET", "/v1/user/repos").
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -35,7 +35,7 @@ func TestAPIUserReposPublicOnly(t *testing.T) {
 	}
 	assert.NotContains(t, repoNames(repos), "user2/repo2")
 
-	req = NewRequest(t, "GET", "/api/v1/users/user2/repos").
+	req = NewRequest(t, "GET", "/v1/users/user2/repos").
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	DecodeJSON(t, resp, &repos)
@@ -58,11 +58,11 @@ func TestAPIRepoByIDPublicOnly(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadRepository, auth_model.AccessTokenScopePublicOnly)
-	req := NewRequest(t, "GET", "/api/v1/repositories/1").
+	req := NewRequest(t, "GET", "/v1/repositories/1").
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 
-	req = NewRequest(t, "GET", "/api/v1/repositories/2").
+	req = NewRequest(t, "GET", "/v1/repositories/2").
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -71,7 +71,7 @@ func TestAPIActivityFeedsPublicOnly(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadUser)
-	req := NewRequest(t, "GET", "/api/v1/users/user2/activities/feeds").
+	req := NewRequest(t, "GET", "/v1/users/user2/activities/feeds").
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var activities []api.Activity
@@ -79,21 +79,21 @@ func TestAPIActivityFeedsPublicOnly(t *testing.T) {
 	assert.NotEmpty(t, activities)
 
 	publicToken := getUserToken(t, "user2", auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopePublicOnly)
-	req = NewRequest(t, "GET", "/api/v1/users/user2/activities/feeds").
+	req = NewRequest(t, "GET", "/v1/users/user2/activities/feeds").
 		AddTokenAuth(publicToken)
 	resp = MakeRequest(t, req, http.StatusOK)
 	DecodeJSON(t, resp, &activities)
 	assertPublicActivitiesOnly(t, activities)
 
 	orgToken := getUserToken(t, "user2", auth_model.AccessTokenScopeReadOrganization)
-	req = NewRequest(t, "GET", "/api/v1/orgs/org3/activities/feeds").
+	req = NewRequest(t, "GET", "/v1/orgs/org3/activities/feeds").
 		AddTokenAuth(orgToken)
 	resp = MakeRequest(t, req, http.StatusOK)
 	DecodeJSON(t, resp, &activities)
 	assert.NotEmpty(t, activities)
 
 	publicOrgToken := getUserToken(t, "user2", auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopePublicOnly)
-	req = NewRequest(t, "GET", "/api/v1/orgs/org3/activities/feeds").
+	req = NewRequest(t, "GET", "/v1/orgs/org3/activities/feeds").
 		AddTokenAuth(publicOrgToken)
 	resp = MakeRequest(t, req, http.StatusOK)
 	DecodeJSON(t, resp, &activities)
@@ -108,12 +108,12 @@ func TestAPIOrgPermissionsPublicOnly(t *testing.T) {
 
 	// a full org-scoped token can read the membership permissions
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadOrganization)
-	req := NewRequestf(t, "GET", "/api/v1/users/user2/orgs/%s/permissions", org.Name).AddTokenAuth(token)
+	req := NewRequestf(t, "GET", "/v1/users/user2/orgs/%s/permissions", org.Name).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 
 	// a public-only token must not disclose permissions for a private org
 	publicToken := getUserToken(t, "user2", auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopePublicOnly)
-	req = NewRequestf(t, "GET", "/api/v1/users/user2/orgs/%s/permissions", org.Name).AddTokenAuth(publicToken)
+	req = NewRequestf(t, "GET", "/v1/users/user2/orgs/%s/permissions", org.Name).AddTokenAuth(publicToken)
 	MakeRequest(t, req, http.StatusNotFound)
 }
 
@@ -127,14 +127,14 @@ func TestAPITeamReposPublicOnly(t *testing.T) {
 
 	// a full org+repo scoped token sees the private repos
 	token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadRepository)
-	req := NewRequestf(t, "GET", "/api/v1/teams/%d/repos", team.ID).AddTokenAuth(token)
+	req := NewRequestf(t, "GET", "/v1/teams/%d/repos", team.ID).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	repos := DecodeJSON(t, resp, []api.Repository{})
 	assert.Contains(t, repoNames(repos), privateRepo.FullName())
 
 	// a public-only token must not receive any private repo
 	publicToken := getUserToken(t, "user2", auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadRepository, auth_model.AccessTokenScopePublicOnly)
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d/repos", team.ID).AddTokenAuth(publicToken)
+	req = NewRequestf(t, "GET", "/v1/teams/%d/repos", team.ID).AddTokenAuth(publicToken)
 	resp = MakeRequest(t, req, http.StatusOK)
 	repos = DecodeJSON(t, resp, []api.Repository{})
 	for _, repo := range repos {
@@ -147,9 +147,9 @@ func TestAPITeamReposPublicOnly(t *testing.T) {
 	assert.Equal(t, strconv.Itoa(len(repos)), resp.Header().Get("X-Total-Count"))
 
 	// the single-repo endpoint must not confirm a private repo for a public-only token
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d/repos/%s", team.ID, privateRepo.FullName()).AddTokenAuth(token)
+	req = NewRequestf(t, "GET", "/v1/teams/%d/repos/%s", team.ID, privateRepo.FullName()).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
-	req = NewRequestf(t, "GET", "/api/v1/teams/%d/repos/%s", team.ID, privateRepo.FullName()).AddTokenAuth(publicToken)
+	req = NewRequestf(t, "GET", "/v1/teams/%d/repos/%s", team.ID, privateRepo.FullName()).AddTokenAuth(publicToken)
 	MakeRequest(t, req, http.StatusNotFound)
 }
 
@@ -170,7 +170,7 @@ func TestAPIRepoLimitedOwnerPublicOnly(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
 	// limited_org (limited visibility) owns the non-private repo public_repo_on_limited_org
-	const url = "/api/v1/repos/limited_org/public_repo_on_limited_org"
+	const url = "/v1/repos/limited_org/public_repo_on_limited_org"
 
 	// a public-only token is confined to genuinely public resources
 	publicOnlyToken := getUserToken(t, "user2", auth_model.AccessTokenScopeReadRepository, auth_model.AccessTokenScopePublicOnly)

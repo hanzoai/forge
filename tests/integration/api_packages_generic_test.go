@@ -283,7 +283,7 @@ func TestPackageGenericPublicOnlyTokenLimitedOwner(t *testing.T) {
 	req = NewRequest(t, "GET", base+"/file.bin").AddTokenAuth(publicOnlyToken)
 	MakeRequest(t, req, http.StatusForbidden)
 	// same via the v1 package API surface (checkTokenPublicOnly)
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/pkg/1.0.0", owner.Name)).AddTokenAuth(publicOnlyToken)
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/pkg/1.0.0", owner.Name)).AddTokenAuth(publicOnlyToken)
 	MakeRequest(t, req, http.StatusForbidden)
 
 	// a normal read:package token still works, proving only public-only is restricted

@@ -45,7 +45,7 @@ func TestWorkflowConcurrency(t *testing.T) {
 
 		// add a variable for test
 		req := NewRequestWithJSON(t, "POST",
-			fmt.Sprintf("/api/v1/repos/%s/%s/actions/variables/myvar", user2.Name, repo.Name), &api.CreateVariableOption{
+			fmt.Sprintf("/v1/repos/%s/%s/actions/variables/myvar", user2.Name, repo.Name), &api.CreateVariableOption{
 				Value: "abc123",
 			}).
 			AddTokenAuth(token)
@@ -153,7 +153,7 @@ func TestWorkflowConcurrencyShort(t *testing.T) {
 
 		// add a variable for test
 		req := NewRequestWithJSON(t, "POST",
-			fmt.Sprintf("/api/v1/repos/%s/%s/actions/variables/myvar", user2.Name, repo.Name), &api.CreateVariableOption{
+			fmt.Sprintf("/v1/repos/%s/%s/actions/variables/myvar", user2.Name, repo.Name), &api.CreateVariableOption{
 				Value: "abc123",
 			}).
 			AddTokenAuth(token)
@@ -258,7 +258,7 @@ func TestWorkflowConcurrencyShortJson(t *testing.T) {
 
 		// add a variable for test
 		req := NewRequestWithJSON(t, "POST",
-			fmt.Sprintf("/api/v1/repos/%s/%s/actions/variables/myvar", user2.Name, repo.Name), &api.CreateVariableOption{
+			fmt.Sprintf("/v1/repos/%s/%s/actions/variables/myvar", user2.Name, repo.Name), &api.CreateVariableOption{
 				Value: "abc123",
 			}).
 			AddTokenAuth(token)
@@ -420,7 +420,7 @@ jobs:
 		assert.Equal(t, actions_model.StatusRunning, pr1Run1.Status)
 
 		// user4 forks the repo
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
 			&api.CreateForkOption{
 				Name: new("actions-concurrency-fork"),
 			}).AddTokenAuth(user4Token)
@@ -525,7 +525,7 @@ func TestJobConcurrency(t *testing.T) {
 
 		// add a variable for test
 		req := NewRequestWithJSON(t, "POST",
-			fmt.Sprintf("/api/v1/repos/%s/%s/actions/variables/version_var", user2.Name, repo.Name), &api.CreateVariableOption{
+			fmt.Sprintf("/v1/repos/%s/%s/actions/variables/version_var", user2.Name, repo.Name), &api.CreateVariableOption{
 				Value: "v1.23.0",
 			}).
 			AddTokenAuth(token)

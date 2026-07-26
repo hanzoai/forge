@@ -25,7 +25,7 @@ func TestAPIRepoSecrets(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	t.Run("List", func(t *testing.T) {
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/secrets", repo.FullName())).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/secrets", repo.FullName())).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusOK)
 	})
@@ -66,7 +66,7 @@ func TestAPIRepoSecrets(t *testing.T) {
 		}
 
 		for _, c := range cases {
-			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/actions/secrets/%s", repo.FullName(), c.Name), api.CreateOrUpdateSecretOption{
+			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/actions/secrets/%s", repo.FullName(), c.Name), api.CreateOrUpdateSecretOption{
 				Data: "data",
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, c.ExpectedStatus)
@@ -92,7 +92,7 @@ func TestAPIRepoSecrets(t *testing.T) {
 		}
 
 		for _, c := range cases {
-			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/actions/secrets/%s", repo.FullName(), c.Name), api.CreateOrUpdateSecretOption{
+			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/actions/secrets/%s", repo.FullName(), c.Name), api.CreateOrUpdateSecretOption{
 				Data:        "data",
 				Description: c.Description,
 			}).AddTokenAuth(token)
@@ -102,7 +102,7 @@ func TestAPIRepoSecrets(t *testing.T) {
 
 	t.Run("Update", func(t *testing.T) {
 		name := "update_secret"
-		url := fmt.Sprintf("/api/v1/repos/%s/actions/secrets/%s", repo.FullName(), name)
+		url := fmt.Sprintf("/v1/repos/%s/actions/secrets/%s", repo.FullName(), name)
 
 		req := NewRequestWithJSON(t, "PUT", url, api.CreateOrUpdateSecretOption{
 			Data: "initial",
@@ -117,7 +117,7 @@ func TestAPIRepoSecrets(t *testing.T) {
 
 	t.Run("Delete", func(t *testing.T) {
 		name := "delete_secret"
-		url := fmt.Sprintf("/api/v1/repos/%s/actions/secrets/%s", repo.FullName(), name)
+		url := fmt.Sprintf("/v1/repos/%s/actions/secrets/%s", repo.FullName(), name)
 
 		req := NewRequestWithJSON(t, "PUT", url, api.CreateOrUpdateSecretOption{
 			Data: "initial",

@@ -74,7 +74,7 @@ func testAPICreateWebhookForRepo(t *testing.T, session *TestSession, userName, r
 	if len(branchFilter) > 0 {
 		branchFilterString = branchFilter[0]
 	}
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/"+userName+"/"+repoName+"/hooks", api.CreateHookOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/"+userName+"/"+repoName+"/hooks", api.CreateHookOption{
 		Type: "gitea",
 		Config: api.CreateHookOptionConfig{
 			"content_type": "json",
@@ -100,7 +100,7 @@ func testCreateWebhookForRepo(t *testing.T, session *TestSession, webhookType, u
 
 func testAPICreateWebhookForOrg(t *testing.T, session *TestSession, userName, url, event string) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeAll)
-	req := NewRequestWithJSON(t, "POST", "/api/v1/orgs/"+userName+"/hooks", api.CreateHookOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/orgs/"+userName+"/hooks", api.CreateHookOption{
 		Type: "gitea",
 		Config: api.CreateHookOptionConfig{
 			"content_type": "json",

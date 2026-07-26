@@ -37,7 +37,7 @@ func TestAPIUpdateUserAvatar(t *testing.T) {
 		Image: base64.StdEncoding.EncodeToString(avatar),
 	}
 
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/avatar", &opts).
+	req := NewRequestWithJSON(t, "POST", "/v1/user/avatar", &opts).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 
@@ -45,7 +45,7 @@ func TestAPIUpdateUserAvatar(t *testing.T) {
 		Image: "Invalid",
 	}
 
-	req = NewRequestWithJSON(t, "POST", "/api/v1/user/avatar", &opts).
+	req = NewRequestWithJSON(t, "POST", "/v1/user/avatar", &opts).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusBadRequest)
 
@@ -54,7 +54,7 @@ func TestAPIUpdateUserAvatar(t *testing.T) {
 		Image: base64.StdEncoding.EncodeToString([]byte("This is not an image")),
 	}
 
-	req = NewRequestWithJSON(t, "POST", "/api/v1/user/avatar", &opts).
+	req = NewRequestWithJSON(t, "POST", "/v1/user/avatar", &opts).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusInternalServerError)
 }
@@ -66,7 +66,7 @@ func TestAPIDeleteUserAvatar(t *testing.T) {
 	session := loginUser(t, normalUsername)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteUser)
 
-	req := NewRequest(t, "DELETE", "/api/v1/user/avatar").
+	req := NewRequest(t, "DELETE", "/v1/user/avatar").
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 }

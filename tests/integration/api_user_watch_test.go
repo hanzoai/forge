@@ -30,13 +30,13 @@ func TestAPIWatch(t *testing.T) {
 	t.Run("Watch", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/subscription", repo)).
+		req := NewRequest(t, "PUT", fmt.Sprintf("/v1/repos/%s/subscription", repo)).
 			AddTokenAuth(tokenWithRepoScope)
 		MakeRequest(t, req, http.StatusOK)
 
 		// blocked user can't watch a repo
 		user34 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 34})
-		req = NewRequest(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/subscription", repo)).
+		req = NewRequest(t, "PUT", fmt.Sprintf("/v1/repos/%s/subscription", repo)).
 			AddTokenAuth(getUserToken(t, user34.Name, auth_model.AccessTokenScopeWriteRepository))
 		MakeRequest(t, req, http.StatusForbidden)
 	})
@@ -44,7 +44,7 @@ func TestAPIWatch(t *testing.T) {
 	t.Run("GetWatchedRepos", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/subscriptions", user)).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/subscriptions", user)).
 			AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -58,7 +58,7 @@ func TestAPIWatch(t *testing.T) {
 	t.Run("GetMyWatchedRepos", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", "/api/v1/user/subscriptions").
+		req := NewRequest(t, "GET", "/v1/user/subscriptions").
 			AddTokenAuth(tokenWithRepoScope)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -72,14 +72,14 @@ func TestAPIWatch(t *testing.T) {
 	t.Run("IsWatching", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/subscription", repo))
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/subscription", repo))
 		MakeRequest(t, req, http.StatusUnauthorized)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/subscription", repo)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/subscription", repo)).
 			AddTokenAuth(tokenWithRepoScope)
 		MakeRequest(t, req, http.StatusOK)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/subscription", repo+"notexisting")).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/subscription", repo+"notexisting")).
 			AddTokenAuth(tokenWithRepoScope)
 		MakeRequest(t, req, http.StatusNotFound)
 	})
@@ -87,7 +87,7 @@ func TestAPIWatch(t *testing.T) {
 	t.Run("Unwatch", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/repos/%s/subscription", repo)).
+		req := NewRequest(t, "DELETE", fmt.Sprintf("/v1/repos/%s/subscription", repo)).
 			AddTokenAuth(tokenWithRepoScope)
 		MakeRequest(t, req, http.StatusNoContent)
 	})
@@ -100,17 +100,17 @@ func TestAPIWatchPublicOnly(t *testing.T) {
 	writeRepoToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeReadUser)
 	publicOnlyToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopePublicOnly, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopeReadRepository)
 
-	MakeRequest(t, NewRequest(t, "PUT", "/api/v1/repos/user2/repo1/subscription").AddTokenAuth(writeRepoToken), http.StatusOK)
-	MakeRequest(t, NewRequest(t, "PUT", "/api/v1/repos/user2/repo2/subscription").AddTokenAuth(writeRepoToken), http.StatusOK)
+	MakeRequest(t, NewRequest(t, "PUT", "/v1/repos/user2/repo1/subscription").AddTokenAuth(writeRepoToken), http.StatusOK)
+	MakeRequest(t, NewRequest(t, "PUT", "/v1/repos/user2/repo2/subscription").AddTokenAuth(writeRepoToken), http.StatusOK)
 
-	resp := MakeRequest(t, NewRequest(t, "GET", "/api/v1/user/subscriptions").AddTokenAuth(publicOnlyToken), http.StatusOK)
+	resp := MakeRequest(t, NewRequest(t, "GET", "/v1/user/subscriptions").AddTokenAuth(publicOnlyToken), http.StatusOK)
 	repos := DecodeJSON(t, resp, []api.Repository{})
 	for _, r := range repos {
 		assert.False(t, r.Private, "private repo %s leaked via /user/subscriptions", r.FullName)
 	}
 	assert.NotContains(t, repoNames(repos), "user2/repo2")
 
-	resp = MakeRequest(t, NewRequest(t, "GET", "/api/v1/users/user1/subscriptions").AddTokenAuth(publicOnlyToken), http.StatusOK)
+	resp = MakeRequest(t, NewRequest(t, "GET", "/v1/users/user1/subscriptions").AddTokenAuth(publicOnlyToken), http.StatusOK)
 	repos = DecodeJSON(t, resp, []api.Repository{})
 	for _, r := range repos {
 		assert.False(t, r.Private, "private repo %s leaked via /users/{username}/subscriptions", r.FullName)

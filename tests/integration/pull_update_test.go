@@ -45,7 +45,7 @@ func TestAPIPullUpdate(t *testing.T) {
 
 		session := loginUser(t, "user2")
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-		req := NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req := NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(token)
 		session.MakeRequest(t, req, http.StatusOK)
 
@@ -79,7 +79,7 @@ func TestAPIPullUpdatePublicOnlyToken(t *testing.T) {
 
 		// a public-only write token must be refused (404), not perform the push
 		publicOnlyToken := getUserToken(t, user.Name, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopePublicOnly)
-		req := NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req := NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(publicOnlyToken)
 		MakeRequest(t, req, http.StatusNotFound)
 
@@ -90,7 +90,7 @@ func TestAPIPullUpdatePublicOnlyToken(t *testing.T) {
 
 		// a normal write token still works, proving the guard is scope-specific
 		token := getUserToken(t, user.Name, auth_model.AccessTokenScopeWriteRepository)
-		req = NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req = NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusOK)
 	})
@@ -143,7 +143,7 @@ func TestAPIPullUpdateByRebase(t *testing.T) {
 
 		session := loginUser(t, "user2")
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-		req := NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update?style=rebase", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req := NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update?style=rebase", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(token)
 		session.MakeRequest(t, req, http.StatusForbidden)
 
@@ -156,14 +156,14 @@ func TestAPIPullUpdateByRebase(t *testing.T) {
 		assert.NoError(t, err)
 		token40 := getUserToken(t, "user40", auth_model.AccessTokenScopeWriteRepository)
 
-		req = NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update?style=rebase", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req = NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update?style=rebase", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(token40)
 		session.MakeRequest(t, req, http.StatusForbidden)
 
 		err = repo_service.AddOrUpdateCollaborator(t.Context(), pr.HeadRepo, user40, perm.AccessModeWrite)
 		assert.NoError(t, err)
 
-		req = NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update?style=rebase", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req = NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update?style=rebase", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(token40)
 		session.MakeRequest(t, req, http.StatusOK)
 
@@ -194,7 +194,7 @@ func TestAPIPullUpdateStyleSettings(t *testing.T) {
 		session := loginUser(t, "user40")
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-		req := NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update?style=merge", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req := NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update?style=merge", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(token)
 		session.MakeRequest(t, req, http.StatusForbidden)
 
@@ -202,7 +202,7 @@ func TestAPIPullUpdateStyleSettings(t *testing.T) {
 			c.AllowMergeUpdate = true
 		})
 
-		req = NewRequestf(t, "POST", "/api/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
+		req = NewRequestf(t, "POST", "/v1/repos/%s/%s/pulls/%d/update", pr.BaseRepo.OwnerName, pr.BaseRepo.Name, pr.Issue.Index).
 			AddTokenAuth(token)
 		session.MakeRequest(t, req, http.StatusOK)
 

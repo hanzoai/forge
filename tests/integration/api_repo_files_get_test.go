@@ -60,47 +60,47 @@ func TestAPIGetRequestedFiles(t *testing.T) {
 	t.Run("User2Get", func(t *testing.T) {
 		reqBodyOpt := &api.GetFilesOptions{Files: []string{"README.md"}}
 		reqBodyParam, _ := json.Marshal(reqBodyOpt)
-		req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/file-contents?body="+url.QueryEscape(string(reqBodyParam)))
+		req := NewRequest(t, "GET", "/v1/repos/user2/repo1/file-contents?body="+url.QueryEscape(string(reqBodyParam)))
 		resp := MakeRequest(t, req, http.StatusOK)
 		ret := DecodeJSON(t, resp, []*api.ContentsResponse{})
 		expected := []*api.ContentsResponse{getExpectedContentsResponseForContents(repo1.DefaultBranch, "branch", lastCommit.ID.String())}
 		assert.Equal(t, expected, ret)
 	})
 	t.Run("User2NoRef", func(t *testing.T) {
-		ret := requestFiles(t, "/api/v1/repos/user2/repo1/file-contents", []string{"README.md"})
+		ret := requestFiles(t, "/v1/repos/user2/repo1/file-contents", []string{"README.md"})
 		expected := []*api.ContentsResponse{getExpectedContentsResponseForContents(repo1.DefaultBranch, "branch", lastCommit.ID.String())}
 		assert.Equal(t, expected, ret)
 	})
 	t.Run("User2RefBranch", func(t *testing.T) {
-		ret := requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=master", []string{"README.md"})
+		ret := requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=master", []string{"README.md"})
 		expected := []*api.ContentsResponse{getExpectedContentsResponseForContents(repo1.DefaultBranch, "branch", lastCommit.ID.String())}
 		assert.Equal(t, expected, ret)
 	})
 	t.Run("User2RefTag", func(t *testing.T) {
-		ret := requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=v1.1", []string{"README.md"})
+		ret := requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=v1.1", []string{"README.md"})
 		expected := []*api.ContentsResponse{getExpectedContentsResponseForContents("v1.1", "tag", lastCommit.ID.String())}
 		assert.Equal(t, expected, ret)
 	})
 	t.Run("User2RefCommit", func(t *testing.T) {
-		ret := requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=65f1bf27bc3bf70f64657658635e66094edbcb4d", []string{"README.md"})
+		ret := requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=65f1bf27bc3bf70f64657658635e66094edbcb4d", []string{"README.md"})
 		expected := []*api.ContentsResponse{getExpectedContentsResponseForContents("65f1bf27bc3bf70f64657658635e66094edbcb4d", "commit", lastCommit.ID.String())}
 		assert.Equal(t, expected, ret)
 	})
 	t.Run("User2RefNotExist", func(t *testing.T) {
-		ret := requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=not-exist", []string{"README.md"}, http.StatusNotFound)
+		ret := requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=not-exist", []string{"README.md"}, http.StatusNotFound)
 		assert.Empty(t, ret)
 	})
 
 	t.Run("PermissionCheck", func(t *testing.T) {
 		filesOptions := &api.GetFilesOptions{Files: []string{"README.md"}}
 		// Test accessing private ref with user token that does not have access - should fail
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/file-contents", user2.Name, repo16.Name), &filesOptions).AddTokenAuth(token4)
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/file-contents", user2.Name, repo16.Name), &filesOptions).AddTokenAuth(token4)
 		MakeRequest(t, req, http.StatusNotFound)
 		// Test access private ref of owner of token
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/file-contents", user2.Name, repo16.Name), &filesOptions).AddTokenAuth(token2)
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/file-contents", user2.Name, repo16.Name), &filesOptions).AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusOK)
 		// Test access of org org3 private repo file by owner user2
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/file-contents", org3.Name, repo3.Name), &filesOptions).AddTokenAuth(token2)
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/file-contents", org3.Name, repo3.Name), &filesOptions).AddTokenAuth(token2)
 		MakeRequest(t, req, http.StatusOK)
 	})
 
@@ -131,24 +131,24 @@ func TestAPIGetRequestedFiles(t *testing.T) {
 		}
 
 		// repo1 "DefaultBranch" has 2 files: LICENSE (1064 bytes), README.md (30 bytes)
-		ret := requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
+		ret := requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
 		assertResponse(t, []*expected{nil, {"LICENSE", true}, {"README.md", true}}, ret)
 
 		// the returned file list is limited by the DefaultPagingNum
 		setting.API.DefaultPagingNum = 2
-		ret = requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
+		ret = requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
 		assertResponse(t, []*expected{nil, {"LICENSE", true}}, ret)
 		setting.API.DefaultPagingNum = 100
 
 		// if a file exceeds the DefaultMaxBlobSize, the content is not returned
 		setting.API.DefaultMaxBlobSize = 200
-		ret = requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
+		ret = requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
 		assertResponse(t, []*expected{nil, {"LICENSE", false}, {"README.md", true}}, ret)
 		setting.API.DefaultMaxBlobSize = 20000
 
 		// if the total response size would exceed the DefaultMaxResponseSize, then the list stops
 		setting.API.DefaultMaxResponseSize = ret[1].Size*4/3 + 10
-		ret = requestFiles(t, "/api/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
+		ret = requestFiles(t, "/v1/repos/user2/repo1/file-contents?ref=DefaultBranch", []string{"no-such.txt", "LICENSE", "README.md"})
 		assertResponse(t, []*expected{nil, {"LICENSE", true}}, ret)
 		setting.API.DefaultMaxBlobSize = 20000
 	})

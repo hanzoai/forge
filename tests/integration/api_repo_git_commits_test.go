@@ -32,15 +32,15 @@ func TestAPIReposGitCommits(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// check invalid requests
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo1/git/commits/12345", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo1/git/commits/12345", user.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/repo1/git/commits/..", user.Name).
+	req = NewRequestf(t, "GET", "/v1/repos/%s/repo1/git/commits/..", user.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusUnprocessableEntity)
 
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/repo1/git/commits/branch-not-exist", user.Name).
+	req = NewRequestf(t, "GET", "/v1/repos/%s/repo1/git/commits/branch-not-exist", user.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 
@@ -50,7 +50,7 @@ func TestAPIReposGitCommits(t *testing.T) {
 		"65f1",   // short sha
 		"65f1bf27bc3bf70f64657658635e66094edbcb4d", // full sha
 	} {
-		req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo1/git/commits/%s", user.Name, ref).
+		req := NewRequestf(t, "GET", "/v1/repos/%s/repo1/git/commits/%s", user.Name, ref).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusOK)
 	}
@@ -63,12 +63,12 @@ func TestAPIReposGitCommitsHEAD(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// HEAD on a valid ref must return 200 (RFC 9110 §9.3.2)
-	req := NewRequestf(t, "HEAD", "/api/v1/repos/%s/repo1/git/commits/master", user.Name).
+	req := NewRequestf(t, "HEAD", "/v1/repos/%s/repo1/git/commits/master", user.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 
 	// HEAD on a missing sha must return 404, not 405
-	req = NewRequestf(t, "HEAD", "/api/v1/repos/%s/repo1/git/commits/12345", user.Name).
+	req = NewRequestf(t, "HEAD", "/v1/repos/%s/repo1/git/commits/12345", user.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -81,7 +81,7 @@ func TestAPIReposGitCommitList(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// Test getting commits (Page 1)
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo20/commits?not=master&sha=remove-files-a", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo20/commits?not=master&sha=remove-files-a", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -104,7 +104,7 @@ func TestAPIReposGitCommitListNotMaster(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// Test getting commits (Page 1)
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/commits", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo16/commits", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -129,7 +129,7 @@ func TestAPIReposGitCommitListPage2Empty(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// Test getting commits (Page=2)
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/commits?page=2", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo16/commits?page=2", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -146,7 +146,7 @@ func TestAPIReposGitCommitListDifferentBranch(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// Test getting commits (Page=1, Branch=good-sign)
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/commits?sha=good-sign", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo16/commits?sha=good-sign", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -165,7 +165,7 @@ func TestAPIReposGitCommitListWithoutSelectFields(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// Test getting commits without files, verification, and stats
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/commits?sha=good-sign&stat=false&files=false&verification=false", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo16/commits?sha=good-sign&stat=false&files=false&verification=false", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -186,7 +186,7 @@ func TestDownloadCommitDiffOrPatch(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// Test getting diff
-	reqDiff := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/git/commits/f27c2b2b03dcab38beaf89b0ab4ff61f6de63441.diff", user.Name).
+	reqDiff := NewRequestf(t, "GET", "/v1/repos/%s/repo16/git/commits/f27c2b2b03dcab38beaf89b0ab4ff61f6de63441.diff", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, reqDiff, http.StatusOK)
 	assert.Equal(t,
@@ -194,7 +194,7 @@ func TestDownloadCommitDiffOrPatch(t *testing.T) {
 		resp.Body.String())
 
 	// Test getting patch
-	reqPatch := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/git/commits/f27c2b2b03dcab38beaf89b0ab4ff61f6de63441.patch", user.Name).
+	reqPatch := NewRequestf(t, "GET", "/v1/repos/%s/repo16/git/commits/f27c2b2b03dcab38beaf89b0ab4ff61f6de63441.patch", user.Name).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, reqPatch, http.StatusOK)
 	assert.Equal(t,
@@ -209,7 +209,7 @@ func TestGetFileHistory(t *testing.T) {
 	session := loginUser(t, user.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/commits?path=readme.md&sha=good-sign", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo16/commits?path=readme.md&sha=good-sign", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -229,7 +229,7 @@ func TestGetFileHistoryNotOnMaster(t *testing.T) {
 	session := loginUser(t, user.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo20/commits?path=test.csv&sha=add-csv&not=master", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo20/commits?path=test.csv&sha=add-csv&not=master", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -252,7 +252,7 @@ func TestGetFileHistoryEmptyDateRange(t *testing.T) {
 	// readme.md exists in repo16 but no commits fall before 1970, so the date
 	// filter yields an empty range: this must return 200 with an empty list,
 	// not 404 (regression: a valid path with an empty date range was a 404).
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/commits?path=readme.md&sha=good-sign&until=1970-01-01T00:00:00Z", user.Name).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/repo16/commits?path=readme.md&sha=good-sign&until=1970-01-01T00:00:00Z", user.Name).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -261,7 +261,7 @@ func TestGetFileHistoryEmptyDateRange(t *testing.T) {
 	assert.Equal(t, "0", resp.Header().Get("X-Total"))
 
 	// a path that does not exist must still return 404 even with a date filter
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/repo16/commits?path=does-not-exist.md&sha=good-sign&until=1970-01-01T00:00:00Z", user.Name).
+	req = NewRequestf(t, "GET", "/v1/repos/%s/repo16/commits?path=does-not-exist.md&sha=good-sign&until=1970-01-01T00:00:00Z", user.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }

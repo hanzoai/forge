@@ -86,7 +86,7 @@ func WebfingerQuery(ctx *context.Context) {
 
 	aliases := []string{
 		u.HTMLURL(ctx),
-		appURL.String() + "api/v1/activitypub/user-id/" + strconv.FormatInt(u.ID, 10),
+		appURL.String() + "v1/activitypub/user-id/" + strconv.FormatInt(u.ID, 10),
 	}
 	if !u.KeepEmailPrivate {
 		aliases = append(aliases, "mailto:"+u.Email)
@@ -105,7 +105,7 @@ func WebfingerQuery(ctx *context.Context) {
 		{
 			Rel:  "self",
 			Type: "application/activity+json",
-			Href: appURL.String() + "api/v1/activitypub/user-id/" + strconv.FormatInt(u.ID, 10),
+			Href: appURL.String() + "v1/activitypub/user-id/" + strconv.FormatInt(u.ID, 10),
 		},
 		{
 			Rel:  "http://openid.net/specs/connect/1.0/issuer",

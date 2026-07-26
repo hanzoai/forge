@@ -35,12 +35,12 @@ func testAPICreateOAuth2Application(t *testing.T) {
 	appBody := api.CreateOAuth2ApplicationOptions{Name: "test-app-1", RedirectURIs: redirectURIs, ConfidentialClient: true}
 
 	// no custom scheme
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/applications/oauth2", &appBody).AddBasicAuth(user.Name)
+	req := NewRequestWithJSON(t, "POST", "/v1/user/applications/oauth2", &appBody).AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusBadRequest)
 
 	// with custom scheme
 	defer test.MockVariableValue(&setting.OAuth2.CustomSchemes, []string{"my-app"})()
-	req = NewRequestWithJSON(t, "POST", "/api/v1/user/applications/oauth2", &appBody).AddBasicAuth(user.Name)
+	req = NewRequestWithJSON(t, "POST", "/v1/user/applications/oauth2", &appBody).AddBasicAuth(user.Name)
 	resp := MakeRequest(t, req, http.StatusCreated)
 	createdApp := DecodeJSON(t, resp, &api.OAuth2Application{})
 
@@ -61,7 +61,7 @@ func testAPIListOAuth2Applications(t *testing.T) {
 	existApp := unittest.AssertExistsAndLoadBean(t, &auth_model.OAuth2Application{UID: user.ID, Name: "test-app-1", ConfidentialClient: true})
 	require.NotEmpty(t, existApp.RedirectURIs)
 
-	req := NewRequest(t, "GET", "/api/v1/user/applications/oauth2").AddTokenAuth(token)
+	req := NewRequest(t, "GET", "/v1/user/applications/oauth2").AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	appList := DecodeJSON(t, resp, api.OAuth2ApplicationList{})
@@ -83,7 +83,7 @@ func testAPIDeleteOAuth2Application(t *testing.T) {
 
 	oldApp := unittest.AssertExistsAndLoadBean(t, &auth_model.OAuth2Application{UID: user.ID, Name: "test-app-1"})
 
-	urlStr := fmt.Sprintf("/api/v1/user/applications/oauth2/%d", oldApp.ID)
+	urlStr := fmt.Sprintf("/v1/user/applications/oauth2/%d", oldApp.ID)
 	req := NewRequest(t, "DELETE", urlStr).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 
@@ -102,7 +102,7 @@ func testAPIGetOAuth2Application(t *testing.T) {
 	existApp := unittest.AssertExistsAndLoadBean(t, &auth_model.OAuth2Application{UID: user.ID, Name: "test-app-1", ConfidentialClient: true})
 	require.NotEmpty(t, existApp.RedirectURIs)
 
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/user/applications/oauth2/%d", existApp.ID)).AddTokenAuth(token)
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/user/applications/oauth2/%d", existApp.ID)).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	expectedApp := DecodeJSON(t, resp, &api.OAuth2Application{})
 
@@ -121,7 +121,7 @@ func testAPIUpdateOAuth2Application(t *testing.T) {
 	existApp := unittest.AssertExistsAndLoadBean(t, &auth_model.OAuth2Application{UID: user.ID, Name: "test-app-1"})
 	redirectURIs := []string{"https://www.google.com", "my-app:foo"}
 	appBody := api.CreateOAuth2ApplicationOptions{Name: "test-app-1", RedirectURIs: redirectURIs, ConfidentialClient: true}
-	urlStr := fmt.Sprintf("/api/v1/user/applications/oauth2/%d", existApp.ID)
+	urlStr := fmt.Sprintf("/v1/user/applications/oauth2/%d", existApp.ID)
 
 	// no custom scheme
 	req := NewRequestWithJSON(t, "PATCH", urlStr, &appBody).AddBasicAuth(user.Name)

@@ -54,7 +54,7 @@ func TestAPIUserSecrets(t *testing.T) {
 		}
 
 		for _, c := range cases {
-			req := NewRequestWithJSON(t, "PUT", "/api/v1/user/actions/secrets/"+c.Name, api.CreateOrUpdateSecretOption{
+			req := NewRequestWithJSON(t, "PUT", "/v1/user/actions/secrets/"+c.Name, api.CreateOrUpdateSecretOption{
 				Data: "data",
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, c.ExpectedStatus)
@@ -63,7 +63,7 @@ func TestAPIUserSecrets(t *testing.T) {
 
 	t.Run("Update", func(t *testing.T) {
 		name := "update_secret"
-		url := "/api/v1/user/actions/secrets/" + name
+		url := "/v1/user/actions/secrets/" + name
 
 		req := NewRequestWithJSON(t, "PUT", url, api.CreateOrUpdateSecretOption{
 			Data: "initial",
@@ -78,7 +78,7 @@ func TestAPIUserSecrets(t *testing.T) {
 
 	t.Run("Delete", func(t *testing.T) {
 		name := "delete_secret"
-		url := "/api/v1/user/actions/secrets/" + name
+		url := "/v1/user/actions/secrets/" + name
 
 		req := NewRequestWithJSON(t, "PUT", url, api.CreateOrUpdateSecretOption{
 			Data: "initial",

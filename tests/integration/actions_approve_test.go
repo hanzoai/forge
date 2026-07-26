@@ -65,7 +65,7 @@ jobs:
 		createWorkflowFile(t, user2Token, baseRepo.OwnerName, baseRepo.Name, wf2TreePath, opts2)
 
 		// user4 forks the repo
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
 			&api.CreateForkOption{
 				Name: new("approve-all-runs-fork"),
 			}).AddTokenAuth(user4Token)
@@ -171,7 +171,7 @@ jobs:
 			getWorkflowCreateFileOptions(user2, baseRepo.DefaultBranch, "add ci", wfContent))
 
 		// user4 forks the repo
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
 			&api.CreateForkOption{Name: new("fork-approval-regression-fork")}).AddTokenAuth(user4Token)
 		resp := MakeRequest(t, req, http.StatusAccepted)
 		apiForkRepo := DecodeJSON(t, resp, &api.Repository{})

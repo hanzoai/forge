@@ -58,7 +58,7 @@ func TestAPIRepoLicense(t *testing.T) {
 		// Change default branch
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 		branchName := "DefaultBranch"
-		req = NewRequestWithJSON(t, "PATCH", "/api/v1/repos/user2/repo1", api.EditRepoOption{
+		req = NewRequestWithJSON(t, "PATCH", "/v1/repos/user2/repo1", api.EditRepoOption{
 			DefaultBranch: &branchName,
 		}).AddTokenAuth(token)
 		session.MakeRequest(t, req, http.StatusOK)
@@ -70,7 +70,7 @@ func TestAPIRepoLicense(t *testing.T) {
 }
 
 func checkRepoLicense(t *testing.T, owner, repo string, expected []string) {
-	reqURL := fmt.Sprintf("/api/v1/repos/%s/%s/licenses", owner, repo)
+	reqURL := fmt.Sprintf("/v1/repos/%s/%s/licenses", owner, repo)
 	req := NewRequest(t, "GET", reqURL)
 	resp := MakeRequest(t, req, http.StatusOK)
 

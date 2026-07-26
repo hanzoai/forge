@@ -36,15 +36,15 @@ func TestAPIReposGitTrees(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// Test a public repo that anyone can GET the tree of
-	_ = MakeRequest(t, NewRequest(t, "GET", "/api/v1/repos/user2/repo1/git/trees/master"), http.StatusOK)
+	_ = MakeRequest(t, NewRequest(t, "GET", "/v1/repos/user2/repo1/git/trees/master"), http.StatusOK)
 
-	resp := MakeRequest(t, NewRequest(t, "GET", "/api/v1/repos/user2/repo1/git/trees/62fb502a7172d4453f0322a2cc85bddffa57f07a?per_page=1"), http.StatusOK)
+	resp := MakeRequest(t, NewRequest(t, "GET", "/v1/repos/user2/repo1/git/trees/62fb502a7172d4453f0322a2cc85bddffa57f07a?per_page=1"), http.StatusOK)
 	respGitTree := DecodeJSON(t, resp, &api.GitTreeResponse{})
 	assert.True(t, respGitTree.Truncated)
 	require.Len(t, respGitTree.Entries, 1)
 	assert.Equal(t, "File-WoW", respGitTree.Entries[0].Path)
 
-	resp = MakeRequest(t, NewRequest(t, "GET", "/api/v1/repos/user2/repo1/git/trees/62fb502a7172d4453f0322a2cc85bddffa57f07a?page=2&per_page=1"), http.StatusOK)
+	resp = MakeRequest(t, NewRequest(t, "GET", "/v1/repos/user2/repo1/git/trees/62fb502a7172d4453f0322a2cc85bddffa57f07a?page=2&per_page=1"), http.StatusOK)
 	respGitTree = DecodeJSON(t, resp, &api.GitTreeResponse{})
 	assert.False(t, respGitTree.Truncated)
 	require.Len(t, respGitTree.Entries, 1)
@@ -55,26 +55,26 @@ func TestAPIReposGitTrees(t *testing.T) {
 		"master",     // Branch
 		repo1TreeSHA, // Tag
 	} {
-		req := NewRequestf(t, "GET", "/api/v1/repos/%s/%s/git/trees/%s", user2.Name, repo16.Name, ref)
+		req := NewRequestf(t, "GET", "/v1/repos/%s/%s/git/trees/%s", user2.Name, repo16.Name, ref)
 		MakeRequest(t, req, http.StatusNotFound)
 	}
 
 	// Test using access token for a private repo that the user of the token owns
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/%s/git/trees/%s", user2.Name, repo16.Name, repo16TreeSHA).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/%s/git/trees/%s", user2.Name, repo16.Name, repo16TreeSHA).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 
 	// Test using bad sha
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/%s/git/trees/%s", user2.Name, repo1.Name, badSHA)
+	req = NewRequestf(t, "GET", "/v1/repos/%s/%s/git/trees/%s", user2.Name, repo1.Name, badSHA)
 	MakeRequest(t, req, http.StatusBadRequest)
 
 	// Test using org repo "org3/repo3" where user2 is a collaborator
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/%s/git/trees/%s", org3.Name, repo3.Name, repo3TreeSHA).
+	req = NewRequestf(t, "GET", "/v1/repos/%s/%s/git/trees/%s", org3.Name, repo3.Name, repo3TreeSHA).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 
 	// Test using org repo "org3/repo3" with no user token
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/%s/git/trees/%s", org3.Name, repo3TreeSHA, repo3.Name)
+	req = NewRequestf(t, "GET", "/v1/repos/%s/%s/git/trees/%s", org3.Name, repo3TreeSHA, repo3.Name)
 	MakeRequest(t, req, http.StatusNotFound)
 
 	// Login as User4.
@@ -82,6 +82,6 @@ func TestAPIReposGitTrees(t *testing.T) {
 	token4 := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeAll)
 
 	// Test using org repo "org3/repo3" where user4 is a NOT collaborator
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/%s/git/trees/d56a3073c1dbb7b15963110a049d50cdb5db99fc?access=%s", org3.Name, repo3.Name, token4)
+	req = NewRequestf(t, "GET", "/v1/repos/%s/%s/git/trees/d56a3073c1dbb7b15963110a049d50cdb5db99fc?access=%s", org3.Name, repo3.Name, token4)
 	MakeRequest(t, req, http.StatusNotFound)
 }

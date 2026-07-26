@@ -41,41 +41,41 @@ async function apiRetry(fn: () => Promise<{ok: () => boolean; status: () => numb
 }
 
 export async function apiCreateRepo(requestContext: APIRequestContext, {name, autoInit = true, headers}: {name: string; autoInit?: boolean; headers?: Record<string, string>}) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/user/repos`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/user/repos`, {
     headers: headers || apiHeaders(),
     data: {name, auto_init: autoInit},
   }), 'apiCreateRepo');
 }
 
 export async function apiCreateOrg(requestContext: APIRequestContext, name: string, {headers}: {headers?: Record<string, string>} = {}) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/orgs`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/orgs`, {
     headers: headers || apiHeaders(),
     data: {username: name},
   }), 'apiCreateOrg');
 }
 
 export async function apiCreateTeam(requestContext: APIRequestContext, org: string, name: string, {permission = 'read', units = ['repo.code'], headers}: {permission?: string; units?: Array<string>; headers?: Record<string, string>} = {}) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/orgs/${org}/teams`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/orgs/${org}/teams`, {
     headers: headers || apiHeaders(),
     data: {name, permission, units},
   }), 'apiCreateTeam');
 }
 
 export async function apiStartStopwatch(requestContext: APIRequestContext, owner: string, repo: string, issueIndex: number, {headers}: {headers?: Record<string, string>} = {}) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/repos/${owner}/${repo}/issues/${issueIndex}/stopwatch/start`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/repos/${owner}/${repo}/issues/${issueIndex}/stopwatch/start`, {
     headers: headers || apiHeaders(),
   }), 'apiStartStopwatch');
 }
 
 export async function apiCreateFile(requestContext: APIRequestContext, owner: string, repo: string, filepath: string, content: string, {branch, newBranch, message}: {branch?: string; newBranch?: string; message?: string} = {}) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/repos/${owner}/${repo}/contents/${filepath}`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/repos/${owner}/${repo}/contents/${filepath}`, {
     headers: apiHeaders(),
     data: {content: Buffer.from(content, 'utf8').toString('base64'), branch, new_branch: newBranch, message},
   }), 'apiCreateFile');
 }
 
 export async function apiCreateBranch(requestContext: APIRequestContext, owner: string, repo: string, newBranch: string) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/repos/${owner}/${repo}/branches`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/repos/${owner}/${repo}/branches`, {
     headers: apiHeaders(),
     data: {new_branch_name: newBranch},
   }), 'apiCreateBranch');
@@ -85,7 +85,7 @@ export async function apiCreateBranch(requestContext: APIRequestContext, owner: 
 export async function apiCreatePR(requestContext: APIRequestContext, owner: string, repo: string, head: string, base: string, title: string, {headers}: {headers?: Record<string, string>} = {}): Promise<number> {
   let prIndex = 0;
   await apiRetry(async () => {
-    const response = await requestContext.post(`${baseUrl()}/api/v1/repos/${owner}/${repo}/pulls`, {
+    const response = await requestContext.post(`${baseUrl()}/v1/repos/${owner}/${repo}/pulls`, {
       headers: headers || apiHeaders(),
       data: {head, base, title},
     });
@@ -97,7 +97,7 @@ export async function apiCreatePR(requestContext: APIRequestContext, owner: stri
 
 /** Create a review on a PR. `event: "COMMENT"` submits immediately without a pending review. */
 export async function apiCreateReview(requestContext: APIRequestContext, owner: string, repo: string, index: number, {event = 'COMMENT', body, comments = [], headers}: {event?: string; body?: string; comments?: Array<{path: string; body: string; new_position?: number; old_position?: number}>; headers?: Record<string, string>} = {}) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/repos/${owner}/${repo}/pulls/${index}/reviews`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/repos/${owner}/${repo}/pulls/${index}/reviews`, {
     headers: headers || apiHeaders(),
     data: {event, body, comments},
   }), 'apiCreateReview');
@@ -111,13 +111,13 @@ export async function createProjectColumn(requestContext: APIRequestContext, own
 }
 
 export async function apiDeleteRepo(requestContext: APIRequestContext, owner: string, name: string) {
-  await apiRetry(() => requestContext.delete(`${baseUrl()}/api/v1/repos/${owner}/${name}`, {
+  await apiRetry(() => requestContext.delete(`${baseUrl()}/v1/repos/${owner}/${name}`, {
     headers: apiHeaders(),
   }), 'apiDeleteRepo');
 }
 
 export async function apiDeleteOrg(requestContext: APIRequestContext, name: string) {
-  await apiRetry(() => requestContext.delete(`${baseUrl()}/api/v1/orgs/${name}`, {
+  await apiRetry(() => requestContext.delete(`${baseUrl()}/v1/orgs/${name}`, {
     headers: apiHeaders(),
   }), 'apiDeleteOrg');
 }
@@ -130,14 +130,14 @@ export function apiUserHeaders(username: string) {
 }
 
 export async function apiCreateUser(requestContext: APIRequestContext, username: string) {
-  await apiRetry(() => requestContext.post(`${baseUrl()}/api/v1/admin/users`, {
+  await apiRetry(() => requestContext.post(`${baseUrl()}/v1/admin/users`, {
     headers: apiHeaders(),
     data: {username, password: testUserPassword, email: `${username}@${env.GIT_TEST_E2E_DOMAIN}`, must_change_password: false},
   }), 'apiCreateUser');
 }
 
 export async function apiDeleteUser(requestContext: APIRequestContext, username: string) {
-  await apiRetry(() => requestContext.delete(`${baseUrl()}/api/v1/admin/users/${username}?purge=true`, {
+  await apiRetry(() => requestContext.delete(`${baseUrl()}/v1/admin/users/${username}?purge=true`, {
     headers: apiHeaders(),
   }), 'apiDeleteUser');
 }
@@ -180,7 +180,7 @@ export async function apiCreateIssue(
 ): Promise<{index: number}> {
   let result: {index: number} = {index: 0};
   await apiRetry(async () => {
-    const response = await requestContext.post(`${baseUrl()}/api/v1/repos/${owner}/${repo}/issues`, {
+    const response = await requestContext.post(`${baseUrl()}/v1/repos/${owner}/${repo}/issues`, {
       headers: headers || apiHeaders(),
       data: {title, body: body || '', projects: projects || []},
     });

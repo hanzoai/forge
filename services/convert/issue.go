@@ -273,7 +273,7 @@ func ToLabel(label *issues_model.Label, repo *repo_model.Repository, org *user_m
 		result.URL = fmt.Sprintf("%s/labels/%d", repo.APIURL(), label.ID)
 	} else { // BelongsToOrg
 		if org != nil {
-			result.URL = fmt.Sprintf("%sapi/v1/orgs/%s/labels/%d", setting.AppURL, url.PathEscape(org.Name), label.ID)
+			result.URL = fmt.Sprintf("%sv1/orgs/%s/labels/%d", setting.AppURL, url.PathEscape(org.Name), label.ID)
 		} else {
 			log.Error("ToLabel did not get org to calculate url for label with id '%d'", label.ID)
 		}

@@ -68,7 +68,7 @@ func TestAPIRepoVariables(t *testing.T) {
 		}
 
 		for _, c := range cases {
-			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/variables/%s", repo.FullName(), c.Name), api.CreateVariableOption{
+			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/variables/%s", repo.FullName(), c.Name), api.CreateVariableOption{
 				Value: "value",
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, c.ExpectedStatus)
@@ -77,7 +77,7 @@ func TestAPIRepoVariables(t *testing.T) {
 
 	t.Run("UpdateRepoVariable", func(t *testing.T) {
 		variableName := "test_update_var"
-		url := fmt.Sprintf("/api/v1/repos/%s/actions/variables/%s", repo.FullName(), variableName)
+		url := fmt.Sprintf("/v1/repos/%s/actions/variables/%s", repo.FullName(), variableName)
 		req := NewRequestWithJSON(t, "POST", url, api.CreateVariableOption{
 			Value: "initial_val",
 		}).AddTokenAuth(token)
@@ -123,7 +123,7 @@ func TestAPIRepoVariables(t *testing.T) {
 		}
 
 		for _, c := range cases {
-			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/actions/variables/%s", repo.FullName(), c.Name), api.UpdateVariableOption{
+			req := NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/actions/variables/%s", repo.FullName(), c.Name), api.UpdateVariableOption{
 				Name:  c.UpdateName,
 				Value: "updated_val",
 			}).AddTokenAuth(token)
@@ -133,7 +133,7 @@ func TestAPIRepoVariables(t *testing.T) {
 
 	t.Run("DeleteRepoVariable", func(t *testing.T) {
 		variableName := "test_delete_var"
-		url := fmt.Sprintf("/api/v1/repos/%s/actions/variables/%s", repo.FullName(), variableName)
+		url := fmt.Sprintf("/v1/repos/%s/actions/variables/%s", repo.FullName(), variableName)
 
 		req := NewRequestWithJSON(t, "POST", url, api.CreateVariableOption{
 			Value: "initial_val",

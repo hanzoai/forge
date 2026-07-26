@@ -62,7 +62,7 @@ func TestHTTPSigPubKey(t *testing.T) {
 		Title: "test-key",
 		Key:   keyType + " " + keyContent,
 	}
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/keys", rawKeyBody).
+	req := NewRequestWithJSON(t, "POST", "/v1/user/keys", rawKeyBody).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusCreated)
 
@@ -72,7 +72,7 @@ func TestHTTPSigPubKey(t *testing.T) {
 
 	// create the request
 	token = getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadAdmin)
-	req = NewRequest(t, "GET", "/api/v1/admin/users").
+	req = NewRequest(t, "GET", "/v1/admin/users").
 		AddTokenAuth(token)
 
 	signer, _, err := httpsig.NewSSHSigner(sshSigner, httpsig.DigestSha512, []string{httpsig.RequestTarget, "(created)", "(expires)"}, httpsig.Signature, 10)
@@ -118,7 +118,7 @@ func TestHTTPSigCert(t *testing.T) {
 	}
 
 	// create the request
-	req = NewRequest(t, "GET", "/api/v1/admin/users")
+	req = NewRequest(t, "GET", "/v1/admin/users")
 
 	// add our cert to the request
 	certString := base64.RawStdEncoding.EncodeToString(pkcert.(*ssh.Certificate).Marshal())

@@ -6,14 +6,12 @@ package private
 import (
 	"context"
 	"fmt"
-
-	"github.com/hanzoai/git/modules/setting"
 )
 
 // UpdatePublicKeyInRepo update public key and if necessary deploy key updates
 func UpdatePublicKeyInRepo(ctx context.Context, keyID, repoID int64) error {
 	// Ask for running deliver hook and test pull request tasks.
-	reqURL := setting.LocalURL + fmt.Sprintf("api/internal/ssh/%d/update/%d", keyID, repoID)
+	reqURL := internalURL(fmt.Sprintf("ssh/%d/update/%d", keyID, repoID))
 	req := newInternalRequestAPI(ctx, reqURL, "POST")
 	_, extra := requestJSONResp(req, &ResponseText{})
 	return extra.Error
@@ -23,7 +21,7 @@ func UpdatePublicKeyInRepo(ctx context.Context, keyID, repoID int64) error {
 // and returns public key found.
 func AuthorizedPublicKeyByContent(ctx context.Context, content string) (*ResponseText, ResponseExtra) {
 	// Ask for running deliver hook and test pull request tasks.
-	reqURL := setting.LocalURL + "api/internal/ssh/authorized_keys"
+	reqURL := internalURL("ssh/authorized_keys")
 	req := newInternalRequestAPI(ctx, reqURL, "POST")
 	req.Param("content", content)
 	return requestJSONResp(req, &ResponseText{})

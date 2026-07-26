@@ -232,7 +232,7 @@ jobs:
 
 			// API: /actions/workflows/dispatch.yaml/dispatches?scoped_workflow_source_repo_id=
 			apiReq := NewRequestWithURLValues(t, "POST",
-				fmt.Sprintf("/api/v1/repos/%s/%s/actions/workflows/dispatch.yaml/dispatches?scoped_workflow_source_repo_id=%d", consumer.OwnerName, consumer.Name, source.ID),
+				fmt.Sprintf("/v1/repos/%s/%s/actions/workflows/dispatch.yaml/dispatches?scoped_workflow_source_repo_id=%d", consumer.OwnerName, consumer.Name, source.ID),
 				url.Values{"ref": {consumer.DefaultBranch}}).AddTokenAuth(user2Token)
 			MakeRequest(t, apiReq, http.StatusNoContent)
 			assert.Equal(t, 2, unittest.GetCount(t, &actions_model.ActionRun{RepoID: consumer.ID, IsScopedRun: true, WorkflowID: "dispatch.yaml", Event: "workflow_dispatch"}),
@@ -277,13 +277,13 @@ jobs:
 
 				if statusCheckEnabled {
 					// satisfy the configured "ci/manual" check so only the scoped check can gate the merge
-					manualStatus := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/statuses/%s", consumer.OwnerName, consumer.Name, pr.Head.Sha),
+					manualStatus := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/statuses/%s", consumer.OwnerName, consumer.Name, pr.Head.Sha),
 						api.CreateStatusOption{State: commitstatus.CommitStatusSuccess, Context: "ci/manual", TargetURL: "http://test.ci/"}).AddTokenAuth(user2Token)
 					user2Session.MakeRequest(t, manualStatus, http.StatusCreated)
 				}
 
 				return func() *RequestWrapper {
-					return NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/pulls/%d/merge", consumer.OwnerName, consumer.Name, pr.Index),
+					return NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/pulls/%d/merge", consumer.OwnerName, consumer.Name, pr.Index),
 						&forms.MergePullRequestForm{Do: string(repo_model.MergeStyleMerge), MergeMessageField: "merge"}).AddTokenAuth(user2Token)
 				}
 			}
@@ -392,7 +392,7 @@ jobs:
 
 			// The skipped (success) status satisfies the required scoped check (prefixed with the source repo), so the merge is allowed.
 			assert.NoError(t, queue.GetManager().FlushAll(t.Context(), 5*time.Second))
-			mergeReq := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/pulls/%d/merge", consumer.OwnerName, consumer.Name, pr.Index),
+			mergeReq := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/pulls/%d/merge", consumer.OwnerName, consumer.Name, pr.Index),
 				&forms.MergePullRequestForm{Do: string(repo_model.MergeStyleMerge), MergeMessageField: "merge"}).AddTokenAuth(user2Token)
 			user2Session.MakeRequest(t, mergeReq, http.StatusOK)
 		})
@@ -512,7 +512,7 @@ jobs:
 
 			// switch the source's trigger to push on its default branch
 			updateReq := NewRequestWithJSON(t, "PUT",
-				fmt.Sprintf("/api/v1/repos/%s/%s/contents/.gitea/scoped_workflows/ci.yaml", source.OwnerName, source.Name),
+				fmt.Sprintf("/v1/repos/%s/%s/contents/.gitea/scoped_workflows/ci.yaml", source.OwnerName, source.Name),
 				&api.UpdateFileOptions{
 					SHA:         created.Content.SHA,
 					FileOptions: api.FileOptions{BranchName: source.DefaultBranch, Message: "switch to push"},
@@ -540,7 +540,7 @@ jobs:
 			user2Session.MakeRequest(t, addReq, http.StatusOK)
 			unittest.AssertExistsAndLoadBean(t, &actions_model.ActionScopedWorkflowSource{OwnerID: user2.ID, SourceRepoID: source.ID})
 
-			delReq := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/repos/%s/%s", source.OwnerName, source.Name)).AddTokenAuth(user2Token)
+			delReq := NewRequest(t, "DELETE", fmt.Sprintf("/v1/repos/%s/%s", source.OwnerName, source.Name)).AddTokenAuth(user2Token)
 			MakeRequest(t, delReq, http.StatusNoContent)
 			unittest.AssertNotExistsBean(t, &actions_model.ActionScopedWorkflowSource{SourceRepoID: source.ID})
 		})

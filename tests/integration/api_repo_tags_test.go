@@ -28,7 +28,7 @@ func TestAPIRepoTags(t *testing.T) {
 
 	repoName := "repo1"
 
-	req := NewRequestf(t, "GET", "/api/v1/repos/%s/%s/tags", user.Name, repoName).
+	req := NewRequestf(t, "GET", "/v1/repos/%s/%s/tags", user.Name, repoName).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 
@@ -38,7 +38,7 @@ func TestAPIRepoTags(t *testing.T) {
 	assert.Equal(t, "v1.1", tags[0].Name)
 	assert.Equal(t, "Initial commit\n", tags[0].Message)
 	assert.Equal(t, "65f1bf27bc3bf70f64657658635e66094edbcb4d", tags[0].Commit.SHA)
-	assert.Equal(t, setting.AppURL+"api/v1/repos/user2/repo1/git/commits/65f1bf27bc3bf70f64657658635e66094edbcb4d", tags[0].Commit.URL)
+	assert.Equal(t, setting.AppURL+"v1/repos/user2/repo1/git/commits/65f1bf27bc3bf70f64657658635e66094edbcb4d", tags[0].Commit.URL)
 	assert.Equal(t, setting.AppURL+"user2/repo1/archive/v1.1.zip", tags[0].ZipballURL)
 	assert.Equal(t, setting.AppURL+"user2/repo1/archive/v1.1.tar.gz", tags[0].TarballURL)
 
@@ -54,14 +54,14 @@ func TestAPIRepoTags(t *testing.T) {
 	assert.Equal(t, newTag.Commit.SHA, respTag.Commit.SHA)
 
 	// get created tag
-	req = NewRequestf(t, "GET", "/api/v1/repos/%s/%s/tags/%s", user.Name, repoName, newTag.Name).
+	req = NewRequestf(t, "GET", "/v1/repos/%s/%s/tags/%s", user.Name, repoName, newTag.Name).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	tag := DecodeJSON(t, resp, &api.Tag{})
 	assert.Equal(t, newTag, tag)
 
 	// delete tag
-	delReq := NewRequestf(t, "DELETE", "/api/v1/repos/%s/%s/tags/%s", user.Name, repoName, newTag.Name).
+	delReq := NewRequestf(t, "DELETE", "/v1/repos/%s/%s/tags/%s", user.Name, repoName, newTag.Name).
 		AddTokenAuth(token)
 	MakeRequest(t, delReq, http.StatusNoContent)
 
@@ -70,7 +70,7 @@ func TestAPIRepoTags(t *testing.T) {
 }
 
 func createNewTagUsingAPI(t *testing.T, token, ownerName, repoName, name, target, msg string) *api.Tag {
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/tags", ownerName, repoName)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/tags", ownerName, repoName)
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.CreateTagOption{
 		TagName: name,
 		Message: msg,

@@ -35,7 +35,7 @@ func testPrivateActivityDoSomethingForActionEntries(t *testing.T) {
 
 	session := loginUser(t, privateActivityTestUser)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues?state=all", owner.Name, repoBefore.Name)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues?state=all", owner.Name, repoBefore.Name)
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.CreateIssueOption{
 		Body:  "test",
 		Title: "test",
@@ -114,7 +114,7 @@ func testPrivateActivityHelperHasVisibleHeatmapFromPublic(t *testing.T) bool {
 // heatmap API helpers
 
 func testPrivateActivityHelperHasHeatmapContentFromPublic(t *testing.T) bool {
-	req := NewRequestf(t, "GET", "/api/v1/users/%s/heatmap", privateActivityTestUser)
+	req := NewRequestf(t, "GET", "/v1/users/%s/heatmap", privateActivityTestUser)
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	items := DecodeJSON(t, resp, []*activities_model.UserHeatmapData{})
@@ -125,7 +125,7 @@ func testPrivateActivityHelperHasHeatmapContentFromPublic(t *testing.T) bool {
 func testPrivateActivityHelperHasHeatmapContentFromSession(t *testing.T, session *TestSession) bool {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser)
 
-	req := NewRequestf(t, "GET", "/api/v1/users/%s/heatmap", privateActivityTestUser).
+	req := NewRequestf(t, "GET", "/v1/users/%s/heatmap", privateActivityTestUser).
 		AddTokenAuth(token)
 	resp := session.MakeRequest(t, req, http.StatusOK)
 

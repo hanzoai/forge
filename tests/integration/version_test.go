@@ -18,7 +18,7 @@ import (
 func TestVersion(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	defer test.MockVariableValue(&setting.AppVer, "test-version-1")()
-	req := NewRequest(t, "GET", "/api/v1/version")
+	req := NewRequest(t, "GET", "/v1/version")
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	version := DecodeJSON(t, resp, &structs.ServerVersion{})

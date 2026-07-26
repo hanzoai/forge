@@ -46,7 +46,7 @@ func New(ctx context.Context, repo, op, token string, logger transfer.Logger) (t
 	if err != nil {
 		return nil, err
 	}
-	server = server.JoinPath("api/internal/repo", repo, "info/lfs")
+	server = server.JoinPath(internalRepoRoutePath, repo, "info/lfs")
 	return &GiteaBackend{ctx: ctx, server: server, op: op, authToken: token, internalAuth: "Bearer " + setting.InternalToken, logger: logger}, nil
 }
 

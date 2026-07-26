@@ -97,9 +97,9 @@ func getExpectedFileResponseForRepoFilesCreate(commitID string, lastCommit *git.
 	treePath := "new/file.txt"
 	encoding := "base64"
 	content := "VGhpcyBpcyBhIE5FVyBmaWxl"
-	selfURL := setting.AppURL + "api/v1/repos/user2/repo1/contents/" + treePath + "?ref=master"
+	selfURL := setting.AppURL + "v1/repos/user2/repo1/contents/" + treePath + "?ref=master"
 	htmlURL := setting.AppURL + "user2/repo1/src/branch/master/" + treePath
-	gitURL := setting.AppURL + "api/v1/repos/user2/repo1/git/blobs/103ff9234cefeee5ec5361d22b49fbb04d385885"
+	gitURL := setting.AppURL + "v1/repos/user2/repo1/git/blobs/103ff9234cefeee5ec5361d22b49fbb04d385885"
 	downloadURL := setting.AppURL + "user2/repo1/raw/branch/master/" + treePath
 	return &api.FileResponse{
 		Content: &api.ContentsResponse{
@@ -125,7 +125,7 @@ func getExpectedFileResponseForRepoFilesCreate(commitID string, lastCommit *git.
 		},
 		Commit: &api.FileCommitResponse{
 			CommitMeta: api.CommitMeta{
-				URL: setting.AppURL + "api/v1/repos/user2/repo1/git/commits/" + commitID,
+				URL: setting.AppURL + "v1/repos/user2/repo1/git/commits/" + commitID,
 				SHA: commitID,
 			},
 			HTMLURL: setting.AppURL + "user2/repo1/commit/" + commitID,
@@ -145,13 +145,13 @@ func getExpectedFileResponseForRepoFilesCreate(commitID string, lastCommit *git.
 			},
 			Parents: []*api.CommitMeta{
 				{
-					URL: setting.AppURL + "api/v1/repos/user2/repo1/git/commits/65f1bf27bc3bf70f64657658635e66094edbcb4d",
+					URL: setting.AppURL + "v1/repos/user2/repo1/git/commits/65f1bf27bc3bf70f64657658635e66094edbcb4d",
 					SHA: "65f1bf27bc3bf70f64657658635e66094edbcb4d",
 				},
 			},
 			Message: "Creates new/file.txt\n",
 			Tree: &api.CommitMeta{
-				URL: setting.AppURL + "api/v1/repos/user2/repo1/git/trees/f93e3a1a1525fb5b91020da86e44810c87a2d7bc",
+				URL: setting.AppURL + "v1/repos/user2/repo1/git/trees/f93e3a1a1525fb5b91020da86e44810c87a2d7bc",
 				SHA: "f93e3a1a1525fb5b91020git dda86e44810c87a2d7bc",
 			},
 		},
@@ -167,9 +167,9 @@ func getExpectedFileResponseForRepoFilesCreate(commitID string, lastCommit *git.
 func getExpectedFileResponseForRepoFilesUpdate(commitID, filename, lastCommitSHA string, lastCommitterWhen, lastAuthorWhen time.Time) *api.FileResponse {
 	encoding := "base64"
 	content := "VGhpcyBpcyBVUERBVEVEIGNvbnRlbnQgZm9yIHRoZSBSRUFETUUgZmlsZQ=="
-	selfURL := setting.AppURL + "api/v1/repos/user2/repo1/contents/" + filename + "?ref=master"
+	selfURL := setting.AppURL + "v1/repos/user2/repo1/contents/" + filename + "?ref=master"
 	htmlURL := setting.AppURL + "user2/repo1/src/branch/master/" + filename
-	gitURL := setting.AppURL + "api/v1/repos/user2/repo1/git/blobs/dbf8d00e022e05b7e5cf7e535de857de57925647"
+	gitURL := setting.AppURL + "v1/repos/user2/repo1/git/blobs/dbf8d00e022e05b7e5cf7e535de857de57925647"
 	downloadURL := setting.AppURL + "user2/repo1/raw/branch/master/" + filename
 	return &api.FileResponse{
 		Content: &api.ContentsResponse{
@@ -195,7 +195,7 @@ func getExpectedFileResponseForRepoFilesUpdate(commitID, filename, lastCommitSHA
 		},
 		Commit: &api.FileCommitResponse{
 			CommitMeta: api.CommitMeta{
-				URL: setting.AppURL + "api/v1/repos/user2/repo1/git/commits/" + commitID,
+				URL: setting.AppURL + "v1/repos/user2/repo1/git/commits/" + commitID,
 				SHA: commitID,
 			},
 			HTMLURL: setting.AppURL + "user2/repo1/commit/" + commitID,
@@ -215,13 +215,13 @@ func getExpectedFileResponseForRepoFilesUpdate(commitID, filename, lastCommitSHA
 			},
 			Parents: []*api.CommitMeta{
 				{
-					URL: setting.AppURL + "api/v1/repos/user2/repo1/git/commits/65f1bf27bc3bf70f64657658635e66094edbcb4d",
+					URL: setting.AppURL + "v1/repos/user2/repo1/git/commits/65f1bf27bc3bf70f64657658635e66094edbcb4d",
 					SHA: "65f1bf27bc3bf70f64657658635e66094edbcb4d",
 				},
 			},
 			Message: "Updates README.md\n",
 			Tree: &api.CommitMeta{
-				URL: setting.AppURL + "api/v1/repos/user2/repo1/git/trees/f93e3a1a1525fb5b91020da86e44810c87a2d7bc",
+				URL: setting.AppURL + "v1/repos/user2/repo1/git/trees/f93e3a1a1525fb5b91020da86e44810c87a2d7bc",
 				SHA: "f93e3a1a1525fb5b91020da86e44810c87a2d7bc",
 			},
 		},
@@ -273,9 +273,9 @@ func getExpectedFileResponseForRepoFilesUpdateRename(commitID, lastCommitSHA str
 
 	var responses []*api.ContentsResponse
 	for _, detail := range details {
-		selfURL := setting.AppURL + "api/v1/repos/user2/lfs/contents/" + detail.filename + "?ref=master"
+		selfURL := setting.AppURL + "v1/repos/user2/lfs/contents/" + detail.filename + "?ref=master"
 		htmlURL := setting.AppURL + "user2/lfs/src/branch/master/" + detail.filename
-		gitURL := setting.AppURL + "api/v1/repos/user2/lfs/git/blobs/" + detail.sha
+		gitURL := setting.AppURL + "v1/repos/user2/lfs/git/blobs/" + detail.sha
 		downloadURL := setting.AppURL + "user2/lfs/raw/branch/master/" + detail.filename
 		// don't set time related fields because there might be different time in one operation
 		responses = append(responses, &api.ContentsResponse{
@@ -305,7 +305,7 @@ func getExpectedFileResponseForRepoFilesUpdateRename(commitID, lastCommitSHA str
 		Files: responses,
 		Commit: &api.FileCommitResponse{
 			CommitMeta: api.CommitMeta{
-				URL: setting.AppURL + "api/v1/repos/user2/lfs/git/commits/" + commitID,
+				URL: setting.AppURL + "v1/repos/user2/lfs/git/commits/" + commitID,
 				SHA: commitID,
 			},
 			HTMLURL: setting.AppURL + "user2/lfs/commit/" + commitID,
@@ -323,13 +323,13 @@ func getExpectedFileResponseForRepoFilesUpdateRename(commitID, lastCommitSHA str
 			},
 			Parents: []*api.CommitMeta{
 				{
-					URL: setting.AppURL + "api/v1/repos/user2/lfs/git/commits/73cf03db6ece34e12bf91e8853dc58f678f2f82d",
+					URL: setting.AppURL + "v1/repos/user2/lfs/git/commits/73cf03db6ece34e12bf91e8853dc58f678f2f82d",
 					SHA: "73cf03db6ece34e12bf91e8853dc58f678f2f82d",
 				},
 			},
 			Message: "Rename files\n",
 			Tree: &api.CommitMeta{
-				URL: setting.AppURL + "api/v1/repos/user2/lfs/git/trees/5307376dc3a5557dc1c403c29a8984668ca9ecb5",
+				URL: setting.AppURL + "v1/repos/user2/lfs/git/trees/5307376dc3a5557dc1c403c29a8984668ca9ecb5",
 				SHA: "5307376dc3a5557dc1c403c29a8984668ca9ecb5",
 			},
 		},

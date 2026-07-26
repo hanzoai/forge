@@ -338,7 +338,7 @@ func TestCantMergeConflict(t *testing.T) {
 
 		// Use API to create a conflicting pr
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
 			Head:  "conflict",
 			Base:  "base",
 			Title: "create a conflicting pr",
@@ -442,7 +442,7 @@ func TestCantMergeUnrelated(t *testing.T) {
 
 		// Use API to create a conflicting pr
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
 			Head:  "unrelated",
 			Base:  "base",
 			Title: "create an unrelated pr",
@@ -471,7 +471,7 @@ func TestFastForwardOnlyMerge(t *testing.T) {
 
 		// Use API to create a pr from update to master
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
 			Head:  "update",
 			Base:  "master",
 			Title: "create a pr that can be fast-forward-only merged",
@@ -505,7 +505,7 @@ func TestFastForwardOnlyMergeWithRequiredSignedCommits(t *testing.T) {
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "update", "README.md", "Hello, signed\n")
 
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-		createPRReq := NewRequestWithJSON(t, http.MethodPost, "/api/v1/repos/user1/repo1/pulls", &api.CreatePullRequestOption{
+		createPRReq := NewRequestWithJSON(t, http.MethodPost, "/v1/repos/user1/repo1/pulls", &api.CreatePullRequestOption{
 			Head:  "update",
 			Base:  "master",
 			Title: "ff-only merge under require-signed-commits",
@@ -566,7 +566,7 @@ func TestFastForwardOnlyMergeWithRequiredSignedCommits(t *testing.T) {
 
 		t.Run("api/fast-forward-only/head-commits-unverified", func(t *testing.T) {
 			apiReq := NewRequestWithJSON(t, http.MethodPost,
-				fmt.Sprintf("/api/v1/repos/user1/repo1/pulls/%s/merge", prIndex),
+				fmt.Sprintf("/v1/repos/user1/repo1/pulls/%s/merge", prIndex),
 				&forms.MergePullRequestForm{Do: string(repo_model.MergeStyleFastForwardOnly)},
 			).AddTokenAuth(token)
 			resp := session.MakeRequest(t, apiReq, http.StatusMethodNotAllowed)
@@ -593,7 +593,7 @@ func TestCantFastForwardOnlyMergeDiverging(t *testing.T) {
 
 		// Use API to create a pr from diverging to update
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/v1/repos/%s/%s/pulls", "user1", "repo1"), &api.CreatePullRequestOption{
 			Head:  "diverging",
 			Base:  "master",
 			Title: "create a pr from a diverging branch",
@@ -745,7 +745,7 @@ func TestPullMergeIndexerNotifier(t *testing.T) {
 		})
 
 		// build the request for searching issues
-		link, _ := url.Parse("/api/v1/repos/issues/search")
+		link, _ := url.Parse("/v1/repos/issues/search")
 		query := url.Values{}
 		query.Add("state", "closed")
 		query.Add("type", "pulls")
@@ -1083,7 +1083,7 @@ func TestPullNonMergeForAdminWithBranchProtection(t *testing.T) {
 
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-		mergeReq := NewRequestWithValues(t, "POST", "/api/v1/repos/user2/repo1/pulls/6/merge", map[string]string{
+		mergeReq := NewRequestWithValues(t, "POST", "/v1/repos/user2/repo1/pulls/6/merge", map[string]string{
 			"head_commit_id":            "",
 			"merge_when_checks_succeed": "false",
 			"force_merge":               "true",
@@ -1141,7 +1141,7 @@ func TestPullForceMergeForBypassAllowlistUser(t *testing.T) {
 		assert.Equal(t, false, mergeForm["allOverridableChecksOk"])
 
 		mergeReq := func(forceMerge bool) *RequestWrapper {
-			return NewRequestWithValues(t, "POST", fmt.Sprintf("/api/v1/repos/user2/repo1/pulls/%d/merge", prIndex), map[string]string{
+			return NewRequestWithValues(t, "POST", fmt.Sprintf("/v1/repos/user2/repo1/pulls/%d/merge", prIndex), map[string]string{
 				"head_commit_id":            "",
 				"merge_when_checks_succeed": "false",
 				"force_merge":               strconv.FormatBool(forceMerge),

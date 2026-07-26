@@ -23,7 +23,7 @@ type nodeInfoLink struct {
 func NodeInfoLinks(ctx *context.Context) {
 	nodeinfolinks := &nodeInfoLinks{
 		Links: []nodeInfoLink{{
-			setting.AppURL + "api/v1/nodeinfo",
+			setting.AppURL + "v1/nodeinfo",
 			"http://nodeinfo.diaspora.software/ns/schema/2.1",
 		}},
 	}

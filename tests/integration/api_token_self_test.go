@@ -24,7 +24,7 @@ func TestAPIGetCurrentToken(t *testing.T) {
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		accessToken := createAPIAccessTokenWithoutCleanUp(t, "test-get-current-token-all", user, []auth_model.AccessTokenScope{auth_model.AccessTokenScopeAll})
 
-		req := NewRequest(t, "GET", "/api/v1/token").
+		req := NewRequest(t, "GET", "/v1/token").
 			AddTokenAuth(accessToken.Token)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -39,7 +39,7 @@ func TestAPIGetCurrentToken(t *testing.T) {
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		accessToken := createAPIAccessTokenWithoutCleanUp(t, "test-get-current-token-limited", user, []auth_model.AccessTokenScope{auth_model.AccessTokenScopeReadRepository})
 
-		req := NewRequest(t, "GET", "/api/v1/token").
+		req := NewRequest(t, "GET", "/v1/token").
 			AddTokenAuth(accessToken.Token)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -51,11 +51,11 @@ func TestAPIGetCurrentToken(t *testing.T) {
 	})
 
 	t.Run("Bad token", func(t *testing.T) {
-		req := NewRequest(t, "GET", "/api/v1/token").
+		req := NewRequest(t, "GET", "/v1/token").
 			AddTokenAuth("this does not exist")
 		MakeRequest(t, req, http.StatusUnauthorized)
 
-		req = NewRequest(t, "GET", "/api/v1/token")
+		req = NewRequest(t, "GET", "/v1/token")
 		MakeRequest(t, req, http.StatusUnauthorized)
 	})
 }
@@ -69,7 +69,7 @@ func TestAPITokenSelfService(t *testing.T) {
 		accessToken := createAPIAccessTokenWithoutCleanUp(t, "test-delete-current-token", user, []auth_model.AccessTokenScope{auth_model.AccessTokenScopeAll})
 
 		// Delete the token via the endpoint
-		req := NewRequest(t, "DELETE", "/api/v1/token").
+		req := NewRequest(t, "DELETE", "/v1/token").
 			AddTokenAuth(accessToken.Token)
 		MakeRequest(t, req, http.StatusNoContent)
 
@@ -77,22 +77,22 @@ func TestAPITokenSelfService(t *testing.T) {
 		unittest.AssertNotExistsBean(t, &auth_model.AccessToken{ID: accessToken.ID})
 
 		// Verify the token can no longer be used for GET
-		req = NewRequest(t, "GET", "/api/v1/token").
+		req = NewRequest(t, "GET", "/v1/token").
 			AddTokenAuth(accessToken.Token)
 		MakeRequest(t, req, http.StatusUnauthorized)
 
 		// Verify the token can no longer be used for DELETE
-		req = NewRequest(t, "DELETE", "/api/v1/token").
+		req = NewRequest(t, "DELETE", "/v1/token").
 			AddTokenAuth(accessToken.Token)
 		MakeRequest(t, req, http.StatusUnauthorized)
 	})
 
 	t.Run("Bad token", func(t *testing.T) {
-		req := NewRequest(t, "DELETE", "/api/v1/token").
+		req := NewRequest(t, "DELETE", "/v1/token").
 			AddTokenAuth("this does not exist")
 		MakeRequest(t, req, http.StatusUnauthorized)
 
-		req = NewRequest(t, "DELETE", "/api/v1/token")
+		req = NewRequest(t, "DELETE", "/v1/token")
 		MakeRequest(t, req, http.StatusUnauthorized)
 	})
 }

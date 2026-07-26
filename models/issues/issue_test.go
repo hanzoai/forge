@@ -66,7 +66,7 @@ func TestIssueAPIURL(t *testing.T) {
 	err := issue.LoadAttributes(t.Context())
 
 	assert.NoError(t, err)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/issues/1", issue.APIURL(t.Context()))
+	assert.Equal(t, "https://try.gitea.io/v1/repos/user2/repo1/issues/1", issue.APIURL(t.Context()))
 }
 
 func TestGetIssuesByIDs(t *testing.T) {

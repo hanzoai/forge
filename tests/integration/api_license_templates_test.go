@@ -20,14 +20,14 @@ import (
 func TestAPIListLicenseTemplates(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	req := NewRequest(t, "GET", "/api/v1/licenses")
+	req := NewRequest(t, "GET", "/v1/licenses")
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	licenseList := DecodeJSON(t, resp, []api.LicensesTemplateListEntry{})
 	assert.Contains(t, licenseList, api.LicensesTemplateListEntry{
 		Key:  "MIT",
 		Name: "MIT",
-		URL:  setting.AppURL + "api/v1/licenses/MIT",
+		URL:  setting.AppURL + "v1/licenses/MIT",
 	})
 }
 
@@ -42,7 +42,7 @@ func TestAPIGetLicenseTemplateInfo(t *testing.T) {
 	// Use the first template for the test
 	licenseName := repo_module.Licenses[0]
 
-	urlStr := "/api/v1/licenses/" + url.PathEscape(licenseName)
+	urlStr := "/v1/licenses/" + url.PathEscape(licenseName)
 	req := NewRequest(t, "GET", urlStr)
 	resp := MakeRequest(t, req, http.StatusOK)
 

@@ -32,7 +32,7 @@ func TestAPIIssuesReactions(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
 
 	user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/reactions", owner.Name, issue.Repo.Name, issue.Index)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/reactions", owner.Name, issue.Repo.Name, issue.Index)
 
 	// Try to add not allowed reaction
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.EditReactionOption{
@@ -100,7 +100,7 @@ func TestAPICommentReactions(t *testing.T) {
 
 	user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 	user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/comments/%d/reactions", owner.Name, issue.Repo.Name, comment.ID)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/comments/%d/reactions", owner.Name, issue.Repo.Name, comment.ID)
 
 	// Try to add not allowed reaction
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.EditReactionOption{
@@ -119,7 +119,7 @@ func TestAPICommentReactions(t *testing.T) {
 		repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 4})
 		repoOwner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: repo.OwnerID})
 		token := getUserToken(t, repoOwner.Name, auth_model.AccessTokenScopeWriteIssue)
-		urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/comments/%d/reactions", repoOwner.Name, repo.Name, comment.ID)
+		urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/comments/%d/reactions", repoOwner.Name, repo.Name, comment.ID)
 		req = NewRequestWithJSON(t, "POST", urlStr, &api.EditReactionOption{
 			Reaction: "+1",
 		}).AddTokenAuth(token)

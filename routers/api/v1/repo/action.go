@@ -2067,11 +2067,11 @@ func buildSignature(endp string, expires, artifactID int64) []byte {
 }
 
 func buildDownloadRawEndpoint(repo *repo_model.Repository, artifactID int64) string {
-	return fmt.Sprintf("api/v1/repos/%s/%s/actions/artifacts/%d/zip/raw", url.PathEscape(repo.OwnerName), url.PathEscape(repo.Name), artifactID)
+	return fmt.Sprintf("v1/repos/%s/%s/actions/artifacts/%d/zip/raw", url.PathEscape(repo.OwnerName), url.PathEscape(repo.Name), artifactID)
 }
 
 func buildSigURL(ctx go_context.Context, endPoint string, artifactID int64) string {
-	// endPoint is a path like "api/v1/repos/owner/repo/actions/artifacts/1/zip/raw"
+	// endPoint is a path like "v1/repos/owner/repo/actions/artifacts/1/zip/raw"
 	expires := time.Now().Add(60 * time.Minute).Unix()
 	uploadURL := httplib.GuessCurrentAppURL(ctx) + endPoint + "?sig=" + base64.RawURLEncoding.EncodeToString(buildSignature(endPoint, expires, artifactID)) + "&expires=" + strconv.FormatInt(expires, 10)
 	return uploadURL

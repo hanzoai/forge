@@ -84,7 +84,7 @@ func (r *mockRunner) doRegister(t *testing.T, name, token string, labels []strin
 func (r *mockRunner) registerAsRepoRunner(t *testing.T, ownerName, repoName, runnerName string, labels []string, ephemeral bool) {
 	session := loginUser(t, ownerName)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-	req := NewRequest(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/%s/actions/runners/registration-token", ownerName, repoName)).AddTokenAuth(token)
+	req := NewRequest(t, http.MethodPost, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/registration-token", ownerName, repoName)).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	registrationToken := DecodeJSON(t, resp, &struct {
 		Token string `json:"token"`

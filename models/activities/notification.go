@@ -307,7 +307,7 @@ func (n *Notification) Link(ctx context.Context) string {
 
 // APIURL formats a URL-string to the notification
 func (n *Notification) APIURL() string {
-	return setting.AppURL + "api/v1/notifications/threads/" + strconv.FormatInt(n.ID, 10)
+	return setting.AppURL + "v1/notifications/threads/" + strconv.FormatInt(n.ID, 10)
 }
 
 func notificationExists(notifications []*Notification, issueID, userID int64) bool {

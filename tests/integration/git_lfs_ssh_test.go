@@ -62,13 +62,13 @@ func TestGitLFSSSH(t *testing.T) {
 		})
 
 		countBatch := slices.ContainsFunc(routerCalls, func(s string) bool {
-			return strings.Contains(s, "POST /api/internal/repo/user2/repo1.git/info/lfs/objects/batch")
+			return strings.Contains(s, "POST /v1/internal/repo/user2/repo1.git/info/lfs/objects/batch")
 		})
 		countUpload := slices.ContainsFunc(routerCalls, func(s string) bool {
-			return strings.Contains(s, "PUT /api/internal/repo/user2/repo1.git/info/lfs/objects/")
+			return strings.Contains(s, "PUT /v1/internal/repo/user2/repo1.git/info/lfs/objects/")
 		})
 		countDownload := slices.ContainsFunc(routerCalls, func(s string) bool {
-			return strings.Contains(s, "GET /api/internal/repo/user2/repo1.git/info/lfs/objects/")
+			return strings.Contains(s, "GET /v1/internal/repo/user2/repo1.git/info/lfs/objects/")
 		})
 		nonAPIRequests := slices.ContainsFunc(routerCalls, func(s string) bool {
 			fields := strings.Fields(s)

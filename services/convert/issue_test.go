@@ -29,7 +29,7 @@ func TestLabel_ToLabel(t *testing.T) {
 		ID:    label.ID,
 		Name:  label.Name,
 		Color: "abcdef",
-		URL:   fmt.Sprintf("%sapi/v1/repos/user2/repo1/labels/%d", setting.AppURL, label.ID),
+		URL:   fmt.Sprintf("%sv1/repos/user2/repo1/labels/%d", setting.AppURL, label.ID),
 	}, ToLabel(label, repo, nil))
 }
 

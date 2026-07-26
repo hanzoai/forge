@@ -45,13 +45,13 @@ func TestActionsReusableWorkflow(t *testing.T) {
 
 			// add a variable for test
 			req := NewRequestWithJSON(t, "POST",
-				fmt.Sprintf("/api/v1/repos/%s/%s/actions/variables/myvar", repo.OwnerName, repo.Name), &api.CreateVariableOption{
+				fmt.Sprintf("/v1/repos/%s/%s/actions/variables/myvar", repo.OwnerName, repo.Name), &api.CreateVariableOption{
 					Value: "abcdef",
 				}).
 				AddTokenAuth(user2Token)
 			MakeRequest(t, req, http.StatusCreated)
 			// add a secret for test
-			req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/%s/actions/secrets/mysecret", repo.OwnerName, repo.Name), api.CreateOrUpdateSecretOption{
+			req = NewRequestWithJSON(t, "PUT", fmt.Sprintf("/v1/repos/%s/%s/actions/secrets/mysecret", repo.OwnerName, repo.Name), api.CreateOrUpdateSecretOption{
 				Data: "secRET-t0Ken",
 			}).AddTokenAuth(user2Token)
 			MakeRequest(t, req, http.StatusCreated)
@@ -584,7 +584,7 @@ jobs:
 
 			// Real secret that must never reach a fork PR task.
 			req := NewRequestWithJSON(t, "PUT",
-				fmt.Sprintf("/api/v1/repos/%s/%s/actions/secrets/leaked_secret", baseRepo.OwnerName, baseRepo.Name),
+				fmt.Sprintf("/v1/repos/%s/%s/actions/secrets/leaked_secret", baseRepo.OwnerName, baseRepo.Name),
 				api.CreateOrUpdateSecretOption{Data: "MUST-NOT-LEAK"}).AddTokenAuth(user2Token)
 			MakeRequest(t, req, http.StatusCreated)
 
@@ -615,7 +615,7 @@ jobs:
 
 			// user4 forks
 			req = NewRequestWithJSON(t, "POST",
-				fmt.Sprintf("/api/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
+				fmt.Sprintf("/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
 				&api.CreateForkOption{Name: new("fork-pr-inherit-test-fork")}).AddTokenAuth(user4Token)
 			resp := MakeRequest(t, req, http.StatusAccepted)
 			apiForkRepo := DecodeJSON(t, resp, &api.Repository{})

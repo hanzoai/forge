@@ -63,7 +63,7 @@ func testOAuth2PrepareTestCode(t *testing.T) {
 
 func createOAuthTestApplication(t *testing.T, userName, name string, redirectURIs []string) *api.OAuth2Application {
 	t.Helper()
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/applications/oauth2", &api.CreateOAuth2ApplicationOptions{
+	req := NewRequestWithJSON(t, "POST", "/v1/user/applications/oauth2", &api.CreateOAuth2ApplicationOptions{
 		Name:               name,
 		RedirectURIs:       redirectURIs,
 		ConfidentialClient: true,
@@ -784,7 +784,7 @@ func testOAuthIntrospectionCrossClientIsolation(t *testing.T) {
 func testOAuthGrantScopesReadUserFailRepos(t *testing.T) {
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 	accessToken := issueOAuthAccessTokenForScope(t, user, "openid read:user")
-	userReq := NewRequest(t, "GET", "/api/v1/user")
+	userReq := NewRequest(t, "GET", "/v1/user")
 	userReq.SetHeader("Authorization", "Bearer "+accessToken)
 	userResp := MakeRequest(t, userReq, http.StatusOK)
 
@@ -797,7 +797,7 @@ func testOAuthGrantScopesReadUserFailRepos(t *testing.T) {
 	require.NoError(t, json.Unmarshal(userResp.Body.Bytes(), userParsed))
 	assert.Contains(t, userParsed.Email, "user2@example.com")
 
-	errorReq := NewRequest(t, "GET", "/api/v1/users/user2/repos")
+	errorReq := NewRequest(t, "GET", "/v1/users/user2/repos")
 	errorReq.SetHeader("Authorization", "Bearer "+accessToken)
 	errorResp := MakeRequest(t, errorReq, http.StatusForbidden)
 
@@ -819,7 +819,7 @@ func testOAuthGrantScopesBasicRespectsWriteUser(t *testing.T) {
 		FullName: &fullName,
 	}
 
-	bearerReq := NewRequestWithJSON(t, "PATCH", "/api/v1/user/settings", updateBody)
+	bearerReq := NewRequestWithJSON(t, "PATCH", "/v1/user/settings", updateBody)
 	bearerReq.SetHeader("Authorization", "Bearer "+accessToken)
 	bearerResp := MakeRequest(t, bearerReq, http.StatusForbidden)
 
@@ -831,7 +831,7 @@ func testOAuthGrantScopesBasicRespectsWriteUser(t *testing.T) {
 	require.NoError(t, json.Unmarshal(bearerResp.Body.Bytes(), bearerError))
 	assert.Contains(t, bearerError.Message, "required=[write:user]")
 
-	basicReq := NewRequestWithJSON(t, "PATCH", "/api/v1/user/settings", updateBody)
+	basicReq := NewRequestWithJSON(t, "PATCH", "/v1/user/settings", updateBody)
 	basicAuth := base64.StdEncoding.EncodeToString([]byte(accessToken + ":x-oauth-basic"))
 	basicReq.SetHeader("Authorization", "Basic "+basicAuth)
 	basicResp := MakeRequest(t, basicReq, http.StatusForbidden)
@@ -852,7 +852,7 @@ func issueOAuthAccessTokenForScope(t *testing.T, user *user_model.User, scope st
 		ConfidentialClient: true,
 	}
 
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/applications/oauth2", &appBody).
+	req := NewRequestWithJSON(t, "POST", "/v1/user/applications/oauth2", &appBody).
 		AddBasicAuth(user.Name)
 	resp := MakeRequest(t, req, http.StatusCreated)
 
@@ -900,7 +900,7 @@ func testOAuthGrantScopesReadRepositoryFailOrganization(t *testing.T) {
 		ConfidentialClient: true,
 	}
 
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/applications/oauth2", &appBody).
+	req := NewRequestWithJSON(t, "POST", "/v1/user/applications/oauth2", &appBody).
 		AddBasicAuth(user.Name)
 	resp := MakeRequest(t, req, http.StatusCreated)
 
@@ -941,7 +941,7 @@ func testOAuthGrantScopesReadRepositoryFailOrganization(t *testing.T) {
 	parsed := new(response)
 
 	require.NoError(t, json.Unmarshal(accessTokenResp.Body.Bytes(), parsed))
-	userReq := NewRequest(t, "GET", "/api/v1/users/user2/repos")
+	userReq := NewRequest(t, "GET", "/v1/users/user2/repos")
 	userReq.SetHeader("Authorization", "Bearer "+parsed.AccessToken)
 	userResp := MakeRequest(t, userReq, http.StatusOK)
 
@@ -1013,7 +1013,7 @@ func testOAuthGrantScopesReadRepositoryFailOrganization(t *testing.T) {
 	}
 	assert.Equal(t, reposExpected, reposCaptured)
 
-	errorReq := NewRequest(t, "GET", "/api/v1/users/user2/orgs")
+	errorReq := NewRequest(t, "GET", "/v1/users/user2/orgs")
 	errorReq.SetHeader("Authorization", "Bearer "+parsed.AccessToken)
 	errorResp := MakeRequest(t, errorReq, http.StatusForbidden)
 
@@ -1037,7 +1037,7 @@ func testOAuthGrantScopesClaimPublicOnlyGroups(t *testing.T) {
 		ConfidentialClient: true,
 	}
 
-	appReq := NewRequestWithJSON(t, "POST", "/api/v1/user/applications/oauth2", &appBody).
+	appReq := NewRequestWithJSON(t, "POST", "/v1/user/applications/oauth2", &appBody).
 		AddBasicAuth(user.Name)
 	appResp := MakeRequest(t, appReq, http.StatusCreated)
 
@@ -1135,7 +1135,7 @@ func testOAuthGrantScopesClaimAllGroups(t *testing.T) {
 		ConfidentialClient: true,
 	}
 
-	appReq := NewRequestWithJSON(t, "POST", "/api/v1/user/applications/oauth2", &appBody).
+	appReq := NewRequestWithJSON(t, "POST", "/v1/user/applications/oauth2", &appBody).
 		AddBasicAuth(user.Name)
 	appResp := MakeRequest(t, appReq, http.StatusCreated)
 

@@ -31,7 +31,6 @@ import (
 	"github.com/hanzoai/git/routers/web/events"
 	"github.com/hanzoai/git/routers/web/explore"
 	"github.com/hanzoai/git/routers/web/feed"
-	"github.com/hanzoai/git/routers/web/healthcheck"
 	"github.com/hanzoai/git/routers/web/misc"
 	"github.com/hanzoai/git/routers/web/org"
 	"github.com/hanzoai/git/routers/web/repo"
@@ -293,10 +292,9 @@ func Routes() *web.Router {
 
 	routes.Methods("GET,HEAD", "/robots.txt", append(mid, misc.RobotsTxt)...)
 	routes.Get("/ssh_info", misc.SSHInfo)
-	routes.Get("/api/healthz", healthcheck.Check)
-	// Mounted here, ahead of the session middleware, because its credential is
-	// the payload HMAC rather than a session.
-	routes.Post("/v1/sync", misc.Sync)
+	// /v1/healthz and /v1/sync are registered in routers.NormalRoutes: the "/v1"
+	// mount there is more specific than this router's "/" mount and would shadow
+	// them here.
 
 	mid = append(mid, common.MustInitSessioner(), context.Contexter())
 
@@ -306,7 +304,7 @@ func Routes() *web.Router {
 
 	if setting.API.EnableSwagger {
 		// Note: The route is here but no in API routes because it renders a web page
-		routes.Get("/api/swagger", append(mid, misc.Swagger)...) // Render V1 by default
+		routes.Get("/swagger", append(mid, misc.Swagger)...) // Render V1 by default
 	}
 
 	mid = append(mid, goGet)

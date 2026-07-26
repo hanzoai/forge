@@ -606,7 +606,7 @@ func TestActionsArtifactV4RunDownloadSinglePublicApi(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifact can be listed and found by name
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/runs/792/artifacts?name=artifact-v4-download", repo.FullName()), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/runs/792/artifacts?name=artifact-v4-download", repo.FullName()), nil).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var listResp api.ActionArtifactsResponse
@@ -639,7 +639,7 @@ func TestActionsArtifactV4DownloadSinglePublicApi(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifact can be listed and found by name
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts?name=artifact-v4-download", repo.FullName()), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts?name=artifact-v4-download", repo.FullName()), nil).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var listResp api.ActionArtifactsResponse
@@ -677,7 +677,7 @@ func TestActionsArtifactV4DownloadSinglePublicApiPrivateRepo(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifact can be listed and found by name
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts?name=artifact-v4-download", repo.FullName()), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts?name=artifact-v4-download", repo.FullName()), nil).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var listResp api.ActionArtifactsResponse
@@ -715,7 +715,7 @@ func TestActionsArtifactV4ListAndGetPublicApi(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifact can be listed
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts", repo.FullName()), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts", repo.FullName()), nil).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var listResp api.ActionArtifactsResponse
@@ -723,8 +723,8 @@ func TestActionsArtifactV4ListAndGetPublicApi(t *testing.T) {
 	assert.NoError(t, err)
 
 	for _, artifact := range listResp.Entries {
-		assert.Contains(t, artifact.URL, fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), artifact.ID))
-		assert.Contains(t, artifact.ArchiveDownloadURL, fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d/zip", repo.FullName(), artifact.ID))
+		assert.Contains(t, artifact.URL, fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), artifact.ID))
+		assert.Contains(t, artifact.ArchiveDownloadURL, fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d/zip", repo.FullName(), artifact.ID))
 		req = NewRequestWithBody(t, "GET", artifact.URL, nil).
 			AddTokenAuth(token)
 
@@ -750,7 +750,7 @@ func TestActionsArtifactV4GetArtifactMismatchedRepoNotFound(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifacts of wrong repo is not visible
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -764,7 +764,7 @@ func TestActionsArtifactV4DownloadArtifactMismatchedRepoNotFound(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifacts of wrong repo is not visible
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d/zip", repo.FullName(), 22), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d/zip", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -778,7 +778,7 @@ func TestActionsArtifactV4DownloadArtifactCorrectRepoFound(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifacts of correct repo is visible
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d/zip", repo.FullName(), 22), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d/zip", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusFound)
 }
@@ -792,7 +792,7 @@ func TestActionsArtifactV4DownloadRawArtifactCorrectRepoMissingSignatureUnauthor
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm cannot use the raw artifact endpoint even with a correct access token
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d/zip/raw", repo.FullName(), 22), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d/zip/raw", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusUnauthorized)
 }
@@ -844,17 +844,17 @@ func TestActionsArtifactV4DeletePublicApi(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// confirm artifacts exists
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 
 	// delete artifact by id
-	req = NewRequestWithBody(t, "DELETE", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
+	req = NewRequestWithBody(t, "DELETE", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 
 	// confirm artifacts has been deleted
-	req = NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
+	req = NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -868,17 +868,17 @@ func TestActionsArtifactV4DeletePublicApiNotAllowedReadScope(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	// confirm artifacts exists
-	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
+	req := NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 
 	// try delete artifact by id
-	req = NewRequestWithBody(t, "DELETE", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
+	req = NewRequestWithBody(t, "DELETE", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusForbidden)
 
 	// confirm artifacts has not been deleted
-	req = NewRequestWithBody(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
+	req = NewRequestWithBody(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/artifacts/%d", repo.FullName(), 22), nil).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 }
@@ -926,7 +926,7 @@ func testActionRunAttemptArtifactV4(t *testing.T, repo *repo_model.Repository, s
 	MakeRequest(t, req, http.StatusNotFound)
 
 	// the run-scoped repo API should list finalized v4 artifacts from all attempts
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/runs/%d/artifacts", repo.OwnerName, repo.Name, run.ID))
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/runs/%d/artifacts", repo.OwnerName, repo.Name, run.ID))
 	resp := session.MakeRequest(t, req, http.StatusOK)
 	var runArtifactsResp api.ActionArtifactsResponse
 	require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &runArtifactsResp))
@@ -938,7 +938,7 @@ func testActionRunAttemptArtifactV4(t *testing.T, repo *repo_model.Repository, s
 	assert.ElementsMatch(t, []string{"artifact-attempt-1", "artifact-shared", "artifact-attempt-2", "artifact-shared"}, runArtifactNames)
 
 	// the result should contain 2 artifacts when query by name=artifact-shared
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/runs/%d/artifacts?name=artifact-shared", repo.OwnerName, repo.Name, run.ID))
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/runs/%d/artifacts?name=artifact-shared", repo.OwnerName, repo.Name, run.ID))
 	resp = session.MakeRequest(t, req, http.StatusOK)
 	var sharedArtifactsResp api.ActionArtifactsResponse
 	require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &sharedArtifactsResp))

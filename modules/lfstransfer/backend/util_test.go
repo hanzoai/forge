@@ -23,7 +23,7 @@ func TestToInternalLFSURL(t *testing.T) {
 		{"http://appurl/sub/any", ""},
 		{"http://appurl/sub/owner/repo/any", ""},
 		{"http://appurl/sub/owner/repo/info/any", ""},
-		{"http://appurl/sub/owner/repo/info/lfs/any", "http://localurl/api/internal/repo/owner/repo/info/lfs/any"},
+		{"http://appurl/sub/owner/repo/info/lfs/any", "http://localurl/v1/internal/repo/owner/repo/info/lfs/any"},
 	}
 	for _, c := range cases {
 		assert.Equal(t, c.expected, toInternalLFSURL(c.url), c.url)
@@ -38,12 +38,12 @@ func TestIsInternalLFSURL(t *testing.T) {
 		expected bool
 	}{
 		{"", false},
-		{"http://otherurl/api/internal/repo/owner/repo/info/lfs/any", false},
-		{"http://localurl/api/internal/repo/owner/repo/info/lfs/any", true},
-		{"http://localurl/api/internal/repo/owner/repo/info", false},
-		{"http://localurl/api/internal/misc/owner/repo/info/lfs/any", false},
-		{"http://localurl/api/internal/owner/repo/info/lfs/any", false},
-		{"http://localurl/api/internal/foo/bar", false},
+		{"http://otherurl/v1/internal/repo/owner/repo/info/lfs/any", false},
+		{"http://localurl/v1/internal/repo/owner/repo/info/lfs/any", true},
+		{"http://localurl/v1/internal/repo/owner/repo/info", false},
+		{"http://localurl/v1/internal/misc/owner/repo/info/lfs/any", false},
+		{"http://localurl/v1/internal/owner/repo/info/lfs/any", false},
+		{"http://localurl/v1/internal/foo/bar", false},
 	}
 	for _, c := range cases {
 		req := newInternalRequestLFS(t.Context(), c.url, "GET", nil, nil)

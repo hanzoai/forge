@@ -163,7 +163,7 @@ func TestActionsJobTokenPermissiveAccess(t *testing.T) {
 				})
 
 				t.Run("WriteGitContent", func(t *testing.T) {
-					req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/contents/test-filename", repo.FullName()), &structs.CreateFileOptions{
+					req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/contents/test-filename", repo.FullName()), &structs.CreateFileOptions{
 						FileOptions:   structs.FileOptions{NewBranchName: "new-branch" + t.Name()},
 						ContentBase64: base64.StdEncoding.EncodeToString([]byte(`dummy content`)),
 					}).AddTokenAuth(task.Token)
@@ -177,7 +177,7 @@ func TestActionsJobTokenPermissiveAccess(t *testing.T) {
 				})
 
 				t.Run("NoOtherPermissions", func(t *testing.T) {
-					req := NewRequest(t, "DELETE", "/api/v1/repos/"+repo.FullName()).AddTokenAuth(task.Token)
+					req := NewRequest(t, "DELETE", "/v1/repos/"+repo.FullName()).AddTokenAuth(task.Token)
 					resp := MakeRequest(t, req, NoExpectedStatus)
 					assertRespCodeForSuccess(t, resp, false)
 				})
@@ -193,7 +193,7 @@ func TestActionsCrossRepoAccess(t *testing.T) {
 
 		// 1. Create Organization
 		orgName := "org-cross-test"
-		req := NewRequestWithJSON(t, "POST", "/api/v1/orgs", &structs.CreateOrgOption{
+		req := NewRequestWithJSON(t, "POST", "/v1/orgs", &structs.CreateOrgOption{
 			UserName: orgName,
 		}).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)
@@ -203,7 +203,7 @@ func TestActionsCrossRepoAccess(t *testing.T) {
 
 		// 2. Create Two Repositories in owner
 		createRepoInOrg := func(name string) int64 {
-			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/orgs/%s/repos", orgName), &structs.CreateRepoOption{
+			req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/orgs/%s/repos", orgName), &structs.CreateRepoOption{
 				Name:     name,
 				AutoInit: true,
 			}).AddTokenAuth(token)
@@ -245,7 +245,7 @@ func TestActionsCrossRepoAccess(t *testing.T) {
 		}))
 
 		// make repo-B be private
-		req = NewRequestWithJSON(t, "PATCH", "/api/v1/repos/org-cross-test/repo-B", &structs.EditRepoOption{Private: new(true)}).AddTokenAuth(token)
+		req = NewRequestWithJSON(t, "PATCH", "/v1/repos/org-cross-test/repo-B", &structs.EditRepoOption{Private: new(true)}).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusOK)
 
 		testCtxA.ExpectedCode = http.StatusNotFound
@@ -265,7 +265,7 @@ func TestActionsCrossRepoAccess(t *testing.T) {
 			assert.Contains(t, ownerActionsCfg.AllowedCrossRepoIDs, repoBID)
 
 			// Transfer Repository to user4
-			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/repo-B/transfer", orgName), &structs.TransferRepoOption{
+			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/repo-B/transfer", orgName), &structs.TransferRepoOption{
 				NewOwner: "user4",
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusCreated)
@@ -273,7 +273,7 @@ func TestActionsCrossRepoAccess(t *testing.T) {
 			// Accept transfer as user4
 			session4 := loginUser(t, "user4")
 			token4 := getTokenForLoggedInUser(t, session4, auth_model.AccessTokenScopeWriteUser, auth_model.AccessTokenScopeWriteRepository)
-			req = NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/repo-B/transfer/accept", orgName)).AddTokenAuth(token4)
+			req = NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/repo-B/transfer/accept", orgName)).AddTokenAuth(token4)
 			MakeRequest(t, req, http.StatusAccepted)
 
 			// Verify it is removed from the org's config
@@ -315,7 +315,7 @@ func TestActionsJobTokenPermissionsWriteIssue(t *testing.T) {
 	session := loginUser(t, user.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue, auth_model.AccessTokenScopeWriteRepository)
 
-	labelURL := fmt.Sprintf("/api/v1/repos/%s/%s/labels", user.Name, repo.Name)
+	labelURL := fmt.Sprintf("/v1/repos/%s/%s/labels", user.Name, repo.Name)
 	req := NewRequestWithJSON(t, "POST", labelURL, &structs.CreateLabelOption{
 		Name:  "task-label",
 		Color: "0e8a16",
@@ -323,7 +323,7 @@ func TestActionsJobTokenPermissionsWriteIssue(t *testing.T) {
 	resp := MakeRequest(t, req, http.StatusCreated)
 	label := DecodeJSON(t, resp, &structs.Label{})
 
-	issueURL := fmt.Sprintf("/api/v1/repos/%s/%s/issues", user.Name, repo.Name)
+	issueURL := fmt.Sprintf("/v1/repos/%s/%s/issues", user.Name, repo.Name)
 	req = NewRequestWithJSON(t, "POST", issueURL, &structs.CreateIssueOption{
 		Title: "issue for actions token label deletion",
 	}).AddTokenAuth(token)
@@ -333,7 +333,7 @@ func TestActionsJobTokenPermissionsWriteIssue(t *testing.T) {
 	taskToken := task.Token
 	require.NotEmpty(t, taskToken)
 
-	issueLabelsURL := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/labels", user.Name, repo.Name, issue.Index)
+	issueLabelsURL := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/labels", user.Name, repo.Name, issue.Index)
 	req = NewRequestWithJSON(t, "POST", issueLabelsURL, &structs.IssueLabelsOption{
 		Labels: []any{label.ID},
 	}).AddTokenAuth(taskToken)
@@ -424,7 +424,7 @@ jobs:
 		require.NotEmpty(t, task1Token)
 
 		// should fail: target repo does not allow code access
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo2.Name)).AddTokenAuth(task1Token)
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo2.Name)).AddTokenAuth(task1Token)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// set repo2 max permission to "read" so that the actions token can access code
@@ -438,7 +438,7 @@ jobs:
 		session.MakeRequest(t, req, http.StatusSeeOther)
 
 		// should succeed: target repo now allows code read access for this token
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s", user2.Name, repo2.Name)).AddTokenAuth(task1Token)
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s", user2.Name, repo2.Name)).AddTokenAuth(task1Token)
 		MakeRequest(t, req, http.StatusOK)
 		// but it should not have write access
 		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/%s/%s.git/info/lfs/objects/batch", user2.Name, repo2.Name), lfs.BatchRequest{Operation: "upload"}).

@@ -141,8 +141,8 @@ func TestRouter(t *testing.T) {
 	})
 
 	m := NewRouter()
-	m.NotFound(h("not-found:/api/v1"))
-	r.Mount("/api/v1", m)
+	m.NotFound(h("not-found:/v1"))
+	r.Mount("/v1", m)
 	m.Group("/repos", func() {
 		m.Group("/{username}/{reponame}", func() {
 			m.Group("/branches", func() {
@@ -196,70 +196,70 @@ func TestRouter(t *testing.T) {
 	})
 
 	t.Run("Sub Router", func(t *testing.T) {
-		testRoute(t, "GET /api/v1/other", resultStruct{
+		testRoute(t, "GET /v1/other", resultStruct{
 			method:       "GET",
-			handlerMarks: []string{"not-found:/api/v1"},
+			handlerMarks: []string{"not-found:/v1"},
 		})
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches", resultStruct{
 			method:     "GET",
 			pathParams: map[string]string{"username": "the-user", "reponame": "the-repo"},
 		})
 
-		testRoute(t, "POST /api/v1/repos/the-user/the-repo/branches", resultStruct{
+		testRoute(t, "POST /v1/repos/the-user/the-repo/branches", resultStruct{
 			method:     "POST",
 			pathParams: map[string]string{"username": "the-user", "reponame": "the-repo"},
 		})
 
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches/master", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/master", resultStruct{
 			method:     "GET",
 			pathParams: map[string]string{"username": "the-user", "reponame": "the-repo", "name": "master"},
 		})
 
-		testRoute(t, "PATCH /api/v1/repos/the-user/the-repo/branches/master", resultStruct{
+		testRoute(t, "PATCH /v1/repos/the-user/the-repo/branches/master", resultStruct{
 			method:     "PATCH",
 			pathParams: map[string]string{"username": "the-user", "reponame": "the-repo", "name": "master"},
 		})
 
-		testRoute(t, "DELETE /api/v1/repos/the-user/the-repo/branches/master", resultStruct{
+		testRoute(t, "DELETE /v1/repos/the-user/the-repo/branches/master", resultStruct{
 			method:     "DELETE",
 			pathParams: map[string]string{"username": "the-user", "reponame": "the-repo", "name": "master"},
 		})
 	})
 
 	t.Run("MatchPath", func(t *testing.T) {
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches/d1/d2/fn", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/d1/d2/fn", resultStruct{
 			method:       "GET",
 			pathParams:   map[string]string{"username": "the-user", "reponame": "the-repo", "*": "d1/d2/fn", "dir": "d1/d2", "file": "fn"},
 			handlerMarks: []string{"s1", "s2", "s3", "match-path"},
 		})
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches/d1%2fd2/fn", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/d1%2fd2/fn", resultStruct{
 			method:       "GET",
 			pathParams:   map[string]string{"username": "the-user", "reponame": "the-repo", "*": "d1%2fd2/fn", "dir": "d1%2fd2", "file": "fn"},
 			handlerMarks: []string{"s1", "s2", "s3", "match-path"},
 		})
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches/d1/d2/000", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/d1/d2/000", resultStruct{
 			method:       "GET",
 			pathParams:   map[string]string{"reponame": "the-repo", "username": "the-user", "*": "d1/d2/000"},
-			handlerMarks: []string{"s1", "not-found:/api/v1"},
+			handlerMarks: []string{"s1", "not-found:/v1"},
 		})
 
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches/d1/d2/fn?stop=s1", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/d1/d2/fn?stop=s1", resultStruct{
 			method:       "GET",
 			pathParams:   map[string]string{"username": "the-user", "reponame": "the-repo", "*": "d1/d2/fn"},
 			handlerMarks: []string{"s1"},
 		})
 
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches/d1/d2/fn?stop=s2", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/d1/d2/fn?stop=s2", resultStruct{
 			method:       "GET",
 			pathParams:   map[string]string{"username": "the-user", "reponame": "the-repo", "*": "d1/d2/fn", "dir": "d1/d2", "file": "fn"},
 			handlerMarks: []string{"s1", "s2"},
 		})
 
-		testRoute(t, "GET /api/v1/repos/the-user/the-repo/branches/d1/d2/fn?stop=s3", resultStruct{
+		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/d1/d2/fn?stop=s3", resultStruct{
 			method:          "GET",
 			pathParams:      map[string]string{"username": "the-user", "reponame": "the-repo", "*": "d1/d2/fn", "dir": "d1/d2", "file": "fn"},
 			handlerMarks:    []string{"s1", "s2", "s3"},
-			chiRoutePattern: new("/api/v1/repos/{username}/{reponame}/branches/<dir:*>/<file:[a-z]{1,2}>"),
+			chiRoutePattern: new("/v1/repos/{username}/{reponame}/branches/<dir:*>/<file:[a-z]{1,2}>"),
 		})
 	})
 }

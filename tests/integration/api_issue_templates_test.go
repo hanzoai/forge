@@ -24,7 +24,7 @@ func TestAPIIssueTemplateList(t *testing.T) {
 		repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{OwnerName: "user2", Name: "repo1"})
 
 		// no issue template
-		req := NewRequest(t, "GET", "/api/v1/repos/user2/repo1/issue_templates")
+		req := NewRequest(t, "GET", "/v1/repos/user2/repo1/issue_templates")
 		resp := MakeRequest(t, req, http.StatusOK)
 		issueTemplates := DecodeJSON(t, resp, []*api.IssueTemplate{})
 		assert.Empty(t, issueTemplates)
@@ -43,7 +43,7 @@ about: bar
 		err = createOrReplaceFileInBranch(user, repo, ".gitea/ISSUE_TEMPLATE/tmpl-err2.yml", repo.DefaultBranch, `other: `)
 		assert.NoError(t, err)
 
-		req = NewRequest(t, "GET", "/api/v1/repos/user2/repo1/issue_templates")
+		req = NewRequest(t, "GET", "/v1/repos/user2/repo1/issue_templates")
 		resp = MakeRequest(t, req, http.StatusOK)
 		issueTemplates = DecodeJSON(t, resp, []*api.IssueTemplate{})
 		assert.Len(t, issueTemplates, 1)
@@ -58,8 +58,8 @@ func TestAPIIssueTemplateRequiresCodeUnit(t *testing.T) {
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 24})
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 	token := getUserToken(t, user.Name, auth_model.AccessTokenScopeReadRepository)
-	issueTemplatesURL := "/api/v1/repos/" + repo.FullName() + "/issue_templates"
-	languagesURL := "/api/v1/repos/" + repo.FullName() + "/languages"
+	issueTemplatesURL := "/v1/repos/" + repo.FullName() + "/issue_templates"
+	languagesURL := "/v1/repos/" + repo.FullName() + "/languages"
 
 	req := NewRequest(t, "GET", issueTemplatesURL).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusForbidden)

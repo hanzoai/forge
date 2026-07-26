@@ -127,7 +127,7 @@ func issueTestPayload() *api.IssuePayload {
 		Issue: &api.Issue{
 			ID:      2,
 			Index:   2,
-			URL:     "http://localhost:3000/api/v1/repos/test/repo/issues/2",
+			URL:     "http://localhost:3000/v1/repos/test/repo/issues/2",
 			HTMLURL: "http://localhost:3000/test/repo/issues/2",
 			Title:   "crash",
 			Body:    "issue body",
@@ -170,7 +170,7 @@ func issueCommentTestPayload() *api.IssueCommentPayload {
 		Issue: &api.Issue{
 			ID:      2,
 			Index:   2,
-			URL:     "http://localhost:3000/api/v1/repos/test/repo/issues/2",
+			URL:     "http://localhost:3000/v1/repos/test/repo/issues/2",
 			HTMLURL: "http://localhost:3000/test/repo/issues/2",
 			Title:   "crash",
 			Poster: &api.User{
@@ -202,7 +202,7 @@ func pullRequestCommentTestPayload() *api.IssueCommentPayload {
 		Issue: &api.Issue{
 			ID:      12,
 			Index:   12,
-			URL:     "http://localhost:3000/api/v1/repos/test/repo/pulls/12",
+			URL:     "http://localhost:3000/v1/repos/test/repo/pulls/12",
 			HTMLURL: "http://localhost:3000/test/repo/pulls/12",
 			Title:   "Fix bug",
 			Body:    "fixes bug #2",

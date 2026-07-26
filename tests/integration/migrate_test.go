@@ -234,7 +234,7 @@ func Test_MigrateFromGiteaToGitea(t *testing.T) {
 	repoName := "migrated-from-mock-gitea"
 	cloneAddr := mockServer.URL + "/gitea/test_repo.git"
 
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/migrate", &structs.MigrateRepoOptions{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/migrate", &structs.MigrateRepoOptions{
 		CloneAddr:    cloneAddr,
 		RepoOwnerID:  owner.ID,
 		RepoName:     repoName,

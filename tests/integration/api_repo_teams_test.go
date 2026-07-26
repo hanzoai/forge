@@ -31,7 +31,7 @@ func TestAPIRepoTeams(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	// ListTeams
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/teams", publicOrgRepo.FullName())).
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/teams", publicOrgRepo.FullName())).
 		AddTokenAuth(token)
 	res := MakeRequest(t, req, http.StatusOK)
 	teams := DecodeJSON(t, res, []*api.Team{})
@@ -48,18 +48,18 @@ func TestAPIRepoTeams(t *testing.T) {
 	}
 
 	// IsTeam
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "Test_Team")).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "Test_Team")).
 		AddTokenAuth(token)
 	res = MakeRequest(t, req, http.StatusOK)
 	team := DecodeJSON(t, res, &api.Team{})
 	assert.Equal(t, teams[1], team)
 
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "NonExistingTeam")).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "NonExistingTeam")).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 
 	// AddTeam with user4
-	req = NewRequest(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "team1")).
+	req = NewRequest(t, "PUT", fmt.Sprintf("/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "team1")).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusForbidden)
 
@@ -67,13 +67,13 @@ func TestAPIRepoTeams(t *testing.T) {
 	user = unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 	session = loginUser(t, user.Name)
 	token = getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
-	req = NewRequest(t, "PUT", fmt.Sprintf("/api/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "team1")).
+	req = NewRequest(t, "PUT", fmt.Sprintf("/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "team1")).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 	MakeRequest(t, req, http.StatusUnprocessableEntity) // test duplicate request
 
 	// DeleteTeam
-	req = NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "team1")).
+	req = NewRequest(t, "DELETE", fmt.Sprintf("/v1/repos/%s/teams/%s", publicOrgRepo.FullName(), "team1")).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)
 	MakeRequest(t, req, http.StatusUnprocessableEntity) // test duplicate request

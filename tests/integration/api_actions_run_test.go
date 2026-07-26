@@ -50,13 +50,13 @@ func testAPIActionsGetWorkflowRun(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 	t.Run("GetRun", func(t *testing.T) {
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/runs/802802", repo.FullName())).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/runs/802802", repo.FullName())).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNotFound)
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/runs/802", repo.FullName())).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/runs/802", repo.FullName())).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNotFound)
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/runs/803", repo.FullName())).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/runs/803", repo.FullName())).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusOK)
 	})
@@ -74,7 +74,7 @@ func testAPIActionsGetWorkflowRun(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795/jobs", repo.FullName())).AddTokenAuth(token)
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/runs/795/jobs", repo.FullName())).AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		jobList := DecodeJSON(t, resp, &api.ActionWorkflowJobsResponse{})
 
@@ -92,13 +92,13 @@ func testAPIActionsGetWorkflowJob(t *testing.T) {
 	session := loginUser(t, user.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/jobs/198198", repo.FullName())).
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/jobs/198198", repo.FullName())).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/jobs/198", repo.FullName())).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/jobs/198", repo.FullName())).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
-	req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/jobs/196", repo.FullName())).
+	req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/jobs/196", repo.FullName())).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -132,26 +132,26 @@ func testAPIActionsDeleteRunRunning(t *testing.T) {
 	session := loginUser(t, user.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-	req := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/repos/%s/actions/runs/793", repo.FullName())).
+	req := NewRequest(t, "DELETE", fmt.Sprintf("/v1/repos/%s/actions/runs/793", repo.FullName())).
 		AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusBadRequest)
 }
 
 func testAPIActionsDeleteRun(t *testing.T, repo *repo_model.Repository, token string, expected int) {
-	req := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795", repo.FullName())).
+	req := NewRequest(t, "DELETE", fmt.Sprintf("/v1/repos/%s/actions/runs/795", repo.FullName())).
 		AddTokenAuth(token)
 	MakeRequest(t, req, expected)
 }
 
 func testAPIActionsDeleteRunListArtifacts(t *testing.T, repo *repo_model.Repository, token string, artifacts int) {
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795/artifacts", repo.FullName())).AddTokenAuth(token)
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/runs/795/artifacts", repo.FullName())).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	listResp := DecodeJSON(t, resp, &api.ActionArtifactsResponse{})
 	assert.Len(t, listResp.Entries, artifacts)
 }
 
 func testAPIActionsDeleteRunListTasks(t *testing.T, repo *repo_model.Repository, token string, expected bool) {
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/tasks", repo.FullName())).AddTokenAuth(token)
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/tasks", repo.FullName())).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	listResp := DecodeJSON(t, resp, &api.ActionTaskResponse{})
 
@@ -178,7 +178,7 @@ func testAPIActionsRerunWorkflowRun(t *testing.T) {
 		session := loginUser(t, user.Name)
 		writeToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/793/rerun", repo.FullName())).
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/793/rerun", repo.FullName())).
 			AddTokenAuth(writeToken)
 		MakeRequest(t, req, http.StatusBadRequest)
 	})
@@ -191,7 +191,7 @@ func testAPIActionsRerunWorkflowRun(t *testing.T) {
 	readToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	t.Run("Success", func(t *testing.T) {
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795/rerun", repo.FullName())).AddTokenAuth(writeToken)
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/795/rerun", repo.FullName())).AddTokenAuth(writeToken)
 		resp := MakeRequest(t, req, http.StatusCreated)
 		rerunResp := DecodeJSON(t, resp, &api.ActionWorkflowRun{})
 
@@ -220,13 +220,13 @@ func testAPIActionsRerunWorkflowRun(t *testing.T) {
 	})
 
 	t.Run("ForbiddenWithoutWriteScope", func(t *testing.T) {
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795/rerun", repo.FullName())).
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/795/rerun", repo.FullName())).
 			AddTokenAuth(readToken)
 		MakeRequest(t, req, http.StatusForbidden)
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/999999/rerun", repo.FullName())).
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/999999/rerun", repo.FullName())).
 			AddTokenAuth(writeToken)
 		MakeRequest(t, req, http.StatusNotFound)
 	})
@@ -239,7 +239,7 @@ func testAPIActionsRerunWorkflowJob(t *testing.T) {
 		session := loginUser(t, user.Name)
 		writeToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/793/jobs/194/rerun", repo.FullName())).
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/793/jobs/194/rerun", repo.FullName())).
 			AddTokenAuth(writeToken)
 		MakeRequest(t, req, http.StatusBadRequest)
 	})
@@ -252,7 +252,7 @@ func testAPIActionsRerunWorkflowJob(t *testing.T) {
 	readToken := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
 	t.Run("Success", func(t *testing.T) {
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795/jobs/199/rerun", repo.FullName())).AddTokenAuth(writeToken)
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/795/jobs/199/rerun", repo.FullName())).AddTokenAuth(writeToken)
 		resp := MakeRequest(t, req, http.StatusCreated)
 		rerunResp := DecodeJSON(t, resp, &api.ActionWorkflowJob{})
 
@@ -281,13 +281,13 @@ func testAPIActionsRerunWorkflowJob(t *testing.T) {
 	})
 
 	t.Run("ForbiddenWithoutWriteScope", func(t *testing.T) {
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795/jobs/199/rerun", repo.FullName())).
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/795/jobs/199/rerun", repo.FullName())).
 			AddTokenAuth(readToken)
 		MakeRequest(t, req, http.StatusForbidden)
 	})
 
 	t.Run("NotFoundJob", func(t *testing.T) {
-		req := NewRequest(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/runs/795/jobs/999999/rerun", repo.FullName())).
+		req := NewRequest(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/runs/795/jobs/999999/rerun", repo.FullName())).
 			AddTokenAuth(writeToken)
 		MakeRequest(t, req, http.StatusNotFound)
 	})
@@ -299,7 +299,7 @@ func testAPIActionsListUserWorkflows(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadUser)
 
 	t.Run("Runs", func(t *testing.T) {
-		req := NewRequest(t, "GET", "/api/v1/user/actions/runs").AddTokenAuth(token)
+		req := NewRequest(t, "GET", "/v1/user/actions/runs").AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		runs := DecodeJSON(t, resp, &api.ActionWorkflowRunsResponse{})
 
@@ -315,7 +315,7 @@ func testAPIActionsListUserWorkflows(t *testing.T) {
 	})
 
 	t.Run("Jobs", func(t *testing.T) {
-		req := NewRequest(t, "GET", "/api/v1/user/actions/jobs").AddTokenAuth(token)
+		req := NewRequest(t, "GET", "/v1/user/actions/jobs").AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		jobs := DecodeJSON(t, resp, &api.ActionWorkflowJobsResponse{})
 
@@ -329,7 +329,7 @@ func testAPIActionsListUserWorkflows(t *testing.T) {
 	})
 
 	t.Run("JobsDefaultOrderAsc", func(t *testing.T) {
-		req := NewRequest(t, "GET", "/api/v1/user/actions/jobs").AddTokenAuth(token)
+		req := NewRequest(t, "GET", "/v1/user/actions/jobs").AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		jobs := DecodeJSON(t, resp, &api.ActionWorkflowJobsResponse{})
 
@@ -341,7 +341,7 @@ func testAPIActionsListUserWorkflows(t *testing.T) {
 	})
 
 	t.Run("JobsOrderedByIDDesc", func(t *testing.T) {
-		req := NewRequest(t, "GET", "/api/v1/user/actions/jobs?sort=id&order=desc").AddTokenAuth(token)
+		req := NewRequest(t, "GET", "/v1/user/actions/jobs?sort=id&order=desc").AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		jobs := DecodeJSON(t, resp, &api.ActionWorkflowJobsResponse{})
 
@@ -359,7 +359,7 @@ func testAPIActionsListRepoWorkflows(t *testing.T) {
 	session := loginUser(t, user.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/runs", repo.FullName())).AddTokenAuth(token)
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/runs", repo.FullName())).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	runs := DecodeJSON(t, resp, &api.ActionWorkflowRunsResponse{})
 
@@ -382,14 +382,14 @@ func TestAPIOrgActionsRunsAccessControl(t *testing.T) {
 	// (teams 12/13) with no access to repo5.
 	token := getUserToken(t, "user28", auth_model.AccessTokenScopeReadOrganization)
 
-	req := NewRequest(t, "GET", "/api/v1/orgs/org3/actions/runs").AddTokenAuth(token)
+	req := NewRequest(t, "GET", "/v1/orgs/org3/actions/runs").AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	runs := DecodeJSON(t, resp, &api.ActionWorkflowRunsResponse{})
 	for _, r := range runs.Entries {
 		assert.NotEqual(t, int64(802), r.ID, "must not leak a run from an inaccessible repo")
 	}
 
-	req = NewRequest(t, "GET", "/api/v1/orgs/org3/actions/jobs").AddTokenAuth(token)
+	req = NewRequest(t, "GET", "/v1/orgs/org3/actions/jobs").AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	jobs := DecodeJSON(t, resp, &api.ActionWorkflowJobsResponse{})
 	for _, j := range jobs.Entries {
@@ -400,14 +400,14 @@ func TestAPIOrgActionsRunsAccessControl(t *testing.T) {
 	// must stay confined to public repos, so the run/job in the private repo5 must not be listed.
 	adminPublicOnly := getUserToken(t, "user1", auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopePublicOnly)
 
-	req = NewRequest(t, "GET", "/api/v1/orgs/org3/actions/runs").AddTokenAuth(adminPublicOnly)
+	req = NewRequest(t, "GET", "/v1/orgs/org3/actions/runs").AddTokenAuth(adminPublicOnly)
 	resp = MakeRequest(t, req, http.StatusOK)
 	adminRuns := DecodeJSON(t, resp, &api.ActionWorkflowRunsResponse{})
 	for _, r := range adminRuns.Entries {
 		assert.NotEqual(t, int64(802), r.ID, "a public-only admin token must not list a private repo's run")
 	}
 
-	req = NewRequest(t, "GET", "/api/v1/orgs/org3/actions/jobs").AddTokenAuth(adminPublicOnly)
+	req = NewRequest(t, "GET", "/v1/orgs/org3/actions/jobs").AddTokenAuth(adminPublicOnly)
 	resp = MakeRequest(t, req, http.StatusOK)
 	adminJobs := DecodeJSON(t, resp, &api.ActionWorkflowJobsResponse{})
 	for _, j := range adminJobs.Entries {

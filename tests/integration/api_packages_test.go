@@ -49,7 +49,7 @@ func TestPackageAPI(t *testing.T) {
 	t.Run("ListPackages", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", "/api/v1/packages/"+user.Name).
+		req := NewRequest(t, "GET", "/v1/packages/"+user.Name).
 			AddTokenAuth(tokenReadPackage)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -66,11 +66,11 @@ func TestPackageAPI(t *testing.T) {
 	t.Run("GetPackage", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/dummy/%s/%s", user.Name, packageName, packageVersion)).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/dummy/%s/%s", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenReadPackage)
 		MakeRequest(t, req, http.StatusNotFound)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenReadPackage)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -94,11 +94,11 @@ func TestPackageAPI(t *testing.T) {
 			MakeRequest(t, req, http.StatusCreated)
 		}
 
-		req := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/packages/%s/generic/%s", user.Name, packageName)).
+		req := NewRequest(t, "DELETE", fmt.Sprintf("/v1/packages/%s/generic/%s", user.Name, packageName)).
 			AddTokenAuth(tokenWritePackage)
 		MakeRequest(t, req, http.StatusNoContent)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s", user.Name, packageName)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s", user.Name, packageName)).
 			AddTokenAuth(tokenReadPackage)
 		MakeRequest(t, req, http.StatusNotFound)
 	})
@@ -114,15 +114,15 @@ func TestPackageAPI(t *testing.T) {
 			MakeRequest(t, req, http.StatusCreated)
 		}
 
-		req := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/packages/%s/generic/%s/1.0.1", user.Name, packageName)).
+		req := NewRequest(t, "DELETE", fmt.Sprintf("/v1/packages/%s/generic/%s/1.0.1", user.Name, packageName)).
 			AddTokenAuth(tokenWritePackage)
 		MakeRequest(t, req, http.StatusNoContent)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/1.0.1", user.Name, packageName)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/1.0.1", user.Name, packageName)).
 			AddTokenAuth(tokenReadPackage)
 		MakeRequest(t, req, http.StatusNotFound)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/1.0.2", user.Name, packageName)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/1.0.2", user.Name, packageName)).
 			AddTokenAuth(tokenReadPackage)
 		MakeRequest(t, req, http.StatusOK)
 	})
@@ -130,7 +130,7 @@ func TestPackageAPI(t *testing.T) {
 	t.Run("ListPackageVersions", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s", user.Name, packageName)).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s", user.Name, packageName)).
 			AddTokenAuth(tokenReadPackage)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -145,7 +145,7 @@ func TestPackageAPI(t *testing.T) {
 	t.Run("LatestPackageVersion", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/-/latest", user.Name, packageName)).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/-/latest", user.Name, packageName)).
 			AddTokenAuth(tokenReadPackage)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -163,7 +163,7 @@ func TestPackageAPI(t *testing.T) {
 		assert.NoError(t, err)
 
 		// no repository link
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenReadPackage)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -177,10 +177,10 @@ func TestPackageAPI(t *testing.T) {
 		assert.NoError(t, err)
 
 		// link to public repository
-		req = NewRequest(t, "POST", fmt.Sprintf("/api/v1/packages/%s/generic/%s/-/link/%s", user.Name, packageName, newRepo.Name)).AddTokenAuth(tokenWritePackage)
+		req = NewRequest(t, "POST", fmt.Sprintf("/v1/packages/%s/generic/%s/-/link/%s", user.Name, packageName, newRepo.Name)).AddTokenAuth(tokenWritePackage)
 		MakeRequest(t, req, http.StatusCreated)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenReadPackage)
 		resp = MakeRequest(t, req, http.StatusOK)
 
@@ -189,14 +189,14 @@ func TestPackageAPI(t *testing.T) {
 		assert.Equal(t, newRepo.ID, ap2.Repository.ID)
 
 		// link to repository without write access, should fail
-		req = NewRequest(t, "POST", fmt.Sprintf("/api/v1/packages/%s/generic/%s/-/link/%s", user.Name, packageName, "repo3")).AddTokenAuth(tokenWritePackage)
+		req = NewRequest(t, "POST", fmt.Sprintf("/v1/packages/%s/generic/%s/-/link/%s", user.Name, packageName, "repo3")).AddTokenAuth(tokenWritePackage)
 		MakeRequest(t, req, http.StatusNotFound)
 
 		// remove link
-		req = NewRequest(t, "POST", fmt.Sprintf("/api/v1/packages/%s/generic/%s/-/unlink", user.Name, packageName)).AddTokenAuth(tokenWritePackage)
+		req = NewRequest(t, "POST", fmt.Sprintf("/v1/packages/%s/generic/%s/-/unlink", user.Name, packageName)).AddTokenAuth(tokenWritePackage)
 		MakeRequest(t, req, http.StatusNoContent)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenReadPackage)
 		resp = MakeRequest(t, req, http.StatusOK)
 
@@ -207,7 +207,7 @@ func TestPackageAPI(t *testing.T) {
 		privateRepoID := int64(6)
 		assert.NoError(t, packages_model.SetRepositoryLink(t.Context(), ap1.ID, privateRepoID))
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).AddTokenAuth(tokenReadPackage)
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).AddTokenAuth(tokenReadPackage)
 		resp = MakeRequest(t, req, http.StatusOK)
 
 		ap4 := DecodeJSON(t, resp, &api.Package{})
@@ -219,11 +219,11 @@ func TestPackageAPI(t *testing.T) {
 	t.Run("ListPackageFiles", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/dummy/%s/%s/files", user.Name, packageName, packageVersion)).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/dummy/%s/%s/files", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenReadPackage)
 		MakeRequest(t, req, http.StatusNotFound)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s/generic/%s/%s/files", user.Name, packageName, packageVersion)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s/generic/%s/%s/files", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenReadPackage)
 		resp := MakeRequest(t, req, http.StatusOK)
 
@@ -241,11 +241,11 @@ func TestPackageAPI(t *testing.T) {
 	t.Run("DeletePackage", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		req := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/packages/%s/dummy/%s/%s", user.Name, packageName, packageVersion)).
+		req := NewRequest(t, "DELETE", fmt.Sprintf("/v1/packages/%s/dummy/%s/%s", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenWritePackage)
 		MakeRequest(t, req, http.StatusNotFound)
 
-		req = NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
+		req = NewRequest(t, "DELETE", fmt.Sprintf("/v1/packages/%s/generic/%s/%s", user.Name, packageName, packageVersion)).
 			AddTokenAuth(tokenWritePackage)
 		MakeRequest(t, req, http.StatusNoContent)
 	})
@@ -474,7 +474,7 @@ func TestPackageAccess(t *testing.T) {
 			{limitedOrgNoMember, http.StatusOK},
 			{publicOrgNoMember, http.StatusOK},
 		} {
-			req := NewRequest(t, "GET", "/api/v1/packages/"+target.Owner.Name).
+			req := NewRequest(t, "GET", "/v1/packages/"+target.Owner.Name).
 				AddTokenAuth(tokenReadPackage)
 			MakeRequest(t, req, target.ExpectedStatus)
 		}

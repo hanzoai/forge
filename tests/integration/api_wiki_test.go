@@ -21,7 +21,7 @@ func TestAPIGetWikiPage(t *testing.T) {
 
 	username := "user2"
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/wiki/page/Home", username, "repo1")
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/wiki/page/Home", username, "repo1")
 
 	req := NewRequest(t, "GET", urlStr)
 	resp := MakeRequest(t, req, http.StatusOK)
@@ -65,7 +65,7 @@ func TestAPIListWikiPages(t *testing.T) {
 
 	username := "user2"
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/wiki/pages", username, "repo1")
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/wiki/pages", username, "repo1")
 
 	req := NewRequest(t, "GET", urlStr)
 	resp := MakeRequest(t, req, http.StatusOK)
@@ -173,7 +173,7 @@ func TestAPIListWikiPages(t *testing.T) {
 func testAPICreateWikiPage(t *testing.T, session *TestSession, userName, repoName, title string, status int) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/wiki/new", userName, repoName)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/wiki/new", userName, repoName)
 
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.CreateWikiPageOptions{
 		Title:         title,
@@ -201,7 +201,7 @@ func TestAPIEditWikiPage(t *testing.T) {
 	session := loginUser(t, username)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/wiki/page/Page-With-Spaced-Name", username, "repo1")
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/wiki/page/Page-With-Spaced-Name", username, "repo1")
 
 	req := NewRequestWithJSON(t, "PATCH", urlStr, &api.CreateWikiPageOptions{
 		Title:         "edited title",
@@ -215,7 +215,7 @@ func TestAPIListPageRevisions(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	username := "user2"
 
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/wiki/revisions/Home", username, "repo1")
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/wiki/revisions/Home", username, "repo1")
 
 	req := NewRequest(t, "GET", urlStr)
 	resp := MakeRequest(t, req, http.StatusOK)

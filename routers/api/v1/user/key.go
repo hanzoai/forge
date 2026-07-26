@@ -47,7 +47,7 @@ func appendPrivateInformation(ctx std_ctx.Context, apiKey *api.PublicKey, key *a
 }
 
 func composePublicKeysAPILink() string {
-	return setting.AppURL + "api/v1/user/keys/"
+	return setting.AppURL + "v1/user/keys/"
 }
 
 func listPublicKeys(ctx *context.APIContext, user *user_model.User) {

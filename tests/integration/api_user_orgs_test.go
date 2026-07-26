@@ -86,7 +86,7 @@ func getUserOrgs(t *testing.T, userDoer, userCheck string) (orgs []*api.Organiza
 	if len(userDoer) != 0 {
 		token = getUserToken(t, userDoer, auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadUser)
 	}
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/orgs", userCheck)).
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/orgs", userCheck)).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	orgs = DecodeJSON(t, resp, []*api.Organization{})
@@ -95,19 +95,19 @@ func getUserOrgs(t *testing.T, userDoer, userCheck string) (orgs []*api.Organiza
 
 func testUserOrgsUnauthenticated(t *testing.T, userCheck string) {
 	session := emptyTestSession(t)
-	req := NewRequestf(t, "GET", "/api/v1/users/%s/orgs", userCheck)
+	req := NewRequestf(t, "GET", "/v1/users/%s/orgs", userCheck)
 	session.MakeRequest(t, req, http.StatusUnauthorized)
 }
 
 func TestMyOrgs(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	req := NewRequest(t, "GET", "/api/v1/user/orgs")
+	req := NewRequest(t, "GET", "/v1/user/orgs")
 	MakeRequest(t, req, http.StatusUnauthorized)
 
 	normalUsername := "user2"
 	token := getUserToken(t, normalUsername, auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadUser)
-	req = NewRequest(t, "GET", "/api/v1/user/orgs").
+	req = NewRequest(t, "GET", "/v1/user/orgs").
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	orgs := DecodeJSON(t, resp, []*api.Organization{})
@@ -160,7 +160,7 @@ func TestMyOrgsPublicOnly(t *testing.T) {
 
 	normalUsername := "user2"
 	token := getUserToken(t, normalUsername, auth_model.AccessTokenScopeReadOrganization, auth_model.AccessTokenScopeReadUser, auth_model.AccessTokenScopePublicOnly)
-	req := NewRequest(t, "GET", "/api/v1/user/orgs").
+	req := NewRequest(t, "GET", "/v1/user/orgs").
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var orgs []*api.Organization

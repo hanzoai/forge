@@ -156,7 +156,7 @@ jobs:
 				}
 
 				// check result
-				req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/tasks", user2.Name, apiRepo.Name)).
+				req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/tasks", user2.Name, apiRepo.Name)).
 					AddTokenAuth(token)
 				resp := MakeRequest(t, req, http.StatusOK)
 				actionTaskRespAfter := DecodeJSON(t, resp, &api.ActionTaskResponse{})
@@ -365,13 +365,13 @@ func TestRunnerDisableEnable(t *testing.T) {
 
 			triggerRunnerDisableEnableRun(t, user2, token, testData.repo, "second-push.txt")
 
-			req := newRunnerUpdateRequest(t, fmt.Sprintf("/api/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), true).AddTokenAuth(token)
+			req := newRunnerUpdateRequest(t, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), true).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusOK)
 
 			testData.runner.execTask(t, task1, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
 			testData.runner.fetchNoTask(t, 2*time.Second)
 
-			req = newRunnerUpdateRequest(t, fmt.Sprintf("/api/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), false).AddTokenAuth(token)
+			req = newRunnerUpdateRequest(t, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), false).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusOK)
 
 			task2 := testData.runner.fetchTask(t, 5*time.Second)
@@ -399,7 +399,7 @@ func TestRunnerDisableEnable(t *testing.T) {
 			triggerRunnerDisableEnableRun(t, user2, token, testData.repo, "second-push.txt")
 			time.Sleep(500 * time.Millisecond) // allow workflow run to be created
 
-			req := newRunnerUpdateRequest(t, fmt.Sprintf("/api/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), true).AddTokenAuth(token)
+			req := newRunnerUpdateRequest(t, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), true).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusOK)
 
 			testData.runner.execTask(t, task1, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
@@ -409,7 +409,7 @@ func TestRunnerDisableEnable(t *testing.T) {
 			taskAfterDisable, _ := testData.runner.fetchTaskOnce(t, firstVersion)
 			assert.Nil(t, taskAfterDisable, "disabled runner must not receive a task when sending previous TasksVersion")
 
-			req = newRunnerUpdateRequest(t, fmt.Sprintf("/api/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), false).AddTokenAuth(token)
+			req = newRunnerUpdateRequest(t, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), false).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusOK)
 
 			task2 := testData.runner.fetchTask(t, 5*time.Second)
@@ -459,7 +459,7 @@ func triggerRunnerDisableEnableRun(t *testing.T, user *user_model.User, authToke
 
 func getRepoRunnerID(t *testing.T, authToken, ownerName, repoName string) int64 {
 	t.Helper()
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/runners", ownerName, repoName)).AddTokenAuth(authToken)
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/runners", ownerName, repoName)).AddTokenAuth(authToken)
 	resp := MakeRequest(t, req, http.StatusOK)
 	runnerList := DecodeJSON(t, resp, &api.ActionRunnersResponse{})
 	require.Len(t, runnerList.Entries, 1)
@@ -521,7 +521,7 @@ jobs:
 		assert.NoError(t, actionRun.LoadAttributes(t.Context()))
 
 		assert.Equal(t, user2.Name, gtCtx["actor"].GetStringValue())
-		assert.Equal(t, setting.AppURL+"api/v1", gtCtx["api_url"].GetStringValue())
+		assert.Equal(t, setting.AppURL+"v1", gtCtx["api_url"].GetStringValue())
 		assert.Equal(t, apiPull.Base.Ref, gtCtx["base_ref"].GetStringValue())
 		runEvent := map[string]any{}
 		assert.NoError(t, json.Unmarshal([]byte(actionRun.EventPayload), &runEvent))
@@ -613,7 +613,7 @@ jobs:
 		assert.NoError(t, actionRun.LoadAttributes(t.Context()))
 
 		assert.Equal(t, user2.Name, gtCtx["actor"].GetStringValue())
-		assert.Equal(t, setting.AppURL+"api/v1", gtCtx["api_url"].GetStringValue())
+		assert.Equal(t, setting.AppURL+"v1", gtCtx["api_url"].GetStringValue())
 		assert.Equal(t, apiPull.Base.Ref, gtCtx["base_ref"].GetStringValue())
 		runEvent := map[string]any{}
 		assert.NoError(t, json.Unmarshal([]byte(actionRun.EventPayload), &runEvent))
@@ -699,7 +699,7 @@ jobs:
 }
 
 func createActionsTestRepo(t *testing.T, authToken, repoName string, isPrivate bool) *api.Repository {
-	req := NewRequestWithJSON(t, "POST", "/api/v1/user/repos", &api.CreateRepoOption{
+	req := NewRequestWithJSON(t, "POST", "/v1/user/repos", &api.CreateRepoOption{
 		Name:          repoName,
 		Private:       isPrivate,
 		Readme:        "Default",
@@ -734,7 +734,7 @@ func getWorkflowCreateFileOptions(u *user_model.User, branch, msg, content strin
 }
 
 func createWorkflowFile(t *testing.T, authToken, ownerName, repoName, treePath string, opts *api.CreateFileOptions) *api.FileResponse {
-	req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/contents/%s", ownerName, repoName, treePath), opts).
+	req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/contents/%s", ownerName, repoName, treePath), opts).
 		AddTokenAuth(authToken)
 	resp := MakeRequest(t, req, http.StatusCreated)
 	fileResponse := DecodeJSON(t, resp, &api.FileResponse{})
@@ -745,7 +745,7 @@ func createWorkflowFile(t *testing.T, authToken, ownerName, repoName, treePath s
 // there is currently not an API for querying a task by ID so we have to list all the tasks
 func getTaskJobNameByTaskID(t *testing.T, authToken, ownerName, repoName string, taskID int64) string {
 	// FIXME: we may need to query several pages
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/tasks", ownerName, repoName)).
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/tasks", ownerName, repoName)).
 		AddTokenAuth(authToken)
 	resp := MakeRequest(t, req, http.StatusOK)
 	taskRespBefore := DecodeJSON(t, resp, &api.ActionTaskResponse{})

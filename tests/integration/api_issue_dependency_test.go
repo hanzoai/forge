@@ -49,7 +49,7 @@ func TestAPICreateIssueDependencyCrossRepoPermission(t *testing.T) {
 	_, err := db.DeleteByID[access_model.Access](t.Context(), 30)
 	assert.NoError(t, err)
 
-	url := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/dependencies", "user2", "repo1", targetIssue.Index)
+	url := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/dependencies", "user2", "repo1", targetIssue.Index)
 	dependencyMeta := &api.IssueMeta{
 		Owner: "org3",
 		Name:  "repo3",
@@ -110,7 +110,7 @@ func TestAPIDeleteIssueDependencyCrossRepoPermission(t *testing.T) {
 	_, err := db.DeleteByID[access_model.Access](t.Context(), 30)
 	assert.NoError(t, err)
 
-	url := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/dependencies", "user2", "repo1", targetIssue.Index)
+	url := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/dependencies", "user2", "repo1", targetIssue.Index)
 	dependencyMeta := &api.IssueMeta{
 		Owner: "org3",
 		Name:  "repo3",

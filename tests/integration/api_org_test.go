@@ -45,7 +45,7 @@ func testAPIOrgCreateRename(t *testing.T) {
 		Location:    "Shanghai",
 		Visibility:  "limited",
 	}
-	req := NewRequestWithJSON(t, "POST", "/api/v1/orgs", &org).AddTokenAuth(token)
+	req := NewRequestWithJSON(t, "POST", "/v1/orgs", &org).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusCreated)
 
 	apiOrg := DecodeJSON(t, resp, &api.Organization{})
@@ -64,7 +64,7 @@ func testAPIOrgCreateRename(t *testing.T) {
 	})
 
 	// check org name
-	req = NewRequestf(t, "GET", "/api/v1/orgs/%s", org.UserName).AddTokenAuth(token)
+	req = NewRequestf(t, "GET", "/v1/orgs/%s", org.UserName).AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	apiOrg = DecodeJSON(t, resp, &api.Organization{})
 	assert.Equal(t, org.UserName, apiOrg.Name)
@@ -87,7 +87,7 @@ func testAPIOrgCreateRename(t *testing.T) {
 	})
 
 	t.Run("CheckMembers", func(t *testing.T) {
-		req = NewRequestf(t, "GET", "/api/v1/orgs/%s/members", org.UserName).AddTokenAuth(token)
+		req = NewRequestf(t, "GET", "/v1/orgs/%s/members", org.UserName).AddTokenAuth(token)
 		resp = MakeRequest(t, req, http.StatusOK)
 
 		// user1 on this org is public
@@ -97,7 +97,7 @@ func testAPIOrgCreateRename(t *testing.T) {
 	})
 
 	t.Run("RenameOrg", func(t *testing.T) {
-		req = NewRequestWithJSON(t, "POST", "/api/v1/orgs/user1_org/rename", &api.RenameOrgOption{
+		req = NewRequestWithJSON(t, "POST", "/v1/orgs/user1_org/rename", &api.RenameOrgOption{
 			NewName: "renamed_org",
 		}).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNoContent)
@@ -107,7 +107,7 @@ func testAPIOrgCreateRename(t *testing.T) {
 
 	t.Run("ListRepos", func(t *testing.T) {
 		// FIXME: this test is wrong, there is no repository at all, so the for-loop is empty
-		req = NewRequestf(t, "GET", "/api/v1/orgs/%s/repos", org.UserName).AddTokenAuth(token)
+		req = NewRequestf(t, "GET", "/v1/orgs/%s/repos", org.UserName).AddTokenAuth(token)
 		resp = MakeRequest(t, req, http.StatusOK)
 		repos := DecodeJSON(t, resp, []*api.Repository{})
 		for _, repo := range repos {
@@ -122,7 +122,7 @@ func testAPIOrgGeneral(t *testing.T) {
 
 	t.Run("OrgGetAll", func(t *testing.T) {
 		// accessing with a token will return all orgs
-		req := NewRequest(t, "GET", "/api/v1/orgs").AddTokenAuth(user1Token)
+		req := NewRequest(t, "GET", "/v1/orgs").AddTokenAuth(user1Token)
 		resp := MakeRequest(t, req, http.StatusOK)
 
 		apiOrgList := DecodeJSON(t, resp, []*api.Organization{})
@@ -131,7 +131,7 @@ func testAPIOrgGeneral(t *testing.T) {
 		assert.Equal(t, api.UserVisibilityLimited, apiOrgList[1].Visibility)
 
 		// accessing without a token will return only public orgs
-		req = NewRequest(t, "GET", "/api/v1/orgs")
+		req = NewRequest(t, "GET", "/v1/orgs")
 		resp = MakeRequest(t, req, http.StatusOK)
 
 		apiOrgList = DecodeJSON(t, resp, []*api.Organization{})
@@ -152,7 +152,7 @@ func testAPIOrgGeneral(t *testing.T) {
 			Visibility:  new(api.UserVisibilityLimited),
 			Email:       new("org3-new-email@example.com"),
 		}
-		req := NewRequestWithJSON(t, "PATCH", "/api/v1/orgs/org3", &org3Edit).AddTokenAuth(user1Token)
+		req := NewRequestWithJSON(t, "PATCH", "/v1/orgs/org3", &org3Edit).AddTokenAuth(user1Token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		apiOrg := DecodeJSON(t, resp, &api.Organization{})
 
@@ -167,7 +167,7 @@ func testAPIOrgGeneral(t *testing.T) {
 		assert.Equal(t, api.VisibleTypeLimited, org3.Visibility)
 
 		// empty email can clear the email, nil fields won't change the settings
-		req = NewRequestWithJSON(t, "PATCH", "/api/v1/orgs/org3", &api.EditOrgOption{
+		req = NewRequestWithJSON(t, "PATCH", "/v1/orgs/org3", &api.EditOrgOption{
 			Email: new(""),
 		}).AddTokenAuth(user1Token)
 		resp = MakeRequest(t, req, http.StatusOK)
@@ -181,7 +181,7 @@ func testAPIOrgGeneral(t *testing.T) {
 		org := api.EditOrgOption{
 			Visibility: new(api.UserVisibility("invalid-visibility")),
 		}
-		req := NewRequestWithJSON(t, "PATCH", "/api/v1/orgs/org3", &org).AddTokenAuth(user1Token)
+		req := NewRequestWithJSON(t, "PATCH", "/v1/orgs/org3", &org).AddTokenAuth(user1Token)
 		MakeRequest(t, req, http.StatusUnprocessableEntity)
 	})
 
@@ -189,26 +189,26 @@ func testAPIOrgGeneral(t *testing.T) {
 		defer test.MockVariableValue(&setting.Service.RequireSignInViewStrict, true)()
 
 		orgName := "user1_org"
-		req := NewRequestf(t, "GET", "/api/v1/orgs/%s", orgName)
+		req := NewRequestf(t, "GET", "/v1/orgs/%s", orgName)
 		MakeRequest(t, req, http.StatusNotFound)
 
-		req = NewRequestf(t, "GET", "/api/v1/orgs/%s/repos", orgName)
+		req = NewRequestf(t, "GET", "/v1/orgs/%s/repos", orgName)
 		MakeRequest(t, req, http.StatusNotFound)
 
-		req = NewRequestf(t, "GET", "/api/v1/orgs/%s/members", orgName)
+		req = NewRequestf(t, "GET", "/v1/orgs/%s/members", orgName)
 		MakeRequest(t, req, http.StatusNotFound)
 	})
 
 	t.Run("OrgSearchEmptyTeam", func(t *testing.T) {
 		orgName := "org_with_empty_team"
 		// create org
-		req := NewRequestWithJSON(t, "POST", "/api/v1/orgs", &api.CreateOrgOption{
+		req := NewRequestWithJSON(t, "POST", "/v1/orgs", &api.CreateOrgOption{
 			UserName: orgName,
 		}).AddTokenAuth(user1Token)
 		MakeRequest(t, req, http.StatusCreated)
 
 		// create team with no member
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/orgs/%s/teams", orgName), &api.CreateTeamOption{
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/orgs/%s/teams", orgName), &api.CreateTeamOption{
 			Name:                    "Empty",
 			IncludesAllRepositories: true,
 			Permission:              "read",
@@ -217,7 +217,7 @@ func testAPIOrgGeneral(t *testing.T) {
 		MakeRequest(t, req, http.StatusCreated)
 
 		// case-insensitive search for teams that have no members
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/orgs/%s/teams/search?q=%s", orgName, "empty")).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/orgs/%s/teams/search?q=%s", orgName, "empty")).
 			AddTokenAuth(user1Token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		data := DecodeJSON(t, resp, &struct {
@@ -234,17 +234,17 @@ func testAPIOrgGeneral(t *testing.T) {
 		user2Session := loginUser(t, "user2")
 		user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteOrganization)
 
-		req := NewRequest(t, "PUT", "/api/v1/orgs/org3/public_members/user2").AddTokenAuth(user2Token)
+		req := NewRequest(t, "PUT", "/v1/orgs/org3/public_members/user2").AddTokenAuth(user2Token)
 		MakeRequest(t, req, http.StatusNoContent)
-		req = NewRequest(t, "DELETE", "/api/v1/orgs/org3/public_members/user2").AddTokenAuth(user2Token)
+		req = NewRequest(t, "DELETE", "/v1/orgs/org3/public_members/user2").AddTokenAuth(user2Token)
 		MakeRequest(t, req, http.StatusNoContent)
 
 		// non admin but org owner could also change other member's status
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{Name: "user2"})
 		require.False(t, user2.IsAdmin)
-		req = NewRequest(t, "PUT", "/api/v1/orgs/org3/public_members/user1").AddTokenAuth(user2Token)
+		req = NewRequest(t, "PUT", "/v1/orgs/org3/public_members/user1").AddTokenAuth(user2Token)
 		MakeRequest(t, req, http.StatusNoContent)
-		req = NewRequest(t, "DELETE", "/api/v1/orgs/org3/public_members/user1").AddTokenAuth(user2Token)
+		req = NewRequest(t, "DELETE", "/v1/orgs/org3/public_members/user1").AddTokenAuth(user2Token)
 		MakeRequest(t, req, http.StatusNoContent)
 	})
 
@@ -253,13 +253,13 @@ func testAPIOrgGeneral(t *testing.T) {
 		user4Token := getTokenForLoggedInUser(t, user4Session, auth_model.AccessTokenScopeWriteOrganization)
 
 		// user4 is a normal team member, they could change their own status
-		req := NewRequest(t, "PUT", "/api/v1/orgs/org3/public_members/user4").AddTokenAuth(user4Token)
+		req := NewRequest(t, "PUT", "/v1/orgs/org3/public_members/user4").AddTokenAuth(user4Token)
 		MakeRequest(t, req, http.StatusNoContent)
-		req = NewRequest(t, "DELETE", "/api/v1/orgs/org3/public_members/user4").AddTokenAuth(user4Token)
+		req = NewRequest(t, "DELETE", "/v1/orgs/org3/public_members/user4").AddTokenAuth(user4Token)
 		MakeRequest(t, req, http.StatusNoContent)
-		req = NewRequest(t, "PUT", "/api/v1/orgs/org3/public_members/user1").AddTokenAuth(user4Token)
+		req = NewRequest(t, "PUT", "/v1/orgs/org3/public_members/user1").AddTokenAuth(user4Token)
 		MakeRequest(t, req, http.StatusForbidden)
-		req = NewRequest(t, "DELETE", "/api/v1/orgs/org3/public_members/user1").AddTokenAuth(user4Token)
+		req = NewRequest(t, "DELETE", "/v1/orgs/org3/public_members/user1").AddTokenAuth(user4Token)
 		MakeRequest(t, req, http.StatusForbidden)
 	})
 }
@@ -274,25 +274,25 @@ func TestAPIOrgPrivateMembersNotLeaked(t *testing.T) {
 	// member publicizes their own membership inside the private org
 	memberSession := loginUser(t, memberName)
 	memberToken := getTokenForLoggedInUser(t, memberSession, auth_model.AccessTokenScopeWriteOrganization)
-	req := NewRequest(t, "PUT", "/api/v1/orgs/"+orgName+"/public_members/"+memberName).AddTokenAuth(memberToken)
+	req := NewRequest(t, "PUT", "/v1/orgs/"+orgName+"/public_members/"+memberName).AddTokenAuth(memberToken)
 	MakeRequest(t, req, http.StatusNoContent)
 
 	// an outsider must not be able to learn about the membership of a private org
 	outsiderSession := loginUser(t, "user2")
 	outsiderToken := getTokenForLoggedInUser(t, outsiderSession, auth_model.AccessTokenScopeReadOrganization)
-	req = NewRequest(t, "GET", "/api/v1/orgs/"+orgName+"/public_members/"+memberName).AddTokenAuth(outsiderToken)
+	req = NewRequest(t, "GET", "/v1/orgs/"+orgName+"/public_members/"+memberName).AddTokenAuth(outsiderToken)
 	MakeRequest(t, req, http.StatusNotFound)
-	req = NewRequest(t, "GET", "/api/v1/orgs/"+orgName+"/public_members").AddTokenAuth(outsiderToken)
+	req = NewRequest(t, "GET", "/v1/orgs/"+orgName+"/public_members").AddTokenAuth(outsiderToken)
 	MakeRequest(t, req, http.StatusNotFound)
 	// the full member list of a private org must not be enumerable by an outsider either
-	req = NewRequest(t, "GET", "/api/v1/orgs/"+orgName+"/members").AddTokenAuth(outsiderToken)
+	req = NewRequest(t, "GET", "/v1/orgs/"+orgName+"/members").AddTokenAuth(outsiderToken)
 	MakeRequest(t, req, http.StatusNotFound)
 
 	// the member can still see the public membership of their own org
-	req = NewRequest(t, "GET", "/api/v1/orgs/"+orgName+"/public_members/"+memberName).AddTokenAuth(memberToken)
+	req = NewRequest(t, "GET", "/v1/orgs/"+orgName+"/public_members/"+memberName).AddTokenAuth(memberToken)
 	MakeRequest(t, req, http.StatusNoContent)
 	// and the member can still list the org's members
-	req = NewRequest(t, "GET", "/api/v1/orgs/"+orgName+"/members").AddTokenAuth(memberToken)
+	req = NewRequest(t, "GET", "/v1/orgs/"+orgName+"/members").AddTokenAuth(memberToken)
 	MakeRequest(t, req, http.StatusOK)
 }
 
@@ -305,14 +305,14 @@ func testAPIDeleteOrgRepos(t *testing.T) {
 	t.Run("NoPermission", func(t *testing.T) {
 		nonOwnerSession := loginUser(t, "user4")
 		nonOwnerToken := getTokenForLoggedInUser(t, nonOwnerSession, auth_model.AccessTokenScopeWriteOrganization)
-		req := NewRequest(t, "DELETE", "/api/v1/orgs/org3/repos").AddTokenAuth(nonOwnerToken)
+		req := NewRequest(t, "DELETE", "/v1/orgs/org3/repos").AddTokenAuth(nonOwnerToken)
 		MakeRequest(t, req, http.StatusForbidden)
 	})
 
 	t.Run("DeleteAllOrgRepos", func(t *testing.T) {
 		session := loginUser(t, "user1")
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteOrganization, auth_model.AccessTokenScopeWriteRepository)
-		req := NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/orgs/%s/repos", org3.Name)).AddTokenAuth(token)
+		req := NewRequest(t, "DELETE", fmt.Sprintf("/v1/orgs/%s/repos", org3.Name)).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusAccepted)
 
 		assert.Eventually(t, func() bool {
@@ -321,7 +321,7 @@ func testAPIDeleteOrgRepos(t *testing.T) {
 			return len(repos) == 0
 		}, 2*time.Second, 50*time.Millisecond)
 
-		req = NewRequest(t, "DELETE", fmt.Sprintf("/api/v1/orgs/%s/repos", org3.Name)).AddTokenAuth(token)
+		req = NewRequest(t, "DELETE", fmt.Sprintf("/v1/orgs/%s/repos", org3.Name)).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNoContent) // The org contains no repositories, so the API should return StatusNoContent
 	})
 }
@@ -337,8 +337,8 @@ func TestAPIOrgLabelsVisibility(t *testing.T) {
 	label := &issues_model.Label{OrgID: privateOrg.ID, Name: "internal-label", Color: "#aabbcc", Description: "private organization label"}
 	require.NoError(t, issues_model.NewLabel(t.Context(), label))
 
-	listURL := fmt.Sprintf("/api/v1/orgs/%s/labels", privateOrg.Name)
-	getURL := fmt.Sprintf("/api/v1/orgs/%s/labels/%d", privateOrg.Name, label.ID)
+	listURL := fmt.Sprintf("/v1/orgs/%s/labels", privateOrg.Name)
+	getURL := fmt.Sprintf("/v1/orgs/%s/labels/%d", privateOrg.Name, label.ID)
 
 	t.Run("NonMemberDenied", func(t *testing.T) {
 		// user2 is not a member of the private org and must not see its labels.
@@ -369,6 +369,6 @@ func TestAPIOrgLabelsVisibility(t *testing.T) {
 	t.Run("PublicOrgStillReadable", func(t *testing.T) {
 		// org3 (id 3) is a public org with labels; non-members may read them.
 		token := getUserToken(t, "user2", auth_model.AccessTokenScopeReadOrganization)
-		MakeRequest(t, NewRequest(t, "GET", "/api/v1/orgs/org3/labels").AddTokenAuth(token), http.StatusOK)
+		MakeRequest(t, NewRequest(t, "GET", "/v1/orgs/org3/labels").AddTokenAuth(token), http.StatusOK)
 	})
 }

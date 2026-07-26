@@ -21,6 +21,17 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 )
 
+// RoutePrefix is where routers/private is mounted (see routers.NormalRoutes).
+// Every internal request URL is built from it via internalURL, so the mount and
+// its ~25 callers cannot drift apart.
+const RoutePrefix = "/v1/internal"
+
+// internalURL builds an absolute internal-API URL. setting.LocalURL always ends
+// in "/", so RoutePrefix is joined without its leading slash.
+func internalURL(routePath string) string {
+	return setting.LocalURL + RoutePrefix[1:] + "/" + routePath
+}
+
 // Response is used for internal request response (for user message and error message)
 type Response struct {
 	Err     string `json:"err,omitempty"`      // server-side error log message, it won't be exposed to end users

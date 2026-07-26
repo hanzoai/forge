@@ -144,7 +144,7 @@ jobs:
 		assert.Equal(t, runLatestAttempt.LatestAttemptID, job2LatestAttempt.RunAttemptID)
 
 		t.Run("AttemptAPI", func(t *testing.T) {
-			req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/runs/%d/attempts/2", user2.Name, repo.Name, run.ID)).
+			req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/runs/%d/attempts/2", user2.Name, repo.Name, run.ID)).
 				AddTokenAuth(token)
 			attemptResp := MakeRequest(t, req, http.StatusOK)
 			apiAttempt := DecodeJSON(t, attemptResp, &api.ActionWorkflowRun{})
@@ -153,11 +153,11 @@ jobs:
 			assert.Equal(t, "completed", apiAttempt.Status)
 			assert.Equal(t, "success", apiAttempt.Conclusion)
 			assert.NotNil(t, apiAttempt.PreviousAttemptURL)
-			assert.True(t, strings.HasSuffix(*apiAttempt.PreviousAttemptURL, fmt.Sprintf("/api/v1/repos/%s/%s/actions/runs/%d/attempts/1", user2.Name, repo.Name, run.ID)))
+			assert.True(t, strings.HasSuffix(*apiAttempt.PreviousAttemptURL, fmt.Sprintf("/v1/repos/%s/%s/actions/runs/%d/attempts/1", user2.Name, repo.Name, run.ID)))
 			assert.Equal(t, user2.Name, apiAttempt.Actor.UserName)
 			assert.Equal(t, userAdmin.Name, apiAttempt.TriggerActor.UserName)
 
-			req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/runs/%d/attempts/2/jobs", user2.Name, repo.Name, run.ID)).
+			req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/runs/%d/attempts/2/jobs", user2.Name, repo.Name, run.ID)).
 				AddTokenAuth(token)
 			attemptJobsResp := MakeRequest(t, req, http.StatusOK)
 			apiAttemptJobs := DecodeJSON(t, attemptJobsResp, &api.ActionWorkflowJobsResponse{})

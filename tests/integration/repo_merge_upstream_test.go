@@ -40,7 +40,7 @@ func TestRepoMergeUpstream(t *testing.T) {
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
 		// create a fork
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/forks", baseUser.Name, baseRepo.Name), &api.CreateForkOption{
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/forks", baseUser.Name, baseRepo.Name), &api.CreateForkOption{
 			Name: new("test-repo-fork"),
 		}).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusAccepted)
@@ -125,7 +125,7 @@ func TestRepoMergeUpstream(t *testing.T) {
 			}, 5*time.Second, 100*time.Millisecond)
 
 			// and do the merge-upstream by API
-			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
+			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
 				Branch: "fork-branch",
 			}).AddTokenAuth(token)
 			resp := MakeRequest(t, req, http.StatusOK)
@@ -153,7 +153,7 @@ func TestRepoMergeUpstream(t *testing.T) {
 			require.NoError(t, createOrReplaceFileInBranch(baseUser, baseRepo, "ff-test.txt", "master", "ff-content-1"))
 
 			// ff_only=true with fast-forward possible (should succeed)
-			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
+			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
 				Branch: "ff-test-branch",
 				FfOnly: true,
 			}).AddTokenAuth(token)
@@ -165,7 +165,7 @@ func TestRepoMergeUpstream(t *testing.T) {
 			// ff_only=true when fast-forward is not possible (should fail)
 			require.NoError(t, createOrReplaceFileInBranch(baseUser, baseRepo, "another-file.txt", "master", "more-content"))
 
-			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
+			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
 				Branch: "fork-branch",
 				FfOnly: true,
 			}).AddTokenAuth(token)
@@ -179,7 +179,7 @@ func TestRepoMergeUpstream(t *testing.T) {
 			_, err := db.GetEngine(t.Context()).ID(baseRepo.ID).Cols("is_private").Update(baseRepo)
 			require.NoError(t, err)
 			// the fork owner can no longer read the base repo, so syncing must be refused
-			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
+			req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/test-repo-fork/merge-upstream", forkUser.Name), &api.MergeUpstreamRequest{
 				Branch: "fork-branch",
 			}).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusForbidden)

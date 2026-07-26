@@ -5,8 +5,6 @@ package private
 
 import (
 	"context"
-
-	"github.com/hanzoai/git/modules/setting"
 )
 
 type GenerateTokenRequest struct {
@@ -15,7 +13,7 @@ type GenerateTokenRequest struct {
 
 // GenerateActionsRunnerToken calls the internal GenerateActionsRunnerToken function
 func GenerateActionsRunnerToken(ctx context.Context, scope string) (*ResponseText, ResponseExtra) {
-	reqURL := setting.LocalURL + "api/internal/actions/generate_actions_runner_token"
+	reqURL := internalURL("actions/generate_actions_runner_token")
 
 	req := newInternalRequestAPI(ctx, reqURL, "POST", GenerateTokenRequest{
 		Scope: scope,

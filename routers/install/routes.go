@@ -33,7 +33,7 @@ func Routes() *web.Router {
 
 	r.Get("/-/web-theme/list", misc.WebThemeList)
 	r.Post("/-/web-theme/apply", misc.WebThemeApply)
-	r.Get("/api/healthz", healthcheck.Check)
+	r.Get("/v1/healthz", healthcheck.Check)
 
 	r.NotFound(installNotFound)
 

@@ -58,7 +58,7 @@ func TestRepoAPIURL(t *testing.T) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
 	repo := unittest.AssertExistsAndLoadBean(t, &Repository{ID: 10})
 
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user12/repo10", repo.APIURL())
+	assert.Equal(t, "https://try.gitea.io/v1/repos/user12/repo10", repo.APIURL())
 }
 
 func TestWatchRepo(t *testing.T) {

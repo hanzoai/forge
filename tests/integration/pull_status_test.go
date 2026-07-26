@@ -99,7 +99,7 @@ func TestPullCreate_CommitStatus(t *testing.T) {
 
 func doAPICreateCommitStatusTest(ctx APITestContext, ref string, state commitstatus.CommitStatusState, statusContext string) func(*testing.T) {
 	return func(t *testing.T) {
-		link := fmt.Sprintf("/api/v1/repos/%s/%s/statuses/%s", ctx.Username, ctx.Reponame, url.PathEscape(ref))
+		link := fmt.Sprintf("/v1/repos/%s/%s/statuses/%s", ctx.Username, ctx.Reponame, url.PathEscape(ref))
 		req := NewRequestWithJSON(t, http.MethodPost, link, api.CreateStatusOption{
 			State:     state,
 			TargetURL: "http://test.ci/",

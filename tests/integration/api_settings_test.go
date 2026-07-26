@@ -17,14 +17,14 @@ import (
 func TestAPIExposedSettings(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	req := NewRequest(t, "GET", "/api/v1/settings/ui")
+	req := NewRequest(t, "GET", "/v1/settings/ui")
 	resp := MakeRequest(t, req, http.StatusOK)
 
 	ui := DecodeJSON(t, resp, &api.GeneralUISettings{})
 	assert.Len(t, ui.AllowedReactions, len(setting.UI.Reactions))
 	assert.ElementsMatch(t, setting.UI.Reactions, ui.AllowedReactions)
 
-	req = NewRequest(t, "GET", "/api/v1/settings/api")
+	req = NewRequest(t, "GET", "/v1/settings/api")
 	resp = MakeRequest(t, req, http.StatusOK)
 
 	apiSettings := DecodeJSON(t, resp, &api.GeneralAPISettings{})
@@ -36,7 +36,7 @@ func TestAPIExposedSettings(t *testing.T) {
 		DefaultMaxResponseSize: setting.API.DefaultMaxResponseSize,
 	}, apiSettings)
 
-	req = NewRequest(t, "GET", "/api/v1/settings/repository")
+	req = NewRequest(t, "GET", "/v1/settings/repository")
 	resp = MakeRequest(t, req, http.StatusOK)
 
 	repo := DecodeJSON(t, resp, &api.GeneralRepoSettings{})
@@ -48,7 +48,7 @@ func TestAPIExposedSettings(t *testing.T) {
 		LFSDisabled:          !setting.LFS.StartServer,
 	}, repo)
 
-	req = NewRequest(t, "GET", "/api/v1/settings/attachment")
+	req = NewRequest(t, "GET", "/v1/settings/attachment")
 	resp = MakeRequest(t, req, http.StatusOK)
 
 	attachment := DecodeJSON(t, resp, &api.GeneralAttachmentSettings{})

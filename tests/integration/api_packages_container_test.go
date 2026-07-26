@@ -710,7 +710,7 @@ func TestPackageContainer(t *testing.T) {
 					assert.Equal(t, c.ExpectedLink, resp.Header().Get("Link"))
 				}
 
-				req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/packages/%s?type=container&q=%s", user.Name, image)).
+				req := NewRequest(t, "GET", fmt.Sprintf("/v1/packages/%s?type=container&q=%s", user.Name, image)).
 					AddTokenAuth(token)
 				resp := MakeRequest(t, req, http.StatusOK)
 

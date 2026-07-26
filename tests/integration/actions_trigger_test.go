@@ -970,7 +970,7 @@ jobs:
 		assert.NoError(t, err)
 		values := url.Values{}
 		values.Set("ref", "main")
-		req := NewRequestWithURLValues(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), values).
+		req := NewRequestWithURLValues(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), values).
 			AddTokenAuth(token)
 		_ = MakeRequest(t, req, http.StatusNoContent)
 
@@ -987,7 +987,7 @@ jobs:
 		// Now trigger with rundetails
 		values.Set("return_run_details", "true")
 
-		req = NewRequestWithURLValues(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), values).
+		req = NewRequestWithURLValues(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), values).
 			AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		runDetails := &api.RunDetails{}
@@ -1063,7 +1063,7 @@ jobs:
 
 		values := url.Values{}
 		values.Set("ref", "main")
-		req := NewRequestWithURLValues(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/push-only.yml/dispatches", repo.FullName()), values).
+		req := NewRequestWithURLValues(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/push-only.yml/dispatches", repo.FullName()), values).
 			AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusUnprocessableEntity)
 		apiError := DecodeJSON(t, resp, &api.APIError{})
@@ -1143,7 +1143,7 @@ jobs:
 		values.Set("ref", "main")
 		values.Set("inputs[myinput]", "val0")
 		values.Set("inputs[myinput3]", "true")
-		req := NewRequestWithURLValues(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), values).
+		req := NewRequestWithURLValues(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), values).
 			AddTokenAuth(token)
 		_ = MakeRequest(t, req, http.StatusNoContent)
 
@@ -1238,7 +1238,7 @@ jobs:
 			},
 		}
 
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
 			AddTokenAuth(token)
 		_ = MakeRequest(t, req, http.StatusNoContent)
 
@@ -1323,7 +1323,7 @@ jobs:
 				"myinput3": "true",
 			},
 		}
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
 			AddTokenAuth(token)
 		_ = MakeRequest(t, req, http.StatusNoContent)
 
@@ -1453,7 +1453,7 @@ jobs:
 				"myinput3": "true",
 			},
 		}
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
 			AddTokenAuth(token)
 		_ = MakeRequest(t, req, http.StatusNoContent)
 
@@ -1499,7 +1499,7 @@ func TestWorkflowApi(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotEmpty(t, repo)
 
-		req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/workflows", repo.FullName())).
+		req := NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/workflows", repo.FullName())).
 			AddTokenAuth(token)
 		resp := MakeRequest(t, req, http.StatusOK)
 		workflows := &api.ActionWorkflowResponse{}
@@ -1542,7 +1542,7 @@ jobs:
 		assert.NoError(t, err)
 		assert.NotEmpty(t, addWorkflowToBaseResp)
 
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/workflows", repo.FullName())).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/workflows", repo.FullName())).
 			AddTokenAuth(token)
 		resp = MakeRequest(t, req, http.StatusOK)
 		json.NewDecoder(resp.Body).Decode(workflows)
@@ -1553,7 +1553,7 @@ jobs:
 		assert.Equal(t, "active", workflows.Workflows[0].State)
 
 		// Use a hardcoded api path
-		req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/%s", repo.FullName(), workflows.Workflows[0].ID)).
+		req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/actions/workflows/%s", repo.FullName(), workflows.Workflows[0].ID)).
 			AddTokenAuth(token)
 		resp = MakeRequest(t, req, http.StatusOK)
 		workflow := &api.ActionWorkflow{}
@@ -1604,7 +1604,7 @@ jobs:
 			},
 		}
 		// Since the workflow is disabled, so the response code is 403 forbidden
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
 			AddTokenAuth(token)
 		_ = MakeRequest(t, req, http.StatusForbidden)
 
@@ -1651,7 +1651,7 @@ jobs:
 				"myinput3": "true",
 			},
 		}
-		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
+		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/actions/workflows/dispatch.yml/dispatches", repo.FullName()), inputs).
 			AddTokenAuth(token)
 		_ = MakeRequest(t, req, http.StatusNoContent)
 
@@ -1709,7 +1709,7 @@ jobs:
 		createWorkflowFile(t, user2Token, baseRepo.OwnerName, baseRepo.Name, wfTreePath, opts1)
 
 		// user4 forks the repo
-		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/api/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
+		req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/forks", baseRepo.OwnerName, baseRepo.Name),
 			&api.CreateForkOption{
 				Name: new("close-pull-request-with-path-fork"),
 			}).AddTokenAuth(user4Token)

@@ -199,7 +199,7 @@ jobs:
 					}
 
 					// download task logs from API and check content
-					req = NewRequest(t, "GET", fmt.Sprintf("/api/v1/repos/%s/%s/actions/jobs/%d/logs", user2.Name, repo.Name, job.ID)).
+					req = NewRequest(t, "GET", fmt.Sprintf("/v1/repos/%s/%s/actions/jobs/%d/logs", user2.Name, repo.Name, job.ID)).
 						AddTokenAuth(token)
 					resp = MakeRequest(t, req, http.StatusOK)
 					logTextLines = strings.Split(strings.TrimSpace(resp.Body.String()), "\n")

@@ -59,7 +59,7 @@ func TestInstance(t *testing.T) {
 			})
 
 			t.Run("APIRequestUnchanged", func(t *testing.T) {
-				MakeRequest(t, NewRequest(t, "GET", "/api/v1/version"), http.StatusOK)
+				MakeRequest(t, NewRequest(t, "GET", "/v1/version"), http.StatusOK)
 			})
 		})
 
@@ -103,7 +103,7 @@ func TestInstance(t *testing.T) {
 
 			MakeRequest(t, NewRequest(t, "GET", "/user/login"), http.StatusOK)
 			MakeRequest(t, NewRequest(t, "GET", "/-/admin"), http.StatusSeeOther)
-			MakeRequest(t, NewRequest(t, "GET", "/api/internal/dummy"), http.StatusForbidden)
+			MakeRequest(t, NewRequest(t, "GET", "/v1/internal/dummy"), http.StatusForbidden)
 		})
 
 		t.Run("AdminLogin", func(t *testing.T) {

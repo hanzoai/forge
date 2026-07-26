@@ -71,7 +71,7 @@ func TestEmptyRepoAddFile(t *testing.T) {
 	assert.True(t, test.IsNormalPageCompleted(bodyString))
 
 	// test api
-	req = NewRequest(t, "GET", "/api/v1/repos/user30/empty/raw/main/README.md").AddTokenAuth(token)
+	req = NewRequest(t, "GET", "/v1/repos/user30/empty/raw/main/README.md").AddTokenAuth(token)
 	session.MakeRequest(t, req, http.StatusNotFound)
 
 	// test feed
@@ -170,7 +170,7 @@ func TestEmptyRepoAddFileByAPI(t *testing.T) {
 	session := loginUser(t, "user30")
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 
-	req := NewRequestWithJSON(t, "POST", "/api/v1/repos/user30/empty/contents/new-file.txt", &api.CreateFileOptions{
+	req := NewRequestWithJSON(t, "POST", "/v1/repos/user30/empty/contents/new-file.txt", &api.CreateFileOptions{
 		FileOptions: api.FileOptions{
 			NewBranchName: "new_branch",
 			Message:       "init",
@@ -187,7 +187,7 @@ func TestEmptyRepoAddFileByAPI(t *testing.T) {
 	resp = session.MakeRequest(t, req, http.StatusOK)
 	assert.Contains(t, resp.Body.String(), "newly-added-api-file")
 
-	req = NewRequest(t, "GET", "/api/v1/repos/user30/empty").
+	req = NewRequest(t, "GET", "/v1/repos/user30/empty").
 		AddTokenAuth(token)
 	resp = session.MakeRequest(t, req, http.StatusOK)
 	apiRepo := DecodeJSON(t, resp, &api.Repository{})

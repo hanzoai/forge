@@ -22,7 +22,7 @@ func TestAPITwoFactor(t *testing.T) {
 
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 16})
 
-	req := NewRequest(t, "GET", "/api/v1/user").
+	req := NewRequest(t, "GET", "/v1/user").
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusOK)
 
@@ -40,20 +40,20 @@ func TestAPITwoFactor(t *testing.T) {
 
 	assert.NoError(t, auth_model.NewTwoFactor(t.Context(), tfa))
 
-	req = NewRequest(t, "GET", "/api/v1/user").
+	req = NewRequest(t, "GET", "/v1/user").
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusUnauthorized)
 
 	passcode, err := totp.GenerateCode(otpKey.Secret(), time.Now())
 	assert.NoError(t, err)
 
-	req = NewRequest(t, "GET", "/api/v1/user").
+	req = NewRequest(t, "GET", "/v1/user").
 		AddBasicAuth(user.Name)
 	req.Header.Set("X-Gitea-OTP", passcode)
 	MakeRequest(t, req, http.StatusOK)
 
 	// the same passcode must not be replayable on the basic-auth surface (RFC 6238 single-use)
-	req = NewRequest(t, "GET", "/api/v1/user").
+	req = NewRequest(t, "GET", "/v1/user").
 		AddBasicAuth(user.Name)
 	req.Header.Set("X-Gitea-OTP", passcode)
 	MakeRequest(t, req, http.StatusUnauthorized)
@@ -65,7 +65,7 @@ func TestBasicAuthWithWebAuthn(t *testing.T) {
 	// user1 has no webauthn enrolled, he can request API with basic auth
 	user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 	unittest.AssertNotExistsBean(t, &auth_model.WebAuthnCredential{UserID: user1.ID})
-	req := NewRequest(t, "GET", "/api/v1/user")
+	req := NewRequest(t, "GET", "/v1/user")
 	req.SetBasicAuth(user1.Name, "password")
 	MakeRequest(t, req, http.StatusOK)
 
@@ -89,7 +89,7 @@ func TestBasicAuthWithWebAuthn(t *testing.T) {
 	user32 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 32})
 	unittest.AssertExistsAndLoadBean(t, &auth_model.WebAuthnCredential{UserID: user32.ID})
 
-	req = NewRequest(t, "GET", "/api/v1/user")
+	req = NewRequest(t, "GET", "/v1/user")
 	req.SetBasicAuth(user32.Name, "notpassword")
 	resp = MakeRequest(t, req, http.StatusUnauthorized)
 

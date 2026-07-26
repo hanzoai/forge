@@ -40,7 +40,7 @@ func TestAPICreateTokenScopeEscalation(t *testing.T) {
 	writeUserToken := getUserToken(t, user.Name, auth_model.AccessTokenScopeWriteUser)
 
 	// requesting a broader scope ("all") than the authenticating token is rejected
-	req := NewRequestWithJSON(t, "POST", "/api/v1/users/"+user.LoginName+"/tokens", map[string]any{
+	req := NewRequestWithJSON(t, "POST", "/v1/users/"+user.LoginName+"/tokens", map[string]any{
 		"name":   "escalated",
 		"scopes": []string{"all"},
 	})
@@ -48,7 +48,7 @@ func TestAPICreateTokenScopeEscalation(t *testing.T) {
 	MakeRequest(t, req, http.StatusForbidden)
 
 	// requesting a subset scope ("read:user") is allowed
-	req = NewRequestWithJSON(t, "POST", "/api/v1/users/"+user.LoginName+"/tokens", map[string]any{
+	req = NewRequestWithJSON(t, "POST", "/v1/users/"+user.LoginName+"/tokens", map[string]any{
 		"name":   "subset",
 		"scopes": []string{"read:user"},
 	})
@@ -56,7 +56,7 @@ func TestAPICreateTokenScopeEscalation(t *testing.T) {
 	MakeRequest(t, req, http.StatusCreated)
 
 	// password (non-token) auth may still create a token with any scope
-	req = NewRequestWithJSON(t, "POST", "/api/v1/users/"+user.LoginName+"/tokens", map[string]any{
+	req = NewRequestWithJSON(t, "POST", "/v1/users/"+user.LoginName+"/tokens", map[string]any{
 		"name":   "by-password",
 		"scopes": []string{"all"},
 	}).AddBasicAuth(user.Name)
@@ -64,7 +64,7 @@ func TestAPICreateTokenScopeEscalation(t *testing.T) {
 
 	// a public-only token must not mint a token that drops the public-only restriction
 	publicOnlyToken := getUserToken(t, user.Name, auth_model.AccessTokenScopeWriteUser, auth_model.AccessTokenScopePublicOnly)
-	req = NewRequestWithJSON(t, "POST", "/api/v1/users/"+user.LoginName+"/tokens", map[string]any{
+	req = NewRequestWithJSON(t, "POST", "/v1/users/"+user.LoginName+"/tokens", map[string]any{
 		"name":   "still-public-only",
 		"scopes": []string{"write:user"},
 	})
@@ -76,7 +76,7 @@ func TestAPICreateTokenScopeEscalation(t *testing.T) {
 
 	// an unrestricted parent token may create a narrower public-only child: public-only is a restriction,
 	// not a grantable permission, so the subset check must not reject it
-	req = NewRequestWithJSON(t, "POST", "/api/v1/users/"+user.LoginName+"/tokens", map[string]any{
+	req = NewRequestWithJSON(t, "POST", "/v1/users/"+user.LoginName+"/tokens", map[string]any{
 		"name":   "narrower-public-only",
 		"scopes": []string{"write:user", "public-only"},
 	})
@@ -91,7 +91,7 @@ func TestAPIDeleteMissingToken(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 
-	req := NewRequestf(t, "DELETE", "/api/v1/users/user1/tokens/%d", unittest.NonexistentID).
+	req := NewRequestf(t, "DELETE", "/v1/users/user1/tokens/%d", unittest.NonexistentID).
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusNotFound)
 }
@@ -102,19 +102,19 @@ func TestAPIGetTokensPermission(t *testing.T) {
 
 	// admin can get tokens for other users
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
-	req := NewRequest(t, "GET", "/api/v1/users/user2/tokens").
+	req := NewRequest(t, "GET", "/v1/users/user2/tokens").
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusOK)
 
 	// non-admin can get tokens for himself
 	user = unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
-	req = NewRequest(t, "GET", "/api/v1/users/user2/tokens").
+	req = NewRequest(t, "GET", "/v1/users/user2/tokens").
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusOK)
 
 	// non-admin can't get tokens for other users
 	user = unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4})
-	req = NewRequest(t, "GET", "/api/v1/users/user2/tokens").
+	req = NewRequest(t, "GET", "/v1/users/user2/tokens").
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusForbidden)
 }
@@ -129,19 +129,19 @@ func TestAPIDeleteTokensPermission(t *testing.T) {
 
 	// admin can delete tokens for other users
 	createAPIAccessTokenWithoutCleanUp(t, "test-key-1", user2, []auth_model.AccessTokenScope{auth_model.AccessTokenScopeAll})
-	req := NewRequest(t, "DELETE", "/api/v1/users/"+user2.LoginName+"/tokens/test-key-1").
+	req := NewRequest(t, "DELETE", "/v1/users/"+user2.LoginName+"/tokens/test-key-1").
 		AddBasicAuth(admin.Name)
 	MakeRequest(t, req, http.StatusNoContent)
 
 	// non-admin can delete tokens for himself
 	createAPIAccessTokenWithoutCleanUp(t, "test-key-2", user2, []auth_model.AccessTokenScope{auth_model.AccessTokenScopeAll})
-	req = NewRequest(t, "DELETE", "/api/v1/users/"+user2.LoginName+"/tokens/test-key-2").
+	req = NewRequest(t, "DELETE", "/v1/users/"+user2.LoginName+"/tokens/test-key-2").
 		AddBasicAuth(user2.Name)
 	MakeRequest(t, req, http.StatusNoContent)
 
 	// non-admin can't delete tokens for other users
 	createAPIAccessTokenWithoutCleanUp(t, "test-key-3", user2, []auth_model.AccessTokenScope{auth_model.AccessTokenScopeAll})
-	req = NewRequest(t, "DELETE", "/api/v1/users/"+user2.LoginName+"/tokens/test-key-3").
+	req = NewRequest(t, "DELETE", "/v1/users/"+user2.LoginName+"/tokens/test-key-3").
 		AddBasicAuth(user4.Name)
 	MakeRequest(t, req, http.StatusForbidden)
 }
@@ -175,7 +175,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 	// Test cases are in alphabetical order by URL.
 	testCases := []requiredScopeTestCase{
 		{
-			"/api/v1/admin/emails",
+			"/v1/admin/emails",
 			"GET",
 			[]permission{
 				{
@@ -185,7 +185,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/admin/users",
+			"/v1/admin/users",
 			"GET",
 			[]permission{
 				{
@@ -195,7 +195,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/admin/users",
+			"/v1/admin/users",
 			"POST",
 			[]permission{
 				{
@@ -205,7 +205,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/admin/users/user2",
+			"/v1/admin/users/user2",
 			"PATCH",
 			[]permission{
 				{
@@ -215,7 +215,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/admin/users/user2/orgs",
+			"/v1/admin/users/user2/orgs",
 			"GET",
 			[]permission{
 				{
@@ -225,7 +225,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/admin/users/user2/orgs",
+			"/v1/admin/users/user2/orgs",
 			"POST",
 			[]permission{
 				{
@@ -235,7 +235,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/admin/orgs",
+			"/v1/admin/orgs",
 			"GET",
 			[]permission{
 				{
@@ -245,7 +245,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/notifications",
+			"/v1/notifications",
 			"GET",
 			[]permission{
 				{
@@ -255,7 +255,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/notifications",
+			"/v1/notifications",
 			"PUT",
 			[]permission{
 				{
@@ -265,7 +265,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/org/org1/repos",
+			"/v1/org/org1/repos",
 			"POST",
 			[]permission{
 				{
@@ -279,7 +279,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/packages/user1/type/name/1",
+			"/v1/packages/user1/type/name/1",
 			"GET",
 			[]permission{
 				{
@@ -289,7 +289,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/packages/user1/type/name/1",
+			"/v1/packages/user1/type/name/1",
 			"DELETE",
 			[]permission{
 				{
@@ -299,7 +299,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1",
+			"/v1/repos/user1/repo1",
 			"GET",
 			[]permission{
 				{
@@ -309,7 +309,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1",
+			"/v1/repos/user1/repo1",
 			"PATCH",
 			[]permission{
 				{
@@ -319,7 +319,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1",
+			"/v1/repos/user1/repo1",
 			"DELETE",
 			[]permission{
 				{
@@ -329,7 +329,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/branches",
+			"/v1/repos/user1/repo1/branches",
 			"GET",
 			[]permission{
 				{
@@ -339,7 +339,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/archive/foo",
+			"/v1/repos/user1/repo1/archive/foo",
 			"GET",
 			[]permission{
 				{
@@ -349,7 +349,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/issues",
+			"/v1/repos/user1/repo1/issues",
 			"GET",
 			[]permission{
 				{
@@ -359,7 +359,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/media/foo",
+			"/v1/repos/user1/repo1/media/foo",
 			"GET",
 			[]permission{
 				{
@@ -369,7 +369,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/raw/foo",
+			"/v1/repos/user1/repo1/raw/foo",
 			"GET",
 			[]permission{
 				{
@@ -379,7 +379,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/teams",
+			"/v1/repos/user1/repo1/teams",
 			"GET",
 			[]permission{
 				{
@@ -389,7 +389,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/teams/team1",
+			"/v1/repos/user1/repo1/teams/team1",
 			"PUT",
 			[]permission{
 				{
@@ -399,7 +399,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/repos/user1/repo1/transfer",
+			"/v1/repos/user1/repo1/transfer",
 			"POST",
 			[]permission{
 				{
@@ -410,7 +410,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 		},
 		// Private repo
 		{
-			"/api/v1/repos/user2/repo2",
+			"/v1/repos/user2/repo2",
 			"GET",
 			[]permission{
 				{
@@ -421,7 +421,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 		},
 		// Private repo
 		{
-			"/api/v1/repos/user2/repo2",
+			"/v1/repos/user2/repo2",
 			"GET",
 			[]permission{
 				{
@@ -431,7 +431,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/user",
+			"/v1/user",
 			"GET",
 			[]permission{
 				{
@@ -441,7 +441,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/user/emails",
+			"/v1/user/emails",
 			"GET",
 			[]permission{
 				{
@@ -451,7 +451,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/user/emails",
+			"/v1/user/emails",
 			"POST",
 			[]permission{
 				{
@@ -461,7 +461,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/user/emails",
+			"/v1/user/emails",
 			"DELETE",
 			[]permission{
 				{
@@ -471,7 +471,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/user/applications/oauth2",
+			"/v1/user/applications/oauth2",
 			"GET",
 			[]permission{
 				{
@@ -481,7 +481,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/user/applications/oauth2",
+			"/v1/user/applications/oauth2",
 			"POST",
 			[]permission{
 				{
@@ -491,7 +491,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 			},
 		},
 		{
-			"/api/v1/users/search",
+			"/v1/users/search",
 			"GET",
 			[]permission{
 				{
@@ -502,7 +502,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 		},
 		// Private user
 		{
-			"/api/v1/users/user31",
+			"/v1/users/user31",
 			"GET",
 			[]permission{
 				{
@@ -513,7 +513,7 @@ func TestAPIDeniesPermissionBasedOnTokenScope(t *testing.T) {
 		},
 		// Private user
 		{
-			"/api/v1/users/user31/gpg_keys",
+			"/v1/users/user31/gpg_keys",
 			"GET",
 			[]permission{
 				{
@@ -596,7 +596,7 @@ func createAPIAccessTokenWithoutCleanUp(t *testing.T, tokenName string, user *us
 	}
 
 	log.Debug("Requesting creation of token with scopes: %v", scopes)
-	req := NewRequestWithJSON(t, "POST", "/api/v1/users/"+user.LoginName+"/tokens", payload).
+	req := NewRequestWithJSON(t, "POST", "/v1/users/"+user.LoginName+"/tokens", payload).
 		AddBasicAuth(user.Name)
 	resp := MakeRequest(t, req, http.StatusCreated)
 
@@ -613,7 +613,7 @@ func createAPIAccessTokenWithoutCleanUp(t *testing.T, tokenName string, user *us
 
 // deleteAPIAccessToken deletes an API access token and assert that deletion succeeded.
 func deleteAPIAccessToken(t *testing.T, accessToken api.AccessToken, user *user_model.User) {
-	req := NewRequestf(t, "DELETE", "/api/v1/users/"+user.LoginName+"/tokens/%d", accessToken.ID).
+	req := NewRequestf(t, "DELETE", "/v1/users/"+user.LoginName+"/tokens/%d", accessToken.ID).
 		AddBasicAuth(user.Name)
 	MakeRequest(t, req, http.StatusNoContent)
 

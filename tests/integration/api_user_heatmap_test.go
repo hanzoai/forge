@@ -27,7 +27,7 @@ func TestUserHeatmap(t *testing.T) {
 	timeutil.MockSet(fakeNow)
 	defer timeutil.MockUnset()
 
-	req := NewRequest(t, "GET", fmt.Sprintf("/api/v1/users/%s/heatmap", normalUsername)).
+	req := NewRequest(t, "GET", fmt.Sprintf("/v1/users/%s/heatmap", normalUsername)).
 		AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	heatmap := DecodeJSON(t, resp, []*activities_model.UserHeatmapData{})

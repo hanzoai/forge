@@ -40,7 +40,7 @@ func appendPrivateInformation(ctx stdCtx.Context, apiKey *api.DeployKey, key *as
 }
 
 func composeDeployKeysAPILink(owner, name string) string {
-	return setting.AppURL + "api/v1/repos/" + url.PathEscape(owner) + "/" + url.PathEscape(name) + "/keys/"
+	return setting.AppURL + "v1/repos/" + url.PathEscape(owner) + "/" + url.PathEscape(name) + "/keys/"
 }
 
 // ListDeployKeys list all the deploy keys of a repository

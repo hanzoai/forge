@@ -26,7 +26,7 @@ func TestAPIModifyLabels(t *testing.T) {
 	owner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: repo.OwnerID})
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/labels", owner.Name, repo.Name)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/labels", owner.Name, repo.Name)
 
 	// CreateLabel
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.CreateLabelOption{
@@ -60,7 +60,7 @@ func TestAPIModifyLabels(t *testing.T) {
 	assert.Len(t, apiLabels, 2)
 
 	// GetLabel
-	singleURLStr := fmt.Sprintf("/api/v1/repos/%s/%s/labels/%d", owner.Name, repo.Name, dbLabel.ID)
+	singleURLStr := fmt.Sprintf("/v1/repos/%s/%s/labels/%d", owner.Name, repo.Name, dbLabel.ID)
 	req = NewRequest(t, "GET", singleURLStr).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
@@ -99,7 +99,7 @@ func TestAPIAddIssueLabels(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/labels",
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/labels",
 		repo.OwnerName, repo.Name, issue.Index)
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.IssueLabelsOption{
 		Labels: []any{1, 2},
@@ -126,7 +126,7 @@ func TestAPIDeleteIssueLabelCrossRepo(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	base := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/labels", repo.OwnerName, repo.Name, issue.Index)
+	base := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/labels", repo.OwnerName, repo.Name, issue.Index)
 
 	// a foreign-but-existing label ID must not be accepted (was 204 before the fix)
 	req := NewRequest(t, "DELETE", fmt.Sprintf("%s/%d", base, foreignLabel.ID)).AddTokenAuth(token)
@@ -157,7 +157,7 @@ func TestAPIAddIssueLabelsWithLabelNames(t *testing.T) {
 	token := getTokenForLoggedInUser(t, user1Session, auth_model.AccessTokenScopeWriteIssue)
 
 	// add the org label and the repo label to the issue
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/labels", owner.Name, repo.Name, issue.Index)
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/labels", owner.Name, repo.Name, issue.Index)
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.IssueLabelsOption{
 		Labels: []any{repoLabel.Name, orgLabel.Name},
 	}).AddTokenAuth(token)
@@ -185,7 +185,7 @@ func TestAPIReplaceIssueLabels(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/labels",
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/labels",
 		owner.Name, repo.Name, issue.Index)
 	req := NewRequestWithJSON(t, "PUT", urlStr, &api.IssueLabelsOption{
 		Labels: []any{label.ID},
@@ -210,7 +210,7 @@ func TestAPIReplaceIssueLabelsWithLabelNames(t *testing.T) {
 
 	session := loginUser(t, owner.Name)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue)
-	urlStr := fmt.Sprintf("/api/v1/repos/%s/%s/issues/%d/labels",
+	urlStr := fmt.Sprintf("/v1/repos/%s/%s/issues/%d/labels",
 		owner.Name, repo.Name, issue.Index)
 	req := NewRequestWithJSON(t, "PUT", urlStr, &api.IssueLabelsOption{
 		Labels: []any{label.Name},
@@ -230,7 +230,7 @@ func TestAPIModifyOrgLabels(t *testing.T) {
 	user := "user1"
 	session := loginUser(t, user)
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteOrganization)
-	urlStr := fmt.Sprintf("/api/v1/orgs/%s/labels", owner.Name)
+	urlStr := fmt.Sprintf("/v1/orgs/%s/labels", owner.Name)
 
 	// CreateLabel
 	req := NewRequestWithJSON(t, "POST", urlStr, &api.CreateLabelOption{
@@ -264,7 +264,7 @@ func TestAPIModifyOrgLabels(t *testing.T) {
 	assert.Len(t, apiLabels, 4)
 
 	// GetLabel
-	singleURLStr := fmt.Sprintf("/api/v1/orgs/%s/labels/%d", owner.Name, dbLabel.ID)
+	singleURLStr := fmt.Sprintf("/v1/orgs/%s/labels/%d", owner.Name, dbLabel.ID)
 	req = NewRequest(t, "GET", singleURLStr).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
