@@ -26,7 +26,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/test"
-	"github.com/hanzoai/git/routers/v1/packages/nuget"
+	"github.com/hanzoai/git/routers/api/packages/nuget"
 	packageService "github.com/hanzoai/git/services/packages"
 	"github.com/hanzoai/git/tests"
 

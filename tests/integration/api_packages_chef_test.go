@@ -30,7 +30,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	chef_module "github.com/hanzoai/git/modules/packages/chef"
 	"github.com/hanzoai/git/modules/setting"
-	chef_router "github.com/hanzoai/git/routers/v1/packages/chef"
+	chef_router "github.com/hanzoai/git/routers/api/packages/chef"
 	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"

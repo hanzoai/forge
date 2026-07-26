@@ -18,7 +18,7 @@ import (
 	swift_module "github.com/hanzoai/git/modules/packages/swift"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/test"
-	swift_router "github.com/hanzoai/git/routers/v1/packages/swift"
+	swift_router "github.com/hanzoai/git/routers/api/packages/swift"
 	"github.com/hanzoai/git/tests"
 
 	"github.com/stretchr/testify/assert"
