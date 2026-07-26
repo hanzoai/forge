@@ -63,7 +63,7 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/s3-go v1.0.0
-	github.com/hanzoai/sqlite v0.3.1
+	github.com/hanzoai/sqlite v0.3.2
 	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hanzokv/lock/v4 v4.17.2
 	github.com/hashicorp/go-version v1.9.0
@@ -122,11 +122,16 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
+	github.com/hanzoai/dbx v1.16.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/rs/xid v1.6.0 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasthttp v1.72.0 // indirect
+	github.com/zap-proto/go v1.1.0 // indirect
+	github.com/zap-proto/http v0.2.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	modernc.org/sqlite v1.53.0 // indirect
 )
@@ -211,8 +216,8 @@ require (
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hanzoai/builder v0.3.13
-	github.com/hanzoai/orm v0.6.4
-	github.com/hanzoai/xorm v1.4.3
+	github.com/hanzoai/orm v0.6.8
+	github.com/hanzoai/xorm v1.4.4
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/inbucket/html2text v1.0.0 // indirect
