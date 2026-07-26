@@ -1,2 +1,5 @@
 #!/bin/bash
-exec /app/gitd/gitd config edit-ini --in-place --apply-env "$@"
+# Through the wrapper, not the binary: the binary's path is a detail the wrapper
+# already owns, and a second copy of it here is what silently broke the GIT__*
+# merge when /app/gitd became /app/git.
+exec /usr/local/bin/gitd config edit-ini --in-place --apply-env "$@"

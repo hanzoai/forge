@@ -59,12 +59,15 @@ if [ ! -f ${GIT_CUSTOM}/conf/app.ini ]; then
 fi
 
 # Replace app.ini settings with env variables in the form GIT__SECTION_NAME__KEY_NAME
-environment-to-ini --config ${GIT_CUSTOM}/conf/app.ini
+# Fatal on failure: every deploy configures this server through GIT__* env alone,
+# so a server that starts without the merge runs on whatever app.ini the volume
+# happened to keep — the failure this line used to swallow.
+environment-to-ini --config ${GIT_CUSTOM}/conf/app.ini || exit 1
 
 # only chown if current owner is not already the ${USER}. No recursive check to save time
-# (/data/gitea is the durable volume layout and stays put; /app/gitd is where the
+# (/data/gitea is the durable volume layout and stays put; /app/git is where the
 # daemon binary lives.)
 if ! [[ $(ls -ld /data/gitea | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git /data/gitea; fi
-if ! [[ $(ls -ld /app/gitd   | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git /app/gitd;   fi
+if ! [[ $(ls -ld /app/git    | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git /app/git;    fi
 if ! [[ $(ls -ld /data/git   | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git /data/git;   fi
-chmod 0755 /data/gitea /app/gitd /data/git
+chmod 0755 /data/gitea /app/git /data/git

@@ -8,7 +8,7 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 - **Base:** Gitea **1.26.4** (upstream `go-gitea/gitea`; see `CHANGELOG.md` top
   entry). Module path forked to `github.com/hanzoai/git`; the Actions proto is
   `github.com/hanzo-git/actions-proto-go`. The daemon is **`gitd`**
-  (`/app/gitd/gitd`, wrapper `/usr/local/bin/gitd`); upstream's CLI subcommands
+  (`/app/git/gitd`, wrapper `/usr/local/bin/gitd`); upstream's CLI subcommands
   are intact under the new name (`gitd admin auth …`, `gitd migrate`).
 
   **`/usr/local/bin/gitd` is load-bearing, not cosmetic.** It is what

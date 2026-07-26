@@ -1,2 +1,3 @@
 #!/bin/bash
-exec /app/gitd/gitd config edit-ini --in-place --apply-env "$@"
+# Through the wrapper, not the binary — see the rootful copy.
+exec /usr/local/bin/gitd config edit-ini --in-place --apply-env "$@"
