@@ -21,14 +21,14 @@ func loadGlobalLockFrom(rootCfg ConfigProvider) {
 	GlobalLock.ServiceType = sec.Key("SERVICE_TYPE").MustString("memory")
 	switch GlobalLock.ServiceType {
 	case "memory":
-	case "redis":
+	case "kv":
 		connStr := sec.Key("SERVICE_CONN_STR").String()
 		if connStr == "" {
-			log.Fatal("SERVICE_CONN_STR is empty for redis")
+			log.Fatal("SERVICE_CONN_STR is empty for kv")
 		}
 		u := nosql.ToKVURI(connStr)
 		if u == nil {
-			log.Fatal("SERVICE_CONN_STR %s is not a valid redis connection string", connStr)
+			log.Fatal("SERVICE_CONN_STR %s is not a valid KV connection string", connStr)
 		}
 		GlobalLock.ServiceConnStr = connStr
 	default:

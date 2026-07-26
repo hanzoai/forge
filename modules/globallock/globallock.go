@@ -18,7 +18,7 @@ var (
 
 func initDefaultLocker() Locker {
 	switch setting.GlobalLock.ServiceType {
-	case "redis":
+	case "kv":
 		return NewKVLocker(setting.GlobalLock.ServiceConnStr)
 	default: // "memory"
 		return NewMemoryLocker()

@@ -158,5 +158,5 @@ func (c *KVCacher) Ping() error {
 }
 
 func init() {
-	cache.Register("redis", &KVCacher{})
+	cache.Register("kv", &KVCacher{})
 }

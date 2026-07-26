@@ -17,10 +17,10 @@ type QueueSettings struct {
 
 	Type    string
 	Datadir string
-	ConnStr string // for leveldb or redis
+	ConnStr string // for leveldb or kv
 	Length  int    // max queue length before blocking
 
-	QueueName, SetName string // the name suffix for storage (db key, redis key), "set" is for unique queue
+	QueueName, SetName string // the name suffix for storage (db key, kv key), "set" is for unique queue
 
 	BatchLength int
 	MaxWorkers  int
@@ -28,7 +28,7 @@ type QueueSettings struct {
 
 func GetQueueSettings(rootCfg ConfigProvider, name string) (QueueSettings, error) {
 	queueSettingsDefault := QueueSettings{
-		Type:    "level",         // dummy, channel, level, redis
+		Type:    "level",         // dummy, channel, level, kv
 		Datadir: "queues/common", // relative to AppDataPath
 		Length:  100000,          // queue length before a channel queue will block
 
@@ -77,8 +77,8 @@ func GetQueueSettings(rootCfg ConfigProvider, name string) (QueueSettings, error
 	}
 	cfg.Datadir = filepath.ToSlash(cfg.Datadir)
 
-	if cfg.Type == "redis" && cfg.ConnStr == "" {
-		cfg.ConnStr = "redis://127.0.0.1:6379/0"
+	if cfg.Type == "kv" && cfg.ConnStr == "" {
+		cfg.ConnStr = "kv://127.0.0.1:6379/0"
 	}
 
 	if cfg.Length <= 0 {

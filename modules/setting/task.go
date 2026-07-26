@@ -18,8 +18,8 @@ func loadTaskFrom(rootCfg ConfigProvider) {
 	case "channel":
 		queueTaskSec.Key("TYPE").MustString("persistable-channel")
 		queueTaskSec.Key("CONN_STR").MustString(taskSec.Key("QUEUE_CONN_STR").MustString(""))
-	case "redis":
-		queueTaskSec.Key("TYPE").MustString("redis")
+	case "kv":
+		queueTaskSec.Key("TYPE").MustString("kv")
 		queueTaskSec.Key("CONN_STR").MustString(taskSec.Key("QUEUE_CONN_STR").MustString("addrs=127.0.0.1:6379 db=0"))
 	}
 	queueTaskSec.Key("LENGTH").MustInt(taskSec.Key("QUEUE_LENGTH").MustInt(1000))

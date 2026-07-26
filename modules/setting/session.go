@@ -43,7 +43,7 @@ var SessionConfig = struct {
 func loadSessionFrom(rootCfg ConfigProvider) {
 	sec := rootCfg.Section("session")
 	SessionConfig.Provider = sec.Key("PROVIDER").In("memory",
-		[]string{"memory", "file", "redis", "mysql", "postgres", "couchbase", "memcache", "db"})
+		[]string{"memory", "file", "kv", "mysql", "postgres", "couchbase", "memcache", "db"})
 	SessionConfig.ProviderConfig = strings.Trim(sec.Key("PROVIDER_CONFIG").MustString(filepath.Join(AppDataPath, "sessions")), "\" ")
 	if SessionConfig.Provider == "file" && !filepath.IsAbs(SessionConfig.ProviderConfig) {
 		SessionConfig.ProviderConfig = filepath.Join(AppWorkPath, SessionConfig.ProviderConfig)

@@ -24,12 +24,12 @@ type Locker interface {
 	//
 	// Lock returns an error if failed to acquire the lock.
 	// Be aware that even the context is not canceled, it's still possible to fail to acquire the lock.
-	// For example, redis is down, or it reached the maximum number of tries.
+	// For example, the KV server is down, or it reached the maximum number of tries.
 	Lock(ctx context.Context, key string) (ReleaseFunc, error)
 
 	// TryLock tries to acquire a lock for the given key, it returns immediately.
 	// It follows the same pattern as Lock, but it doesn't block.
-	// And if it fails to acquire the lock because it's already locked, not other reasons like redis is down,
+	// And if it fails to acquire the lock because it's already locked, not other reasons like the KV server being down,
 	// it will return false without any error.
 	TryLock(ctx context.Context, key string) (bool, ReleaseFunc, error)
 }

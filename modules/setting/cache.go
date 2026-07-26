@@ -50,10 +50,10 @@ func loadCacheFrom(rootCfg ConfigProvider) {
 		log.Fatal("Failed to map Cache settings: %v", err)
 	}
 
-	CacheService.Adapter = sec.Key("ADAPTER").In("memory", []string{"memory", "redis", "memcache", "twoqueue"})
+	CacheService.Adapter = sec.Key("ADAPTER").In("memory", []string{"memory", "kv", "memcache", "twoqueue"})
 	switch CacheService.Adapter {
 	case "memory":
-	case "redis", "memcache":
+	case "kv", "memcache":
 		CacheService.Conn = strings.Trim(sec.Key("HOST").String(), "\" ")
 	case "twoqueue":
 		CacheService.Conn = strings.TrimSpace(sec.Key("HOST").String())

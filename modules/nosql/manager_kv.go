@@ -95,30 +95,27 @@ func (m *Manager) getKVClient(connection string) kv.UniversalClient {
 		client.name = append(client.name, clientName)
 	}
 
+	// the trailing "s" on "kv" is the one and only way to ask for TLS: kvs, kvs+sentinel, kvs+cluster
 	switch uri.Scheme {
-	case "redis+sentinels":
-		fallthrough
-	case "rediss+sentinel":
+	case "kvs+sentinel":
 		opts.TLSConfig = tlsConfig
 		fallthrough
-	case "redis+sentinel":
+	case "kv+sentinel":
 		client.UniversalClient = kv.NewFailoverClient(opts.Failover())
-	case "redis+clusters":
-		fallthrough
-	case "rediss+cluster":
+	case "kvs+cluster":
 		opts.TLSConfig = tlsConfig
 		fallthrough
-	case "redis+cluster":
+	case "kv+cluster":
 		client.UniversalClient = kv.NewClusterClient(opts.Cluster())
-	case "redis+socket":
+	case "kv+socket":
 		simpleOpts := opts.Simple()
 		simpleOpts.Network = "unix"
 		simpleOpts.Addr = path.Join(uri.Host, uri.Path)
 		client.UniversalClient = kv.NewClient(simpleOpts)
-	case "rediss":
+	case "kvs":
 		opts.TLSConfig = tlsConfig
 		fallthrough
-	case "redis":
+	case "kv":
 		client.UniversalClient = kv.NewClient(opts.Simple())
 	default:
 		return nil
@@ -135,8 +132,8 @@ func (m *Manager) getKVClient(connection string) kv.UniversalClient {
 
 // getKVOptions pulls various configuration options based on the KV URI format and converts them to the KV client's
 // UniversalOptions fields. This function explicitly excludes fields related to TLS configuration, which is
-// conditionally attached to this options struct before being converted to the specific type for the redis scheme being
-// used, and only in scenarios where TLS is applicable (e.g. rediss://, redis+clusters://).
+// conditionally attached to this options struct before being converted to the specific type for the KV scheme being
+// used, and only in scenarios where TLS is applicable (e.g. kvs://, kvs+cluster://).
 func getKVOptions(uri *url.URL) *kv.UniversalOptions {
 	opts := &kv.UniversalOptions{}
 
@@ -216,11 +213,11 @@ func getKVOptions(uri *url.URL) *kv.UniversalOptions {
 		opts.Addrs = append(opts.Addrs, strings.Split(uri.Host, ",")...)
 	}
 
-	// A redis connection string uses the path section of the URI in two different ways. In a TCP-based connection, the
+	// A KV connection string uses the path section of the URI in two different ways. In a TCP-based connection, the
 	// path will be a database index to automatically have the client SELECT. In a Unix socket connection, it will be the
 	// file path. We only want to try to coerce this to the database index when we're not expecting a file path so that
 	// the error log stays clean.
-	if uri.Path != "" && uri.Scheme != "redis+socket" {
+	if uri.Path != "" && uri.Scheme != "kv+socket" {
 		if db, err := strconv.Atoi(uri.Path[1:]); err == nil {
 			opts.DB = db
 		} else {

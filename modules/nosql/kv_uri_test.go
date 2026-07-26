@@ -19,12 +19,37 @@ func TestToKVURI(t *testing.T) {
 		{
 			name:       "old_default",
 			connection: "addrs=127.0.0.1:6379 db=0",
-			want:       "redis://127.0.0.1:6379/0",
+			want:       "kv://127.0.0.1:6379/0",
 		},
 		{
 			name:       "old_macaron_session_default",
 			connection: "network=tcp,addr=127.0.0.1:6379,password=macaron,db=0,pool_size=100,idle_timeout=180",
-			want:       "redis://:macaron@127.0.0.1:6379/0?idle_timeout=180s&pool_size=100",
+			want:       "kv://:macaron@127.0.0.1:6379/0?idle_timeout=180s&pool_size=100",
+		},
+		{
+			name:       "old_cluster",
+			connection: "addrs=127.0.0.1:6379,127.0.0.1:6380 db=0",
+			want:       "kv+cluster://127.0.0.1:6379,127.0.0.1:6380/0",
+		},
+		{
+			name:       "old_socket",
+			connection: "network=unix addr=/var/run/kv.sock",
+			want:       "kv+socket:///var/run/kv.sock?db=%2F0",
+		},
+		{ // an already-KV URI passes through untouched, whichever member of the scheme family it uses
+			name:       "kv_uri",
+			connection: "kv://127.0.0.1:6379/0",
+			want:       "kv://127.0.0.1:6379/0",
+		},
+		{
+			name:       "kvs_uri",
+			connection: "kvs://127.0.0.1:6379/0",
+			want:       "kvs://127.0.0.1:6379/0",
+		},
+		{
+			name:       "kv_sentinel_uri",
+			connection: "kv+sentinel://127.0.0.1:26379/0?mastername=mymaster",
+			want:       "kv+sentinel://127.0.0.1:26379/0?mastername=mymaster",
 		},
 	}
 	for _, tt := range tests {

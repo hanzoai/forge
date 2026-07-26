@@ -16,7 +16,7 @@ import (
 )
 
 func TestBaseLevelDB(t *testing.T) {
-	_, err := newBaseLevelQueueGeneric(&BaseConfig{ConnStr: "redis://"}, false)
+	_, err := newBaseLevelQueueGeneric(&BaseConfig{ConnStr: "kv://"}, false)
 	assert.ErrorContains(t, err, "invalid leveldb connection string")
 
 	_, err = newBaseLevelQueueGeneric(&BaseConfig{DataFullDir: "relative"}, false)

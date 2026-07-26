@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func waitRedisReady(conn string, dur time.Duration) (ready bool) {
+func waitKVReady(conn string, dur time.Duration) (ready bool) {
 	ctxTimed, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	for t := time.Now(); ; time.Sleep(50 * time.Millisecond) {
@@ -32,14 +32,16 @@ func waitRedisReady(conn string, dur time.Duration) (ready bool) {
 	}
 }
 
-func redisServerCmd(t *testing.T) *exec.Cmd {
-	redisServerProg, err := exec.LookPath("redis-server")
+// kvServerCmd spawns a local KV server for developers who don't have one running; "redis-server" is the
+// name of the program on PATH, not a vocabulary choice.
+func kvServerCmd(t *testing.T) *exec.Cmd {
+	kvServerProg, err := exec.LookPath("redis-server")
 	if err != nil {
 		return nil
 	}
 	c := &exec.Cmd{
-		Path:   redisServerProg,
-		Args:   []string{redisServerProg, "--bind", "127.0.0.1", "--port", "6379"},
+		Path:   kvServerProg,
+		Args:   []string{kvServerProg, "--bind", "127.0.0.1", "--port", "6379"},
 		Dir:    t.TempDir(),
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
@@ -49,21 +51,21 @@ func redisServerCmd(t *testing.T) *exec.Cmd {
 }
 
 func TestBaseKV(t *testing.T) {
-	var redisServer *exec.Cmd
+	var kvServer *exec.Cmd
 	defer func() {
-		if redisServer != nil {
-			_ = redisServer.Process.Signal(os.Interrupt)
-			_ = redisServer.Wait()
+		if kvServer != nil {
+			_ = kvServer.Process.Signal(os.Interrupt)
+			_ = kvServer.Wait()
 		}
 	}()
-	if !waitRedisReady("redis://127.0.0.1:6379/0", 0) {
-		redisServer = redisServerCmd(t)
-		if redisServer == nil && test.AllowSkipExternalService() {
-			t.Skip("redis server command not found, skipped")
+	if !waitKVReady("kv://127.0.0.1:6379/0", 0) {
+		kvServer = kvServerCmd(t)
+		if kvServer == nil && test.AllowSkipExternalService() {
+			t.Skip("KV server command not found, skipped")
 		}
-		require.NotNil(t, redisServer)
-		assert.NoError(t, redisServer.Start())
-		require.True(t, waitRedisReady("redis://127.0.0.1:6379/0", 5*time.Second), "start redis-server")
+		require.NotNil(t, kvServer)
+		assert.NoError(t, kvServer.Start())
+		require.True(t, waitKVReady("kv://127.0.0.1:6379/0", 5*time.Second), "start KV server")
 	}
 
 	testQueueBasic(t, newBaseKVSimple, toBaseConfig("baseKV", setting.QueueSettings{Length: 10}), false)

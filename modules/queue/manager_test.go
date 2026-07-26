@@ -31,7 +31,7 @@ func TestManager(t *testing.T) {
 	_, err := newQueueFromConfig("default", `
 [queue]
 DATADIR = temp-dir
-CONN_STR = redis://
+CONN_STR = kv://
 `)
 	assert.ErrorContains(t, err, "invalid leveldb connection string")
 

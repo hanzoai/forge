@@ -9,16 +9,16 @@ import (
 )
 
 func TestKVUsernameOpt(t *testing.T) {
-	uri, _ := url.Parse("redis://redis:password@myredis/0")
+	uri, _ := url.Parse("kv://user:password@kvhost/0")
 	opts := getKVOptions(uri)
 
-	if opts.Username != "redis" {
+	if opts.Username != "user" {
 		t.Fail()
 	}
 }
 
 func TestKVPasswordOpt(t *testing.T) {
-	uri, _ := url.Parse("redis://redis:password@myredis/0")
+	uri, _ := url.Parse("kv://user:password@kvhost/0")
 	opts := getKVOptions(uri)
 
 	if opts.Password != "password" {
@@ -27,7 +27,7 @@ func TestKVPasswordOpt(t *testing.T) {
 }
 
 func TestSkipVerifyOpt(t *testing.T) {
-	uri, _ := url.Parse("rediss://myredis/0?skipverify=true")
+	uri, _ := url.Parse("kvs://kvhost/0?skipverify=true")
 	tlsConfig := getKVTLSOptions(uri)
 
 	if !tlsConfig.InsecureSkipVerify {
@@ -36,7 +36,7 @@ func TestSkipVerifyOpt(t *testing.T) {
 }
 
 func TestInsecureSkipVerifyOpt(t *testing.T) {
-	uri, _ := url.Parse("rediss://myredis/0?insecureskipverify=true")
+	uri, _ := url.Parse("kvs://kvhost/0?insecureskipverify=true")
 	tlsConfig := getKVTLSOptions(uri)
 
 	if !tlsConfig.InsecureSkipVerify {
@@ -45,7 +45,7 @@ func TestInsecureSkipVerifyOpt(t *testing.T) {
 }
 
 func TestKVSentinelUsernameOpt(t *testing.T) {
-	uri, _ := url.Parse("redis+sentinel://redis:password@myredis/0?sentinelusername=suser&sentinelpassword=spass")
+	uri, _ := url.Parse("kv+sentinel://user:password@kvhost/0?sentinelusername=suser&sentinelpassword=spass")
 	opts := getKVOptions(uri).Failover()
 
 	if opts.SentinelUsername != "suser" {
@@ -54,7 +54,7 @@ func TestKVSentinelUsernameOpt(t *testing.T) {
 }
 
 func TestKVSentinelPasswordOpt(t *testing.T) {
-	uri, _ := url.Parse("redis+sentinel://redis:password@myredis/0?sentinelusername=suser&sentinelpassword=spass")
+	uri, _ := url.Parse("kv+sentinel://user:password@kvhost/0?sentinelusername=suser&sentinelpassword=spass")
 	opts := getKVOptions(uri).Failover()
 
 	if opts.SentinelPassword != "spass" {
@@ -63,7 +63,7 @@ func TestKVSentinelPasswordOpt(t *testing.T) {
 }
 
 func TestKVDatabaseIndexTcp(t *testing.T) {
-	uri, _ := url.Parse("redis://redis:password@myredis/12")
+	uri, _ := url.Parse("kv://user:password@kvhost/12")
 	opts := getKVOptions(uri)
 
 	if opts.DB != 12 {
@@ -72,7 +72,7 @@ func TestKVDatabaseIndexTcp(t *testing.T) {
 }
 
 func TestKVDatabaseIndexUnix(t *testing.T) {
-	uri, _ := url.Parse("redis+socket:///var/run/kv.sock?database=12")
+	uri, _ := url.Parse("kv+socket:///var/run/kv.sock?database=12")
 	opts := getKVOptions(uri)
 
 	if opts.DB != 12 {

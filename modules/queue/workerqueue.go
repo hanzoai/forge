@@ -203,7 +203,7 @@ func getNewQueueFn(t string) (string, func(cfg *BaseConfig, unique bool) (baseQu
 		return t, newBaseDummy
 	case "channel":
 		return t, newBaseChannelGeneric
-	case "redis":
+	case "kv":
 		return t, newBaseKVGeneric
 	default: // level(leveldb,levelqueue,persistable-channel)
 		return "level", newBaseLevelQueueGeneric

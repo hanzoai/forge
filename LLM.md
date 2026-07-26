@@ -21,6 +21,15 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 - **Config = env.** `GITEA__<section>__<KEY>` (upstream's app.ini API, kept
   verbatim). No custom/conf baked, no Helm — the running config lives entirely in
   the deployment's env (see universe).
+- **KV, not redis.** The client is `github.com/hanzokv/go` and the vocabulary is
+  KV end to end — there is no `redis` spelling left and no alias accepting one.
+  Connection URIs are `kv://`, `kvs://`, `kv+socket://`, `kv+sentinel://`,
+  `kv+cluster://` (the trailing `s` on `kv` is the one way to ask for TLS, so
+  `kvs+sentinel://` / `kvs+cluster://` too). The operator-facing values are
+  `[cache] ADAPTER = kv`, `[session] PROVIDER = kv`, `[queue] TYPE = kv`,
+  `[global_lock] SERVICE_TYPE = kv`. `modules/nosql.getKVOptions` hand-parses the
+  URI, so the scheme family is this repo's to define — it never reaches the
+  client's own parser.
 
 ## Image / release lane
 

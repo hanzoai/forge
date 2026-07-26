@@ -20,18 +20,18 @@ import (
 
 func newTestKVLocker(t *testing.T) Locker {
 	t.Helper()
-	kvURL := util.IfZero(os.Getenv("TEST_REDIS_URL"), "redis://127.0.0.1:6379/0")
+	kvURL := util.IfZero(os.Getenv("TEST_KV_URL"), "kv://127.0.0.1:6379/0")
 	rl := NewKVLocker(kvURL).(*kvLocker)
 	err := rl.conn.Ping(t.Context()).Err()
 	if err != nil && test.AllowSkipExternalService() {
-		t.Skip("no redis server for testing, skipped")
+		t.Skip("no KV server for testing, skipped")
 	}
-	require.NoError(t, err, "redis error for testing: %v", err)
+	require.NoError(t, err, "KV error for testing: %v", err)
 	return rl
 }
 
 func TestLocker(t *testing.T) {
-	t.Run("redis", func(t *testing.T) {
+	t.Run("kv", func(t *testing.T) {
 		defer test.MockVariableValue(&kvLockExpiry, 5*time.Second)() // make it shorter for testing
 		locker := newTestKVLocker(t)
 		testLocker(t, locker)

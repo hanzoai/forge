@@ -32,7 +32,7 @@
 //     - Represents the underlying storage mechanism for the queue. There are several implementations:
 //     - Channel: Uses Go's native channel constructs to manage the queue, suitable for in-memory queuing.
 //     - LevelDB: Especially useful in persistent queues for single instances.
-//     - Redis: Suitable for clusters, where we may have multiple nodes.
+//     - KV: Suitable for clusters, where we may have multiple nodes.
 //     - Dummy: This is special, it's not a real queue, it's a immediate no-op queue, which is useful for tests.
 //     - They all have the same abstraction, the same interface, and they are tested by the same testing code.
 //

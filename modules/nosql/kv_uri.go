@@ -15,11 +15,11 @@ import (
 //
 // A KV URI matches the pattern:
 //
-// redis://[username:password@]host[:port][/database][?[option=value]*]
-// rediss://[username:password@]host[:port][/database][?[option=value]*]
-// redis+socket://[username:password@]path[/database][?[option=value]*]
-// redis+sentinel://[password@]host1 [: port1][, host2 [:port2]][, hostN [:portN]][/ database][?[option=value]*]
-// redis+cluster://[password@]host1 [: port1][, host2 [:port2]][, hostN [:portN]][/ database][?[option=value]*]
+// kv://[username:password@]host[:port][/database][?[option=value]*]
+// kvs://[username:password@]host[:port][/database][?[option=value]*]
+// kv+socket://[username:password@]path[/database][?[option=value]*]
+// kv+sentinel://[password@]host1 [: port1][, host2 [:port2]][, hostN [:portN]][/ database][?[option=value]*]
+// kv+cluster://[password@]host1 [: port1][, host2 [:port2]][, hostN [:portN]][/ database][?[option=value]*]
 //
 // We have previously used a URI like:
 // addrs=127.0.0.1:6379 db=0
@@ -28,13 +28,13 @@ import (
 // We need to convert this old style to the new style
 func ToKVURI(connection string) *url.URL {
 	uri, err := url.Parse(connection)
-	if err == nil && strings.HasPrefix(uri.Scheme, "redis") {
-		// OK we're going to assume that this is a reasonable redis URI
+	if err == nil && strings.HasPrefix(uri.Scheme, "kv") {
+		// OK we're going to assume that this is a reasonable KV URI
 		return uri
 	}
 
 	// Let's set a nice default
-	uri, _ = url.Parse("redis://127.0.0.1:6379/0")
+	uri, _ = url.Parse("kv://127.0.0.1:6379/0")
 	network := "tcp"
 	query := uri.Query()
 
@@ -53,14 +53,14 @@ func ToKVURI(connection string) *url.URL {
 		switch strings.ToLower(items[0]) {
 		case "network":
 			if items[1] == "unix" {
-				uri.Scheme = "redis+socket"
+				uri.Scheme = "kv+socket"
 			}
 			network = items[1]
 		case "addrs":
 			uri.Host = items[1]
 			// now we need to handle the clustering
 			if strings.Contains(items[1], ",") && network == "tcp" {
-				uri.Scheme = "redis+cluster"
+				uri.Scheme = "kv+cluster"
 			}
 		case "addr":
 			uri.Host = items[1]
@@ -89,7 +89,7 @@ func ToKVURI(connection string) *url.URL {
 	}
 
 	// Finally we need to fix up the Host if we have a unix port
-	if uri.Scheme == "redis+socket" {
+	if uri.Scheme == "kv+socket" {
 		query.Set("db", uri.Path)
 		uri.Path = uri.Host
 		uri.Host = ""

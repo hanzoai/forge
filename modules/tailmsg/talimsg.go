@@ -24,7 +24,7 @@ type memoryMsgRecorder struct {
 	limit int
 }
 
-// TODO: use redis for a clustered environment
+// TODO: use KV for a clustered environment
 
 func (m *memoryMsgRecorder) Record(content string) {
 	m.mu.Lock()

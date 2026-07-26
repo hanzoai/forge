@@ -19,17 +19,17 @@ func TestLoadGlobalLockConfig(t *testing.T) {
 		assert.Equal(t, "memory", GlobalLock.ServiceType)
 	})
 
-	t.Run("RedisGlobalLockConfig", func(t *testing.T) {
+	t.Run("KVGlobalLockConfig", func(t *testing.T) {
 		iniStr := `
 [global_lock]
-SERVICE_TYPE = redis
+SERVICE_TYPE = kv
 SERVICE_CONN_STR = addrs=127.0.0.1:6379 db=0
 `
 		cfg, err := NewConfigProviderFromData(iniStr)
 		assert.NoError(t, err)
 
 		loadGlobalLockFrom(cfg)
-		assert.Equal(t, "redis", GlobalLock.ServiceType)
+		assert.Equal(t, "kv", GlobalLock.ServiceType)
 		assert.Equal(t, "addrs=127.0.0.1:6379 db=0", GlobalLock.ServiceConnStr)
 	})
 }

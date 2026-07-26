@@ -215,5 +215,5 @@ func (p *KVProvider) Count() (int, error) {
 func (*KVProvider) GC() {}
 
 func init() {
-	session.Register("redis", &KVProvider{})
+	session.Register("kv", &KVProvider{})
 }

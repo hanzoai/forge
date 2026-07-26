@@ -13,7 +13,7 @@ import (
 )
 
 func TestLockAndDo(t *testing.T) {
-	t.Run("redis", func(t *testing.T) {
+	t.Run("kv", func(t *testing.T) {
 		locker := newTestKVLocker(t)
 		defaultLocker.Store(new(locker))
 		testLockAndDo(t)
