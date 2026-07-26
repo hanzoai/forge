@@ -156,10 +156,26 @@ func runPushSync(ctx context.Context, m *repo_model.PushMirror) error {
 		log.Trace("Pushing %s mirror[%d] remote %s", storageRepo.RelativePath(), m.ID, m.RemoteName)
 
 		envs := proxy.EnvWithProxy(remoteURL.URL)
+		// Carry branches and tags outward, additively. This deliberately does NOT
+		// use Force or Mirror: together those made the push authoritative over the
+		// remote, free to rewrite a diverged ref and to DELETE any ref the remote
+		// had and we did not. A mirror is a copy, so it must never be able to
+		// remove history from the thing it copies — and one already did: a push
+		// mirror of an IAM repo pruned the entire v1.0 through v1.31 tag range off
+		// the remote, a contiguous block belonging to the production line, and the
+		// objects were then garbage-collected there.
+		//
+		// A ref the remote already has resolves to a no-op, so nothing echoes back
+		// on repos we pull FROM. A ref that only exists here is added. A ref that
+		// diverged is REJECTED and reported rather than overwritten, which is the
+		// correct failure: divergence is a question for a person, not something a
+		// sync job should silently settle.
 		if err := gitrepo.PushToExternal(ctx, storageRepo, git.PushOptions{
-			Remote:  m.RemoteName,
-			Force:   true,
-			Mirror:  true,
+			Remote: m.RemoteName,
+			Refspecs: []string{
+				"refs/heads/*:refs/heads/*",
+				"refs/tags/*:refs/tags/*",
+			},
 			Timeout: timeout,
 			Env:     envs,
 		}); err != nil {
