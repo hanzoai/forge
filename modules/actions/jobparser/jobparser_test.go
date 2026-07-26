@@ -107,3 +107,94 @@ func TestParse(t *testing.T) {
 		})
 	}
 }
+
+// TestParseRunsOnExpression pins that `runs-on` is evaluated STRUCTURALLY.
+//
+// A reusable workflow takes its pool from an input as
+// `runs-on: ${{ fromJson(inputs.runner) }}`. That used to be flattened to
+// []string and pushed through Interpolate, which forces a string result, so an
+// array collapsed to the literal label "Array". No runner carries that label,
+// so the job queued forever and nothing logged an error — the failure mode that
+// kept hanzoai/commerce and hanzoai/cloud from ever producing a build after
+// their CI moved onto this forge.
+func TestParseRunsOnExpression(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		inputs map[string]any
+		yaml   string
+		want   []string
+	}{
+		{
+			name:   "array-valued expression expands to labels",
+			inputs: map[string]any{"runner": `["hanzo-build-linux-amd64"]`},
+			yaml: `
+on: push
+jobs:
+  build:
+    runs-on: ${{ fromJson(inputs.runner) }}
+    steps:
+      - run: echo hi
+`,
+			want: []string{"hanzo-build-linux-amd64"},
+		},
+		{
+			name:   "multi-label array keeps every label",
+			inputs: map[string]any{"runner": `["self-hosted","linux","amd64"]`},
+			yaml: `
+on: push
+jobs:
+  build:
+    runs-on: ${{ fromJson(inputs.runner) }}
+    steps:
+      - run: echo hi
+`,
+			want: []string{"self-hosted", "linux", "amd64"},
+		},
+		{
+			name:   "string-valued expression still yields one label",
+			inputs: map[string]any{"pool": "ubuntu-22.04"},
+			yaml: `
+on: push
+jobs:
+  build:
+    runs-on: ${{ inputs.pool }}
+    steps:
+      - run: echo hi
+`,
+			want: []string{"ubuntu-22.04"},
+		},
+		{
+			name: "a plain literal is untouched",
+			yaml: `
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo hi
+`,
+			want: []string{"ubuntu-22.04"},
+		},
+		{
+			name: "a plain list is untouched",
+			yaml: `
+on: push
+jobs:
+  build:
+    runs-on: [self-hosted, linux]
+    steps:
+      - run: echo hi
+`,
+			want: []string{"self-hosted", "linux"},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := Parse([]byte(tc.yaml), WithInputs(tc.inputs))
+			require.NoError(t, err)
+			require.Len(t, got, 1)
+			_, job := got[0].Job()
+			assert.Equal(t, tc.want, job.RunsOn(),
+				"runs-on must evaluate structurally; %q means the array was stringified", "Array")
+		})
+	}
+}

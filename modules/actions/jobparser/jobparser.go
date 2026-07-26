@@ -64,11 +64,24 @@ func Parse(content []byte, options ...ParseOption) ([]*SingleWorkflow, error) {
 			job.Strategy.RawMatrix = encodeMatrix(matrix)
 			evaluator := NewExpressionEvaluator(NewInterpeter(id, origin.GetJob(id), matrix, pc.gitContext, results, pc.vars, pc.inputs))
 			job.Name = nameWithMatrix(job.Name, matrix, evaluator)
-			runsOn := origin.GetJob(id).RunsOn()
-			for i, v := range runsOn {
-				runsOn[i] = evaluator.Interpolate(v)
+			// Evaluate runs-on STRUCTURALLY, not as a list of strings.
+			//
+			// It used to flatten the node to []string and Interpolate each entry.
+			// Interpolate forces the result to a string, so `runs-on:
+			// ${{ fromJson(inputs.runner) }}` — the shape a reusable workflow uses
+			// to take its pool from an input — collapsed to the literal label
+			// "Array", which no runner has, and the job queued forever with no
+			// error anywhere. GitHub evaluates the expression structurally and
+			// gets a list of labels.
+			//
+			// EvaluateYamlNode already does that: for a scalar it calls
+			// rewriteSubExpression with forceFormat=false and node.Encode(res), so
+			// an array result re-encodes as a sequence node. A string result still
+			// encodes as a scalar, so `runs-on: ${{ matrix.os }}` is unchanged.
+			// This is the same evaluator applied to RawContinueOnError below.
+			if err := evaluator.EvaluateYamlNode(&job.RawRunsOn); err != nil {
+				return nil, fmt.Errorf("evaluate runs-on for job %q: %w", id, err)
 			}
-			job.RawRunsOn = encodeRunsOn(runsOn)
 			if err := evaluator.EvaluateYamlNode(&job.RawContinueOnError); err != nil {
 				return nil, fmt.Errorf("evaluate continue-on-error for job %q: %w", id, err)
 			}
@@ -137,16 +150,6 @@ func encodeMatrix(matrix map[string]any) yaml.Node {
 	}
 	node := yaml.Node{}
 	_ = node.Encode(value)
-	return node
-}
-
-func encodeRunsOn(runsOn []string) yaml.Node {
-	node := yaml.Node{}
-	if len(runsOn) == 1 {
-		_ = node.Encode(runsOn[0])
-	} else {
-		_ = node.Encode(runsOn)
-	}
 	return node
 }
 
