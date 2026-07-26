@@ -28,3 +28,23 @@ jobs:
   cicd:
     uses: hanzoai/ci/.github/workflows/build.yml@v1
     secrets: inherit
+    with:
+      # BOOTSTRAP ONLY — remove once the image built from this commit is live.
+      #
+      # hanzoai/ci declares `runs-on: ${{ fromJson(inputs.runner) }}` and defaults
+      # the input to the JSON array '["hanzo-build-linux-amd64"]'. GitHub resolves
+      # that structurally to a label list. This forge did not: it flattened
+      # runs-on to strings and interpolated each one, so the array rendered as the
+      # single literal label "Array", no runner ever matched, and the job queued
+      # forever with nothing logged. That is why every repo whose CI moved here
+      # produced no builds at all.
+      #
+      # The fix is in this very commit (modules/actions/jobparser: evaluate
+      # runs-on structurally). It cannot build itself while the running forge
+      # still has the bug, so this passes the pool as a JSON *string* instead:
+      # fromJson('"x"') is the string "x" under both engines, which sidesteps the
+      # array path entirely and lets one build through.
+      #
+      # Once that image is deployed, delete this `with:` block so the array
+      # default applies again — one shape everywhere, the same one GitHub uses.
+      runner: '"hanzo-build-linux-amd64"'
