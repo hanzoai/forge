@@ -8,7 +8,7 @@
 ENABLED = true
 FILE_EXTENSIONS = .in-iframe
 RENDER_CONTENT_MODE = iframe
-RENDER_COMMAND = `echo '<div style="width: 100%; height: 2000px; border: 10px solid red; box-sizing: border-box;"><a href="/">a link</a> <a target="_blank" href="//gitea.com">external link</a></div>'`
+RENDER_COMMAND = `echo '<div style="width: 100%; height: 2000px; border: 10px solid red; box-sizing: border-box;"><a href="/">a link</a> <a target="_blank" href="//example.com">external link</a></div>'`
 
 ;RENDER_COMMAND = cat /path/to/file.pdf
 ;RENDER_CONTENT_SANDBOX = disabled
@@ -52,7 +52,7 @@ body { background: ${backgroundColor}; }
 const iframeId = queryParams.get('hanzo-iframe-id');
 // iframe is in different origin, so we need to use postMessage to communicate
 const postIframeMsg = (cmd: string, data: Record<string, any> = {}) => {
-  window.parent.postMessage({giteaIframeCmd: cmd, giteaIframeId: iframeId, ...data}, '*');
+  window.parent.postMessage({hanzoIframeCmd: cmd, hanzoIframeId: iframeId, ...data}, '*');
 };
 
 if (iframeId) {
@@ -90,4 +90,4 @@ if (iframeId) {
   });
 }
 
-window.giteaExternalRenderHelper = {isValidCssColor, queryParams, postIframeMsg};
+window.hanzoExternalRenderHelper = {isValidCssColor, queryParams, postIframeMsg};

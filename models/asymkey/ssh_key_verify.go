@@ -13,6 +13,11 @@ import (
 	"github.com/42wim/sshsig"
 )
 
+// SSHSignatureNamespace is the ssh-keygen "-n" namespace for key-ownership proofs.
+// The settings page renders it into the command it tells the user to run, so both
+// sides of the proof always agree on one value.
+const SSHSignatureNamespace = "hanzo-git"
+
 // VerifySSHKey marks a SSH key as verified
 func VerifySSHKey(ctx context.Context, ownerID int64, fingerprint, token, signature string) (string, error) {
 	return db.WithTx2(ctx, func(ctx context.Context) (string, error) {
@@ -25,11 +30,11 @@ func VerifySSHKey(ctx context.Context, ownerID int64, fingerprint, token, signat
 			return "", ErrKeyNotExist{}
 		}
 
-		err = sshsig.Verify(strings.NewReader(token), []byte(signature), []byte(key.Content), "gitea")
+		err = sshsig.Verify(strings.NewReader(token), []byte(signature), []byte(key.Content), SSHSignatureNamespace)
 		if err != nil {
 			// edge case for Windows based shells that will add CR LF if piped to ssh-keygen command
 			// see https://github.com/PowerShell/PowerShell/issues/5974
-			if sshsig.Verify(strings.NewReader(token+"\r\n"), []byte(signature), []byte(key.Content), "gitea") != nil {
+			if sshsig.Verify(strings.NewReader(token+"\r\n"), []byte(signature), []byte(key.Content), SSHSignatureNamespace) != nil {
 				log.Debug("VerifySSHKey sshsig.Verify failed: %v", err)
 				return "", ErrSSHInvalidTokenSignature{
 					Fingerprint: key.Fingerprint,

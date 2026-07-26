@@ -324,6 +324,7 @@ func loadKeysData(ctx *context.Context) {
 
 	// generate a new aes cipher using the token
 	ctx.Data["TokenToSign"] = tokenToSign
+	ctx.Data["SSHSignNamespace"] = asymkey_model.SSHSignatureNamespace
 
 	principals, err := db.Find[asymkey_model.PublicKey](ctx, asymkey_model.FindPublicKeyOptions{
 		ListOptions: db.ListOptionsAll,

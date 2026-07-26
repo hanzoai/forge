@@ -38,7 +38,7 @@ func TestRedirect(t *testing.T) {
 
 	req, _ = http.NewRequest(http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
-	req.Header.Add("X-Gitea-Fetch-Action", "1")
+	req.Header.Add("X-Fetch-Action", "1")
 	b := NewBaseContextForTest(resp, req)
 	b.Redirect("/other")
 	assert.Contains(t, resp.Header().Get("Content-Type"), "application/json")

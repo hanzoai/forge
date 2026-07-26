@@ -60,8 +60,8 @@ type ComboMarkdownEditorOptions = {
   easyMDEOptions?: EasyMDE.Options,
 };
 
-type ComboMarkdownEditorTextarea = HTMLTextAreaElement & {_giteaComboMarkdownEditor: any};
-type ComboMarkdownEditorContainer = HTMLElement & {_giteaComboMarkdownEditor?: any};
+type ComboMarkdownEditorTextarea = HTMLTextAreaElement & {_hanzoComboMarkdownEditor: any};
+type ComboMarkdownEditorContainer = HTMLElement & {_hanzoComboMarkdownEditor?: any};
 
 export class ComboMarkdownEditor {
   static EventEditorContentChanged = EventEditorContentChanged;
@@ -93,8 +93,8 @@ export class ComboMarkdownEditor {
   previewContext!: string;
 
   constructor(container: ComboMarkdownEditorContainer, options:ComboMarkdownEditorOptions = {}) {
-    if (container._giteaComboMarkdownEditor) throw new Error('ComboMarkdownEditor already initialized');
-    container._giteaComboMarkdownEditor = this;
+    if (container._hanzoComboMarkdownEditor) throw new Error('ComboMarkdownEditor already initialized');
+    container._hanzoComboMarkdownEditor = this;
     this.options = options;
     this.container = container;
   }
@@ -126,7 +126,7 @@ export class ComboMarkdownEditor {
 
   setupTextarea() {
     this.textarea = this.container.querySelector('.markdown-text-editor')!;
-    this.textarea._giteaComboMarkdownEditor = this;
+    this.textarea._hanzoComboMarkdownEditor = this;
     this.textarea.id = generateElemId(`_combo_markdown_editor_`);
     this.textarea.addEventListener('input', () => triggerEditorContentChanged(this.container));
     this.applyEditorHeights(this.textarea, this.options.editorHeights);
@@ -441,7 +441,7 @@ function applyMonospaceToAllEditors() {
 export function getComboMarkdownEditor(el: any): ComboMarkdownEditor | null {
   if (!el) return null;
   if (el.length) el = el[0];
-  return el._giteaComboMarkdownEditor;
+  return el._hanzoComboMarkdownEditor;
 }
 
 export async function initComboMarkdownEditor(container: HTMLElement, options:ComboMarkdownEditorOptions = {}) {

@@ -48,14 +48,14 @@ export async function initExternalRenderIframe(iframe: HTMLIFrameElement) {
 
   window.addEventListener('message', (e) => {
     if (e.source !== iframe.contentWindow) return;
-    if (!e.data?.giteaIframeCmd || e.data?.giteaIframeId !== iframe.id) return;
-    const cmd = e.data.giteaIframeCmd;
+    if (!e.data?.hanzoIframeCmd || e.data?.hanzoIframeId !== iframe.id) return;
+    const cmd = e.data.hanzoIframeCmd;
     if (cmd === 'resize') {
       iframe.style.height = `${e.data.iframeHeight}px`;
     } else if (cmd === 'open-link') {
       navigateToIframeLink(e.data.openLink, e.data.anchorTarget);
     } else {
-      throw new Error(`Unknown gitea iframe cmd: ${cmd}`);
+      throw new Error(`Unknown iframe cmd: ${cmd}`);
     }
   });
 

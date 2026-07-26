@@ -124,7 +124,7 @@ func loadSecurityFrom(rootCfg ConfigProvider) {
 		SecretKey = "!#@FDEWREWR&*("
 	}
 
-	CookieRememberName = sec.Key("COOKIE_REMEMBER_NAME").MustString("gitea_incredible")
+	CookieRememberName = sec.Key("COOKIE_REMEMBER_NAME").MustString("hanzo_git_remember")
 
 	ReverseProxyAuthUser = sec.Key("REVERSE_PROXY_AUTHENTICATION_USER").MustString("X-WEBAUTH-USER")
 	ReverseProxyAuthEmail = sec.Key("REVERSE_PROXY_AUTHENTICATION_EMAIL").MustString("X-WEBAUTH-EMAIL")

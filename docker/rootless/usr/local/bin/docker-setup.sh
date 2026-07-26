@@ -26,7 +26,9 @@ if [ ! -f "${GIT_APP_INI}" ]; then
     fi
 
     # Substitute the environment variables in the template
-    APP_NAME=${APP_NAME:-"Gitea: Git with a cup of tea"} \
+    # APP_NAME is passed through empty on purpose: the default lives in one place,
+    # setting.AppName, so the container cannot brand the site title differently.
+    APP_NAME=${APP_NAME:-""} \
     RUN_MODE=${RUN_MODE:-"prod"} \
     RUN_USER=${USER:-"git"} \
     SSH_DOMAIN=${SSH_DOMAIN:-"localhost"} \
@@ -37,7 +39,7 @@ if [ ! -f "${GIT_APP_INI}" ]; then
     SSH_LISTEN_PORT=${SSH_LISTEN_PORT:-} \
     DB_TYPE=${DB_TYPE:-"sqlite3"} \
     DB_HOST=${DB_HOST:-"localhost:3306"} \
-    DB_NAME=${DB_NAME:-"gitea"} \
+    DB_NAME=${DB_NAME:-"hanzo_git"} \
     DB_USER=${DB_USER:-"root"} \
     DB_PASSWD=${DB_PASSWD:-""} \
     INSTALL_LOCK=${INSTALL_LOCK:-"false"} \

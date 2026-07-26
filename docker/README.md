@@ -1,7 +1,7 @@
-# Gitea - Docker
+# Hanzo Git - Docker
 
 Dockerfile is found in the root of the repository.
 
-Docker image can be found on [docker hub](https://hub.docker.com/r/gitea/gitea).
+The image is published as `ghcr.io/hanzoai/git`, built on our own runners. Never build the image locally.
 
-Documentation on using docker image can be found on [Gitea Docs site](https://docs.gitea.com/installation/install-with-docker-rootless).
+Documentation on using the docker image can be found on the [Hanzo docs site](https://docs.hanzo.ai/installation/install-with-docker-rootless).

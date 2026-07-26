@@ -35,7 +35,7 @@ func DeleteRedirectToCookie(resp http.ResponseWriter) {
 }
 
 func RedirectLinkUserLogin(req *http.Request) string {
-	if req.Header.Get("X-Gitea-Fetch-Action") != "" {
+	if req.Header.Get("X-Fetch-Action") != "" {
 		// when building the redirect link for a fetch request, the current link might be a partial page,
 		// so we only redirect to the login page without redirect_to parameter
 		return setting.AppSubURL + "/user/login"
