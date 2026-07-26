@@ -8,7 +8,7 @@
 default = "hanzo"
 
 [registries.hanzo]
-index = "sparse+{{ctx.AppFullLink}}/api/packages/{{.PackageDescriptor.Owner.Name}}/cargo/" # Sparse index
+index = "sparse+{{ctx.AppFullLink}}/v1/packages/{{.PackageDescriptor.Owner.Name}}/cargo/" # Sparse index
 # index = "{{ctx.AppFullLink}}/{{.PackageDescriptor.Owner.Name}}/_cargo-index.git" # Git
 
 [net]

@@ -4,8 +4,8 @@
 		<div class="ui form">
 			<div class="field">
 				<label>{{svg "octicon-terminal"}} {{ctx.Locale.Tr "packages.debian.registry"}}</label>
-				<div class="markup"><pre class="code-block"><code>sudo curl {{ctx.AppFullLink}}/api/packages/{{$.PackageDescriptor.Owner.Name}}/debian/repository.key -o /etc/apt/keyrings/hanzo-{{$.PackageDescriptor.Owner.Name}}.asc
-echo "deb [signed-by=/etc/apt/keyrings/hanzo-{{$.PackageDescriptor.Owner.Name}}.asc] {{ctx.AppFullLink}}/api/packages/{{$.PackageDescriptor.Owner.Name}}/debian $distribution $component" | sudo tee -a /etc/apt/sources.list.d/hanzo.list
+				<div class="markup"><pre class="code-block"><code>sudo curl {{ctx.AppFullLink}}/v1/packages/{{$.PackageDescriptor.Owner.Name}}/debian/repository.key -o /etc/apt/keyrings/hanzo-{{$.PackageDescriptor.Owner.Name}}.asc
+echo "deb [signed-by=/etc/apt/keyrings/hanzo-{{$.PackageDescriptor.Owner.Name}}.asc] {{ctx.AppFullLink}}/v1/packages/{{$.PackageDescriptor.Owner.Name}}/debian $distribution $component" | sudo tee -a /etc/apt/sources.list.d/hanzo.list
 sudo apt update</code></pre></div>
 				<p>{{ctx.Locale.Tr "packages.debian.registry.info"}}</p>
 			</div>
