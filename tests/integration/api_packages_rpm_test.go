@@ -110,7 +110,7 @@ name=%s
 baseurl=%s
 enabled=1
 gpgcheck=1
-gpgkey=%sapi/packages/%s/rpm/repository.key`,
+gpgkey=%sv1/packages/%s/rpm/repository.key`,
 					strings.Join(append([]string{user.LowerName}, groupParts...), "-"),
 					strings.Join(append([]string{user.Name, setting.AppName}, groupParts...), " - "),
 					strings.TrimSuffix(setting.AppURL, "/")+groupURL,

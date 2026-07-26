@@ -210,7 +210,7 @@ func TestPackageConan(t *testing.T) {
 	revision1 := "rev1"
 	revision2 := "rev2"
 
-	url := fmt.Sprintf("%sapi/packages/%s/conan", setting.AppURL, user.Name)
+	url := fmt.Sprintf("%sv1/packages/%s/conan", setting.AppURL, user.Name)
 
 	t.Run("v1", func(t *testing.T) {
 		t.Run("Ping", func(t *testing.T) {

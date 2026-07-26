@@ -57,7 +57,7 @@ func TestPackageComposer(t *testing.T) {
 	}`,
 	}).Bytes()
 
-	url := fmt.Sprintf("%sapi/packages/%s/composer", setting.AppURL, user.Name)
+	url := fmt.Sprintf("%sv1/packages/%s/composer", setting.AppURL, user.Name)
 
 	t.Run("ServiceIndex", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
@@ -305,7 +305,7 @@ func TestPackageComposer(t *testing.T) {
 				]
 			}`,
 		}).Bytes()
-		privateUploadURL := fmt.Sprintf("%sapi/packages/%s/composer?version=%s", setting.AppURL, privateUser.Name, privatePackageVersion)
+		privateUploadURL := fmt.Sprintf("%sv1/packages/%s/composer?version=%s", setting.AppURL, privateUser.Name, privatePackageVersion)
 
 		uploadReq := NewRequestWithBody(t, "PUT", privateUploadURL, bytes.NewReader(privateContent)).
 			AddBasicAuth(privateUser.Name)
