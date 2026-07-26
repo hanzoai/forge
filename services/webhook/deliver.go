@@ -127,6 +127,14 @@ func addDefaultHeaders(req *http.Request, secret []byte, w *webhook_model.Webhoo
 		}
 	}
 
+	// X-Git-* is ours and is what our own consumers read. The X-Gitea/Gogs/GitHub
+	// families below carry the same values so webhook receivers written for those
+	// servers keep working unchanged — that is what this block has always been for.
+	req.Header.Add("X-Git-Delivery", t.UUID)
+	req.Header.Add("X-Git-Event", event)
+	req.Header.Add("X-Git-Event-Type", eventType)
+	req.Header.Add("X-Git-Signature", signatureSHA256)
+	req.Header.Add("X-Git-Hook-Installation-Target-Type", targetType)
 	req.Header.Add("X-Gitea-Delivery", t.UUID)
 	req.Header.Add("X-Gitea-Event", event)
 	req.Header.Add("X-Gitea-Event-Type", eventType)

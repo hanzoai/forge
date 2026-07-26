@@ -83,6 +83,57 @@ func TestWebhookProxy(t *testing.T) {
 	}
 }
 
+func TestWebhookDeliverGitHeaders(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	done := make(chan struct{}, 1)
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// X-Git-* is our own family; the vendor families must carry the same values
+		// so receivers written for those servers keep working.
+		assert.Equal(t, "push", r.Header.Get("X-Git-Event"))
+		assert.Equal(t, "push", r.Header.Get("X-Git-Event-Type"))
+		assert.NotEmpty(t, r.Header.Get("X-Git-Delivery"))
+		assert.Equal(t, "repository", r.Header.Get("X-Git-Hook-Installation-Target-Type"))
+		for _, h := range []string{"Delivery", "Event", "Event-Type", "Hook-Installation-Target-Type"} {
+			assert.Equal(t, r.Header.Get("X-Gitea-"+h), r.Header.Get("X-Git-"+h), "X-Git-%s must match X-Gitea-%s", h, h)
+		}
+		// Signed: the signature header must be present and identical across families.
+		assert.NotEmpty(t, r.Header.Get("X-Git-Signature"))
+		assert.Equal(t, r.Header.Get("X-Gitea-Signature"), r.Header.Get("X-Git-Signature"))
+		assert.Equal(t, r.Header.Get("X-Gogs-Signature"), r.Header.Get("X-Git-Signature"))
+		w.WriteHeader(http.StatusOK)
+		done <- struct{}{}
+	}))
+	t.Cleanup(s.Close)
+
+	hook := &webhook_model.Webhook{
+		RepoID:      3,
+		URL:         s.URL + "/webhook",
+		ContentType: webhook_model.ContentTypeJSON,
+		IsActive:    true,
+		Type:        webhook_module.GITEA,
+		Secret:      "s3cr3t",
+	}
+	assert.NoError(t, webhook_model.CreateWebhook(t.Context(), hook))
+
+	hookTask := &webhook_model.HookTask{
+		HookID:         hook.ID,
+		EventType:      webhook_module.HookEventPush,
+		PayloadVersion: 2,
+	}
+	hookTask, err := webhook_model.CreateHookTask(t.Context(), hookTask)
+	assert.NoError(t, err)
+	assert.NotNil(t, hookTask)
+
+	assert.NoError(t, Deliver(t.Context(), hookTask))
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("waited to long for request to happen")
+	}
+	assert.True(t, hookTask.IsSucceed)
+}
+
 func TestWebhookDeliverAuthorizationHeader(t *testing.T) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
 
