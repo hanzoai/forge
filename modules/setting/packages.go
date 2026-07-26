@@ -83,11 +83,70 @@ var (
 		// enforced server-side so it does not depend on every client being
 		// configured correctly.
 		GoProxyPrivate string
+
+		// ConanUpstream makes the Conan registry a READ-THROUGH CACHE of the
+		// public C++ ecosystem, in the one case where a Conan reference names
+		// something immutable: the recipe files of
+		// name/version@user/channel#recipe_revision.
+		//
+		// Anything vaguer -- "latest", a revision-less v1 URL -- is refused
+		// rather than resolved here, because picking a revision on the caller's
+		// behalf would pin whatever upstream published first into a name that
+		// promises never to change. Binary packages are not cached; they are
+		// selected by a settings hash computed against the caller's own
+		// dependency graph.
+		//
+		// Set it empty to go back to publish-only.
+		ConanUpstream string
+
+		// ConanPrivate is what makes turning the cache on safe. A PRIVATE recipe
+		// is not published publicly, so a local miss on one would otherwise send
+		// its name -- lux-crypto, luxcpp -- to a public remote, which logs it.
+		// The name alone leaks an internal library that may not be public yet.
+		//
+		// Any recipe whose name matches one of these comma-separated prefixes is
+		// NEVER fetched upstream: a miss stays a miss. Enforced server-side so it
+		// does not depend on every client's remote order being right.
+		ConanPrivate string
+
+		// CargoUpstream is the same read-through cache for Rust: on a miss the
+		// server fetches the crate ONCE, stores it as an ordinary package
+		// version, and serves every later request from our own disk. ON by
+		// default, for the same reason as GoProxyUpstream -- a cache nobody
+		// remembered to enable is just a slower registry.
+		//
+		// Set it empty to go back to publish-only.
+		//
+		// It must speak the crates.io web API: version metadata at
+		// /api/v1/crates/{crate}/{version}, its dependencies at
+		// .../dependencies, the file at .../download. Point it at an internal
+		// mirror of that API and caching follows it.
+		//
+		// Every cached crate is checked against the SHA256 the upstream
+		// publishes for it, so a cached copy cannot become a place where a
+		// tampered crate hides.
+		CargoUpstream string
+
+		// CargoPrivate is the same never-leak guard as GoProxyPrivate: a crate
+		// whose name starts with one of these comma-separated prefixes is NEVER
+		// fetched upstream, because a miss on a private crate would otherwise
+		// send its name to crates.io, which logs it.
+		//
+		// Empty by default, unlike GoProxyPrivate and ConanPrivate: a crate name
+		// is FLAT -- there is no org in it -- so no prefix is knowably ours, and
+		// any default we picked would be a guess that stops caching someone
+		// else's public dependency. Deployments that publish private crates
+		// under a naming convention ("hanzo-", "lux-") set it; deployments that
+		// do not need nothing.
+		CargoPrivate string
 	}{
 		Enabled:              true,
 		LimitTotalOwnerCount: -1,
 		GoProxyUpstream:      "https://proxy.golang.org",
 		GoProxyPrivate:       "github.com/hanzoai/,github.com/luxfi/,github.com/zooai/,git.hanzo.ai/",
+		ConanUpstream:        "https://center.conan.io",
+		ConanPrivate:         "hanzo-,lux-,luxcpp,zoo-",
+		CargoUpstream:        "https://crates.io",
 	}
 )
 

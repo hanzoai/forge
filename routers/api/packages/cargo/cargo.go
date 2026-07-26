@@ -5,10 +5,8 @@ package cargo
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/hanzoai/git/models/db"
 	packages_model "github.com/hanzoai/git/models/packages"
@@ -164,19 +162,9 @@ func ListOwners(ctx *context.Context) {
 
 // DownloadPackageFile serves the content of a package
 func DownloadPackageFile(ctx *context.Context) {
-	s, u, pf, err := packages_service.OpenFileForDownloadByPackageNameAndVersion(
-		ctx,
-		&packages_service.PackageInfo{
-			Owner:       ctx.Package.Owner,
-			PackageType: packages_model.TypeCargo,
-			Name:        ctx.PathParam("package"),
-			Version:     ctx.PathParam("version"),
-		},
-		&packages_service.PackageFileInfo{
-			Filename: strings.ToLower(fmt.Sprintf("%s-%s.crate", ctx.PathParam("package"), ctx.PathParam("version"))),
-		},
-		ctx.Req.Method,
-	)
+	// openOrCache: serve what we have, else fetch it once from the configured
+	// upstream and serve that. With no upstream set this is exactly the local open.
+	s, u, pf, err := openOrCache(ctx, ctx.PathParam("package"), ctx.PathParam("version"))
 	if err != nil {
 		if errors.Is(err, packages_model.ErrPackageNotExist) || errors.Is(err, packages_model.ErrPackageFileNotExist) {
 			apiError(ctx, http.StatusNotFound, err)
@@ -229,7 +217,7 @@ func UploadPackage(ctx *context.Context) {
 		},
 		&packages_service.PackageFileCreationInfo{
 			PackageFileInfo: packages_service.PackageFileInfo{
-				Filename: strings.ToLower(fmt.Sprintf("%s-%s.crate", cp.Name, cp.Version)),
+				Filename: crateFilename(cp.Name, cp.Version),
 			},
 			Creator: ctx.Doer,
 			Data:    buf,

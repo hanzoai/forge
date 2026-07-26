@@ -16,6 +16,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	packages_model "github.com/hanzoai/git/models/packages"
 	conan_model "github.com/hanzoai/git/models/packages/conan"
+	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/container"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/log"
@@ -353,6 +354,26 @@ func uploadFile(ctx *context.Context, fileFilter container.Set[string], fileKey 
 	}
 	defer buf.Close()
 
+	if err := storeFile(ctx, ctx.Doer, rref, pref, fileKey, filename, buf); err != nil {
+		switch err {
+		case packages_model.ErrDuplicatePackageFile:
+			apiError(ctx, http.StatusConflict, err)
+		case packages_service.ErrQuotaTotalCount, packages_service.ErrQuotaTypeSize, packages_service.ErrQuotaTotalSize:
+			apiError(ctx, http.StatusForbidden, err)
+		default:
+			apiError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
+// storeFile is the ONE writer of Conan package files. The upload handler and the
+// upstream cache both go through it, so a cached file lands in exactly the rows a
+// publish would have produced and the cache can never hold something the registry
+// would have refused on upload.
+func storeFile(ctx *context.Context, creator *user_model.User, rref *conan_module.RecipeReference, pref *conan_module.PackageReference, fileKey, filename string, buf *packages_module.HashedBuffer) error {
 	isConanfileFile := filename == conanfileFile
 	isConaninfoFile := filename == conaninfoFile
 
@@ -363,14 +384,14 @@ func uploadFile(ctx *context.Context, fileFilter container.Set[string], fileKey 
 			Name:        rref.Name,
 			Version:     rref.Version,
 		},
-		Creator: ctx.Doer,
+		Creator: creator,
 	}
 	pfci := &packages_service.PackageFileCreationInfo{
 		PackageFileInfo: packages_service.PackageFileInfo{
 			Filename:     strings.ToLower(filename),
 			CompositeKey: fileKey,
 		},
-		Creator: ctx.Doer,
+		Creator: creator,
 		Data:    buf,
 		IsLead:  isConanfileFile,
 		Properties: map[string]string{
@@ -390,24 +411,20 @@ func uploadFile(ctx *context.Context, fileFilter container.Set[string], fileKey 
 		if isConanfileFile {
 			metadata, err := conan_module.ParseConanfile(buf)
 			if err != nil {
-				apiError(ctx, http.StatusInternalServerError, err)
-				return
+				return err
 			}
 			pv, err := packages_model.GetVersionByNameAndVersion(ctx, pci.Owner.ID, pci.PackageType, pci.Name, pci.Version)
 			if err != nil && err != packages_model.ErrPackageNotExist {
-				apiError(ctx, http.StatusInternalServerError, err)
-				return
+				return err
 			}
 			if pv != nil {
 				raw, err := json.Marshal(metadata)
 				if err != nil {
-					apiError(ctx, http.StatusInternalServerError, err)
-					return
+					return err
 				}
 				pv.MetadataJSON = string(raw)
 				if err := packages_model.UpdateVersion(ctx, pv); err != nil {
-					apiError(ctx, http.StatusInternalServerError, err)
-					return
+					return err
 				}
 			} else {
 				pci.Metadata = metadata
@@ -415,46 +432,31 @@ func uploadFile(ctx *context.Context, fileFilter container.Set[string], fileKey 
 		} else {
 			info, err := conan_module.ParseConaninfo(buf)
 			if err != nil {
-				apiError(ctx, http.StatusInternalServerError, err)
-				return
+				return err
 			}
 			raw, err := json.Marshal(info)
 			if err != nil {
-				apiError(ctx, http.StatusInternalServerError, err)
-				return
+				return err
 			}
 			pfci.Properties[conan_module.PropertyPackageInfo] = string(raw)
 		}
 
 		if _, err := buf.Seek(0, io.SeekStart); err != nil {
-			apiError(ctx, http.StatusInternalServerError, err)
-			return
+			return err
 		}
 	}
 
-	_, _, err = packages_service.CreatePackageOrAddFileToExisting(
-		ctx,
-		pci,
-		pfci,
-	)
-	if err != nil {
-		switch err {
-		case packages_model.ErrDuplicatePackageFile:
-			apiError(ctx, http.StatusConflict, err)
-		case packages_service.ErrQuotaTotalCount, packages_service.ErrQuotaTypeSize, packages_service.ErrQuotaTotalSize:
-			apiError(ctx, http.StatusForbidden, err)
-		default:
-			apiError(ctx, http.StatusInternalServerError, err)
-		}
-		return
-	}
-
-	ctx.Status(http.StatusCreated)
+	_, _, err := packages_service.CreatePackageOrAddFileToExisting(ctx, pci, pfci)
+	return err
 }
 
 // DownloadRecipeFile serves the content of the requested recipe file
 func DownloadRecipeFile(ctx *context.Context) {
 	rref := ctx.Data[recipeReferenceKey].(*conan_module.RecipeReference)
+
+	// cacheRecipeIfMissing: fetch this exact revision from the configured
+	// upstream once. With no upstream set this is a single string check.
+	cacheRecipeIfMissing(ctx, rref)
 
 	downloadFile(ctx, recipeFileList, rref.AsKey())
 }
@@ -777,6 +779,10 @@ func LatestPackageRevision(ctx *context.Context) {
 // ListRecipeRevisionFiles gets a list of all recipe revision files
 func ListRecipeRevisionFiles(ctx *context.Context) {
 	rref := ctx.Data[recipeReferenceKey].(*conan_module.RecipeReference)
+
+	// cacheRecipeIfMissing: a client asks for the file list before the files, so
+	// this is where a cold cache fills.
+	cacheRecipeIfMissing(ctx, rref)
 
 	listRevisionFiles(ctx, rref.AsKey())
 }
