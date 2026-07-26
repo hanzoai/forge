@@ -12,8 +12,8 @@ import (
 
 	"github.com/hanzoai/git/modules/nosql"
 
-	"github.com/go-redsync/redsync/v4"
-	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
+	"github.com/hanzokv/lock/v4"
+	"github.com/hanzokv/lock/v4/redis/goredis/v9"
 	"github.com/hanzokv/go/v9"
 )
 

@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/modules/test"
 	"github.com/hanzoai/git/modules/util"
 
-	"github.com/go-redsync/redsync/v4"
+	"github.com/hanzokv/lock/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

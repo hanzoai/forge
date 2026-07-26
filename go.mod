@@ -50,7 +50,6 @@ require (
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.19.1
 	github.com/go-ldap/ldap/v3 v3.4.13
-	github.com/go-redsync/redsync/v4 v4.17.0
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/go-webauthn/webauthn v0.17.4
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f
@@ -65,6 +64,8 @@ require (
 	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/s3-go v1.0.0
 	github.com/hanzoai/sqlite v0.3.1
+	github.com/hanzokv/go/v9 v9.21.1
+	github.com/hanzokv/lock/v4 v4.17.1
 	github.com/hashicorp/go-version v1.9.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/huandu/xstrings v1.5.0
@@ -86,7 +87,6 @@ require (
 	github.com/pquerna/otp v1.5.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/quasoft/websspi v1.1.2
-	github.com/hanzokv/go/v9 v9.21.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/sassoftware/go-rpmutils v0.4.0
@@ -119,6 +119,7 @@ require (
 )
 
 require (
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
