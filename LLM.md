@@ -122,3 +122,81 @@ Operator-managed in `hanzoai/universe` (DOKS `hanzo-k8s`, namespace `hanzo`):
 
 The migration (fork becomes THE git server, replacing the raw upstream-image deploy
 and the cloud embedded git seam as the host) is STAGED — the coordinator flips it.
+
+## Cloud-native, multi-tenant, S3-aware: what actually blocks it
+
+Measured 2026-07-26 against the running deploy, not inferred.
+
+**Blobs are already on S3.** `GIT__storage__STORAGE_TYPE=s3` →
+`s3.hanzo.svc:9000`, bucket `git`. Gitea's unified `[storage]` section covers
+attachments, LFS, avatars, repo-archives, packages and Actions logs/artifacts, so
+all of that is off the volume already. This is the part people assume is missing
+and it is done.
+
+**What still pins the server to one node** — the 250Gi RWO PVC holds 166G:
+
+| Path | Size | Why it pins |
+|---|---|---|
+| `/data/gitea/data` | 145G | bare git repositories |
+| `/data/gitea/indexers` | 18.4G | bleve code index |
+| `/data/gitea/gitea.db` | 2.3G | **SQLite**, WAL mode |
+
+That is why the Deployment is `replicas: 1` with `strategy: Recreate`, and why a
+routine image bump caused a ~10 minute outage on 2026-07-26: the new pod hit
+`Multi-Attach` on the RWO volume while terminated pods still held the
+attachment, and the ReplicaSet wedged at zero. Single replica + RWO + Recreate
+is not a tuning problem, it is the architecture.
+
+### Ordering, cheapest unlock first
+
+**1. SQLite → Postgres.** The single biggest unlock and the best
+payoff-to-risk. A file-backed single-writer DB makes >1 replica impossible
+*even if storage were shared*, so every later step is blocked behind this one.
+Gitea supports Postgres natively with a documented dump/restore path. Blast
+radius is the database alone; reversible from a dump. Nothing about repos,
+hooks or S3 changes.
+
+**2. bleve → external indexer, or off.** 18.4G of local index, and it is
+*derived* — rebuildable from repos, so losing it costs time, not data. Set
+`REPO_INDEXER_TYPE=elasticsearch` (or disable code search) and another local-file
+dependency is gone. Low risk precisely because it is derived state.
+
+After 1 and 2 the volume holds only repositories. That is the honest boundary.
+
+**3. Repositories — the hard one, and S3 is not the answer.** git wants POSIX
+semantics: rename-into-place, locking, mmap'd packfiles. An object store does not
+provide them, so "put repos on S3" is not a configuration change; it is a storage
+engine. Three real options, in ascending cost:
+
+  - **RWX filesystem** (CephFS / an NFS service). N replicas share one tree, no
+    code change, and `Recreate` becomes `RollingUpdate`. DO block storage is
+    RWO-only, so this means running a filesystem service. Cheapest path to HA.
+  - **Shard by tenant.** Each tenant gets its own instance and volume. No shared
+    filesystem needed and it is genuinely multi-tenant, but it multiplies
+    instances to operate and moves the problem to routing and provisioning.
+  - **Object-backed git** (the Gitaly shape: a service owning repo storage that
+    everything else calls). Correct end state, largest effort, and only worth it
+    at a scale we are not at.
+
+**4. Hooks are not the blocker.** Every push re-execs the binary as a git hook.
+That looks unfashionable but it is node-local to whichever replica holds the
+repo, so it neither blocks HA nor multi-tenancy. Leave it alone. Note the hooks
+embed `setting.AppPath` — the runtime path, not a hardcoded name — which is why
+the gitea→gitd rename regenerated every repo's hooks automatically. Do not
+"improve" that into a constant.
+
+### Multi-tenant means two different things — decide which
+
+Gitea's model is one instance, one user table, orgs inside it.
+
+  - **Orgs as tenants** — mostly already true; the work is isolation and quota,
+    not architecture.
+  - **Instance per tenant** — real isolation, and it is option 3b above.
+
+These have almost nothing in common. Picking one is a prerequisite to the repo
+storage decision, not a consequence of it.
+
+### If you only do one thing
+
+Step 1. Postgres removes the single-writer file that blocks every other step, and
+it can ship on its own with a dump to roll back to.
