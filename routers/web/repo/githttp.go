@@ -152,7 +152,7 @@ func httpBase(ctx *context.Context, optGitService ...string) *serviceHandler {
 				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Gitea"`)
 			} else {
 				// If OAuth2 is disabled, then use another realm to avoid GCM OAuth2 attempt
-				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Gitea (Basic Auth)"`)
+				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Hanzo Git (Basic Auth)"`)
 			}
 			ctx.HTTPError(http.StatusUnauthorized)
 			return nil

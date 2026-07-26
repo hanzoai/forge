@@ -1,7 +1,7 @@
 // Copyright 2018 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// Package cmd provides subcommands to the gitea binary - such as "web" or
+// Package cmd provides subcommands to the gitd binary - such as "web" or
 // "admin".
 package cmd
 
@@ -134,7 +134,7 @@ func PrepareConsoleLoggerLevel(defaultLevel log.Level) func(context.Context, *cl
 
 func isValidDefaultSubCommand(cmd *cli.Command) (string, bool) {
 	// Dirty patch for urfave/cli's strange design.
-	// "./gitea bad-cmd" should not start the web server.
+	// "./gitd bad-cmd" should not start the web server.
 	args := cmd.Args().Slice()
 	if len(args) != 0 {
 		return args[0], false

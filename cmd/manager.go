@@ -16,8 +16,8 @@ import (
 func newManagerCommand() *cli.Command {
 	return &cli.Command{
 		Name:        "manager",
-		Usage:       "Manage the running gitea process",
-		Description: "This is a command for managing the running gitea process",
+		Usage:       "Manage the running Hanzo Git process",
+		Description: "This is a command for managing the running Hanzo Git process",
 		Commands: []*cli.Command{
 			newShutdownCommand(),
 			newRestartCommand(),

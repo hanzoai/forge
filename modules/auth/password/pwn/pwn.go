@@ -64,7 +64,7 @@ func newRequest(ctx context.Context, method, url string, body io.ReadCloser) (*h
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("User-Agent", "Gitea "+setting.AppVer)
+	req.Header.Add("User-Agent", "Hanzo Git "+setting.AppVer)
 	return req, nil
 }
 

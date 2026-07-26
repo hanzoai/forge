@@ -78,7 +78,7 @@ func TestAdminUserCreate(t *testing.T) {
 		assert.NoError(t, createUser("u", "--random-password", "--access-token"))
 		assert.Equal(t, 1, unittest.GetCount(t, &user_model.User{}))
 		assert.Equal(t, 1, unittest.GetCount(t, &auth_model.AccessToken{}))
-		accessToken := unittest.AssertExistsAndLoadBean(t, &auth_model.AccessToken{Name: "gitea-admin"})
+		accessToken := unittest.AssertExistsAndLoadBean(t, &auth_model.AccessToken{Name: "hanzo-admin"})
 		hasScopes, err := accessToken.Scope.HasScope(auth_model.AccessTokenScopeWriteAdmin, auth_model.AccessTokenScopeWriteRepository)
 		assert.NoError(t, err)
 		assert.True(t, hasScopes)

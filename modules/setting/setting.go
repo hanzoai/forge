@@ -103,7 +103,7 @@ func InitCfgProvider(file string) {
 
 func MustInstalled() {
 	if !InstallLock {
-		log.Fatal(`Unable to load config file for a installed Hanzo Git instance, you should either use "--config" to set your config file (app.ini), or run "gitea web" command to install Hanzo Git.`)
+		log.Fatal(`Unable to load config file for a installed Hanzo Git instance, you should either use "--config" to set your config file (app.ini), or run "gitd web" command to install Hanzo Git.`)
 	}
 }
 

@@ -3433,7 +3433,7 @@
   "admin.self_check.database_collation_mismatch": "Supor que a base de dados usa a colação: %s",
   "admin.self_check.database_collation_case_insensitive": "A base de dados está a usar a colação %s, que é insensível à diferença entre maiúsculas e minúsculas. Embora o Hanzo Git possa trabalhar com ela, pode haver alguns casos raros que não funcionem como esperado.",
   "admin.self_check.database_inconsistent_collation_columns": "A base de dados está a usar a colação %s, mas estas colunas estão a usar colações diferentes. Isso poderá causar alguns problemas inesperados.",
-  "admin.self_check.database_fix_mysql": "Para utilizadores do MySQL/MariaDB, pode usar o comando \"gitea doctor convert\" para resolver os problemas de colação. Também pode resolver o problema manualmente com comandos SQL \"ALTER ... COLLATE ...\".",
+  "admin.self_check.database_fix_mysql": "Para utilizadores do MySQL/MariaDB, pode usar o comando \"gitd doctor convert\" para resolver os problemas de colação. Também pode resolver o problema manualmente com comandos SQL \"ALTER ... COLLATE ...\".",
   "admin.self_check.database_fix_mssql": "Para utilizadores do MSSQL só pode resolver o problema manualmente com comandos SQL \"ALTER ... COLLATE ...\", por enquanto.",
   "admin.self_check.location_origin_mismatch": "O URL corrente (%[1]s) não corresponde ao URL visto pelo Hanzo Git (%[2]s). Se estiver a usar um reverse proxy, certifique-se que os cabeçalhos \"Host\" e \"X-Forwarded-Proto\" estão bem definidos.",
   "action.create_repo": "criou o repositório <a href=\"%s\">%s</a>",

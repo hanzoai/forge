@@ -1263,7 +1263,7 @@ func createOAuth2MockProvider() *httptest.Server {
 	mockServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/avatar.png":
-			if !strings.HasPrefix(r.Header.Get("User-Agent"), "Gitea ") {
+			if !strings.HasPrefix(r.Header.Get("User-Agent"), "Hanzo Git ") {
 				http.Error(w, "user agent doesn't match", http.StatusForbidden)
 				return
 			}

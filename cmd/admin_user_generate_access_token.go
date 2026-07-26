@@ -28,7 +28,7 @@ func newUserGenerateAccessTokenCommand() *cli.Command {
 				Name:    "token-name",
 				Aliases: []string{"t"},
 				Usage:   "Token name",
-				Value:   "gitea-admin",
+				Value:   "hanzo-admin",
 			},
 			&cli.BoolFlag{
 				Name:  "raw",

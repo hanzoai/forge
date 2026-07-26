@@ -470,13 +470,13 @@ func EnsureUpToDate(ctx context.Context, x db.EngineMigration) error {
 	}
 
 	if minDBVersion > currentDB {
-		return fmt.Errorf("DB version %d (<= %d) is too old for auto-migration. Upgrade to Gitea 1.6.4 first then upgrade to this version", currentDB, minDBVersion)
+		return fmt.Errorf("DB version %d (<= %d) is too old for auto-migration. Upgrade to Gitea 1.6.4 (upstream) first then upgrade to this version", currentDB, minDBVersion)
 	}
 
 	expectedDB := ExpectedDBVersion()
 
 	if currentDB != expectedDB {
-		return fmt.Errorf(`current database version %d is not equal to the expected version %d. Please run "gitea [--config /path/to/app.ini] migrate" to update the database version`, currentDB, expectedDB)
+		return fmt.Errorf(`current database version %d is not equal to the expected version %d. Please run "gitd [--config /path/to/app.ini] migrate" to update the database version`, currentDB, expectedDB)
 	}
 
 	return nil
@@ -523,10 +523,10 @@ Please try upgrading to a lower version first (suggested v1.6.4), then upgrade t
 		return nil
 	}
 
-	// Downgrading Gitea's database version not supported
+	// Downgrading the database version is not supported
 	if maxDBVer < curDBVer {
-		msg := fmt.Sprintf("Your database (migration version: %d) is for a newer Gitea, you can not use the newer database for this old Gitea release (%d).", curDBVer, maxDBVer)
-		msg += "\nGitea will exit to keep your database safe and unchanged. Please use the correct Gitea release, do not change the migration version manually (incorrect manual operation may lose data)."
+		msg := fmt.Sprintf("Your database (migration version: %d) is for a newer Hanzo Git, you can not use the newer database for this old Hanzo Git release (%d).", curDBVer, maxDBVer)
+		msg += "\nHanzo Git will exit to keep your database safe and unchanged. Please use the correct Hanzo Git release, do not change the migration version manually (incorrect manual operation may lose data)."
 		if !setting.IsProd {
 			msg += fmt.Sprintf("\nIf you are in development and really know what you're doing, you can force changing the migration version by executing: UPDATE version SET version=%d WHERE id=1;", maxDBVer)
 		}

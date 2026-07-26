@@ -24,5 +24,5 @@ env contract, OIDC login reconciled to hanzo.id.
 ## Development
 
 See [docs/development.md](docs/development.md) for a local environment.
-After building, run `./gitea web` to start the server, or `./gitea help` for
+After building, run `./gitd web` to start the server, or `./gitd help` for
 all commands.

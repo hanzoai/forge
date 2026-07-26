@@ -3433,7 +3433,7 @@
   "admin.self_check.database_collation_mismatch": "Exige que la base de données utilise la collation %s.",
   "admin.self_check.database_collation_case_insensitive": "La base de données utilise la collation %s, insensible à la casse. Bien que Hanzo Git soit compatible, il peut y avoir quelques rares cas qui ne fonctionnent pas comme prévu.",
   "admin.self_check.database_inconsistent_collation_columns": "La base de données utilise la collation %s, mais ces colonnes utilisent des collations différentes. Cela peut causer des problèmes imprévus.",
-  "admin.self_check.database_fix_mysql": "Pour les utilisateurs de MySQL ou MariaDB, vous pouvez utiliser la commande « gitea doctor convert » dans un terminal ou exécuter une requête du type « ALTER … COLLATE ... » pour résoudre les problèmes de collation.",
+  "admin.self_check.database_fix_mysql": "Pour les utilisateurs de MySQL ou MariaDB, vous pouvez utiliser la commande « gitd doctor convert » dans un terminal ou exécuter une requête du type « ALTER … COLLATE ... » pour résoudre les problèmes de collation.",
   "admin.self_check.database_fix_mssql": "Pour les utilisateurs de MSSQL, vous ne pouvez résoudre le problème qu’en exécutant une requête SQL du type « ALTER … COLLATE … ».",
   "admin.self_check.location_origin_mismatch": "L’URL actuelle (%[1]s) ne correspond pas à l’URL vue par Hanzo Git (%[2]). Si vous utilisez un proxy inverse, assurez-vous que les en-têtes « Host » et « X-Forwarded-Proto » sont correctement définis.",
   "action.create_repo": "a créé le dépôt <a href=\"%s\">%s</a>",

@@ -35,7 +35,7 @@ func SetCacheControlInHeader(h http.Header, opts *CacheControlOptions) {
 	} else {
 		// use dev-related controls, and remind users they are using non-prod setting.
 		directives = append(directives, "max-age=0", publicPrivate, "must-revalidate")
-		h.Set("X-Gitea-Debug", fmt.Sprintf("RUN_MODE=%v, MaxAge=%s", setting.RunMode, opts.MaxAge))
+		h.Set("X-Cache-Debug", fmt.Sprintf("RUN_MODE=%v, MaxAge=%s", setting.RunMode, opts.MaxAge))
 	}
 	h.Set("Cache-Control", strings.Join(directives, ", "))
 }

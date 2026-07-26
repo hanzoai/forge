@@ -3433,7 +3433,7 @@
   "admin.self_check.database_collation_mismatch": "Bí ag súil le comhthiomsú a úsáid sa bhunachar sonraí: %s",
   "admin.self_check.database_collation_case_insensitive": "Tá an bunachar sonraí ag baint úsáide as an gcóimheas %s, arb é atá ann ná cóimheas neamhíogair ó thaobh cás de. Cé gur féidir le Hanzo Git oibriú leis, d'fhéadfadh go mbeadh roinnt cásanna neamhchoitianta ann nach n-oibreoidh mar a bhíothas ag súil leis.",
   "admin.self_check.database_inconsistent_collation_columns": "Tá an bunachar sonraí ag úsáid an chóimheasa %s, ach tá na colúin seo ag úsáid chóimheasa mí-oiriúnacha. D’fhéadfadh sé seo roinnt fadhbanna gan choinne a chruthú.",
-  "admin.self_check.database_fix_mysql": "I gcás úsáideoirí MySQL/MariaDB, d'fhéadfá an t-ordú \"gitea doctor convert\" a úsáid chun na fadhbanna cóimheasa a shocrú, nó d'fhéadfá an fhadhb a shocrú de láimh le fiosrúcháin SQL \"ALTER ... COLLATE ...\".",
+  "admin.self_check.database_fix_mysql": "I gcás úsáideoirí MySQL/MariaDB, d'fhéadfá an t-ordú \"gitd doctor convert\" a úsáid chun na fadhbanna cóimheasa a shocrú, nó d'fhéadfá an fhadhb a shocrú de láimh le fiosrúcháin SQL \"ALTER ... COLLATE ...\".",
   "admin.self_check.database_fix_mssql": "I gcás úsáideoirí MSSQL, ní fhéadfá an fhadhb a réiteach de láimh ach le fiosrúcháin SQL \"ALTER ... COLLATE ...\" faoi láthair.",
   "admin.self_check.location_origin_mismatch": "Ní mheaitseálann an URL reatha (%[1]s) an URL atá le feiceáil ag Hanzo Git (%[2]s). Má tá seachfhreastalaí droim ar ais á úsáid agat, cinntigh le do thoil go bhfuil na ceanntásca \"Óstríomhaire\" agus \"X-Forwarded-Proto\" socraithe i gceart.",
   "action.create_repo": "stóras cruthaithe <a href=\"%s\">%s</a>",

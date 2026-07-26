@@ -52,10 +52,10 @@ The integration tests require [Git LFS](https://git-lfs.com/) to be installed.
 Clone the repository:
 
 ```bash
-git clone https://github.com/go-gitea/gitea
+git clone https://github.com/hanzoai/git
 ```
 
-To contribute changes, [fork the repository](https://github.com/go-gitea/gitea) on
+To contribute changes, [fork the repository](https://github.com/hanzoai/git) on
 GitHub and add your fork as a git remote so you can push branches and open pull
 requests. See GitHub's [working with forks](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks)
 documentation for the details.

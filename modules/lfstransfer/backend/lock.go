@@ -45,10 +45,10 @@ func (g *giteaLockBackend) Create(path, refname string) (transfer.Lock, error) {
 		return nil, err
 	}
 	headers := map[string]string{
-		headerAuthorization:     g.authToken,
-		headerGiteaInternalAuth: g.internalAuth,
-		headerAccept:            mimeGitLFS,
-		headerContentType:       mimeGitLFS,
+		headerAuthorization: g.authToken,
+		headerInternalAuth:  g.internalAuth,
+		headerAccept:        mimeGitLFS,
+		headerContentType:   mimeGitLFS,
 	}
 	req := newInternalRequestLFS(g.ctx, g.server.String(), http.MethodPost, headers, bodyBytes)
 	resp, err := req.Response()
@@ -96,10 +96,10 @@ func (g *giteaLockBackend) Unlock(lock transfer.Lock) error {
 		return err
 	}
 	headers := map[string]string{
-		headerAuthorization:     g.authToken,
-		headerGiteaInternalAuth: g.internalAuth,
-		headerAccept:            mimeGitLFS,
-		headerContentType:       mimeGitLFS,
+		headerAuthorization: g.authToken,
+		headerInternalAuth:  g.internalAuth,
+		headerAccept:        mimeGitLFS,
+		headerContentType:   mimeGitLFS,
 	}
 	req := newInternalRequestLFS(g.ctx, g.server.JoinPath(lock.ID(), "unlock").String(), http.MethodPost, headers, bodyBytes)
 	resp, err := req.Response()
@@ -178,10 +178,10 @@ func (g *giteaLockBackend) queryLocks(v url.Values) ([]transfer.Lock, string, er
 	serverURLWithQuery := g.server.JoinPath() // get a copy
 	serverURLWithQuery.RawQuery = v.Encode()
 	headers := map[string]string{
-		headerAuthorization:     g.authToken,
-		headerGiteaInternalAuth: g.internalAuth,
-		headerAccept:            mimeGitLFS,
-		headerContentType:       mimeGitLFS,
+		headerAuthorization: g.authToken,
+		headerInternalAuth:  g.internalAuth,
+		headerAccept:        mimeGitLFS,
+		headerContentType:   mimeGitLFS,
 	}
 	req := newInternalRequestLFS(g.ctx, serverURLWithQuery.String(), http.MethodGet, headers, nil)
 	resp, err := req.Response()

@@ -93,7 +93,7 @@ func TestPackageContainer(t *testing.T) {
 		}
 		wwwAuthenticateForRequiredSignIn := []string{
 			`Bearer realm="` + setting.AppURL + `v2/token",service="container_registry",scope="*"`,
-			`Basic realm="Gitea Container Registry"`,
+			`Basic realm="Hanzo Git Container Registry"`,
 		}
 		t.Run("Anonymous", func(t *testing.T) {
 			defer tests.PrintCurrentTest(t)()

@@ -25,16 +25,18 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   updated in the SAME change that bumps the image tag.
 - **`[actions]` intact:** `services/actions`, `models/actions`,
   `routers/api/actions/runner` — full act_runner registration + job API. Enabled
-  via `GITEA__actions__ENABLED=true`.
+  via `GIT__actions__ENABLED=true`.
 - **Identity = hanzo.id OIDC only.** No fork-baked issuer; binding is a standard
   Gitea OAuth2 auth source (goth `openidConnect`) pointed at
   `https://hanzo.id/.well-known/openid-configuration`. Org membership is driven by
   the IAM `owner` claim (`--group-claim-name owner --group-team-map …
   --group-team-map-removal`), reconciled declaratively by the deploy's `oauth-sync`
   init container. hanzo.id IAM app: `hanzo-gitea`.
-- **Config = env.** `GITEA__<section>__<KEY>` (upstream's app.ini API, kept
-  verbatim). No custom/conf baked, no Helm — the running config lives entirely in
-  the deployment's env (see universe).
+- **Config = env.** `GIT__<section>__<KEY>` (upstream's app.ini API under our
+  prefix; `modules/setting.EnvConfigKeyPrefixGit`). `GITEA__*` is NOT accepted —
+  there is no fallback, so a stale `GITEA__` var is silently ignored. No
+  custom/conf baked, no Helm — the running config lives entirely in the
+  deployment's env (see universe).
 - **KV, not redis.** The client is `github.com/hanzokv/go` and the vocabulary is
   KV end to end — there is no `redis` spelling left and no alias accepting one.
   Connection URIs are `kv://`, `kvs://`, `kv+socket://`, `kv+sentinel://`,
@@ -44,6 +46,45 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   `[global_lock] SERVICE_TYPE = kv`. `modules/nosql.getKVOptions` hand-parses the
   URI, so the scheme family is this repo's to define — it never reaches the
   client's own parser.
+
+## Upstream naming: what stays, and why
+
+The rendered UI, locale strings, CLI help, log/error text, outbound User-Agents
+and our own `X-*` headers are Hanzo Git. What is left is left on purpose — it is
+either legally required or an addressing value where a rename silently points at
+a different resource. Do NOT sed these:
+
+- **MIT attribution** — `Copyright ... The Gitea Authors` headers, `LICENSE`,
+  and the generated `licenses.txt` (17 hits, all dependency notices). Required.
+- **Dependency import paths** — `gitea.com/go-chi/*`, `gitea.com/gitea/runner/*`,
+  and `github.com/go-gitea/gitea` links in provenance comments.
+- **Addressing values.** Renaming these redirects to a resource that does not
+  exist, usually silently: webhook type `gitea` (DB column + API enum + the
+  `/settings/hooks/gitea/*` route and its templates), migration source service
+  `gitea`, `.gitea/` repo conventions (workflows, issue/PR templates — users'
+  own files), bleve analyzer `gitea/path`, indexer names `gitea_issues` /
+  `gitea_codes`, the `[storage]` S3/Azure default `gitea`, the user setting key
+  `email_notification.gitea_actions`, and `yaml:"gitea"` markdown front-matter.
+- **`/data/gitea`, `/etc/gitea`, `gitea.db`** — the durable volume layout. A
+  rename is a live PVC migration, not a branding change. `/app/git/gitd` and
+  `/usr/local/bin/gitd` (the binary) are already ours.
+- **`WWW-Authenticate: Basic realm="Gitea"`** in `routers/web/repo/githttp.go` —
+  Git Credential Manager matches this literal to offer built-in OAuth2
+  (git-ecosystem/git-credential-manager#1442). The OAuth2-disabled branch beside
+  it is ours, because its job is to NOT match that probe.
+- **`ONLY_ALLOW_PUSH_IF_GITEA_ENVIRONMENT_SET`** — renaming the key makes any
+  app.ini that set it `false` silently revert to the `true` default, which
+  rejects pushes. Needs a migration, not a rename.
+
+Still branded upstream and needing an owner decision, because each is a wire
+contract with consumers we cannot enumerate: the `X-GITEA-OTP` request header
+(`services/auth/basic.go`, CORS allow-list, both swagger specs), the webhook
+delivery headers `X-Gitea-{Delivery,Event,Event-Type,Signature,Hook-Installation-Target-Type}`
+(`services/webhook/deliver.go`), and the notification-mail headers `X-Gitea-*`
+(`services/mailer/`). All three already ship vendor-compat aliases beside them
+(`X-GitHub-*`, `X-Hub-Signature-256`, `X-Gogs-*`, `X-GitLab-*`), so the target
+names are the platform's `X-Webhook-*` convention — but dropping `X-Gitea-*`
+breaks any receiver verifying signatures on it.
 
 ## Image / release lane
 

@@ -31,8 +31,8 @@ func TestPrepareFileNameAndType(t *testing.T) {
 		)
 	}
 
-	test("", "", "gitea-dump-1234.zip", "zip")
-	test("", "tar.gz", "gitea-dump-1234.tar.gz", "tar.gz")
+	test("", "", "hanzo-git-dump-1234.zip", "zip")
+	test("", "tar.gz", "hanzo-git-dump-1234.tar.gz", "tar.gz")
 	test("", "no-such", "", "")
 
 	test("-", "", "-", "zip")

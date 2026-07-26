@@ -81,7 +81,7 @@ func microcmdUserCreate() *cli.Command {
 			&cli.StringFlag{
 				Name:  "access-token-name",
 				Usage: `Name of the generated access token`,
-				Value: "gitea-admin",
+				Value: "hanzo-admin",
 			},
 			&cli.StringFlag{
 				Name:  "access-token-scopes",

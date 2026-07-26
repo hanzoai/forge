@@ -326,7 +326,7 @@ func oauth2UpdateAvatarIfNeed(ctx *context.Context, avatarURL string, u *user_mo
 		return
 	}
 	// Some hosts (e.g. Wikimedia) reject Go's default User-Agent.
-	req.Header.Set("User-Agent", "Gitea "+setting.AppVer)
+	req.Header.Set("User-Agent", "Hanzo Git "+setting.AppVer)
 
 	resp, err := oauth2AvatarHTTPClient().Do(req)
 	if err != nil {

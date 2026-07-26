@@ -181,7 +181,7 @@ func preprocessDatabaseCollation(x EngineMigration) {
 
 	// check column collation, and show warning/error to end users -- no need to fatal, do not block the startup
 	if !r.IsCollationCaseSensitive(r.DatabaseCollation) {
-		log.Warn("Current database is using a case-insensitive collation %q, although Gitea could work with it, there might be some rare cases which don't work as expected.", r.DatabaseCollation)
+		log.Warn("Current database is using a case-insensitive collation %q, although Hanzo Git could work with it, there might be some rare cases which don't work as expected.", r.DatabaseCollation)
 	}
 
 	if len(r.InconsistentCollationColumns) > 0 {

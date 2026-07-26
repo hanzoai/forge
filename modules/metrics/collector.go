@@ -13,7 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-const namespace = "gitea_"
+const namespace = "hanzogit_"
 
 // Collector implements the prometheus.Collector interface and
 // exposes gitea metrics for prometheus

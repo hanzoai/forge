@@ -3323,7 +3323,7 @@
   "admin.self_check.database_collation_mismatch": "Veritabanının şu harmanlamayı kullanmasını bekle: %s",
   "admin.self_check.database_collation_case_insensitive": "Veritabanı %s harmanlamasını kullanıyor, bu duyarsız bir harmanlamadır. Her ne kadar Hanzo Git bununla çalışabilse de, beklendiği gibi çalışmadığı nadir durumlar ortaya çıkabilir.",
   "admin.self_check.database_inconsistent_collation_columns": "Veritabanı %s harmanlamasını kullanıyor, ancak bu sütunlar uyumsuz harmanlamalar kullanıyor. Bu beklenmedik sorunlar oluşturabilir.",
-  "admin.self_check.database_fix_mysql": "MySQL/MariaDB kullanıcıları \"gitea doctor convert\" komutunu harmanlama sorunlarını çözmek için kullanabilir veya \"ALTER ... COLLATE ...\" SQL'lerini şahsen çalıştırarak sorunu çözebilirler.",
+  "admin.self_check.database_fix_mysql": "MySQL/MariaDB kullanıcıları \"gitd doctor convert\" komutunu harmanlama sorunlarını çözmek için kullanabilir veya \"ALTER ... COLLATE ...\" SQL'lerini şahsen çalıştırarak sorunu çözebilirler.",
   "admin.self_check.database_fix_mssql": "MSSQL kullanıcıları sorunu şu an sadece \"ALTER ... COLLATE ...\" SQL'lerini şahsen çalıştırarak çözebilirler.",
   "admin.self_check.location_origin_mismatch": "Mevcut URL (%[1]s) Hanzo Git tarafından görülen URL (%[2]s) ile eşleşmiyor. Eğer bir vekil sunucu kullanıyorsanız, lütfen \"Host\" ve \"X-Forwarded-Proto\" başlıklarının doğru ayarlandığından emin olunuz.",
   "action.create_repo": "depo <a href=\"%s\">%s</a> oluşturuldu",

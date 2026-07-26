@@ -1903,7 +1903,7 @@
   "admin.auths.user_base": "پایگاه جستجوی کاربر",
   "admin.auths.user_dn": "کاربر DN",
   "admin.auths.attribute_username": "ویژگی نام کاربری",
-  "admin.auths.attribute_username_placeholder": "نام کاربری را خالی بگذارید برای انتخاب نام کاربری gitea انتخاب شود.",
+  "admin.auths.attribute_username_placeholder": "نام کاربری را خالی بگذارید برای انتخاب نام کاربری Hanzo Git انتخاب شود.",
   "admin.auths.attribute_name": "ویژگی نام",
   "admin.auths.attribute_surname": "ویژگی نام خانوادگی",
   "admin.auths.attribute_mail": "ویژگی ایمیل",

@@ -29,7 +29,7 @@ func authInternal(next http.Handler) http.Handler {
 			return
 		}
 
-		tokens := req.Header.Get("X-Gitea-Internal-Auth") // TODO: use something like JWT or HMAC to avoid passing the token in the clear
+		tokens := req.Header.Get("X-Internal-Auth") // TODO: use something like JWT or HMAC to avoid passing the token in the clear
 		after, found := strings.CutPrefix(tokens, "Bearer ")
 		authSucceeded := found && subtle.ConstantTimeCompare([]byte(after), []byte(setting.InternalToken)) == 1
 		if !authSucceeded {

@@ -20,7 +20,7 @@ func MonitorDiagnosis(ctx *context.Context) {
 
 	httplib.ServeSetHeaders(ctx.Resp, httplib.ServeHeaderOptions{
 		ContentType:        "application/zip",
-		Filename:           fmt.Sprintf("gitea-diagnosis-%s.zip", time.Now().Format("20060102-150405")),
+		Filename:           fmt.Sprintf("hanzo-git-diagnosis-%s.zip", time.Now().Format("20060102-150405")),
 		ContentDisposition: httplib.ContentDispositionAttachment,
 	})
 

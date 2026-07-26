@@ -3433,7 +3433,7 @@
   "admin.self_check.database_collation_mismatch": "期望数据库使用的校验方式：%s",
   "admin.self_check.database_collation_case_insensitive": "数据库正在使用一个排序规则 %s，这是一个不区分大小写的排序规则。虽然 Hanzo Git 可以在此环境下工作，但可能存在一些无法按预期工作的罕见情况。",
   "admin.self_check.database_inconsistent_collation_columns": "数据库正在使用排序规则 %s，但这些列使用了不匹配的排序规则。这可能会导致一些意外问题。",
-  "admin.self_check.database_fix_mysql": "对于 MySQL/MariaDB 用户，您可以使用「gitea doctor convert」命令来解决校验问题。 或者您也可以通过「ALTER ... COLLATE ...」这样的 SQL 来手动解决这个问题。",
+  "admin.self_check.database_fix_mysql": "对于 MySQL/MariaDB 用户，您可以使用「gitd doctor convert」命令来解决校验问题。 或者您也可以通过「ALTER ... COLLATE ...」这样的 SQL 来手动解决这个问题。",
   "admin.self_check.database_fix_mssql": "对于 MSSQL 用户，您现在只能通过「ALTER ... COLLATE ...」SQL 手动解决这个问题。",
   "admin.self_check.location_origin_mismatch": "当前 URL（%[1]s）与 Hanzo Git 的 URL（%[2]s）不匹配。如果您正在使用反向代理，请确保设置正确的「Host」和「X-Forwarded-Proto」标头。",
   "action.create_repo": "创建了仓库 <a href=\"%s\">%s</a>",

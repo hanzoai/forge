@@ -16,10 +16,10 @@ const (
 	MediaType = "application/vnd.git-lfs+json"
 	// AcceptHeader Some LFS servers offer content with other types, so fallback to '*/*' if application/vnd.git-lfs+json cannot be served
 	AcceptHeader = "application/vnd.git-lfs+json;q=0.9, */*;q=0.8"
-	// UserAgentHeader Add User-Agent for gitea's self-implemented lfs client,
+	// UserAgentHeader Add User-Agent for our self-implemented lfs client,
 	// and the version is consistent with the latest version of git lfs can be avoided incompatibilities.
-	// Some lfs servers will check this
-	UserAgentHeader = "git-lfs/3.6.0 (Gitea)"
+	// Some lfs servers check the "git-lfs/<version>" part, so only the product name in parentheses is ours.
+	UserAgentHeader = "git-lfs/3.6.0 (Hanzo Git)"
 )
 
 // BatchRequest contains multiple requests processed in one batch operation.

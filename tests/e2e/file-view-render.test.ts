@@ -17,7 +17,7 @@ test('3d model file', async ({page, request, browserName}) => {
   await expect(viewer.locator('canvas')).toBeVisible(); // unclear firefox-only CI-only failure
   expect((await viewer.boundingBox())!.height).toBeGreaterThan(300);
   await assertFlushWithParent(iframe, page.locator('.file-view'));
-  // bgcolor passed via gitea-iframe-bgcolor; 3D viewer reads it from body bgcolor — must match parent
+  // bgcolor passed via hanzo-iframe-bgcolor; 3D viewer reads it from body bgcolor — must match parent
   const [parentBg, iframeBg] = await Promise.all([
     page.evaluate(() => getComputedStyle(document.body).backgroundColor),
     frame.locator('body').evaluate((el) => getComputedStyle(el).backgroundColor),

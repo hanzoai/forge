@@ -334,7 +334,7 @@ func runServ(ctx context.Context, c *cli.Command) error {
 		repo_module.EnvKeyID+"="+strconv.FormatInt(results.KeyID, 10),
 		repo_module.EnvAppURL+"="+setting.AppURL,
 	)
-	// to avoid breaking, here only use the minimal environment variables for the "gitea serv" command.
+	// to avoid breaking, here only use the minimal environment variables for the "gitd serv" command.
 	// it could be re-considered whether to use the same git.CommonGitCmdEnvs() as "git" command later.
 	command.Env = append(command.Env, gitcmd.CommonCmdServEnvs()...)
 

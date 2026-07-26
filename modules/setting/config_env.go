@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	EnvConfigKeyPrefixGitea = "GIT__"
-	EnvConfigKeySuffixFile  = "__FILE"
+	EnvConfigKeyPrefixGit  = "GIT__"
+	EnvConfigKeySuffixFile = "__FILE"
 )
 
 const escapeRegexpString = "_0[xX](([0-9a-fA-F][0-9a-fA-F])+)_"
@@ -24,7 +24,7 @@ var escapeRegex = regexp.MustCompile(escapeRegexpString)
 
 func CollectEnvConfigKeys() (keys []string) {
 	for _, env := range os.Environ() {
-		if strings.HasPrefix(env, EnvConfigKeyPrefixGitea) {
+		if strings.HasPrefix(env, EnvConfigKeyPrefixGit) {
 			k, _, _ := strings.Cut(env, "=")
 			keys = append(keys, k)
 		}
@@ -97,15 +97,15 @@ func decodeEnvSectionKey(encoded string) (ok bool, section, key string) {
 
 // decodeEnvironmentKey decode the environment key to section and key
 // The environment key is in the form of GIT__SECTION__KEY or GIT__SECTION__KEY__FILE
-func decodeEnvironmentKey(prefixGitea, suffixFile, envKey string) (ok bool, section, key string, useFileValue bool) {
-	if !strings.HasPrefix(envKey, prefixGitea) {
+func decodeEnvironmentKey(prefixGit, suffixFile, envKey string) (ok bool, section, key string, useFileValue bool) {
+	if !strings.HasPrefix(envKey, prefixGit) {
 		return false, "", "", false
 	}
 	if strings.HasSuffix(envKey, suffixFile) {
 		useFileValue = true
 		envKey = envKey[:len(envKey)-len(suffixFile)]
 	}
-	ok, section, key = decodeEnvSectionKey(envKey[len(prefixGitea):])
+	ok, section, key = decodeEnvSectionKey(envKey[len(prefixGit):])
 	return ok, section, key, useFileValue
 }
 
@@ -119,7 +119,7 @@ func EnvironmentToConfig(cfg ConfigProvider, envs []string) (changed bool) {
 		// parse the environment variable to config section name and key name
 		envKey := before
 		envValue := after
-		ok, sectionName, keyName, useFileValue := decodeEnvironmentKey(EnvConfigKeyPrefixGitea, EnvConfigKeySuffixFile, envKey)
+		ok, sectionName, keyName, useFileValue := decodeEnvironmentKey(EnvConfigKeyPrefixGit, EnvConfigKeySuffixFile, envKey)
 		if !ok {
 			continue
 		}

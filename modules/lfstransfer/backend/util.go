@@ -26,11 +26,11 @@ var internalRepoRoutePath = private.RoutePrefix[1:] + "/repo/"
 
 // HTTP headers
 const (
-	headerAccept            = "Accept"
-	headerAuthorization     = "Authorization"
-	headerGiteaInternalAuth = "X-Gitea-Internal-Auth"
-	headerContentType       = "Content-Type"
-	headerContentLength     = "Content-Length"
+	headerAccept        = "Accept"
+	headerAuthorization = "Authorization"
+	headerInternalAuth  = "X-Internal-Auth"
+	headerContentType   = "Content-Type"
+	headerContentLength = "Content-Length"
 )
 
 // MIME types

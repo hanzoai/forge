@@ -154,7 +154,7 @@ func (r *Request) Response() (*http.Response, error) {
 	}
 
 	if r.req.Header.Get("User-Agent") == "" {
-		r.req.Header.Set("User-Agent", "GiteaHttpLib")
+		r.req.Header.Set("User-Agent", "HanzoGitHttpLib")
 	}
 
 	return client.Do(r.req)

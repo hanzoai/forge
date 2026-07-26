@@ -21,4 +21,4 @@ GitHub Actions 的 CI/CD，并通过 hanzo.id OIDC 原生集成 IAM。服务位�
 ## 开发
 
 本地环境请见 [docs/development.md](docs/development.md)。构建完成后，运行
-`./gitea web` 启动服务器，或 `./gitea help` 查看所有命令。
+`./gitd web` 启动服务器，或 `./gitd help` 查看所有命令。

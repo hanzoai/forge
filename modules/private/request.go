@@ -56,7 +56,7 @@ func requestJSONResp[T any](req *httplib.Request, res *T) (ret *T, extra Respons
 	resp, err := req.Response()
 	if err != nil {
 		extra.UserMsg = "Internal Server Connection Error"
-		extra.Error = fmt.Errorf("unable to contact gitea %q: %w", req.GoString(), err)
+		extra.Error = fmt.Errorf("unable to contact Hanzo Git %q: %w", req.GoString(), err)
 		return nil, extra
 	}
 	defer resp.Body.Close()

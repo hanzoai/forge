@@ -33,7 +33,7 @@ func newDumpCommand() *cli.Command {
 			&cli.StringFlag{
 				Name:    "file",
 				Aliases: []string{"f"},
-				Usage:   `Name of the dump file which will be created, default to "gitea-dump-{time}.zip". Supply '-' for stdout. See type for available types.`,
+				Usage:   `Name of the dump file which will be created, default to "hanzo-git-dump-{time}.zip". Supply '-' for stdout. See type for available types.`,
 			},
 			&cli.BoolFlag{
 				Name:    "verbose",
@@ -192,7 +192,7 @@ func runDump(ctx context.Context, cmd *cli.Command) error {
 			fatal("Path does not exist: %s", tmpDir)
 		}
 
-		dbDump, err := os.CreateTemp(tmpDir, "gitea-db.sql")
+		dbDump, err := os.CreateTemp(tmpDir, "hanzo-git-db.sql")
 		if err != nil {
 			fatal("Failed to create tmp file: %v", err)
 		}
@@ -214,8 +214,8 @@ func runDump(ctx context.Context, cmd *cli.Command) error {
 			fatal("Failed to dump database: %v", err)
 		}
 
-		if err = dumper.AddFileByPath("gitea-db.sql", dbDump.Name()); err != nil {
-			fatal("Failed to include gitea-db.sql: %v", err)
+		if err = dumper.AddFileByPath("hanzo-git-db.sql", dbDump.Name()); err != nil {
+			fatal("Failed to include hanzo-git-db.sql: %v", err)
 		}
 	}
 

@@ -210,13 +210,13 @@ ACCESS = file
 }
 `
 	dump := manager.GetLogger(log.DEFAULT).DumpWriters()
-	require.JSONEq(t, strings.ReplaceAll(writerDump, "$FILENAME", tempPath("gitea.log")), toJSON(dump))
+	require.JSONEq(t, strings.ReplaceAll(writerDump, "$FILENAME", tempPath("hanzo-git.log")), toJSON(dump))
 
 	dump = manager.GetLogger("access").DumpWriters()
 	require.JSONEq(t, strings.ReplaceAll(writerDumpAccess, "$FILENAME", tempPath("access.log")), toJSON(dump))
 
 	dump = manager.GetLogger("router").DumpWriters()
-	require.JSONEq(t, strings.ReplaceAll(writerDump, "$FILENAME", tempPath("gitea.log")), toJSON(dump))
+	require.JSONEq(t, strings.ReplaceAll(writerDump, "$FILENAME", tempPath("hanzo-git.log")), toJSON(dump))
 }
 
 func TestLogConfigLegacyModeDisable(t *testing.T) {
@@ -381,7 +381,7 @@ COMPRESSION_LEVEL = 4
 
 	dump := manager.GetLogger(log.DEFAULT).DumpWriters()
 	expected := writerDump
-	expected = strings.ReplaceAll(expected, "$FILENAME-0", tempPath("gitea.log"))
+	expected = strings.ReplaceAll(expected, "$FILENAME-0", tempPath("hanzo-git.log"))
 	expected = strings.ReplaceAll(expected, "$FILENAME-1", tempPath("file-xxx.log"))
 	require.JSONEq(t, expected, toJSON(dump))
 }

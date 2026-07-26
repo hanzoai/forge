@@ -114,7 +114,7 @@ Ensure you are running in the correct environment or set the correct configurati
 		SetContext(ctx).
 		SetTransport(internalAPITransport()).
 		Header("X-Real-IP", getClientIP()).
-		Header("X-Gitea-Internal-Auth", "Bearer "+setting.InternalToken)
+		Header("X-Internal-Auth", "Bearer "+setting.InternalToken)
 }
 
 func newInternalRequestAPI(ctx context.Context, url, method string, body ...any) *httplib.Request {

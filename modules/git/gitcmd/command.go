@@ -252,7 +252,7 @@ func CommonGitCmdEnvs() []string {
 	}...)
 }
 
-// CommonCmdServEnvs is like CommonGitCmdEnvs, but it only returns minimal required environment variables for the "gitea serv" command
+// CommonCmdServEnvs is like CommonGitCmdEnvs, but it only returns minimal required environment variables for the "gitd serv" command
 func CommonCmdServEnvs() []string {
 	return commonBaseEnvs()
 }

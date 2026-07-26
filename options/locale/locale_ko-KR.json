@@ -3424,7 +3424,7 @@
   "admin.self_check.database_collation_mismatch": "데이터베이스가 다음 정렬 방식을 사용할 것으로 예상함: %s",
   "admin.self_check.database_collation_case_insensitive": "데이터베이스가 대소문자를 구분하지 않는 %s 정렬 방식을 사용하고 있습니다. Hanzo Git는 이 정렬 방식으로 작동할 수 있지만, 정상적으로 작동하지 않는 경우가 드물게 있을 수 있습니다.",
   "admin.self_check.database_inconsistent_collation_columns": "데이터베이스가 %s 정렬 방식을 사용하고 있지만, 이 열들은 다른 정렬 방식을 사용하고 있습니다. 이는 예상치 못한 문제를 야기할 수 있습니다.",
-  "admin.self_check.database_fix_mysql": "MySQL/MariaDB 사용자의 경우, \"gitea doctor convert\" 명령을 사용하여 정렬 방식 문제를 수정하거나 \"ALTER ... COLLATE ...\" SQL 쿼리를 수동으로 실행하여 문제를 수정할 수 있습니다.",
+  "admin.self_check.database_fix_mysql": "MySQL/MariaDB 사용자의 경우, \"gitd doctor convert\" 명령을 사용하여 정렬 방식 문제를 수정하거나 \"ALTER ... COLLATE ...\" SQL 쿼리를 수동으로 실행하여 문제를 수정할 수 있습니다.",
   "admin.self_check.database_fix_mssql": "MSSQL 사용자의 경우, 현재로서는 \"ALTER ... COLLATE ...\" SQL 쿼리를 수동으로 실행하여 문제를 수정하는 방법밖에 없습니다.",
   "admin.self_check.location_origin_mismatch": "현재 URL(%[1]s)이 Hanzo Git가 인식하는 URL(%[2]s)과 일치하지 않습니다. 리버스 프록시를 사용하는 경우 \"Host\" 및 \"X-Forwarded-Proto\" 헤더가 올바르게 설정되었는지 확인하십시오.",
   "action.create_repo": "리포지토리를 생성됨 <a href=\"%s\">%s</a>",

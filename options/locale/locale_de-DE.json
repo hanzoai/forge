@@ -3433,7 +3433,7 @@
   "admin.self_check.database_collation_mismatch": "Erwarte Datenbank-Kollation: %s",
   "admin.self_check.database_collation_case_insensitive": "Die Datenbank verwendet die Sortierfolge %s, was eine unbeachtete Sortierfolge ist. Obwohl Hanzo Git damit arbeiten könnte, gibt es einige seltene Fälle, die nicht wie erwartet funktionieren.",
   "admin.self_check.database_inconsistent_collation_columns": "Datenbank verwendet Sortierfolge %s, aber diese Spalten verwenden falsche Sortierfolgen. Dies kann zu unerwarteten Problemen führen.",
-  "admin.self_check.database_fix_mysql": "Für MySQL/MariaDB-Benutzer können Sie den Befehl \"gitea doctor convert\" verwenden, um die Sortierprobleme zu beheben oder Sie können das Problem auch manuell mit \"ALTER ... COLLATE ...\" SQL-Abfragen lösen.",
+  "admin.self_check.database_fix_mysql": "Für MySQL/MariaDB-Benutzer können Sie den Befehl \"gitd doctor convert\" verwenden, um die Sortierprobleme zu beheben oder Sie können das Problem auch manuell mit \"ALTER ... COLLATE ...\" SQL-Abfragen lösen.",
   "admin.self_check.database_fix_mssql": "Für MSSQL-Benutzer konnten Sie das Problem derzeit nur manuell mit \"ALTER ... COLLATE ...\" SQL-Abfragen beheben.",
   "admin.self_check.location_origin_mismatch": "Aktuelle URL (%[1]s) stimmt nicht mit der URL überein, die Hanzo Git (%[2]s) sieht. Wenn du einen Reverse-Proxy verwendest, stelle bitte sicher, dass die Header \"Host\" und \"X-Forwarded-Proto\" korrekt gesetzt sind.",
   "action.create_repo": "hat das Repository <a href=\"%s\">%s</a> erstellt",

@@ -32,7 +32,7 @@ import (
 )
 
 // PIDFile could be set from build tag
-var PIDFile = "/run/gitea.pid"
+var PIDFile = "/run/gitd.pid"
 
 func newWebCommand() *cli.Command {
 	return &cli.Command{
