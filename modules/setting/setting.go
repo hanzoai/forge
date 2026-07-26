@@ -177,6 +177,10 @@ func loadRunModeFrom(rootCfg ConfigProvider) {
 }
 
 func mustNotRunAsRoot(rootSec ConfigSection) {
+	if IsInTesting {
+		return // this guards the server process; a test binary is not one, and CI containers run as uid 0
+	}
+
 	if os.Getuid() != 0 {
 		return
 	}
