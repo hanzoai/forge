@@ -123,80 +123,89 @@ Operator-managed in `hanzoai/universe` (DOKS `hanzo-k8s`, namespace `hanzo`):
 The migration (fork becomes THE git server, replacing the raw upstream-image deploy
 and the cloud embedded git seam as the host) is STAGED — the coordinator flips it.
 
-## Cloud-native, multi-tenant, S3-aware: what actually blocks it
+## Cloud-native, multi-tenant: the house pattern, not Postgres
 
-Measured 2026-07-26 against the running deploy, not inferred.
+Measured 2026-07-26 against the running deploy. An earlier draft of this section
+recommended SQLite -> Postgres. **That was wrong for this stack** and is removed:
+Postgres buys HA for one shared schema, which is the opposite of what we want.
+The house answer is SQLite per tenant, S3 as the source of truth, stateless
+nodes.
 
-**Blobs are already on S3.** `GIT__storage__STORAGE_TYPE=s3` →
-`s3.hanzo.svc:9000`, bucket `git`. Gitea's unified `[storage]` section covers
-attachments, LFS, avatars, repo-archives, packages and Actions logs/artifacts, so
-all of that is off the volume already. This is the part people assume is missing
-and it is done.
+### What is already true
 
-**What still pins the server to one node** — the 250Gi RWO PVC holds 166G:
+Blobs are on S3 (`GIT__storage__STORAGE_TYPE=s3` -> `s3.hanzo.svc:9000`, bucket
+`git`): attachments, LFS, avatars, archives, packages, Actions artifacts. Done.
 
-| Path | Size | Why it pins |
+What pins the server to one node is the 250Gi RWO PVC, 166G used:
+
+| Path | Size | What it is |
 |---|---|---|
-| `/data/gitea/data` | 145G | bare git repositories |
-| `/data/gitea/indexers` | 18.4G | bleve code index |
-| `/data/gitea/gitea.db` | 2.3G | **SQLite**, WAL mode |
+| `/data/gitea/data` | 145G | bare repositories |
+| `/data/gitea/indexers` | 18.4G | bleve index (derived, rebuildable) |
+| `/data/gitea/gitea.db` | 2.3G | ONE SQLite for the whole instance |
 
-That is why the Deployment is `replicas: 1` with `strategy: Recreate`, and why a
-routine image bump caused a ~10 minute outage on 2026-07-26: the new pod hit
-`Multi-Attach` on the RWO volume while terminated pods still held the
-attachment, and the ReplicaSet wedged at zero. Single replica + RWO + Recreate
-is not a tuning problem, it is the architecture.
+That is why it is `replicas: 1` + `Recreate`, and why an image bump took
+git.hanzo.ai down ~10 min on 2026-07-26 (new pod hit Multi-Attach while
+terminated pods still held the volume; the ReplicaSet wedged at zero).
 
-### Ordering, cheapest unlock first
+### The house stack this should use
 
-**1. SQLite → Postgres.** The single biggest unlock and the best
-payoff-to-risk. A file-backed single-writer DB makes >1 replica impossible
-*even if storage were shared*, so every later step is blocked behind this one.
-Gitea supports Postgres natively with a documented dump/restore path. Blast
-radius is the database alone; reversible from a dump. Nothing about repos,
-hooks or S3 changes.
+- **`hanzoai/replicate`** — SQLite WAL replication to S3. One import, zero
+  config files, zero sidecars; set `REPLICATE_S3_ENDPOINT` and it runs. Already
+  wrapped as a Base plugin (`base/plugins/replicate`). luxfi/kms does the same
+  shape with the ZapDB Replicator.
+- **DB per tenant** — `hanzoai/commerce` already does this: `db.Manager` holds
+  `userDBs map[string]*SQLiteDB` and `orgDBs map[string]*SQLiteDB`, opened on
+  demand.
 
-**2. bleve → external indexer, or off.** 18.4G of local index, and it is
-*derived* — rebuildable from repos, so losing it costs time, not data. Set
-`REPO_INDEXER_TYPE=elasticsearch` (or disable code search) and another local-file
-dependency is gone. Low risk precisely because it is derived state.
+So the target for git is one SQLite per org/project, replicated to S3, with
+local disk as a *cache* rather than the source of truth. Nodes become stateless:
+any node can serve any tenant by materialising that tenant's DB from S3.
 
-After 1 and 2 the volume holds only repositories. That is the honest boundary.
+### Two gaps to close first — and they are shared, not git-specific
 
-**3. Repositories — the hard one, and S3 is not the answer.** git wants POSIX
-semantics: rename-into-place, locking, mmap'd packfiles. An object store does not
-provide them, so "put repos on S3" is not a configuration change; it is a storage
-engine. Three real options, in ascending cost:
+1. **No eviction.** commerce's `userDBs`/`orgDBs` maps are unbounded; handles are
+   only closed by `Manager.Close()`. Open-per-tenant without eviction is a file
+   descriptor and memory leak that grows with tenant count — exactly what makes a
+   node stop being lightweight. Needs an LRU (or idle TTL) that closes cold
+   handles and lets the local file be re-fetched on next use.
+2. **Per-tenant DBs are not replicated.** commerce does NOT import
+   `hanzoai/replicate` — its tenant DBs are local-only. So per-tenant SQLite
+   exists and S3-backed SQLite exists, but nothing yet does both.
 
-  - **RWX filesystem** (CephFS / an NFS service). N replicas share one tree, no
-    code change, and `Recreate` becomes `RollingUpdate`. DO block storage is
-    RWO-only, so this means running a filesystem service. Cheapest path to HA.
-  - **Shard by tenant.** Each tenant gets its own instance and volume. No shared
-    filesystem needed and it is genuinely multi-tenant, but it multiplies
-    instances to operate and moves the problem to routing and provisioning.
-  - **Object-backed git** (the Gitaly shape: a service owning repo storage that
-    everything else calls). Correct end state, largest effort, and only worth it
-    at a scale we are not at.
+Close those two once, in the shared layer, and both commerce and git get it.
 
-**4. Hooks are not the blocker.** Every push re-execs the binary as a git hook.
-That looks unfashionable but it is node-local to whichever replica holds the
-repo, so it neither blocks HA nor multi-tenancy. Leave it alone. Note the hooks
-embed `setting.AppPath` — the runtime path, not a hardcoded name — which is why
-the gitea→gitd rename regenerated every repo's hooks automatically. Do not
-"improve" that into a constant.
+### Then: git embeds into cloud
 
-### Multi-tenant means two different things — decide which
+`hanzoai/cloud` already owns the git control plane, smart-HTTP and SSH surface
+(`clients/git/git.go` — `/v1/git/repos`, `/usage`, and root `/:org/:repo/*`
+smart-HTTP for the git host). Today it *fronts* a separate stateful hanzo-git
+Deployment; `cloud/go.mod` does not import `hanzoai/git`.
 
-Gitea's model is one instance, one user table, orgs inside it.
+Embedding it natively is the actual "cloud-native" step, and it is the right one
+because cloud is already horizontally scalable and stateless. Order matters:
 
-  - **Orgs as tenants** — mostly already true; the work is isolation and quota,
-    not architecture.
-  - **Instance per tenant** — real isolation, and it is option 3b above.
+1. eviction + replication in the shared tenant-DB layer (above),
+2. git's schema split from one instance DB to per-org/project DBs,
+3. cloud imports the fork as a module and serves git in-process,
+4. the standalone hanzo-git Deployment and its RWO PVC go away.
 
-These have almost nothing in common. Picking one is a prerequisite to the repo
-storage decision, not a consequence of it.
+Only step 4 removes the single-replica constraint, and it cannot come first.
 
-### If you only do one thing
+### Repositories are still the hard part, and S3 is not the answer
 
-Step 1. Postgres removes the single-writer file that blocks every other step, and
-it can ship on its own with a dump to roll back to.
+git wants POSIX rename-into-place, locking and mmap'd packfiles; an object store
+provides none of them, so "repos on S3" is a storage engine, not a config flag.
+With per-tenant DBs the honest option is **shard by tenant** — a node owns a
+tenant's repos while it owns that tenant's DB, which is the same sharding key,
+and DO block volumes attach per node. Keep a KV in front for hot reads. An RWX
+filesystem also works and needs no code change, but it means running a
+filesystem service and it does not give tenancy — only HA.
+
+### Do not "fix" this
+
+Hooks re-exec the binary per push. That is node-local to whoever holds the repo,
+so it blocks neither HA nor tenancy. The hook scripts embed `setting.AppPath`
+(the runtime path), not a hardcoded name — which is why the gitea->gitd rename
+regenerated every repo's hooks by itself. Turning that into a constant would
+break the next rename.
