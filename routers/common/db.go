@@ -52,7 +52,7 @@ func migrateWithSetting(ctx context.Context, x db.EngineMigration) error {
 		return versioned_migration.Migrate(ctx, x)
 	} else if expected := migrations.ExpectedDBVersion(); current != expected {
 		log.Fatal(`"database.AUTO_MIGRATION" is disabled, but current database version %d is not equal to the expected version %d.`+
-			`You can set "database.AUTO_MIGRATION" to true or migrate manually by running "gitea [--config /path/to/app.ini] migrate"`, current, expected)
+			`You can set "database.AUTO_MIGRATION" to true or migrate manually by running "gitd [--config /path/to/app.ini] migrate"`, current, expected)
 	}
 	return nil
 }

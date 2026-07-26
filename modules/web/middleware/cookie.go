@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	CookieWebBannerDismissed = "gitea_disbnr"
-	CookieTheme              = "gitea_theme"
+	CookieWebBannerDismissed = "hanzo_git_disbnr"
+	CookieTheme              = "hanzo_git_theme"
 	cookieRedirectTo         = "redirect_to"
 )
 

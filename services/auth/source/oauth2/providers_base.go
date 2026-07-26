@@ -35,7 +35,7 @@ func (b *BaseProvider) DisplayName() string {
 
 // IconHTML returns icon HTML for this provider
 func (b *BaseProvider) IconHTML(size int) template.HTML {
-	svgName := "gitea-" + b.name
+	svgName := "hanzo-" + b.name
 	switch b.name {
 	case "gplus":
 		svgName = "hanzo-google"

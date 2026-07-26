@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/git/modules/web/middleware"
 )
 
-const CookieNameFlash = "gitea_flash"
+const CookieNameFlash = "hanzo_git_flash"
 
 func removeSessionCookieHeader(w http.ResponseWriter) {
 	cookies := w.Header()["Set-Cookie"]
