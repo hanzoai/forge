@@ -13,7 +13,7 @@ import (
 
 	"github.com/hanzoai/git/modules/log"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 )
 
 var replacer = strings.NewReplacer("_", "", "-", "")

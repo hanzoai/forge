@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/nosql"
 
 	"gitea.com/go-chi/session"
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 )
 
 // RedisStore represents a redis session store implementation.

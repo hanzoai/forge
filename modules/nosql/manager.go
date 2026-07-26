@@ -11,7 +11,7 @@ import (
 
 	"github.com/hanzoai/git/modules/process"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 

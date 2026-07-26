@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/modules/nosql"
 
 	"gitea.com/go-chi/cache" //nolint:depguard // we wrap this package here
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 )
 
 // RedisCacher represents a redis cache adapter implementation.
