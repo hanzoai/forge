@@ -38,7 +38,7 @@ func (o *VirtualSessionProvider) Init(gcLifetime int64, config string) error {
 	case "file":
 		o.provider = &session.FileProvider{}
 	case "redis":
-		o.provider = &RedisProvider{}
+		o.provider = &KVProvider{}
 	case "db":
 		o.provider = &DBProvider{}
 	case "mysql":

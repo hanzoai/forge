@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestToRedisURI(t *testing.T) {
+func TestToKVURI(t *testing.T) {
 	tests := []struct {
 		name       string
 		connection string
@@ -29,7 +29,7 @@ func TestToRedisURI(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ToRedisURI(tt.connection)
+			got := ToKVURI(tt.connection)
 			require.NotNil(t, got)
 			assert.Equal(t, tt.want, got.String())
 		})

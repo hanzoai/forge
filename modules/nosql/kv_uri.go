@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-// The file contains common redis connection functions
+// The file contains common KV connection functions
 
-// ToRedisURI converts old style connections to a RedisURI
+// ToKVURI converts old style connections to a KV URI
 //
-// A RedisURI matches the pattern:
+// A KV URI matches the pattern:
 //
 // redis://[username:password@]host[:port][/database][?[option=value]*]
 // rediss://[username:password@]host[:port][/database][?[option=value]*]
@@ -26,7 +26,7 @@ import (
 // network=tcp,addr=127.0.0.1:6379,password=macaron,db=0,pool_size=100,idle_timeout=180
 //
 // We need to convert this old style to the new style
-func ToRedisURI(connection string) *url.URL {
+func ToKVURI(connection string) *url.URL {
 	uri, err := url.Parse(connection)
 	if err == nil && strings.HasPrefix(uri.Scheme, "redis") {
 		// OK we're going to assume that this is a reasonable redis URI

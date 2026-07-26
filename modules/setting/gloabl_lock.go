@@ -26,7 +26,7 @@ func loadGlobalLockFrom(rootCfg ConfigProvider) {
 		if connStr == "" {
 			log.Fatal("SERVICE_CONN_STR is empty for redis")
 		}
-		u := nosql.ToRedisURI(connStr)
+		u := nosql.ToKVURI(connStr)
 		if u == nil {
 			log.Fatal("SERVICE_CONN_STR %s is not a valid redis connection string", connStr)
 		}

@@ -12,19 +12,19 @@ import (
 
 	"github.com/hanzoai/git/modules/nosql"
 
-	"github.com/hanzokv/lock/v4"
-	"github.com/hanzokv/lock/v4/redis/goredis/v9"
 	"github.com/hanzokv/go/v9"
+	"github.com/hanzokv/lock/v4"
+	"github.com/hanzokv/lock/v4/kv/kvgo"
 )
 
-const redisLockKeyPrefix = "gitea:globallock:"
+const kvLockKeyPrefix = "gitea:globallock:"
 
-// redisLockExpiry is the default expiry time for a lock.
+// kvLockExpiry is the default expiry time for a lock.
 // Define it as a variable to make it possible to change it in tests.
-var redisLockExpiry = 30 * time.Second
+var kvLockExpiry = 30 * time.Second
 
-type redisLocker struct {
-	conn redis.UniversalClient
+type kvLocker struct {
+	conn kv.UniversalClient
 	rs   *redsync.Redsync
 
 	mutexM   sync.Map
@@ -32,24 +32,24 @@ type redisLocker struct {
 	extendWg sync.WaitGroup
 }
 
-var _ Locker = &redisLocker{}
+var _ Locker = &kvLocker{}
 
-func NewRedisLocker(connection string) Locker {
-	conn := nosql.GetManager().GetRedisClient(connection)
-	l := &redisLocker{
+func NewKVLocker(connection string) Locker {
+	conn := nosql.GetManager().GetKVClient(connection)
+	l := &kvLocker{
 		conn: conn,
-		rs:   redsync.New(goredis.NewPool(conn)),
+		rs:   redsync.New(kvgo.NewPool(conn)),
 	}
 	l.extendWg.Add(1)
 	l.startExtend()
 	return l
 }
 
-func (l *redisLocker) Lock(ctx context.Context, key string) (ReleaseFunc, error) {
+func (l *kvLocker) Lock(ctx context.Context, key string) (ReleaseFunc, error) {
 	return l.lock(ctx, key, 0)
 }
 
-func (l *redisLocker) TryLock(ctx context.Context, key string) (bool, ReleaseFunc, error) {
+func (l *kvLocker) TryLock(ctx context.Context, key string) (bool, ReleaseFunc, error) {
 	f, err := l.lock(ctx, key, 1)
 
 	var (
@@ -67,24 +67,24 @@ func (l *redisLocker) TryLock(ctx context.Context, key string) (bool, ReleaseFun
 // In actual use, it is not necessary to call this function.
 // But it's useful in tests to release resources.
 // It could take some time since it waits for the extending goroutine to finish.
-func (l *redisLocker) Close() error {
+func (l *kvLocker) Close() error {
 	l.closed.Store(true)
 	l.extendWg.Wait()
 	return nil
 }
 
-func (l *redisLocker) lock(ctx context.Context, key string, tries int) (ReleaseFunc, error) {
+func (l *kvLocker) lock(ctx context.Context, key string, tries int) (ReleaseFunc, error) {
 	if l.closed.Load() {
 		return func() {}, errors.New("locker is closed")
 	}
 
 	options := []redsync.Option{
-		redsync.WithExpiry(redisLockExpiry),
+		redsync.WithExpiry(kvLockExpiry),
 	}
 	if tries > 0 {
 		options = append(options, redsync.WithTries(tries))
 	}
-	mutex := l.rs.NewMutex(redisLockKeyPrefix+key, options...)
+	mutex := l.rs.NewMutex(kvLockKeyPrefix+key, options...)
 	if err := mutex.LockContext(ctx); err != nil {
 		return func() {}, err
 	}
@@ -104,7 +104,7 @@ func (l *redisLocker) lock(ctx context.Context, key string, tries int) (ReleaseF
 	}, nil
 }
 
-func (l *redisLocker) startExtend() {
+func (l *kvLocker) startExtend() {
 	if l.closed.Load() {
 		l.extendWg.Done()
 		return
@@ -130,5 +130,5 @@ func (l *redisLocker) startExtend() {
 		_, _ = v.Extend()
 	}
 
-	time.AfterFunc(redisLockExpiry/2, l.startExtend)
+	time.AfterFunc(kvLockExpiry/2, l.startExtend)
 }

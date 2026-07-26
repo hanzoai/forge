@@ -18,10 +18,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newTestRedisLocker(t *testing.T) Locker {
+func newTestKVLocker(t *testing.T) Locker {
 	t.Helper()
-	redisURL := util.IfZero(os.Getenv("TEST_REDIS_URL"), "redis://127.0.0.1:6379/0")
-	rl := NewRedisLocker(redisURL).(*redisLocker)
+	kvURL := util.IfZero(os.Getenv("TEST_REDIS_URL"), "redis://127.0.0.1:6379/0")
+	rl := NewKVLocker(kvURL).(*kvLocker)
 	err := rl.conn.Ping(t.Context()).Err()
 	if err != nil && test.AllowSkipExternalService() {
 		t.Skip("no redis server for testing, skipped")
@@ -32,11 +32,11 @@ func newTestRedisLocker(t *testing.T) Locker {
 
 func TestLocker(t *testing.T) {
 	t.Run("redis", func(t *testing.T) {
-		defer test.MockVariableValue(&redisLockExpiry, 5*time.Second)() // make it shorter for testing
-		locker := newTestRedisLocker(t)
+		defer test.MockVariableValue(&kvLockExpiry, 5*time.Second)() // make it shorter for testing
+		locker := newTestKVLocker(t)
 		testLocker(t, locker)
-		testRedisLocker(t, locker.(*redisLocker))
-		require.NoError(t, locker.(*redisLocker).Close())
+		testKVLocker(t, locker.(*kvLocker))
+		require.NoError(t, locker.(*kvLocker).Close())
 	})
 	t.Run("memory", func(t *testing.T) {
 		locker := NewMemoryLocker()
@@ -151,8 +151,8 @@ func testMemoryLocker(t *testing.T, locker *memoryLocker) {
 	// nothing to do
 }
 
-// testRedisLocker does specific tests for redisLocker
-func testRedisLocker(t *testing.T, locker *redisLocker) {
+// testKVLocker does specific tests for kvLocker
+func testKVLocker(t *testing.T, locker *kvLocker) {
 	defer func() {
 		// This case should be tested at the end.
 		// Otherwise, it will affect other tests.
@@ -168,7 +168,7 @@ func testRedisLocker(t *testing.T, locker *redisLocker) {
 		defer release()
 		require.NoError(t, err)
 
-		// It simulates that there are some problems with extending like network issues or redis server down.
+		// It simulates that there are some problems with extending like network issues or KV server down.
 		v, ok := locker.mutexM.Load("test")
 		require.True(t, ok)
 		m := v.(*redsync.Mutex)

@@ -15,18 +15,18 @@ import (
 	"github.com/hanzokv/go/v9"
 )
 
-type baseRedis struct {
-	client   redis.UniversalClient
+type baseKV struct {
+	client   kv.UniversalClient
 	isUnique bool
 	cfg      *BaseConfig
 
 	mu sync.Mutex // the old implementation is not thread-safe, the queue operation and set operation should be protected together
 }
 
-var _ baseQueue = (*baseRedis)(nil)
+var _ baseQueue = (*baseKV)(nil)
 
-func newBaseRedisGeneric(cfg *BaseConfig, unique bool) (baseQueue, error) {
-	client := nosql.GetManager().GetRedisClient(cfg.ConnStr)
+func newBaseKVGeneric(cfg *BaseConfig, unique bool) (baseQueue, error) {
+	client := nosql.GetManager().GetKVClient(cfg.ConnStr)
 
 	var err error
 	for range 10 {
@@ -34,25 +34,25 @@ func newBaseRedisGeneric(cfg *BaseConfig, unique bool) (baseQueue, error) {
 		if err == nil {
 			break
 		}
-		log.Warn("Redis is not ready, waiting for 1 second to retry: %v", err)
+		log.Warn("KV is not ready, waiting for 1 second to retry: %v", err)
 		time.Sleep(time.Second)
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return &baseRedis{cfg: cfg, client: client, isUnique: unique}, nil
+	return &baseKV{cfg: cfg, client: client, isUnique: unique}, nil
 }
 
-func newBaseRedisSimple(cfg *BaseConfig) (baseQueue, error) {
-	return newBaseRedisGeneric(cfg, false)
+func newBaseKVSimple(cfg *BaseConfig) (baseQueue, error) {
+	return newBaseKVGeneric(cfg, false)
 }
 
-func newBaseRedisUnique(cfg *BaseConfig) (baseQueue, error) {
-	return newBaseRedisGeneric(cfg, true)
+func newBaseKVUnique(cfg *BaseConfig) (baseQueue, error) {
+	return newBaseKVGeneric(cfg, true)
 }
 
-func (q *baseRedis) PushItem(ctx context.Context, data []byte) error {
+func (q *baseKV) PushItem(ctx context.Context, data []byte) error {
 	return backoffErr(ctx, backoffBegin, backoffUpper, time.After(pushBlockTime), func() (retry bool, err error) {
 		q.mu.Lock()
 		defer q.mu.Unlock()
@@ -78,13 +78,13 @@ func (q *baseRedis) PushItem(ctx context.Context, data []byte) error {
 	})
 }
 
-func (q *baseRedis) PopItem(ctx context.Context) ([]byte, error) {
+func (q *baseKV) PopItem(ctx context.Context) ([]byte, error) {
 	return backoffRetErr(ctx, backoffBegin, backoffUpper, infiniteTimerC, func() (retry bool, data []byte, err error) {
 		q.mu.Lock()
 		defer q.mu.Unlock()
 
 		data, err = q.client.LPop(ctx, q.cfg.QueueFullName).Bytes()
-		if err == redis.Nil {
+		if err == kv.Nil {
 			return true, nil, nil
 		}
 		if err != nil {
@@ -98,7 +98,7 @@ func (q *baseRedis) PopItem(ctx context.Context) ([]byte, error) {
 	})
 }
 
-func (q *baseRedis) HasItem(ctx context.Context, data []byte) (bool, error) {
+func (q *baseKV) HasItem(ctx context.Context, data []byte) (bool, error) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	if !q.isUnique {
@@ -107,20 +107,20 @@ func (q *baseRedis) HasItem(ctx context.Context, data []byte) (bool, error) {
 	return q.client.SIsMember(ctx, q.cfg.SetFullName, data).Result()
 }
 
-func (q *baseRedis) Len(ctx context.Context) (int, error) {
+func (q *baseKV) Len(ctx context.Context) (int, error) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	cnt, err := q.client.LLen(ctx, q.cfg.QueueFullName).Result()
 	return int(cnt), err
 }
 
-func (q *baseRedis) Close() error {
+func (q *baseKV) Close() error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	return q.client.Close()
 }
 
-func (q *baseRedis) RemoveAll(ctx context.Context) error {
+func (q *baseKV) RemoveAll(ctx context.Context) error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 

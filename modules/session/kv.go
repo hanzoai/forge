@@ -17,28 +17,28 @@ import (
 	"github.com/hanzokv/go/v9"
 )
 
-// RedisStore represents a redis session store implementation.
-type RedisStore struct {
-	c           redis.UniversalClient
+// KVStore represents a KV session store implementation.
+type KVStore struct {
+	c           kv.UniversalClient
 	prefix, sid string
 	duration    time.Duration
 	lock        sync.RWMutex
 	data        map[any]any
 }
 
-// NewRedisStore creates and returns a redis session store.
-func NewRedisStore(c redis.UniversalClient, prefix, sid string, dur time.Duration, kv map[any]any) *RedisStore {
-	return &RedisStore{
+// NewKVStore creates and returns a KV session store.
+func NewKVStore(c kv.UniversalClient, prefix, sid string, dur time.Duration, data map[any]any) *KVStore {
+	return &KVStore{
 		c:        c,
 		prefix:   prefix,
 		sid:      sid,
 		duration: dur,
-		data:     kv,
+		data:     data,
 	}
 }
 
 // Set sets value to given key in session.
-func (s *RedisStore) Set(key, val any) error {
+func (s *KVStore) Set(key, val any) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -47,7 +47,7 @@ func (s *RedisStore) Set(key, val any) error {
 }
 
 // Get gets value by given key in session.
-func (s *RedisStore) Get(key any) any {
+func (s *KVStore) Get(key any) any {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -55,7 +55,7 @@ func (s *RedisStore) Get(key any) any {
 }
 
 // Delete delete a key from session.
-func (s *RedisStore) Delete(key any) error {
+func (s *KVStore) Delete(key any) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -64,12 +64,12 @@ func (s *RedisStore) Delete(key any) error {
 }
 
 // ID returns current session ID.
-func (s *RedisStore) ID() string {
+func (s *KVStore) ID() string {
 	return s.sid
 }
 
 // Release releases resource and save data to provider.
-func (s *RedisStore) Release() error {
+func (s *KVStore) Release() error {
 	// Skip encoding if the data is empty
 	if len(s.data) == 0 {
 		return nil
@@ -84,7 +84,7 @@ func (s *RedisStore) Release() error {
 }
 
 // Flush deletes all session data.
-func (s *RedisStore) Flush() error {
+func (s *KVStore) Flush() error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -92,22 +92,22 @@ func (s *RedisStore) Flush() error {
 	return nil
 }
 
-// RedisProvider represents a redis session provider implementation.
-type RedisProvider struct {
-	c        redis.UniversalClient
+// KVProvider represents a KV session provider implementation.
+type KVProvider struct {
+	c        kv.UniversalClient
 	duration time.Duration
 	prefix   string
 }
 
-// Init initializes redis session provider.
+// Init initializes KV session provider.
 // configs: network=tcp,addr=:6379,password=macaron,db=0,pool_size=100,idle_timeout=180,prefix=session;
-func (p *RedisProvider) Init(maxlifetime int64, configs string) (err error) {
+func (p *KVProvider) Init(maxlifetime int64, configs string) (err error) {
 	p.duration, err = time.ParseDuration(fmt.Sprintf("%ds", maxlifetime))
 	if err != nil {
 		return err
 	}
 
-	uri := nosql.ToRedisURI(configs)
+	uri := nosql.ToKVURI(configs)
 
 	for k, v := range uri.Query() {
 		switch k {
@@ -116,12 +116,12 @@ func (p *RedisProvider) Init(maxlifetime int64, configs string) (err error) {
 		}
 	}
 
-	p.c = nosql.GetManager().GetRedisClient(uri.String())
+	p.c = nosql.GetManager().GetKVClient(uri.String())
 	return p.c.Ping(graceful.GetManager().ShutdownContext()).Err()
 }
 
 // Read returns raw session store by session ID.
-func (p *RedisProvider) Read(sid string) (session.RawStore, error) {
+func (p *KVProvider) Read(sid string) (session.RawStore, error) {
 	psid := p.prefix + sid
 	if exist, err := p.Exist(sid); err == nil && !exist {
 		if err := p.c.Set(graceful.GetManager().HammerContext(), psid, "", p.duration).Err(); err != nil {
@@ -131,36 +131,36 @@ func (p *RedisProvider) Read(sid string) (session.RawStore, error) {
 		return nil, err
 	}
 
-	var kv map[any]any
+	var data map[any]any
 	kvs, err := p.c.Get(graceful.GetManager().HammerContext(), psid).Result()
 	if err != nil {
 		return nil, err
 	}
 	if len(kvs) == 0 {
-		kv = make(map[any]any)
+		data = make(map[any]any)
 	} else {
-		kv, err = session.DecodeGob([]byte(kvs))
+		data, err = session.DecodeGob([]byte(kvs))
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return NewRedisStore(p.c, p.prefix, sid, p.duration, kv), nil
+	return NewKVStore(p.c, p.prefix, sid, p.duration, data), nil
 }
 
 // Exist returns true if session with given ID exists.
-func (p *RedisProvider) Exist(sid string) (bool, error) {
+func (p *KVProvider) Exist(sid string) (bool, error) {
 	v, err := p.c.Exists(graceful.GetManager().HammerContext(), p.prefix+sid).Result()
 	return err == nil && v == 1, err
 }
 
 // Destroy deletes a session by session ID.
-func (p *RedisProvider) Destroy(sid string) error {
+func (p *KVProvider) Destroy(sid string) error {
 	return p.c.Del(graceful.GetManager().HammerContext(), p.prefix+sid).Err()
 }
 
 // Regenerate regenerates a session store from old session ID to new one.
-func (p *RedisProvider) Regenerate(oldsid, sid string) (_ session.RawStore, err error) {
+func (p *KVProvider) Regenerate(oldsid, sid string) (_ session.RawStore, err error) {
 	poldsid := p.prefix + oldsid
 	psid := p.prefix + sid
 
@@ -178,7 +178,7 @@ func (p *RedisProvider) Regenerate(oldsid, sid string) (_ session.RawStore, err 
 		return nil, err
 	}
 
-	// do not use Rename here, because the old sid and new sid may be in different redis cluster slot.
+	// do not use Rename here, because the old sid and new sid may be in different KV cluster slot.
 	kvs, err := p.c.Get(graceful.GetManager().HammerContext(), poldsid).Result()
 	if err != nil {
 		return nil, err
@@ -192,28 +192,28 @@ func (p *RedisProvider) Regenerate(oldsid, sid string) (_ session.RawStore, err 
 		return nil, err
 	}
 
-	var kv map[any]any
+	var data map[any]any
 	if len(kvs) == 0 {
-		kv = make(map[any]any)
+		data = make(map[any]any)
 	} else {
-		kv, err = session.DecodeGob([]byte(kvs))
+		data, err = session.DecodeGob([]byte(kvs))
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return NewRedisStore(p.c, p.prefix, sid, p.duration, kv), nil
+	return NewKVStore(p.c, p.prefix, sid, p.duration, data), nil
 }
 
 // Count counts and returns number of sessions.
-func (p *RedisProvider) Count() (int, error) {
+func (p *KVProvider) Count() (int, error) {
 	size, err := p.c.DBSize(graceful.GetManager().HammerContext()).Result()
 	return int(size), err
 }
 
 // GC calls GC to clean expired sessions.
-func (*RedisProvider) GC() {}
+func (*KVProvider) GC() {}
 
 func init() {
-	session.Register("redis", &RedisProvider{})
+	session.Register("redis", &KVProvider{})
 }

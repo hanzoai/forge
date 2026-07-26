@@ -22,7 +22,7 @@ func waitRedisReady(conn string, dur time.Duration) (ready bool) {
 	ctxTimed, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	for t := time.Now(); ; time.Sleep(50 * time.Millisecond) {
-		ret := nosql.GetManager().GetRedisClient(conn).Ping(ctxTimed)
+		ret := nosql.GetManager().GetKVClient(conn).Ping(ctxTimed)
 		if ret.Err() == nil {
 			return true
 		}
@@ -48,7 +48,7 @@ func redisServerCmd(t *testing.T) *exec.Cmd {
 	return c
 }
 
-func TestBaseRedis(t *testing.T) {
+func TestBaseKV(t *testing.T) {
 	var redisServer *exec.Cmd
 	defer func() {
 		if redisServer != nil {
@@ -66,6 +66,6 @@ func TestBaseRedis(t *testing.T) {
 		require.True(t, waitRedisReady("redis://127.0.0.1:6379/0", 5*time.Second), "start redis-server")
 	}
 
-	testQueueBasic(t, newBaseRedisSimple, toBaseConfig("baseRedis", setting.QueueSettings{Length: 10}), false)
-	testQueueBasic(t, newBaseRedisUnique, toBaseConfig("baseRedisUnique", setting.QueueSettings{Length: 10}), true)
+	testQueueBasic(t, newBaseKVSimple, toBaseConfig("baseKV", setting.QueueSettings{Length: 10}), false)
+	testQueueBasic(t, newBaseKVUnique, toBaseConfig("baseKVUnique", setting.QueueSettings{Length: 10}), true)
 }

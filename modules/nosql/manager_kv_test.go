@@ -8,18 +8,18 @@ import (
 	"testing"
 )
 
-func TestRedisUsernameOpt(t *testing.T) {
+func TestKVUsernameOpt(t *testing.T) {
 	uri, _ := url.Parse("redis://redis:password@myredis/0")
-	opts := getRedisOptions(uri)
+	opts := getKVOptions(uri)
 
 	if opts.Username != "redis" {
 		t.Fail()
 	}
 }
 
-func TestRedisPasswordOpt(t *testing.T) {
+func TestKVPasswordOpt(t *testing.T) {
 	uri, _ := url.Parse("redis://redis:password@myredis/0")
-	opts := getRedisOptions(uri)
+	opts := getKVOptions(uri)
 
 	if opts.Password != "password" {
 		t.Fail()
@@ -28,7 +28,7 @@ func TestRedisPasswordOpt(t *testing.T) {
 
 func TestSkipVerifyOpt(t *testing.T) {
 	uri, _ := url.Parse("rediss://myredis/0?skipverify=true")
-	tlsConfig := getRedisTLSOptions(uri)
+	tlsConfig := getKVTLSOptions(uri)
 
 	if !tlsConfig.InsecureSkipVerify {
 		t.Fail()
@@ -37,43 +37,43 @@ func TestSkipVerifyOpt(t *testing.T) {
 
 func TestInsecureSkipVerifyOpt(t *testing.T) {
 	uri, _ := url.Parse("rediss://myredis/0?insecureskipverify=true")
-	tlsConfig := getRedisTLSOptions(uri)
+	tlsConfig := getKVTLSOptions(uri)
 
 	if !tlsConfig.InsecureSkipVerify {
 		t.Fail()
 	}
 }
 
-func TestRedisSentinelUsernameOpt(t *testing.T) {
+func TestKVSentinelUsernameOpt(t *testing.T) {
 	uri, _ := url.Parse("redis+sentinel://redis:password@myredis/0?sentinelusername=suser&sentinelpassword=spass")
-	opts := getRedisOptions(uri).Failover()
+	opts := getKVOptions(uri).Failover()
 
 	if opts.SentinelUsername != "suser" {
 		t.Fail()
 	}
 }
 
-func TestRedisSentinelPasswordOpt(t *testing.T) {
+func TestKVSentinelPasswordOpt(t *testing.T) {
 	uri, _ := url.Parse("redis+sentinel://redis:password@myredis/0?sentinelusername=suser&sentinelpassword=spass")
-	opts := getRedisOptions(uri).Failover()
+	opts := getKVOptions(uri).Failover()
 
 	if opts.SentinelPassword != "spass" {
 		t.Fail()
 	}
 }
 
-func TestRedisDatabaseIndexTcp(t *testing.T) {
+func TestKVDatabaseIndexTcp(t *testing.T) {
 	uri, _ := url.Parse("redis://redis:password@myredis/12")
-	opts := getRedisOptions(uri)
+	opts := getKVOptions(uri)
 
 	if opts.DB != 12 {
 		t.Fail()
 	}
 }
 
-func TestRedisDatabaseIndexUnix(t *testing.T) {
-	uri, _ := url.Parse("redis+socket:///var/run/redis.sock?database=12")
-	opts := getRedisOptions(uri)
+func TestKVDatabaseIndexUnix(t *testing.T) {
+	uri, _ := url.Parse("redis+socket:///var/run/kv.sock?database=12")
+	opts := getKVOptions(uri)
 
 	if opts.DB != 12 {
 		t.Fail()

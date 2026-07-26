@@ -23,18 +23,18 @@ type Manager struct {
 	finished process.FinishedFunc
 	mutex    sync.Mutex
 
-	RedisConnections   map[string]*redisClientHolder
+	KVConnections      map[string]*kvClientHolder
 	LevelDBConnections map[string]*levelDBHolder
 }
 
-type redisClientHolder struct {
-	redis.UniversalClient
+type kvClientHolder struct {
+	kv.UniversalClient
 	name  []string
 	count int64
 }
 
-func (r *redisClientHolder) Close() error {
-	return manager.CloseRedisClient(r.name[0])
+func (r *kvClientHolder) Close() error {
+	return manager.CloseKVClient(r.name[0])
 }
 
 type levelDBHolder struct {
@@ -54,7 +54,7 @@ func GetManager() *Manager {
 		manager = &Manager{
 			ctx:                ctx,
 			finished:           finished,
-			RedisConnections:   make(map[string]*redisClientHolder),
+			KVConnections:      make(map[string]*kvClientHolder),
 			LevelDBConnections: make(map[string]*levelDBHolder),
 		}
 	}

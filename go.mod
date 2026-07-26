@@ -64,8 +64,8 @@ require (
 	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/s3-go v1.0.0
 	github.com/hanzoai/sqlite v0.3.1
-	github.com/hanzokv/go/v9 v9.21.1
-	github.com/hanzokv/lock/v4 v4.17.1
+	github.com/hanzokv/go/v9 v9.22.0
+	github.com/hanzokv/lock/v4 v4.17.2
 	github.com/hashicorp/go-version v1.9.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/huandu/xstrings v1.5.0

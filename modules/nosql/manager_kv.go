@@ -18,14 +18,14 @@ import (
 
 var replacer = strings.NewReplacer("_", "", "-", "")
 
-// CloseRedisClient closes a redis client
-func (m *Manager) CloseRedisClient(connection string) error {
+// CloseKVClient closes a KV client
+func (m *Manager) CloseKVClient(connection string) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	client, ok := m.RedisConnections[connection]
+	client, ok := m.KVConnections[connection]
 	if !ok {
-		connection = ToRedisURI(connection).String()
-		client, ok = m.RedisConnections[connection]
+		connection = ToKVURI(connection).String()
+		client, ok = m.KVConnections[connection]
 	}
 	if !ok {
 		return nil
@@ -37,13 +37,13 @@ func (m *Manager) CloseRedisClient(connection string) error {
 	}
 
 	for _, name := range client.name {
-		delete(m.RedisConnections, name)
+		delete(m.KVConnections, name)
 	}
 	return client.UniversalClient.Close()
 }
 
-// GetRedisClient gets a redis client for a particular connection
-func (m *Manager) GetRedisClient(connection string) (client redis.UniversalClient) {
+// GetKVClient gets a KV client for a particular connection
+func (m *Manager) GetKVClient(connection string) (client kv.UniversalClient) {
 	// Because we want associate any goroutines created by this call to the main nosqldb context we need to
 	// wrap this in a goroutine labelled with the nosqldb context
 	done := make(chan struct{})
@@ -52,13 +52,13 @@ func (m *Manager) GetRedisClient(connection string) (client redis.UniversalClien
 		defer func() {
 			recovered = recover()
 			if recovered != nil {
-				log.Error("PANIC during GetRedisClient: %v\nStacktrace: %s", recovered, log.Stack(2))
+				log.Error("PANIC during GetKVClient: %v\nStacktrace: %s", recovered, log.Stack(2))
 			}
 			close(done)
 		}()
 		pprof.SetGoroutineLabels(m.ctx)
 
-		client = m.getRedisClient(connection)
+		client = m.getKVClient(connection)
 	}()
 	<-done
 	if recovered != nil {
@@ -67,27 +67,27 @@ func (m *Manager) GetRedisClient(connection string) (client redis.UniversalClien
 	return client
 }
 
-func (m *Manager) getRedisClient(connection string) redis.UniversalClient {
+func (m *Manager) getKVClient(connection string) kv.UniversalClient {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	client, ok := m.RedisConnections[connection]
+	client, ok := m.KVConnections[connection]
 	if ok {
 		client.count++
 		return client
 	}
 
-	uri := ToRedisURI(connection)
-	client, ok = m.RedisConnections[uri.String()]
+	uri := ToKVURI(connection)
+	client, ok = m.KVConnections[uri.String()]
 	if ok {
 		client.count++
 		return client
 	}
-	client = &redisClientHolder{
+	client = &kvClientHolder{
 		name: []string{connection, uri.String()},
 	}
 
-	opts := getRedisOptions(uri)
-	tlsConfig := getRedisTLSOptions(uri)
+	opts := getKVOptions(uri)
+	tlsConfig := getKVTLSOptions(uri)
 
 	clientName := uri.Query().Get("clientname")
 
@@ -102,30 +102,30 @@ func (m *Manager) getRedisClient(connection string) redis.UniversalClient {
 		opts.TLSConfig = tlsConfig
 		fallthrough
 	case "redis+sentinel":
-		client.UniversalClient = redis.NewFailoverClient(opts.Failover())
+		client.UniversalClient = kv.NewFailoverClient(opts.Failover())
 	case "redis+clusters":
 		fallthrough
 	case "rediss+cluster":
 		opts.TLSConfig = tlsConfig
 		fallthrough
 	case "redis+cluster":
-		client.UniversalClient = redis.NewClusterClient(opts.Cluster())
+		client.UniversalClient = kv.NewClusterClient(opts.Cluster())
 	case "redis+socket":
 		simpleOpts := opts.Simple()
 		simpleOpts.Network = "unix"
 		simpleOpts.Addr = path.Join(uri.Host, uri.Path)
-		client.UniversalClient = redis.NewClient(simpleOpts)
+		client.UniversalClient = kv.NewClient(simpleOpts)
 	case "rediss":
 		opts.TLSConfig = tlsConfig
 		fallthrough
 	case "redis":
-		client.UniversalClient = redis.NewClient(opts.Simple())
+		client.UniversalClient = kv.NewClient(opts.Simple())
 	default:
 		return nil
 	}
 
 	for _, name := range client.name {
-		m.RedisConnections[name] = client
+		m.KVConnections[name] = client
 	}
 
 	client.count++
@@ -133,17 +133,17 @@ func (m *Manager) getRedisClient(connection string) redis.UniversalClient {
 	return client
 }
 
-// getRedisOptions pulls various configuration options based on the RedisUri format and converts them to go-redis's
+// getKVOptions pulls various configuration options based on the KV URI format and converts them to the KV client's
 // UniversalOptions fields. This function explicitly excludes fields related to TLS configuration, which is
 // conditionally attached to this options struct before being converted to the specific type for the redis scheme being
 // used, and only in scenarios where TLS is applicable (e.g. rediss://, redis+clusters://).
-func getRedisOptions(uri *url.URL) *redis.UniversalOptions {
-	opts := &redis.UniversalOptions{}
+func getKVOptions(uri *url.URL) *kv.UniversalOptions {
+	opts := &kv.UniversalOptions{}
 
 	// Handle username/password
 	if password, ok := uri.User.Password(); ok {
 		opts.Password = password
-		// Username does not appear to be handled by redis.Options
+		// Username does not appear to be handled by kv.Options
 		opts.Username = uri.User.Username()
 	} else if uri.User.Username() != "" {
 		// assume this is the password
@@ -231,9 +231,9 @@ func getRedisOptions(uri *url.URL) *redis.UniversalOptions {
 	return opts
 }
 
-// getRedisTlsOptions parses RedisUri TLS configuration parameters and converts them to the go TLS configuration
+// getKVTLSOptions parses KV URI TLS configuration parameters and converts them to the go TLS configuration
 // equivalent fields.
-func getRedisTLSOptions(uri *url.URL) *tls.Config {
+func getKVTLSOptions(uri *url.URL) *tls.Config {
 	tlsConfig := &tls.Config{}
 
 	skipverify := uri.Query().Get("skipverify")
