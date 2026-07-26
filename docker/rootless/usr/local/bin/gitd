@@ -4,9 +4,9 @@
 # This script sets defaults for gitd to run in the container #
 ##############################################################
 
-# Installed as gitd in /usr/local/bin; the real binary lives in /app/gitd. See
+# Installed as gitd in /usr/local/bin; the real binary lives in /app/git. See
 # the rootful copy for why `exec -a "$0"` and this path are load-bearing.
-GITD="/app/gitd/gitd"
+GITD="/app/git/gitd"
 WORK_DIR="/var/lib/gitea"
 APP_INI="/etc/gitea/app.ini"
 

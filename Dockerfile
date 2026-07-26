@@ -84,7 +84,7 @@ RUN addgroup \
   echo "git:*" | chpasswd -e
 
 COPY --from=build-env /tmp/local /
-COPY --from=build-env /go/src/hanzo-git/gitd /app/gitd/gitd
+COPY --from=build-env /go/src/hanzo-git/gitd /app/git/gitd
 
 ENV USER=git
 ENV GIT_CUSTOM=/data/gitea

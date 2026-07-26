@@ -78,7 +78,7 @@ RUN mkdir -p /var/lib/gitea /etc/gitea
 RUN chown git:git /var/lib/gitea /etc/gitea
 
 COPY --from=build-env /tmp/local /
-COPY --from=build-env --chown=root:root /go/src/hanzo-git/gitd /app/gitd/gitd
+COPY --from=build-env --chown=root:root /go/src/hanzo-git/gitd /app/git/gitd
 
 # git:git
 USER 1000:1000
