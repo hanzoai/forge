@@ -1426,6 +1426,7 @@ func Routes() *web.Router {
 					})
 				}, reqRepoReader(unit.TypeReleases))
 				m.Post("/mirror-sync", reqToken(), reqRepoWriter(unit.TypeCode), mustNotBeArchived, repo.MirrorSync)
+				m.Delete("/pull-mirror", reqToken(), reqOwner(), repo.ConvertPullMirror)
 				m.Post("/push_mirrors-sync", reqAdmin(), reqToken(), mustNotBeArchived, repo.PushMirrorSync)
 				m.Group("/push_mirrors", func() {
 					m.Combo("").Get(repo.ListPushMirrors).

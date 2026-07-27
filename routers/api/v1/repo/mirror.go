@@ -14,6 +14,7 @@ import (
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unit"
 	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 	api "github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/util"
@@ -23,6 +24,7 @@ import (
 	"github.com/hanzoai/git/services/convert"
 	"github.com/hanzoai/git/services/migrations"
 	mirror_service "github.com/hanzoai/git/services/mirror"
+	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 // MirrorSync adds a mirrored repository to the sync queue
@@ -417,4 +419,65 @@ func HandleRemoteAddressError(ctx *context.APIContext, err error) {
 		}
 		return
 	}
+}
+
+// ConvertPullMirror turns a pull mirror into a regular repository.
+func ConvertPullMirror(ctx *context.APIContext) {
+	// swagger:operation DELETE /repos/{owner}/{repo}/pull-mirror repository repoConvertPullMirror
+	// ---
+	// summary: Convert a pull mirror into a regular repository
+	// description: |
+	//   Deletes the pull-mirror configuration, so the repository stops being
+	//   overwritten from upstream and starts accepting pushes and running
+	//   Actions. This is the API form of the web settings action.
+	//
+	//   Propagation from upstream STOPS the moment this returns: the mirror row
+	//   is gone, and a later sync request reports success without queueing
+	//   anything. A repository whose copy here is incomplete therefore becomes
+	//   authoritative while incomplete, so compare it against upstream before
+	//   converting.
+	// produces:
+	// - application/json
+	// parameters:
+	// - name: owner
+	//   in: path
+	//   description: owner of the repo
+	//   type: string
+	//   required: true
+	// - name: repo
+	//   in: path
+	//   description: name of the repo
+	//   type: string
+	//   required: true
+	// responses:
+	//   "204":
+	//     "$ref": "#/responses/empty"
+	//   "403":
+	//     "$ref": "#/responses/forbidden"
+	//   "404":
+	//     "$ref": "#/responses/notFound"
+	//   "422":
+	//     "$ref": "#/responses/validationError"
+	repo := ctx.Repo.Repository
+
+	// Loud rather than idempotent: a batch converting many repositories needs to
+	// tell "already regular" apart from "converted just now", and a silent
+	// success would report progress it did not make.
+	if !repo.IsMirror {
+		ctx.APIError(http.StatusUnprocessableEntity, "repository is not a pull mirror")
+		return
+	}
+
+	repo.IsMirror = false
+	if _, err := repo_service.CleanUpMigrateInfo(ctx, repo); err != nil {
+		ctx.APIErrorInternal(err)
+		return
+	}
+	if err := repo_model.DeleteMirrorByRepoID(ctx, repo.ID); err != nil {
+		ctx.APIErrorInternal(err)
+		return
+	}
+
+	log.Trace("Repository converted from mirror to regular: %s", repo.FullName())
+	ctx.Status(http.StatusNoContent)
 }
