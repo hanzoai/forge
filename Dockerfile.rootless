@@ -38,9 +38,12 @@ RUN --mount=type=secret,id=gh_token \
 COPY --exclude=.git/ . .
 COPY --from=frontend-build /src/public/assets public/assets
 
-# Build gitd, .git mount is required for version data
+# Build gitd. Same as Dockerfile: the Makefile reads the VERSION file when it
+# exists and falls back to `git describe` when it does not, so a build context
+# without .git supplies the version through the ARG instead of the repository.
 RUN --mount=type=cache,target="/root/.cache/go-build" \
-    --mount=type=bind,source=".git/",target=".git/" \
+    if [ -n "${GIT_VERSION}" ]; then echo "${GIT_VERSION}" > VERSION; \
+    elif [ ! -d .git ] && [ ! -f VERSION ]; then echo "0.0.0+unknown" > VERSION; fi && \
     make backend
 
 COPY docker/rootless /tmp/local
