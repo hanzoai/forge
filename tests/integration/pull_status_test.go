@@ -65,9 +65,9 @@ func TestPullCreate_CommitStatus(t *testing.T) {
 		statesIcons := map[commitstatus.CommitStatusState]string{
 			commitstatus.CommitStatusPending: "octicon-dot-fill",
 			commitstatus.CommitStatusSuccess: "octicon-check",
-			commitstatus.CommitStatusError:   "gitea-exclamation",
+			commitstatus.CommitStatusError:   "git-exclamation",
 			commitstatus.CommitStatusFailure: "octicon-x",
-			commitstatus.CommitStatusWarning: "gitea-exclamation",
+			commitstatus.CommitStatusWarning: "git-exclamation",
 		}
 
 		testCtx := NewAPITestContext(t, "user1", "repo1", auth_model.AccessTokenScopeWriteRepository)

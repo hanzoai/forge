@@ -34,7 +34,7 @@ func TestPackageRpm(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
-	packageName := "gitea-test"
+	packageName := "git-test"
 	packageVersion := "1.0.2-1"
 	packageArchitecture := "x86_64"
 

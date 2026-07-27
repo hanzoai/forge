@@ -30,7 +30,7 @@ func TestPackageArch(t *testing.T) {
 
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
-	packageName := "gitea-test"
+	packageName := "git-test"
 	packageVersion := "1.4.1-r3"
 
 	createPackage := func(compression, name, version, architecture string) []byte {
@@ -272,8 +272,8 @@ license = MIT`)
 	}
 	t.Run("KeepLastVersion", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
-		pkgVer1 := createPackage("gz", "gitea-test", "1.0.0", "aarch64")
-		pkgVer2 := createPackage("gz", "gitea-test", "1.0.1", "aarch64")
+		pkgVer1 := createPackage("gz", "git-test", "1.0.0", "aarch64")
+		pkgVer2 := createPackage("gz", "git-test", "1.0.1", "aarch64")
 		req := NewRequestWithBody(t, "PUT", rootURL, bytes.NewReader(pkgVer1)).
 			AddBasicAuth(user.Name)
 		MakeRequest(t, req, http.StatusCreated)

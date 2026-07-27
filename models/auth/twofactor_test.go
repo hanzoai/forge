@@ -19,7 +19,7 @@ import (
 func TestTwoFactorValidateAndConsumeTOTP(t *testing.T) {
 	require.NoError(t, unittest.PrepareTestDatabase())
 
-	key, err := totp.Generate(totp.GenerateOpts{SecretSize: 40, Issuer: "gitea-test", AccountName: "consume"})
+	key, err := totp.Generate(totp.GenerateOpts{SecretSize: 40, Issuer: "git-test", AccountName: "consume"})
 	require.NoError(t, err)
 
 	tfa := &auth_model.TwoFactor{UID: 1}

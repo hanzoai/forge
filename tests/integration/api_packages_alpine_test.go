@@ -29,7 +29,7 @@ func TestPackageAlpine(t *testing.T) {
 
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
-	packageName := "gitea-test"
+	packageName := "git-test"
 	packageVersion := "1.4.1-r3"
 
 	base64AlpinePackageContent := `H4sIAAAAAAACA9ML9nT30wsKdtTLzjNJzjYuckjPLElN1DUzMUxMNTa11CsqTtQrKE1ioAAYAIGZ

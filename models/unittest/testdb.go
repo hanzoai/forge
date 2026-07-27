@@ -45,7 +45,7 @@ func MainTest(m *testing.M, testOptsArg ...*TestOptions) {
 func mainTest(m *testing.M, testOptsArg ...*TestOptions) int {
 	testOpts := util.OptionalArg(testOptsArg, &TestOptions{})
 
-	tempWorkPath, tempCleanup, err := tempdir.OsTempDir("gitea-test").MkdirTempRandom("unit-test-dir-")
+	tempWorkPath, tempCleanup, err := tempdir.OsTempDir("git-test").MkdirTempRandom("unit-test-dir-")
 	if err != nil {
 		return testlogger.MainErrorf("Failed to create temp dir for unit test: %v", err)
 	}

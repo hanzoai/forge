@@ -92,12 +92,12 @@ func TestIsUserAllowedToControlTag(t *testing.T) {
 			allowed: false,
 		},
 		{
-			name:    "gitea-test",
+			name:    "git-test",
 			userid:  1,
 			allowed: true,
 		},
 		{
-			name:    "gitea-test",
+			name:    "git-test",
 			userid:  3,
 			allowed: true,
 		},

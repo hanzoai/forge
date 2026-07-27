@@ -28,7 +28,7 @@ func TestAPITwoFactor(t *testing.T) {
 
 	otpKey, err := totp.Generate(totp.GenerateOpts{
 		SecretSize:  40,
-		Issuer:      "gitea-test",
+		Issuer:      "git-test",
 		AccountName: user.Name,
 	})
 	assert.NoError(t, err)

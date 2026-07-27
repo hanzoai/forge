@@ -29,7 +29,7 @@ index 0000000..4ac13c1
 --- /dev/null
 +++ b/.gitmodules
 @@ -0,0 +1,3 @@
-+[submodule "gitea-mirror"]
++[submodule "git-mirror"]
 +	path = gitea-mirror
 +	url = https://gitea.com/gitea/gitea-mirror
 diff --git a/gitea-mirror b/gitea-mirror
@@ -68,7 +68,7 @@ index 4ac13c1..0510edd 100644
 --- a/.gitmodules
 +++ b/.gitmodules
 @@ -1,3 +1,3 @@
- [submodule "gitea-mirror"]
+ [submodule "git-mirror"]
 -	path = gitea-mirror
 +	path = gitea
  	url = https://gitea.com/gitea/gitea-mirror
@@ -85,7 +85,7 @@ index 0510edd..e69de29 100644
 --- a/.gitmodules
 +++ b/.gitmodules
 @@ -1,3 +0,0 @@
--[submodule "gitea-mirror"]
+-[submodule "git-mirror"]
 -	path = gitea
 -	url = https://gitea.com/gitea/gitea-mirror
 diff --git a/gitea b/gitea
@@ -109,7 +109,7 @@ index 0510edd..bced3d8 100644
 --- a/.gitmodules
 +++ b/.gitmodules
 @@ -1,3 +1,3 @@
- [submodule "gitea-mirror"]
+ [submodule "git-mirror"]
 -	path = gitea
 +	path = gitea-1.22
  	url = https://gitea.com/gitea/gitea-mirror
@@ -144,7 +144,7 @@ index 0510edd..e69de29 100644
 --- a/.gitmodules
 +++ b/.gitmodules
 @@ -1,3 +0,0 @@
--[submodule "gitea-mirror"]
+-[submodule "git-mirror"]
 -	path = gitea
 -	url = https://gitea.com/gitea/gitea-mirror
 diff --git a/gitea b/gitea

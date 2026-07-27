@@ -183,7 +183,7 @@ func RunGitTests(m interface{ Run() int }) {
 }
 
 func runGitTests(m interface{ Run() int }) int {
-	gitHomePath, cleanup, err := tempdir.OsTempDir("gitea-test").MkdirTempRandom("git-home")
+	gitHomePath, cleanup, err := tempdir.OsTempDir("git-test").MkdirTempRandom("git-home")
 	if err != nil {
 		return testlogger.MainErrorf("unable to create temp dir: %v", err)
 	}

@@ -22,10 +22,10 @@ import (
 	"github.com/hanzoai/git/services/auth/source/oauth2"
 	"github.com/hanzoai/git/tests"
 
+	"github.com/hanzoai/builder"
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/hanzoai/builder"
 )
 
 // TestMigrateAzureADV2ToOIDC simulates a login source migration from the Azure AD V2 OAuth2 provider to the OpenID Connect provider,
@@ -531,7 +531,7 @@ func TestOAuth2AutoLinkWithTwoFactor(t *testing.T) {
 
 	otpKey, err := totp.Generate(totp.GenerateOpts{
 		SecretSize:  40,
-		Issuer:      "gitea-test",
+		Issuer:      "git-test",
 		AccountName: localUser.Name,
 	})
 	require.NoError(t, err)
