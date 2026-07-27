@@ -4,6 +4,7 @@
 package goproxy
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -108,6 +109,65 @@ func escapeModule(name string) string {
 	return b.String()
 }
 
+// upstreamListVersions returns the versions upstream knows for a module.
+//
+// This is what makes the cache safe to resolve against, not merely faster.
+// Serving ONLY locally-cached versions from @v/list looks like a gap and is
+// actually a correctness bug: `go get mod@latest` picks the highest version the
+// list offers, so a registry holding just v1.0.0 of a module that is upstream at
+// v1.9.0 silently pins every caller to the stale one. Answering with the union
+// means "latest" means the same thing here as everywhere else.
+func upstreamListVersions(name string) ([]string, error) {
+	if !upstreamEnabled() || isPrivateModule(name) {
+		return nil, nil
+	}
+	body, _, err := upstreamFetch(escapeModule(name) + "/@v/list")
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+	// The list is newline-separated plain text and unbounded in principle; cap
+	// the read so a hostile or broken upstream cannot balloon a request.
+	raw, err := io.ReadAll(io.LimitReader(body, 1<<20))
+	if err != nil {
+		return nil, err
+	}
+	var out []string
+	for _, ln := range strings.Split(string(raw), "\n") {
+		if ln = strings.TrimSpace(ln); ln != "" {
+			out = append(out, ln)
+		}
+	}
+	return out, nil
+}
+
+// upstreamLatest asks upstream which concrete version "latest" currently means.
+//
+// Only upstream can answer this: "latest" is a question about the world, not an
+// artifact that can be stored. Resolving it to a concrete version here means the
+// caching path below still only ever handles concrete versions — one way for a
+// module to get stored, no second code path for a moving target.
+func upstreamLatest(name string) (string, error) {
+	if !upstreamEnabled() || isPrivateModule(name) {
+		return "", packages_model.ErrPackageNotExist
+	}
+	body, _, err := upstreamFetch(escapeModule(name) + "/@latest")
+	if err != nil {
+		return "", err
+	}
+	defer body.Close()
+	var meta struct {
+		Version string `json:"Version"`
+	}
+	if err := json.NewDecoder(io.LimitReader(body, 1<<16)).Decode(&meta); err != nil {
+		return "", err
+	}
+	if meta.Version == "" {
+		return "", packages_model.ErrPackageNotExist
+	}
+	return meta.Version, nil
+}
+
 // cacheFromUpstream fetches one module@version and stores it exactly as
 // UploadPackage would. It returns the stored version so the caller can serve
 // the request it was already handling.
@@ -196,6 +256,15 @@ func cacheFromUpstream(ctx *context.Context, name, version string) (*packages_mo
 // not-found handling — an upstream that is disabled, unreachable or 404s simply
 // yields the original miss.
 func resolveOrCache(ctx *context.Context, name, version string) (*packages_model.PackageVersion, error) {
+	// Answer "which version is latest?" BEFORE anything tries to store one, so
+	// everything below this line deals only in concrete versions. If upstream
+	// cannot say, fall through unchanged: the lookup then behaves exactly as it
+	// did with no upstream configured — a miss, not an error.
+	if version == "latest" {
+		if v, lerr := upstreamLatest(name); lerr == nil {
+			version = v
+		}
+	}
 	pv, err := resolvePackage(ctx, ctx.Package.Owner.ID, name, version)
 	if err == nil {
 		return pv, nil

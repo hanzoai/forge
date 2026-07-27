@@ -64,6 +64,72 @@ func TestIsPrivateModule(t *testing.T) {
 	assert.False(t, isPrivateModule("github.com/hanzoai/git"))
 }
 
+func TestUpstreamListVersions(t *testing.T) {
+	defer func(u, p string) {
+		setting.Packages.GoProxyUpstream, setting.Packages.GoProxyPrivate = u, p
+	}(setting.Packages.GoProxyUpstream, setting.Packages.GoProxyPrivate)
+	setting.Packages.GoProxyPrivate = "github.com/hanzoai/"
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/example.com/mod/@v/list" {
+			// Blank lines and stray whitespace are real in the wild.
+			w.Write([]byte("v1.0.0\nv1.1.0\n\n  v1.2.0  \n"))
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer srv.Close()
+	setting.Packages.GoProxyUpstream = srv.URL
+
+	got, err := upstreamListVersions("example.com/mod")
+	require.NoError(t, err)
+	assert.Equal(t, []string{"v1.0.0", "v1.1.0", "v1.2.0"}, got)
+
+	// A private module must never be listed upstream -- same leak as a fetch.
+	got, err = upstreamListVersions("github.com/hanzoai/secret")
+	require.NoError(t, err)
+	assert.Nil(t, got)
+
+	// Disabled upstream is not an error, just nothing to add.
+	setting.Packages.GoProxyUpstream = ""
+	got, err = upstreamListVersions("example.com/mod")
+	require.NoError(t, err)
+	assert.Nil(t, got)
+}
+
+func TestUpstreamLatest(t *testing.T) {
+	defer func(u, p string) {
+		setting.Packages.GoProxyUpstream, setting.Packages.GoProxyPrivate = u, p
+	}(setting.Packages.GoProxyUpstream, setting.Packages.GoProxyPrivate)
+	setting.Packages.GoProxyPrivate = "github.com/hanzoai/"
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/example.com/mod/@latest":
+			w.Write([]byte(`{"Version":"v1.2.0","Time":"2026-01-01T00:00:00Z"}`))
+		case "/example.com/empty/@latest":
+			w.Write([]byte(`{}`))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer srv.Close()
+	setting.Packages.GoProxyUpstream = srv.URL
+
+	v, err := upstreamLatest("example.com/mod")
+	require.NoError(t, err)
+	assert.Equal(t, "v1.2.0", v)
+
+	// A response with no version must be an error, never an empty version that
+	// downstream would treat as a real one.
+	_, err = upstreamLatest("example.com/empty")
+	require.Error(t, err)
+
+	// Private modules never ask upstream what their latest is.
+	_, err = upstreamLatest("github.com/hanzoai/secret")
+	require.Error(t, err)
+}
+
 func TestUpstreamFetch(t *testing.T) {
 	defer func(v string) { setting.Packages.GoProxyUpstream = v }(setting.Packages.GoProxyUpstream)
 

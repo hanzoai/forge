@@ -27,13 +27,10 @@ func apiError(ctx *context.Context, status int, obj any) {
 }
 
 func EnumeratePackageVersions(ctx *context.Context) {
-	pvs, err := packages_model.GetVersionsByPackageName(ctx, ctx.Package.Owner.ID, packages_model.TypeGo, ctx.PathParam("name"))
+	name := ctx.PathParam("name")
+	pvs, err := packages_model.GetVersionsByPackageName(ctx, ctx.Package.Owner.ID, packages_model.TypeGo, name)
 	if err != nil {
 		apiError(ctx, http.StatusInternalServerError, err)
-		return
-	}
-	if len(pvs) == 0 {
-		apiError(ctx, http.StatusNotFound, err)
 		return
 	}
 
@@ -41,10 +38,40 @@ func EnumeratePackageVersions(ctx *context.Context) {
 		return pvs[i].CreatedUnix < pvs[j].CreatedUnix
 	})
 
+	// The union of what we hold and what upstream knows. Cached-only would make
+	// `go get mod@latest` resolve to the newest version WE happen to have, which
+	// is a silently wrong answer rather than a slow one. Ordering is left to the
+	// client: the go command selects by semver itself, so sorting here would be
+	// a second, weaker implementation of a decision already made correctly
+	// elsewhere.
+	seen := make(map[string]struct{}, len(pvs))
+	versions := make([]string, 0, len(pvs))
+	for _, pv := range pvs {
+		if _, dup := seen[pv.Version]; !dup {
+			seen[pv.Version] = struct{}{}
+			versions = append(versions, pv.Version)
+		}
+	}
+	// Fail-soft: an unreachable upstream degrades to the cached list, never to
+	// an error — the same contract the rest of the read path keeps.
+	if up, uerr := upstreamListVersions(name); uerr == nil {
+		for _, v := range up {
+			if _, dup := seen[v]; !dup {
+				seen[v] = struct{}{}
+				versions = append(versions, v)
+			}
+		}
+	}
+
+	if len(versions) == 0 {
+		apiError(ctx, http.StatusNotFound, err)
+		return
+	}
+
 	ctx.Resp.Header().Set("Content-Type", "text/plain;charset=utf-8")
 
-	for _, pv := range pvs {
-		fmt.Fprintln(ctx.Resp, pv.Version)
+	for _, v := range versions {
+		fmt.Fprintln(ctx.Resp, v)
 	}
 }
 
