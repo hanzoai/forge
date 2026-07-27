@@ -203,6 +203,17 @@ func Push(ctx context.Context, repoPath string, opts PushOptions) error {
 	if opts.Mirror {
 		cmd.AddArguments("--mirror")
 	}
+	// A push-mirror remote is created with --mirror=push, which persists
+	// remote.<name>.mirror=true in the repo config. Git then applies mirror mode
+	// from config alone and refuses any refspec with "--mirror can't be combined
+	// with refspecs", so dropping the CLI flag is not enough to push additively.
+	// Override the config for this invocation only — the stored remote is left
+	// exactly as the mirror machinery wrote it. remote.<name>.push carries a
+	// leading + (force) for the same historical reason, so the explicit refspecs
+	// below replace it rather than inherit it.
+	if len(opts.Refspecs) > 0 && opts.Remote != "" && !opts.Mirror {
+		cmd.AddConfig("remote."+opts.Remote+".mirror", "false")
+	}
 	remoteBranchArgs := []string{opts.Remote}
 	if len(opts.Branch) > 0 {
 		var refspec string
