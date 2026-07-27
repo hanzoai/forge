@@ -12,6 +12,3 @@ contact_links:
   - name: Frequently Asked Questions
     url: https://docs.gitea.com/help/faq
     about: Please check if your question isn't mentioned here.
-  - name: Crowdin Translations
-    url: https://translate.gitea.com
-    about: Translations are managed here.
