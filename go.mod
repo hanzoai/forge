@@ -7,7 +7,6 @@ require (
 	connectrpc.com/connect v1.20.0
 	gitea.com/gitea/runner v1.0.8
 	gitea.com/lunny/dingtalk_webhook v0.0.0-20171025031554-e3534c89ef96
-	gitea.com/lunny/levelqueue v0.4.2-0.20230414023320-3c0159fe0fe4
 	gitea.dev/sdk v1.2.0
 	github.com/42wim/httpsig v1.2.4
 	github.com/42wim/sshsig v0.0.0-20260317195500-b9f38cf0d432
@@ -72,6 +71,7 @@ require (
 	github.com/klauspost/compress v1.19.0
 	github.com/klauspost/cpuid/v2 v2.4.0
 	github.com/lib/pq v1.12.3
+	github.com/luxfi/zapdb v1.10.3
 	github.com/markbates/goth v1.82.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/meilisearch/meilisearch-go v0.36.3
@@ -118,17 +118,27 @@ require (
 )
 
 require (
+	filippo.io/hpke v0.4.0 // indirect
+	github.com/dgraph-io/ristretto/v2 v2.4.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
+	github.com/hanzos3/go-sdk v1.0.2 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
+	github.com/luxfi/age v1.6.0 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/smartystreets/assertions v0.0.0-20190116191733-b6c0e53d7304 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
+	go.opentelemetry.io/otel v1.44.0 // indirect
+	go.opentelemetry.io/otel/metric v1.44.0 // indirect
+	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 )
 

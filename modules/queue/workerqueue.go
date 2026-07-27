@@ -206,8 +206,11 @@ func getNewQueueFn(t string) (string, func(cfg *BaseConfig, unique bool) (baseQu
 		return t, newBaseChannelGeneric
 	case "kv":
 		return t, newBaseKVGeneric
-	default: // level(leveldb,levelqueue,persistable-channel)
-		return "level", newBaseLevelQueueGeneric
+	default: // zapdb — the embedded durable default
+		// "level" is still accepted so an existing app.ini keeps starting, but it
+		// resolves here: leveldb was a second embedded engine doing the job ZapDB
+		// already does for the rest of this stack.
+		return "zapdb", newBaseZapDBGeneric
 	}
 }
 

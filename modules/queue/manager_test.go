@@ -28,19 +28,16 @@ func TestManager(t *testing.T) {
 		return newWorkerPoolQueueForTest(name, qs, func(s ...int) (unhandled []int) { return nil }, false)
 	}
 
-	// test invalid CONN_STR
-	_, err := newQueueFromConfig("default", `
-[queue]
-DATADIR = temp-dir
-CONN_STR = kv://
-`)
-	assert.ErrorContains(t, err, "invalid leveldb connection string")
+	// The old default parsed CONN_STR as a leveldb DSN and rejected a bad one
+	// here. The zapdb backend is addressed by DATADIR and does not read CONN_STR
+	// at all, so there is no DSN left to be invalid — CONN_STR now only means
+	// something to the kv backend, which validates it itself.
 
 	// test default config
 	q, err := newQueueFromConfig("default", "")
 	assert.NoError(t, err)
 	assert.Equal(t, "default", q.GetName())
-	assert.Equal(t, "level", q.GetType())
+	assert.Equal(t, "zapdb", q.GetType())
 	assert.Equal(t, filepath.Join(setting.AppDataPath, "queues/common"), q.baseConfig.DataFullDir)
 	assert.Equal(t, 100000, q.baseConfig.Length)
 	assert.Equal(t, 20, q.batchLength)
@@ -94,7 +91,7 @@ MAX_WORKERS = 123
 
 	q2 := createWorkerPoolQueue(t.Context(), "sub", cfgProvider, func(s ...int) (unhandled []int) { return nil }, false)
 	assert.Equal(t, "sub", q2.GetName())
-	assert.Equal(t, "level", q2.GetType())
+	assert.Equal(t, "zapdb", q2.GetType())
 	assert.Equal(t, filepath.Join(setting.AppDataPath, "queues/dir2"), q2.baseConfig.DataFullDir)
 	assert.Equal(t, 102, q2.baseConfig.Length)
 	assert.Equal(t, 22, q2.batchLength)
