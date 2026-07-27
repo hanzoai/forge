@@ -201,15 +201,17 @@ func (q *WorkerPoolQueue[T]) ShutdownWait(timeout time.Duration) {
 func getNewQueueFn(t string) (string, func(cfg *BaseConfig, unique bool) (baseQueue, error)) {
 	switch t {
 	case "dummy", "immediate":
+		// Not a queue: work runs synchronously on the caller. Kept because
+		// "process this now, inline" is a different behaviour, not a second
+		// implementation of queueing.
 		return t, newBaseDummy
-	case "channel":
-		return t, newBaseChannelGeneric
-	case "kv":
-		return t, newBaseKVGeneric
-	default: // zapdb — the embedded durable default
-		// "level" is still accepted so an existing app.ini keeps starting, but it
-		// resolves here: leveldb was a second embedded engine doing the job ZapDB
-		// already does for the rest of this stack.
+	default: // zapdb — the one queue
+		// Every other TYPE resolves here, so an existing app.ini keeps starting.
+		// There is one queue: ZapDB, embedded and durable. "channel" was a second
+		// in-process queue that happened not to survive a restart, and "kv" was a
+		// second DURABLE queue that needed a server to be one — both did this
+		// job, neither did it better, and each was another thing to configure
+		// wrong.
 		return "zapdb", newBaseZapDBGeneric
 	}
 }

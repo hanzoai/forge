@@ -34,7 +34,7 @@ func TestWorkerPoolQueueUnhandled(t *testing.T) {
 
 	test := func(t *testing.T, queueSetting setting.QueueSettings) {
 		queueSetting.Length = 100
-		queueSetting.Type = "channel"
+		queueSetting.Type = "zapdb"
 		queueSetting.Datadir = t.TempDir() + "/test-queue"
 		m := map[int]int{}
 
@@ -115,7 +115,7 @@ func TestWorkerPoolQueuePersistence(t *testing.T) {
 
 func testWorkerPoolQueuePersistence(t *testing.T, queueSetting setting.QueueSettings) {
 	testCount := queueSetting.Length
-	queueSetting.Type = "level"
+	queueSetting.Type = "zapdb"
 	queueSetting.Datadir = t.TempDir() + "/test-queue"
 
 	mu := sync.Mutex{}
@@ -185,13 +185,18 @@ func TestWorkerPoolQueueActiveWorkers(t *testing.T) {
 		return nil
 	}
 
-	q, _ := newWorkerPoolQueueForTest("test-workpoolqueue", setting.QueueSettings{Type: "channel", BatchLength: 1, MaxWorkers: 1, Length: 100}, handler, false)
+	q, _ := newWorkerPoolQueueForTest("test-workpoolqueue", setting.QueueSettings{Type: "zapdb", Datadir: t.TempDir() + "/queue", BatchLength: 1, MaxWorkers: 1, Length: 100}, handler, false)
 	stop := runWorkerPoolQueue(q)
 	for i := range 5 {
 		assert.NoError(t, q.Push(i))
 	}
 
-	time.Sleep(50 * time.Millisecond)
+	// 150ms, not 50ms: this used to run on the in-memory channel backend, where
+	// a push was visible to the worker immediately. The queue is durable now, so
+	// the first item goes to disk before a worker can pick it up, and the
+	// assertion below is about the worker pool, not about how fast a write
+	// lands.
+	time.Sleep(150 * time.Millisecond)
 	assert.Equal(t, 1, q.GetWorkerNumber())
 	assert.Equal(t, 1, q.GetWorkerActiveNumber())
 	time.Sleep(500 * time.Millisecond)
@@ -201,7 +206,7 @@ func TestWorkerPoolQueueActiveWorkers(t *testing.T) {
 	assert.Equal(t, 1, q.GetWorkerNumber()) // there is at least one worker after the queue begins working
 	stop()
 
-	q, _ = newWorkerPoolQueueForTest("test-workpoolqueue", setting.QueueSettings{Type: "channel", BatchLength: 1, MaxWorkers: 3, Length: 100}, handler, false)
+	q, _ = newWorkerPoolQueueForTest("test-workpoolqueue", setting.QueueSettings{Type: "zapdb", Datadir: t.TempDir() + "/queue", BatchLength: 1, MaxWorkers: 3, Length: 100}, handler, false)
 	stop = runWorkerPoolQueue(q)
 	for i := range 15 {
 		assert.NoError(t, q.Push(i))
@@ -233,7 +238,7 @@ func TestWorkerPoolQueueShutdown(t *testing.T) {
 		return items
 	}
 
-	qs := setting.QueueSettings{Type: "level", Datadir: t.TempDir() + "/queue", BatchLength: 3, MaxWorkers: 4, Length: 20}
+	qs := setting.QueueSettings{Type: "zapdb", Datadir: t.TempDir() + "/queue", BatchLength: 3, MaxWorkers: 4, Length: 20}
 	q, _ := newWorkerPoolQueueForTest("test-workpoolqueue", qs, handler, false)
 	stop := runWorkerPoolQueue(q)
 	for i := 0; i < qs.Length; i++ {
@@ -273,7 +278,7 @@ func TestWorkerPoolQueueWorkerIdleReset(t *testing.T) {
 		}
 		return nil
 	}
-	q, _ = newWorkerPoolQueueForTest("test-workpoolqueue", setting.QueueSettings{Type: "channel", BatchLength: 1, MaxWorkers: 2, Length: 100}, handler, false)
+	q, _ = newWorkerPoolQueueForTest("test-workpoolqueue", setting.QueueSettings{Type: "zapdb", Datadir: t.TempDir() + "/queue", BatchLength: 1, MaxWorkers: 2, Length: 100}, handler, false)
 	stop := runWorkerPoolQueue(q)
 	for i := range 100 {
 		assert.NoError(t, q.Push(i))

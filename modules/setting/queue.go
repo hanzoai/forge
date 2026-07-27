@@ -29,7 +29,7 @@ type QueueSettings struct {
 
 func GetQueueSettings(rootCfg ConfigProvider, name string) (QueueSettings, error) {
 	queueSettingsDefault := QueueSettings{
-		Type:    "zapdb",         // dummy, channel, zapdb, kv
+		Type:    "zapdb",         // zapdb (the queue) or dummy/immediate (run inline)
 		Datadir: "queues/common", // relative to AppDataPath
 		Length:  100000,          // queue length before a channel queue will block
 
