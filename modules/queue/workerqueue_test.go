@@ -177,6 +177,28 @@ func testWorkerPoolQueuePersistence(t *testing.T, queueSetting setting.QueueSett
 	assert.Equal(t, testCount, len(tasksQ1)+len(tasksQ2))
 }
 
+// eventually polls until fn is true or the deadline passes, and reports what it
+// last saw.
+//
+// The assertions below used to be `sleep N; assert`, with N tuned to the
+// in-memory backend. A durable queue writes to disk before a worker can see the
+// item, and under full-package load that write is not a fixed distance away —
+// the tuned sleeps passed alone and failed in the suite. Polling asserts the
+// state the pool reaches rather than the moment it reaches it, which is what
+// these tests are actually about.
+func eventually(t *testing.T, want int, get func() int, msg string) {
+	t.Helper()
+	deadline := time.Now().Add(5 * time.Second)
+	var last int
+	for time.Now().Before(deadline) {
+		if last = get(); last == want {
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	assert.Equal(t, want, last, msg)
+}
+
 func TestWorkerPoolQueueActiveWorkers(t *testing.T) {
 	defer test.MockVariableValue(&workerIdleDuration, 300*time.Millisecond)()
 
@@ -191,17 +213,10 @@ func TestWorkerPoolQueueActiveWorkers(t *testing.T) {
 		assert.NoError(t, q.Push(i))
 	}
 
-	// 150ms, not 50ms: this used to run on the in-memory channel backend, where
-	// a push was visible to the worker immediately. The queue is durable now, so
-	// the first item goes to disk before a worker can pick it up, and the
-	// assertion below is about the worker pool, not about how fast a write
-	// lands.
-	time.Sleep(150 * time.Millisecond)
+	eventually(t, 1, q.GetWorkerNumber, "a worker should start")
+	eventually(t, 1, q.GetWorkerActiveNumber, "that worker should become active")
+	eventually(t, 0, q.GetWorkerActiveNumber, "and go idle once the items are handled")
 	assert.Equal(t, 1, q.GetWorkerNumber())
-	assert.Equal(t, 1, q.GetWorkerActiveNumber())
-	time.Sleep(500 * time.Millisecond)
-	assert.Equal(t, 1, q.GetWorkerNumber())
-	assert.Equal(t, 0, q.GetWorkerActiveNumber())
 	time.Sleep(workerIdleDuration)
 	assert.Equal(t, 1, q.GetWorkerNumber()) // there is at least one worker after the queue begins working
 	stop()
@@ -212,12 +227,10 @@ func TestWorkerPoolQueueActiveWorkers(t *testing.T) {
 		assert.NoError(t, q.Push(i))
 	}
 
-	time.Sleep(50 * time.Millisecond)
+	eventually(t, 3, q.GetWorkerNumber, "the pool should scale to 3 workers")
+	eventually(t, 3, q.GetWorkerActiveNumber, "all 3 should become active")
+	eventually(t, 0, q.GetWorkerActiveNumber, "and all go idle once handled")
 	assert.Equal(t, 3, q.GetWorkerNumber())
-	assert.Equal(t, 3, q.GetWorkerActiveNumber())
-	time.Sleep(500 * time.Millisecond)
-	assert.Equal(t, 3, q.GetWorkerNumber())
-	assert.Equal(t, 0, q.GetWorkerActiveNumber())
 	time.Sleep(workerIdleDuration)
 	assert.Equal(t, 1, q.GetWorkerNumber()) // there is at least one worker after the queue begins working
 	stop()
