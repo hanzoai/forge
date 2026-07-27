@@ -26,7 +26,7 @@ type ReviewRequestNotifier struct {
 	ReviewTeam *org_model.Team
 }
 
-var codeOwnerFiles = []string{"CODEOWNERS", "docs/CODEOWNERS", ".gitea/CODEOWNERS"}
+var codeOwnerFiles = []string{"CODEOWNERS", "docs/CODEOWNERS", ".hanzo/CODEOWNERS"}
 
 // codeOwnerMatchBudget caps the total wall-clock time spent evaluating all
 // CODEOWNERS rules against all changed files for a single PR.

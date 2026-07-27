@@ -180,8 +180,8 @@ func TestCancelJobs_NestedBlockedReusableCaller(t *testing.T) {
 	}
 
 	// outer: a valid top-level caller that expanded; inner: a nested caller stuck Blocked (invalid uses, never expands).
-	outer := newJob("outer", 1, 0, "./.gitea/workflows/lib.yml")
-	inner := newJob("inner", 2, outer.ID, "https://other.example.com/o/r/.gitea/workflows/ci.yml@v1")
+	outer := newJob("outer", 1, 0, "./.hanzo/workflows/lib.yml")
+	inner := newJob("inner", 2, outer.ID, "https://other.example.com/o/r/.hanzo/workflows/ci.yml@v1")
 
 	// Cancel all jobs of the attempt, ordered by id (parent before child).
 	jobs, err := GetRunJobsByRunAndAttemptID(ctx, run.ID, attempt.ID)

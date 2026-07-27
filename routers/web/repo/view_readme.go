@@ -33,11 +33,11 @@ import (
 //
 // FIXME: There has to be a more efficient way of doing this
 func findReadmeFileInEntries(ctx *context.Context, parentDir string, entries []*git.TreeEntry, tryWellKnownDirs bool) (string, *git.TreeEntry, error) {
-	docsEntries := make([]*git.TreeEntry, 3) // (one of docs/, .gitea/ or .github/)
+	docsEntries := make([]*git.TreeEntry, 3) // (one of docs/, .hanzo/ or .github/)
 	for _, entry := range entries {
 		if tryWellKnownDirs && entry.IsDir() {
 			// as a special case for the top-level repo introduction README,
-			// fall back to subfolders, looking for e.g. docs/README.md, .gitea/README.zh-CN.txt, .github/README.txt, ...
+			// fall back to subfolders, looking for e.g. docs/README.md, .hanzo/README.zh-CN.txt, .github/README.txt, ...
 			// (note that docsEntries is ignored unless we are at the root)
 			lowerName := strings.ToLower(entry.Name())
 			switch lowerName {
@@ -45,8 +45,8 @@ func findReadmeFileInEntries(ctx *context.Context, parentDir string, entries []*
 				if entry.Name() == "docs" || docsEntries[0] == nil {
 					docsEntries[0] = entry
 				}
-			case ".gitea":
-				if entry.Name() == ".gitea" || docsEntries[1] == nil {
+			case ".hanzo":
+				if entry.Name() == ".hanzo" || docsEntries[1] == nil {
 					docsEntries[1] = entry
 				}
 			case ".github":

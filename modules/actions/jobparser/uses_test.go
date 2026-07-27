@@ -20,8 +20,8 @@ func TestParseUses(t *testing.T) {
 		}{
 			{
 				name: "gitea dir, .yml",
-				in:   "./.gitea/workflows/build.yml",
-				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".gitea/workflows/build.yml"},
+				in:   "./.hanzo/workflows/build.yml",
+				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/workflows/build.yml"},
 			},
 			{
 				name: "github dir, .yml",
@@ -30,34 +30,34 @@ func TestParseUses(t *testing.T) {
 			},
 			{
 				name: "gitea dir, .yaml",
-				in:   "./.gitea/workflows/build.yaml",
-				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".gitea/workflows/build.yaml"},
+				in:   "./.hanzo/workflows/build.yaml",
+				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/workflows/build.yaml"},
 			},
 			{
 				name: "filename containing dots is allowed",
-				in:   "./.gitea/workflows/foo..bar.yml",
-				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".gitea/workflows/foo..bar.yml"},
+				in:   "./.hanzo/workflows/foo..bar.yml",
+				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/workflows/foo..bar.yml"},
 			},
 			{
 				name: "nested subdirectory",
-				in:   "./.gitea/workflows/sub/build.yml",
-				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".gitea/workflows/sub/build.yml"},
+				in:   "./.hanzo/workflows/sub/build.yml",
+				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/workflows/sub/build.yml"},
 			},
 			{
 				// ParseUses is dir-agnostic; the allowed directories (WORKFLOW_DIRS / SCOPED_WORKFLOW_DIRS) are enforced by ResolveUses.
 				name: "scoped workflows dir parses",
-				in:   "./.gitea/scoped_workflows/lib.yml",
-				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".gitea/scoped_workflows/lib.yml"},
+				in:   "./.hanzo/scoped_workflows/lib.yml",
+				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/scoped_workflows/lib.yml"},
 			},
 			{
 				name: "non-default dir parses (allowlist enforced downstream)",
-				in:   "./.gitea/custom_workflows/x.yaml",
-				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".gitea/custom_workflows/x.yaml"},
+				in:   "./.hanzo/custom_workflows/x.yaml",
+				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/custom_workflows/x.yaml"},
 			},
 			{
 				name: "leading/trailing whitespace is trimmed",
-				in:   "  ./.gitea/workflows/build.yml  ",
-				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".gitea/workflows/build.yml"},
+				in:   "  ./.hanzo/workflows/build.yml  ",
+				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/workflows/build.yml"},
 			},
 		}
 		for _, c := range cases {
@@ -77,12 +77,12 @@ func TestParseUses(t *testing.T) {
 		}{
 			{
 				name: "gitea dir, simple ref",
-				in:   "owner/repo/.gitea/workflows/build.yml@v1",
+				in:   "owner/repo/.hanzo/workflows/build.yml@v1",
 				want: UsesRef{
 					Kind:  UsesKindLocalCrossRepo,
 					Owner: "owner",
 					Repo:  "repo",
-					Path:  ".gitea/workflows/build.yml",
+					Path:  ".hanzo/workflows/build.yml",
 					Ref:   "v1",
 				},
 			},
@@ -99,45 +99,45 @@ func TestParseUses(t *testing.T) {
 			},
 			{
 				name: ".yaml extension",
-				in:   "owner/repo/.gitea/workflows/build.yaml@abc123",
+				in:   "owner/repo/.hanzo/workflows/build.yaml@abc123",
 				want: UsesRef{
 					Kind:  UsesKindLocalCrossRepo,
 					Owner: "owner",
 					Repo:  "repo",
-					Path:  ".gitea/workflows/build.yaml",
+					Path:  ".hanzo/workflows/build.yaml",
 					Ref:   "abc123",
 				},
 			},
 			{
 				name: "ref with slashes (refs/heads/feature)",
-				in:   "owner/repo/.gitea/workflows/build.yml@refs/heads/feature",
+				in:   "owner/repo/.hanzo/workflows/build.yml@refs/heads/feature",
 				want: UsesRef{
 					Kind:  UsesKindLocalCrossRepo,
 					Owner: "owner",
 					Repo:  "repo",
-					Path:  ".gitea/workflows/build.yml",
+					Path:  ".hanzo/workflows/build.yml",
 					Ref:   "refs/heads/feature",
 				},
 			},
 			{
 				name: "nested subdirectory under workflows",
-				in:   "owner/repo/.gitea/workflows/sub/build.yml@v1",
+				in:   "owner/repo/.hanzo/workflows/sub/build.yml@v1",
 				want: UsesRef{
 					Kind:  UsesKindLocalCrossRepo,
 					Owner: "owner",
 					Repo:  "repo",
-					Path:  ".gitea/workflows/sub/build.yml",
+					Path:  ".hanzo/workflows/sub/build.yml",
 					Ref:   "v1",
 				},
 			},
 			{
 				name: "scoped workflows dir parses (allowlist enforced by ResolveUses)",
-				in:   "owner/repo/.gitea/scoped_workflows/lib.yml@v1",
+				in:   "owner/repo/.hanzo/scoped_workflows/lib.yml@v1",
 				want: UsesRef{
 					Kind:  UsesKindLocalCrossRepo,
 					Owner: "owner",
 					Repo:  "repo",
-					Path:  ".gitea/scoped_workflows/lib.yml",
+					Path:  ".hanzo/scoped_workflows/lib.yml",
 					Ref:   "v1",
 				},
 			},
@@ -160,25 +160,25 @@ func TestParseUses(t *testing.T) {
 			{name: "whitespace only", in: "   "},
 
 			// Same-repo malformed (note: a wrong *directory* parses and should be rejected by the caller)
-			{name: "same-repo with @ref", in: "./.gitea/workflows/build.yml@v1"},
-			{name: "same-repo wrong extension", in: "./.gitea/workflows/build.txt"},
-			{name: "same-repo missing extension", in: "./.gitea/workflows/build"},
-			{name: "same-repo absolute path", in: "/.gitea/workflows/build.yml"},
-			{name: "same-repo path traversal", in: "./.gitea/workflows/../escape.yml"},
-			{name: "same-repo double slash", in: "./.gitea/workflows//build.yml"},
-			{name: "same-repo redundant ./", in: "./.gitea/workflows/./build.yml"},
+			{name: "same-repo with @ref", in: "./.hanzo/workflows/build.yml@v1"},
+			{name: "same-repo wrong extension", in: "./.hanzo/workflows/build.txt"},
+			{name: "same-repo missing extension", in: "./.hanzo/workflows/build"},
+			{name: "same-repo absolute path", in: "/.hanzo/workflows/build.yml"},
+			{name: "same-repo path traversal", in: "./.hanzo/workflows/../escape.yml"},
+			{name: "same-repo double slash", in: "./.hanzo/workflows//build.yml"},
+			{name: "same-repo redundant ./", in: "./.hanzo/workflows/./build.yml"},
 
 			// Cross-repo malformed
-			{name: "cross-repo missing @ref", in: "owner/repo/.gitea/workflows/build.yml"},
-			{name: "cross-repo empty ref", in: "owner/repo/.gitea/workflows/build.yml@"},
-			{name: "cross-repo missing owner", in: "/repo/.gitea/workflows/build.yml@v1"},
-			{name: "cross-repo missing repo", in: "owner//.gitea/workflows/build.yml@v1"},
-			{name: "cross-repo wrong extension", in: "owner/repo/.gitea/workflows/build.txt@v1"},
-			{name: "cross-repo path traversal", in: "owner/repo/.gitea/workflows/../escape.yml@v1"},
-			{name: "cross-repo double slash in path", in: "owner/repo/.gitea/workflows//build.yml@v1"},
+			{name: "cross-repo missing @ref", in: "owner/repo/.hanzo/workflows/build.yml"},
+			{name: "cross-repo empty ref", in: "owner/repo/.hanzo/workflows/build.yml@"},
+			{name: "cross-repo missing owner", in: "/repo/.hanzo/workflows/build.yml@v1"},
+			{name: "cross-repo missing repo", in: "owner//.hanzo/workflows/build.yml@v1"},
+			{name: "cross-repo wrong extension", in: "owner/repo/.hanzo/workflows/build.txt@v1"},
+			{name: "cross-repo path traversal", in: "owner/repo/.hanzo/workflows/../escape.yml@v1"},
+			{name: "cross-repo double slash in path", in: "owner/repo/.hanzo/workflows//build.yml@v1"},
 			// owner/repo with chars Gitea's name validators reject
-			{name: "cross-repo owner with space", in: "bad owner/repo/.gitea/workflows/build.yml@v1"},
-			{name: "cross-repo repo with @", in: "owner/re@po/.gitea/workflows/build.yml@v1"},
+			{name: "cross-repo owner with space", in: "bad owner/repo/.hanzo/workflows/build.yml@v1"},
+			{name: "cross-repo repo with @", in: "owner/re@po/.hanzo/workflows/build.yml@v1"},
 		}
 		for _, c := range cases {
 			t.Run(c.name, func(t *testing.T) {

@@ -117,7 +117,7 @@ func Test_WorkflowDirs(t *testing.T) {
 			name:   "default",
 			iniStr: `[actions]`,
 			// .hanzo/workflows leads: the native dir wins over mirrored upstream dirs
-			wantDirs: []string{".hanzo/workflows", ".gitea/workflows", ".github/workflows"},
+			wantDirs: []string{".hanzo/workflows", ".github/workflows"},
 		},
 		{
 			name:     "single dir",
@@ -126,18 +126,18 @@ func Test_WorkflowDirs(t *testing.T) {
 		},
 		{
 			name:     "custom order",
-			iniStr:   "[actions]\nWORKFLOW_DIRS = .github/workflows,.gitea/workflows",
-			wantDirs: []string{".github/workflows", ".gitea/workflows"},
+			iniStr:   "[actions]\nWORKFLOW_DIRS = .github/workflows,.hanzo/workflows",
+			wantDirs: []string{".github/workflows", ".hanzo/workflows"},
 		},
 		{
 			name:     "whitespace trimming",
-			iniStr:   "[actions]\nWORKFLOW_DIRS = .gitea/workflows , .github/workflows ",
-			wantDirs: []string{".gitea/workflows", ".github/workflows"},
+			iniStr:   "[actions]\nWORKFLOW_DIRS = .hanzo/workflows , .github/workflows ",
+			wantDirs: []string{".hanzo/workflows", ".github/workflows"},
 		},
 		{
 			name:     "trailing slash normalization",
-			iniStr:   "[actions]\nWORKFLOW_DIRS = .gitea/workflows/,.github/workflows/",
-			wantDirs: []string{".gitea/workflows", ".github/workflows"},
+			iniStr:   "[actions]\nWORKFLOW_DIRS = .hanzo/workflows/,.github/workflows/",
+			wantDirs: []string{".hanzo/workflows", ".github/workflows"},
 		},
 		{
 			name:    "only commas and whitespace",
@@ -247,8 +247,8 @@ DEFAULT_ACTIONS_URL = gitea
 func Test_ScopedWorkflowDirs(t *testing.T) {
 	defer test.MockVariableValue(&Actions)()
 
-	defaultWorkflowDirs := []string{".gitea/workflows", ".github/workflows"}
-	defaultScopedDirs := []string{".gitea/scoped_workflows"}
+	defaultWorkflowDirs := []string{".hanzo/workflows", ".github/workflows"}
+	defaultScopedDirs := []string{".hanzo/scoped_workflows"}
 
 	tests := []struct {
 		name       string
@@ -263,8 +263,8 @@ func Test_ScopedWorkflowDirs(t *testing.T) {
 		},
 		{
 			name:       "custom dir",
-			iniStr:     "[actions]\nSCOPED_WORKFLOW_DIRS = .gitea/my-scoped",
-			wantScoped: []string{".gitea/my-scoped"},
+			iniStr:     "[actions]\nSCOPED_WORKFLOW_DIRS = .hanzo/my-scoped",
+			wantScoped: []string{".hanzo/my-scoped"},
 		},
 		{
 			name:       "empty disables the feature",
@@ -273,23 +273,23 @@ func Test_ScopedWorkflowDirs(t *testing.T) {
 		},
 		{
 			name:    "overlap equal with workflow dir",
-			iniStr:  "[actions]\nWORKFLOW_DIRS = .gitea/workflows\nSCOPED_WORKFLOW_DIRS = .gitea/workflows",
+			iniStr:  "[actions]\nWORKFLOW_DIRS = .hanzo/workflows\nSCOPED_WORKFLOW_DIRS = .hanzo/workflows",
 			wantErr: true,
 		},
 		{
 			name:    "scoped dir nested under workflow dir",
-			iniStr:  "[actions]\nWORKFLOW_DIRS = .gitea/workflows\nSCOPED_WORKFLOW_DIRS = .gitea/workflows/scoped",
+			iniStr:  "[actions]\nWORKFLOW_DIRS = .hanzo/workflows\nSCOPED_WORKFLOW_DIRS = .hanzo/workflows/scoped",
 			wantErr: true,
 		},
 		{
 			name:    "workflow dir nested under scoped dir",
-			iniStr:  "[actions]\nWORKFLOW_DIRS = .gitea/workflows/ci\nSCOPED_WORKFLOW_DIRS = .gitea/workflows",
+			iniStr:  "[actions]\nWORKFLOW_DIRS = .hanzo/workflows/ci\nSCOPED_WORKFLOW_DIRS = .hanzo/workflows",
 			wantErr: true,
 		},
 		{
 			name:       "no overlap",
-			iniStr:     "[actions]\nSCOPED_WORKFLOW_DIRS = .gitea/scoped",
-			wantScoped: []string{".gitea/scoped"},
+			iniStr:     "[actions]\nSCOPED_WORKFLOW_DIRS = .hanzo/scoped",
+			wantScoped: []string{".hanzo/scoped"},
 		},
 	}
 

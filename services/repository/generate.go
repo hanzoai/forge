@@ -102,7 +102,7 @@ func generateExpansion(ctx context.Context, src string, templateRepo, generateRe
 	})
 }
 
-// gitTemplateFileMatcher holds information about a .gitea/template file
+// gitTemplateFileMatcher holds information about a .hanzo/template file
 type gitTemplateFileMatcher struct {
 	relPath string
 	globs   []glob.Glob
@@ -141,7 +141,7 @@ func (gt *gitTemplateFileMatcher) Match(s string) bool {
 }
 
 func readGitTemplateFile(tmpDir string) (*gitTemplateFileMatcher, error) {
-	templateRelPath := filepath.Join(".gitea", "template")
+	templateRelPath := filepath.Join(".hanzo", "template")
 	content, err := util.ReadRegularPathFile(tmpDir, templateRelPath, 1024*1024)
 	if err != nil {
 		return nil, util.Iif(errors.Is(err, util.ErrNotRegularPathFile), os.ErrNotExist, err)
@@ -166,12 +166,12 @@ func substGitTemplateFile(ctx context.Context, tmpDir, tmpDirSubPath string, tem
 	return util.WriteRegularPathFile(tmpDir, substSubPath, []byte(generatedContent), 0o755, 0o644)
 }
 
-// processGitTemplateFile processes and removes the .gitea/template file, does variable expansion for template files
+// processGitTemplateFile processes and removes the .hanzo/template file, does variable expansion for template files
 // and save the processed files to the filesystem. It returns a list of skipped files that are not regular paths.
 func processGitTemplateFile(ctx context.Context, tmpDir string, templateRepo, generateRepo *repo_model.Repository, fileMatcher *gitTemplateFileMatcher) (skippedFiles []string, _ error) {
 	// Why not use "os.Root" here: symlink is unsafe even in the same root but "os.Root" can't help, it's more difficult to use "os.Root" to do the WalkDir.
 	if err := os.Remove(util.FilePathJoinAbs(tmpDir, fileMatcher.relPath)); err != nil {
-		return nil, fmt.Errorf("unable to remove .gitea/template: %w", err)
+		return nil, fmt.Errorf("unable to remove .hanzo/template: %w", err)
 	}
 	if !fileMatcher.HasRules() {
 		return skippedFiles, nil // Avoid walking tree if there are no globs
@@ -237,7 +237,7 @@ func generateRepoCommit(ctx context.Context, repo, templateRepo, generateRepo *r
 			return fmt.Errorf("processGitTemplateFile: %w", err)
 		}
 	} else if errors.Is(err, fs.ErrNotExist) {
-		log.Debug("skip processing repo template files: no available .gitea/template")
+		log.Debug("skip processing repo template files: no available .hanzo/template")
 	} else {
 		return fmt.Errorf("readGitTemplateFile: %w", err)
 	}

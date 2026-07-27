@@ -558,7 +558,7 @@ func TestActionRunAttemptArtifact(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, repo.OwnerName, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wfTreePath := ".gitea/workflows/run-attempt-artifact.yml"
+		wfTreePath := ".hanzo/workflows/run-attempt-artifact.yml"
 		wfFileContent := `name: run-attempt-artifact
 on:
   workflow_dispatch:

@@ -42,8 +42,8 @@ var (
 		Enabled:                true,
 		DefaultActionsURL:      defaultActionsURLGitHub,
 		SkipWorkflowStrings:    []string{"[skip ci]", "[ci skip]", "[no ci]", "[skip actions]", "[actions skip]"},
-		WorkflowDirs:           []string{".hanzo/workflows", ".gitea/workflows", ".github/workflows"},
-		ScopedWorkflowDirs:     []string{".gitea/scoped_workflows"},
+		WorkflowDirs:           []string{".hanzo/workflows", ".github/workflows"},
+		ScopedWorkflowDirs:     []string{".hanzo/scoped_workflows"},
 		MaxRerunAttempts:       defaultMaxRerunAttempts,
 		MaxConcurrentTaskPicks: defaultMaxConcurrentTaskPicks,
 	}

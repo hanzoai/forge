@@ -36,7 +36,7 @@ func RegisterWebhookRequester(hookType webhook_module.HookType, requester Reques
 
 // IsValidHookTaskType returns true if a webhook registered
 func IsValidHookTaskType(name string) bool {
-	if name == webhook_module.GITEA || name == webhook_module.GOGS {
+	if name == webhook_module.NATIVE || name == webhook_module.GOGS {
 		return true
 	}
 	_, ok := webhookRequesters[name]
@@ -173,7 +173,7 @@ func PrepareWebhook(ctx context.Context, w *webhook_model.Webhook, event webhook
 	// Avoid sending "0 new commits" to non-integration relevant webhooks (e.g. slack, discord, etc.).
 	// Integration webhooks (e.g. drone) still receive the required data.
 	if pushEvent, ok := p.(*api.PushPayload); ok &&
-		w.Type != webhook_module.GITEA && w.Type != webhook_module.GOGS &&
+		w.Type != webhook_module.NATIVE && w.Type != webhook_module.GOGS &&
 		len(pushEvent.Commits) == 0 {
 		return nil
 	}

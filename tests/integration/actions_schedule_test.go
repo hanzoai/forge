@@ -51,7 +51,7 @@ func testScheduleUpdatePush(t *testing.T) {
 
 func testScheduleUpdatePullMerge(t *testing.T) {
 	newBranchName := "feat1"
-	workflowTreePath := ".gitea/workflows/actions-schedule.yml"
+	workflowTreePath := ".hanzo/workflows/actions-schedule.yml"
 	workflowContent := `name: actions-schedule
 on:
   schedule:
@@ -251,7 +251,7 @@ func doTestScheduleUpdate(t *testing.T, updateTrigger scheduleUpdateTrigger) {
 		httpContext := NewAPITestContext(t, user2.Name, repo.Name, auth_model.AccessTokenScopeWriteRepository)
 		defer doAPIDeleteRepository(httpContext)(t)
 
-		wfTreePath := ".gitea/workflows/actions-schedule.yml"
+		wfTreePath := ".hanzo/workflows/actions-schedule.yml"
 		wfFileContent := `name: actions-schedule
 on:
   schedule:
@@ -279,7 +279,7 @@ jobs:
 }
 
 func pushScheduleChange(t *testing.T, u *url.URL, repo *repo_model.Repository, newCron string) {
-	workflowTreePath := ".gitea/workflows/actions-schedule.yml"
+	workflowTreePath := ".hanzo/workflows/actions-schedule.yml"
 	workflowContent := `name: actions-schedule
 on:
   schedule:

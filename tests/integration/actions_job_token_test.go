@@ -402,12 +402,12 @@ func TestActionsTokenPermissionsPersistenceWithWorkflow(t *testing.T) {
 		session.MakeRequest(t, req, http.StatusSeeOther)
 
 		// create a workflow file with "permission" keyword for repo1
-		wfTreePath := ".gitea/workflows/test_permissions.yml"
+		wfTreePath := ".hanzo/workflows/test_permissions.yml"
 		wfFileContent := `name: Test Permissions
 on:
   push:
     paths:
-      - '.gitea/workflows/test_permissions.yml'
+      - '.hanzo/workflows/test_permissions.yml'
 
 jobs:
   job-override:

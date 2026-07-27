@@ -42,12 +42,12 @@ func testActionsRouteForIDBasedURL(t *testing.T) {
 	runner2 := newMockRunner()
 	runner2.registerAsRepoRunner(t, user2.Name, repo2.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-	workflowTreePath := ".gitea/workflows/test.yml"
+	workflowTreePath := ".hanzo/workflows/test.yml"
 	workflowContent := `name: test
 on:
   push:
     paths:
-      - '.gitea/workflows/test.yml'
+      - '.hanzo/workflows/test.yml'
 jobs:
   job1:
     runs-on: ubuntu-latest

@@ -31,17 +31,17 @@ func TestAPIIssueTemplateList(t *testing.T) {
 		assert.Empty(t, issueTemplates)
 
 		// one correct issue template and some incorrect issue templates
-		err := createOrReplaceFileInBranch(user, repo, ".gitea/ISSUE_TEMPLATE/tmpl-ok.md", repo.DefaultBranch, `----
+		err := createOrReplaceFileInBranch(user, repo, ".hanzo/ISSUE_TEMPLATE/tmpl-ok.md", repo.DefaultBranch, `----
 name: foo
 about: bar
 ----
 `)
 		assert.NoError(t, err)
 
-		err = createOrReplaceFileInBranch(user, repo, ".gitea/ISSUE_TEMPLATE/tmpl-err1.yml", repo.DefaultBranch, `name: '`)
+		err = createOrReplaceFileInBranch(user, repo, ".hanzo/ISSUE_TEMPLATE/tmpl-err1.yml", repo.DefaultBranch, `name: '`)
 		assert.NoError(t, err)
 
-		err = createOrReplaceFileInBranch(user, repo, ".gitea/ISSUE_TEMPLATE/tmpl-err2.yml", repo.DefaultBranch, `other: `)
+		err = createOrReplaceFileInBranch(user, repo, ".hanzo/ISSUE_TEMPLATE/tmpl-err2.yml", repo.DefaultBranch, `other: `)
 		assert.NoError(t, err)
 
 		req = NewRequest(t, "GET", "/v1/repos/user2/repo1/issue_templates")

@@ -112,7 +112,7 @@ func TestWebhookDeliverGitHeaders(t *testing.T) {
 		URL:         s.URL + "/webhook",
 		ContentType: webhook_model.ContentTypeJSON,
 		IsActive:    true,
-		Type:        webhook_module.GITEA,
+		Type:        webhook_module.NATIVE,
 		Secret:      "s3cr3t",
 	}
 	assert.NoError(t, webhook_model.CreateWebhook(t.Context(), hook))
@@ -152,7 +152,7 @@ func TestWebhookDeliverAuthorizationHeader(t *testing.T) {
 		URL:         s.URL + "/webhook",
 		ContentType: webhook_model.ContentTypeJSON,
 		IsActive:    true,
-		Type:        webhook_module.GITEA,
+		Type:        webhook_module.NATIVE,
 	}
 	err := hook.SetHeaderAuthorization("Bearer s3cr3t-t0ken")
 	assert.NoError(t, err)

@@ -19,38 +19,38 @@ func TestIsWorkflowInDirs(t *testing.T) {
 	}{
 		{
 			name:     "default scoped dir with yml",
-			dirs:     []string{".gitea/scoped_workflows", ".github/scoped_workflows"},
-			path:     ".gitea/scoped_workflows/security.yml",
+			dirs:     []string{".hanzo/scoped_workflows", ".github/scoped_workflows"},
+			path:     ".hanzo/scoped_workflows/security.yml",
 			expected: true,
 		},
 		{
 			name:     "default scoped dir with yaml",
-			dirs:     []string{".gitea/scoped_workflows", ".github/scoped_workflows"},
+			dirs:     []string{".hanzo/scoped_workflows", ".github/scoped_workflows"},
 			path:     ".github/scoped_workflows/lint.yaml",
 			expected: true,
 		},
 		{
 			name:     "normal workflow path is not a scoped workflow",
-			dirs:     []string{".gitea/scoped_workflows"},
-			path:     ".gitea/workflows/ci.yml",
+			dirs:     []string{".hanzo/scoped_workflows"},
+			path:     ".hanzo/workflows/ci.yml",
 			expected: false,
 		},
 		{
 			name:     "non-yaml file",
-			dirs:     []string{".gitea/scoped_workflows"},
-			path:     ".gitea/scoped_workflows/readme.md",
+			dirs:     []string{".hanzo/scoped_workflows"},
+			path:     ".hanzo/scoped_workflows/readme.md",
 			expected: false,
 		},
 		{
 			name:     "feature disabled (no scoped dirs)",
 			dirs:     []string{},
-			path:     ".gitea/scoped_workflows/security.yml",
+			path:     ".hanzo/scoped_workflows/security.yml",
 			expected: false,
 		},
 		{
 			name:     "directory boundary",
-			dirs:     []string{".gitea/scoped_workflows"},
-			path:     ".gitea/scoped_workflows2/security.yml",
+			dirs:     []string{".hanzo/scoped_workflows"},
+			path:     ".hanzo/scoped_workflows2/security.yml",
 			expected: false,
 		},
 	}

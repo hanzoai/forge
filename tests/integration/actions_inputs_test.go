@@ -35,7 +35,7 @@ func TestWorkflowWithInputsContext(t *testing.T) {
 		lRunner := newMockRunner()
 		lRunner.registerAsRepoRunner(t, user2.Name, repo.Name, "linux-runner", []string{"linux-runner"}, false)
 
-		wf1TreePath := ".gitea/workflows/test-inputs-context.yml"
+		wf1TreePath := ".hanzo/workflows/test-inputs-context.yml"
 		wf1FileContent := `name: Test Inputs Context
 on:
   workflow_dispatch:

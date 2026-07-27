@@ -57,7 +57,7 @@ func TestActionsReusableWorkflow(t *testing.T) {
 			}).AddTokenAuth(user2Token)
 			MakeRequest(t, req, http.StatusCreated)
 
-			createRepoWorkflowFile(t, user2, user2Token, repo, ".gitea/workflows/reusable1.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, repo, ".hanzo/workflows/reusable1.yaml",
 				`name: Reusable1
 on:
   workflow_call:
@@ -96,12 +96,12 @@ jobs:
 
   reusable1_job3:
     needs: [reusable1_job2]
-    uses: ./.gitea/workflows/reusable2.yaml
+    uses: ./.hanzo/workflows/reusable2.yaml
     with:
       msg: ${{ inputs.str_input }}
 `)
 
-			createRepoWorkflowFile(t, user2, user2Token, repo, ".gitea/workflows/reusable2.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, repo, ".hanzo/workflows/reusable2.yaml",
 				`name: Reusable2
 on:
   workflow_call:
@@ -116,12 +116,12 @@ jobs:
       - run: echo ${{ inputs.msg }}
 `)
 
-			createRepoWorkflowFile(t, user2, user2Token, repo, ".gitea/workflows/caller.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, repo, ".hanzo/workflows/caller.yaml",
 				`name: Caller
 on:
   push:
     paths:
-      - '.gitea/workflows/caller.yaml'
+      - '.hanzo/workflows/caller.yaml'
 jobs:
   caller_job1:
     runs-on: ubuntu-latest
@@ -134,7 +134,7 @@ jobs:
 
   caller_job2:
     needs: [caller_job1]
-    uses: './.gitea/workflows/reusable1.yaml'
+    uses: './.hanzo/workflows/reusable1.yaml'
     with:
       str_input: 'from_caller_job2'
       num_input: ${{ 2.3e2 }}
@@ -363,7 +363,7 @@ jobs:
 			// libRepo: private, owned by user2.
 			libAPIRepo := createActionsTestRepo(t, user2Token, "reusable-lib-private", true)
 			libRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: libAPIRepo.ID})
-			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".gitea/workflows/reusable_lib.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".hanzo/workflows/reusable_lib.yaml",
 				`name: ReusableLib
 on:
   workflow_call:
@@ -385,12 +385,12 @@ jobs:
 			runner := newMockRunner()
 			runner.registerAsRepoRunner(t, consumerRepo.OwnerName, consumerRepo.Name, "mock-cross-runner", []string{"ubuntu-latest"}, false)
 
-			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".gitea/workflows/cross-caller.yaml",
+			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".hanzo/workflows/cross-caller.yaml",
 				`name: CrossCaller
 on: push
 jobs:
   cross_job:
-    uses: user2/reusable-lib-private/.gitea/workflows/reusable_lib.yaml@main
+    uses: user2/reusable-lib-private/.hanzo/workflows/reusable_lib.yaml@main
     with:
       from: 'consumer'
 `)
@@ -440,7 +440,7 @@ jobs:
 			// libRepo: private, owned by user2.
 			libAPIRepo := createActionsTestRepo(t, user2Token, "reusable-lib-public-denied", true)
 			libRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: libAPIRepo.ID})
-			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".gitea/workflows/reusable_lib.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".hanzo/workflows/reusable_lib.yaml",
 				`name: ReusableLib
 on:
   workflow_call:
@@ -466,12 +466,12 @@ jobs:
 			runner := newMockRunner()
 			runner.registerAsRepoRunner(t, consumerRepo.OwnerName, consumerRepo.Name, "mock-public-denied-runner", []string{"ubuntu-latest"}, false)
 
-			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".gitea/workflows/cross-caller.yaml",
+			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".hanzo/workflows/cross-caller.yaml",
 				`name: CrossCaller
 on: push
 jobs:
   cross_job:
-    uses: user2/reusable-lib-public-denied/.gitea/workflows/reusable_lib.yaml@main
+    uses: user2/reusable-lib-public-denied/.hanzo/workflows/reusable_lib.yaml@main
 `)
 
 			// Denied: the cross-repo read check fails for the public caller, so NO ActionRun is persisted and no task is dispatched.
@@ -486,7 +486,7 @@ jobs:
 
 			libAPIRepo := createActionsTestRepo(t, user2Token, "reusable-lib-nested", false)
 			libRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: libAPIRepo.ID})
-			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".gitea/workflows/util.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".hanzo/workflows/util.yaml",
 				`name: UtilLib
 on:
   workflow_call:
@@ -497,21 +497,21 @@ jobs:
     steps:
       - run: echo from-lib
 `)
-			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".gitea/workflows/lib.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, libRepo, ".hanzo/workflows/lib.yaml",
 				`name: LibNested
 on:
   workflow_call:
 
 jobs:
   call_util_in_lib:
-    uses: ./.gitea/workflows/util.yaml
+    uses: ./.hanzo/workflows/util.yaml
 `)
 
 			consumerAPIRepo := createActionsTestRepo(t, user4Token, "consumer-nested-uses", false)
 			consumerRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: consumerAPIRepo.ID})
 
 			// A *different* util.yaml in the consumer repo: if `./` mis-resolves we'd see this job's name.
-			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".gitea/workflows/util.yaml",
+			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".hanzo/workflows/util.yaml",
 				`name: UtilConsumer
 on:
   workflow_call:
@@ -526,12 +526,12 @@ jobs:
 			runner := newMockRunner()
 			runner.registerAsRepoRunner(t, consumerRepo.OwnerName, consumerRepo.Name, "mock-nested-runner", []string{"ubuntu-latest"}, false)
 
-			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".gitea/workflows/caller.yaml",
+			createRepoWorkflowFile(t, user4, user4Token, consumerRepo, ".hanzo/workflows/caller.yaml",
 				`name: NestedCaller
 on: push
 jobs:
   cross_job:
-    uses: user2/reusable-lib-nested/.gitea/workflows/lib.yaml@main
+    uses: user2/reusable-lib-nested/.hanzo/workflows/lib.yaml@main
 `)
 
 			run := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{RepoID: consumerRepo.ID})
@@ -547,7 +547,7 @@ jobs:
 			assert.Equal(t, libRepo.ID, callUtilJob.WorkflowSourceRepoID)
 			assert.Equal(t, libHead, callUtilJob.WorkflowSourceCommitSHA)
 
-			// call_util_in_lib has `uses: ./.gitea/workflows/util.yaml`, so its children should come from libRepo/util.yaml
+			// call_util_in_lib has `uses: ./.hanzo/workflows/util.yaml`, so its children should come from libRepo/util.yaml
 			assert.True(t, callUtilJob.IsExpanded)
 			unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{RunID: run.ID, JobID: "util_lib_job", ParentJobID: callUtilJob.ID})
 			unittest.AssertNotExistsBean(t, &actions_model.ActionRunJob{RunID: run.ID, JobID: "util_consumer_job"})
@@ -559,7 +559,7 @@ jobs:
 			apiRepo := createActionsTestRepo(t, user2Token, "caller-missing-callee", false)
 			repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: apiRepo.ID})
 
-			createRepoWorkflowFile(t, user2, user2Token, repo, ".gitea/workflows/caller.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, repo, ".hanzo/workflows/caller.yaml",
 				`name: Caller
 on: push
 jobs:
@@ -568,7 +568,7 @@ jobs:
     steps:
       - run: echo 'job'
   call_missing:
-    uses: ./.gitea/workflows/does-not-exist.yml
+    uses: ./.hanzo/workflows/does-not-exist.yml
 `)
 
 			assert.Equal(t, 0, unittest.GetCount(t, &actions_model.ActionRun{RepoID: repo.ID}))
@@ -592,7 +592,7 @@ jobs:
 			runner := newMockRunner()
 			runner.registerAsRepoRunner(t, baseRepo.OwnerName, baseRepo.Name, "mock-fork-runner", []string{"ubuntu-latest"}, false)
 
-			createRepoWorkflowFile(t, user2, user2Token, baseRepo, ".gitea/workflows/reusable.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, baseRepo, ".hanzo/workflows/reusable.yaml",
 				`name: Reusable
 on:
   workflow_call:
@@ -605,12 +605,12 @@ jobs:
     steps:
       - run: echo
 `)
-			createRepoWorkflowFile(t, user2, user2Token, baseRepo, ".gitea/workflows/caller.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, baseRepo, ".hanzo/workflows/caller.yaml",
 				`name: Caller
 on: pull_request
 jobs:
   call_reusable:
-    uses: ./.gitea/workflows/reusable.yaml
+    uses: ./.hanzo/workflows/reusable.yaml
     secrets: inherit
 `)
 
@@ -671,7 +671,7 @@ jobs:
 			//   attempt 2: rerun gate, mock Failure -> caller is Skipped without expanding (no children inserted)
 			//   attempt 3: rerun gate, mock Success -> caller expands again -> inner.AttemptJobID must equal N
 
-			createRepoWorkflowFile(t, user2, user2Token, repo, ".gitea/workflows/lib.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, repo, ".hanzo/workflows/lib.yaml",
 				`name: Lib
 on:
   workflow_call:
@@ -682,12 +682,12 @@ jobs:
     steps:
       - run: echo inner
 `)
-			createRepoWorkflowFile(t, user2, user2Token, repo, ".gitea/workflows/main.yaml",
+			createRepoWorkflowFile(t, user2, user2Token, repo, ".hanzo/workflows/main.yaml",
 				`name: Main
 on:
   push:
     paths:
-      - '.gitea/workflows/main.yaml'
+      - '.hanzo/workflows/main.yaml'
 jobs:
   gate:
     runs-on: ubuntu-latest
@@ -696,7 +696,7 @@ jobs:
 
   caller:
     needs: [gate]
-    uses: ./.gitea/workflows/lib.yaml
+    uses: ./.hanzo/workflows/lib.yaml
 `)
 
 			run := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{RepoID: repo.ID})

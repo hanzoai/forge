@@ -42,7 +42,7 @@ func TestApproveAllRunsOnPullRequestPage(t *testing.T) {
 		runner.registerAsRepoRunner(t, baseRepo.OwnerName, baseRepo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
 		// init workflows
-		wf1TreePath := ".gitea/workflows/pull_1.yml"
+		wf1TreePath := ".hanzo/workflows/pull_1.yml"
 		wf1FileContent := `name: Pull 1
 on: pull_request
 jobs:
@@ -53,7 +53,7 @@ jobs:
 `
 		opts1 := getWorkflowCreateFileOptions(user2, baseRepo.DefaultBranch, "create %s"+wf1TreePath, wf1FileContent)
 		createWorkflowFile(t, user2Token, baseRepo.OwnerName, baseRepo.Name, wf1TreePath, opts1)
-		wf2TreePath := ".gitea/workflows/pull_2.yml"
+		wf2TreePath := ".hanzo/workflows/pull_2.yml"
 		wf2FileContent := `name: Pull 2
 on: pull_request
 jobs:
@@ -159,7 +159,7 @@ func TestForkPullRequestApprovalNotBypassedByPriorApproval(t *testing.T) {
 		user2APICtx := NewAPITestContext(t, baseRepo.OwnerName, baseRepo.Name, auth_model.AccessTokenScopeWriteRepository)
 		defer doAPIDeleteRepository(user2APICtx)(t)
 
-		wfTreePath := ".gitea/workflows/ci.yml"
+		wfTreePath := ".hanzo/workflows/ci.yml"
 		wfContent := `name: CI
 on: pull_request
 jobs:

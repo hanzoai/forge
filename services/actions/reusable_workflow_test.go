@@ -24,8 +24,8 @@ func TestCheckCallerChain_Cycle(t *testing.T) {
 		require.NoError(t, unittest.PrepareTestDatabase())
 		// A -> A: leaf's CallUses matches its direct parent's.
 		chain := buildCallerChain(t,
-			"./.gitea/workflows/a.yml",
-			"./.gitea/workflows/a.yml",
+			"./.hanzo/workflows/a.yml",
+			"./.hanzo/workflows/a.yml",
 		)
 		err := checkCallerChain(t.Context(), chain[len(chain)-1])
 		assert.ErrorContains(t, err, "cycle detected")
@@ -35,9 +35,9 @@ func TestCheckCallerChain_Cycle(t *testing.T) {
 		require.NoError(t, unittest.PrepareTestDatabase())
 		// A -> B -> A: leaf's CallUses matches its grandparent's.
 		chain := buildCallerChain(t,
-			"./.gitea/workflows/a.yml",
-			"./.gitea/workflows/b.yml",
-			"./.gitea/workflows/a.yml",
+			"./.hanzo/workflows/a.yml",
+			"./.hanzo/workflows/b.yml",
+			"./.hanzo/workflows/a.yml",
 		)
 		err := checkCallerChain(t.Context(), chain[len(chain)-1])
 		assert.ErrorContains(t, err, "cycle detected")
@@ -47,9 +47,9 @@ func TestCheckCallerChain_Cycle(t *testing.T) {
 		require.NoError(t, unittest.PrepareTestDatabase())
 		// Sanity: linear chain with distinct CallUses must not trip cycle detection.
 		chain := buildCallerChain(t,
-			"./.gitea/workflows/a.yml",
-			"./.gitea/workflows/b.yml",
-			"./.gitea/workflows/c.yml",
+			"./.hanzo/workflows/a.yml",
+			"./.hanzo/workflows/b.yml",
+			"./.hanzo/workflows/c.yml",
 		)
 		require.NoError(t, checkCallerChain(t.Context(), chain[len(chain)-1]))
 	})
@@ -60,7 +60,7 @@ func TestCheckCallerChain_DepthLimit(t *testing.T) {
 	makeDistinctUses := func(n int) []string {
 		out := make([]string, n)
 		for i := range out {
-			out[i] = fmt.Sprintf("./.gitea/workflows/level%d.yml", i)
+			out[i] = fmt.Sprintf("./.hanzo/workflows/level%d.yml", i)
 		}
 		return out
 	}
@@ -140,30 +140,30 @@ func buildCallerChain(t *testing.T, callerUses ...string) []*actions_model.Actio
 func TestResolveUses(t *testing.T) {
 	defer test.MockVariableValue(&setting.AppURL, "https://gitea.example.com/sub/")()
 	defer test.MockVariableValue(&setting.AppSubURL, "/sub")()
-	defer test.MockVariableValue(&setting.Actions.WorkflowDirs, []string{".gitea/workflows", ".github/workflows"})()
-	defer test.MockVariableValue(&setting.Actions.ScopedWorkflowDirs, []string{".gitea/scoped_workflows"})()
+	defer test.MockVariableValue(&setting.Actions.WorkflowDirs, []string{".hanzo/workflows", ".github/workflows"})()
+	defer test.MockVariableValue(&setting.Actions.ScopedWorkflowDirs, []string{".hanzo/scoped_workflows"})()
 	ctx := t.Context()
 
 	t.Run("LocalForms", func(t *testing.T) {
 		// Same-repo and cross-repo forms are not URLs and are parsed as-is.
-		ref, err := ResolveUses(ctx, "./.gitea/workflows/build.yml")
+		ref, err := ResolveUses(ctx, "./.hanzo/workflows/build.yml")
 		require.NoError(t, err)
-		assert.Equal(t, jobparser.UsesRef{Kind: jobparser.UsesKindLocalSameRepo, Path: ".gitea/workflows/build.yml"}, *ref)
+		assert.Equal(t, jobparser.UsesRef{Kind: jobparser.UsesKindLocalSameRepo, Path: ".hanzo/workflows/build.yml"}, *ref)
 
-		ref, err = ResolveUses(ctx, "owner/repo/.gitea/workflows/build.yml@v1")
+		ref, err = ResolveUses(ctx, "owner/repo/.hanzo/workflows/build.yml@v1")
 		require.NoError(t, err)
-		assert.Equal(t, jobparser.UsesRef{Kind: jobparser.UsesKindLocalCrossRepo, Owner: "owner", Repo: "repo", Path: ".gitea/workflows/build.yml", Ref: "v1"}, *ref)
+		assert.Equal(t, jobparser.UsesRef{Kind: jobparser.UsesKindLocalCrossRepo, Owner: "owner", Repo: "repo", Path: ".hanzo/workflows/build.yml", Ref: "v1"}, *ref)
 	})
 
 	t.Run("DirectoryAllowlist", func(t *testing.T) {
 		// SCOPED_WORKFLOW_DIRS is allowed (local and cross-repo).
-		ref, err := ResolveUses(ctx, "./.gitea/scoped_workflows/lib.yml")
+		ref, err := ResolveUses(ctx, "./.hanzo/scoped_workflows/lib.yml")
 		require.NoError(t, err)
-		assert.Equal(t, ".gitea/scoped_workflows/lib.yml", ref.Path)
+		assert.Equal(t, ".hanzo/scoped_workflows/lib.yml", ref.Path)
 
-		ref, err = ResolveUses(ctx, "owner/repo/.gitea/scoped_workflows/lib.yml@v1")
+		ref, err = ResolveUses(ctx, "owner/repo/.hanzo/scoped_workflows/lib.yml@v1")
 		require.NoError(t, err)
-		assert.Equal(t, ".gitea/scoped_workflows/lib.yml", ref.Path)
+		assert.Equal(t, ".hanzo/scoped_workflows/lib.yml", ref.Path)
 
 		// A directory that is neither WORKFLOW_DIRS nor SCOPED_WORKFLOW_DIRS parses but is rejected by the allowlist.
 		_, err = ResolveUses(ctx, "./not-workflows/build.yml")
@@ -173,28 +173,28 @@ func TestResolveUses(t *testing.T) {
 	})
 
 	t.Run("ConfigurableWorkflowDirs", func(t *testing.T) {
-		// A non-default WORKFLOW_DIRS is honored (the hardcoded ".gitea/workflows" is no longer special).
-		defer test.MockVariableValue(&setting.Actions.WorkflowDirs, []string{".gitea/ci"})()
-		ref, err := ResolveUses(ctx, "./.gitea/ci/build.yml")
+		// A non-default WORKFLOW_DIRS is honored (the hardcoded ".hanzo/workflows" is no longer special).
+		defer test.MockVariableValue(&setting.Actions.WorkflowDirs, []string{".hanzo/ci"})()
+		ref, err := ResolveUses(ctx, "./.hanzo/ci/build.yml")
 		require.NoError(t, err)
-		assert.Equal(t, ".gitea/ci/build.yml", ref.Path)
+		assert.Equal(t, ".hanzo/ci/build.yml", ref.Path)
 
-		_, err = ResolveUses(ctx, "./.gitea/workflows/build.yml") // no longer a configured dir
+		_, err = ResolveUses(ctx, "./.hanzo/workflows/build.yml") // no longer a configured dir
 		require.Error(t, err)
 	})
 
 	t.Run("LocalInstanceURL", func(t *testing.T) {
 		// An absolute URL on this instance (incl. AppSubURL) resolves to the equivalent cross-repo ref.
-		ref, err := ResolveUses(ctx, "https://gitea.example.com/sub/owner/repo/.gitea/workflows/ci.yml@refs/heads/main")
+		ref, err := ResolveUses(ctx, "https://gitea.example.com/sub/owner/repo/.hanzo/workflows/ci.yml@refs/heads/main")
 		require.NoError(t, err)
-		assert.Equal(t, jobparser.UsesRef{Kind: jobparser.UsesKindLocalCrossRepo, Owner: "owner", Repo: "repo", Path: ".gitea/workflows/ci.yml", Ref: "refs/heads/main"}, *ref)
+		assert.Equal(t, jobparser.UsesRef{Kind: jobparser.UsesKindLocalCrossRepo, Owner: "owner", Repo: "repo", Path: ".hanzo/workflows/ci.yml", Ref: "refs/heads/main"}, *ref)
 	})
 
 	t.Run("InvalidSyntax", func(t *testing.T) {
 		for _, in := range []string{
-			"owner/.gitea/workflows/foo.yml",                                             // missing repo segment
-			"owner/repo/.gitea/workflows/foo.yml",                                        // missing @ref
-			"https://gitea.example.com/sub/repo/.gitea/workflows/ci.yml@refs/heads/main", // local absolute URL but missing owner
+			"owner/.hanzo/workflows/foo.yml",                                             // missing repo segment
+			"owner/repo/.hanzo/workflows/foo.yml",                                        // missing @ref
+			"https://gitea.example.com/sub/repo/.hanzo/workflows/ci.yml@refs/heads/main", // local absolute URL but missing owner
 			"not a valid uses at all",
 		} {
 			_, err := ResolveUses(ctx, in)
@@ -203,7 +203,7 @@ func TestResolveUses(t *testing.T) {
 	})
 
 	t.Run("ForeignURL", func(t *testing.T) {
-		_, err := ResolveUses(ctx, "https://other.gitea-example.com/owner/repo/.gitea/workflows/ci.yaml@v1")
+		_, err := ResolveUses(ctx, "https://other.gitea-example.com/owner/repo/.hanzo/workflows/ci.yaml@v1")
 		assert.ErrorContains(t, err, "must point to this Hanzo Git instance")
 	})
 }

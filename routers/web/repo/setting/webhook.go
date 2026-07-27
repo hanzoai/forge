@@ -335,7 +335,7 @@ func gitHookParams(ctx *context.Context) webhookParams {
 	}
 
 	return webhookParams{
-		Type:        webhook_module.GITEA,
+		Type:        webhook_module.NATIVE,
 		URL:         form.PayloadURL,
 		ContentType: contentType,
 		HTTPMethod:  form.HTTPMethod,

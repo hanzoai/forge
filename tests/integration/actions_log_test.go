@@ -35,12 +35,12 @@ func TestDownloadTaskLogs(t *testing.T) {
 		zstdEnabled bool
 	}{
 		{
-			treePath: ".gitea/workflows/download-task-logs-zstd.yml",
+			treePath: ".hanzo/workflows/download-task-logs-zstd.yml",
 			fileContent: `name: download-task-logs-zstd
 on:
   push:
     paths:
-      - '.gitea/workflows/download-task-logs-zstd.yml'
+      - '.hanzo/workflows/download-task-logs-zstd.yml'
 jobs:
     job1:
       runs-on: ubuntu-latest
@@ -90,12 +90,12 @@ jobs:
 			zstdEnabled: true,
 		},
 		{
-			treePath: ".gitea/workflows/download-task-logs-no-zstd.yml",
+			treePath: ".hanzo/workflows/download-task-logs-no-zstd.yml",
 			fileContent: `name: download-task-logs-no-zstd
 on:
   push:
     paths:
-      - '.gitea/workflows/download-task-logs-no-zstd.yml'
+      - '.hanzo/workflows/download-task-logs-no-zstd.yml'
 jobs:
     job1:
       runs-on: ubuntu-latest
@@ -218,12 +218,12 @@ jobs:
 		}
 
 		t.Run("DownloadRerunTaskLogs", func(t *testing.T) {
-			treePath := ".gitea/workflows/download-rerun-logs.yml"
+			treePath := ".hanzo/workflows/download-rerun-logs.yml"
 			fileContent := `name: download-rerun-logs
 on:
   push:
     paths:
-      - '.gitea/workflows/download-rerun-logs.yml'
+      - '.hanzo/workflows/download-rerun-logs.yml'
 jobs:
     job1:
       runs-on: ubuntu-latest

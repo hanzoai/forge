@@ -17,10 +17,10 @@ type UsesKind int
 
 const (
 	// UsesKindLocalSameRepo is "./<dir>/foo.yml" - a path inside the calling repository.
-	// For example: "./.gitea/workflows/foo.yml"
+	// For example: "./.hanzo/workflows/foo.yml"
 	UsesKindLocalSameRepo UsesKind = iota + 1
 	// UsesKindLocalCrossRepo is "owner/repo/<dir>/foo.yml@ref" - a workflow in another repo on the same instance.
-	// For example: "owner/repo/.gitea/workflows/foo.yml@ref"
+	// For example: "owner/repo/.hanzo/workflows/foo.yml@ref"
 	UsesKindLocalCrossRepo
 )
 

@@ -404,7 +404,7 @@ func MockActionsRunsJobs(ctx *context.Context) {
 				ID: localCallerID, Link: jobLink(localCallerID), JobID: "local_caller", Name: "local caller",
 				Status: actions_model.StatusRunning.String(), Duration: "5m",
 				Needs:            []string{"prepare"},
-				IsReusableCaller: true, CallUses: "./.gitea/workflows/lib.yml",
+				IsReusableCaller: true, CallUses: "./.hanzo/workflows/lib.yml",
 			},
 			{
 				ID: libStepID, Link: jobLink(libStepID), JobID: "lib_step", Name: "lib step",
@@ -415,7 +415,7 @@ func MockActionsRunsJobs(ctx *context.Context) {
 				ID: innerCallerID, Link: jobLink(innerCallerID), JobID: "inner_caller", Name: "inner caller (nested)",
 				Status: actions_model.StatusRunning.String(), Duration: "4m",
 				ParentJobID:      localCallerID,
-				IsReusableCaller: true, CallUses: "./.gitea/workflows/inner.yml",
+				IsReusableCaller: true, CallUses: "./.hanzo/workflows/inner.yml",
 			},
 			{
 				ID: deepJobID, Link: jobLink(deepJobID), JobID: "deep_job", Name: "deep job",
@@ -426,7 +426,7 @@ func MockActionsRunsJobs(ctx *context.Context) {
 				ID: crossCallerID, Link: jobLink(crossCallerID), JobID: "cross_caller", Name: "cross-repo caller",
 				Status: actions_model.StatusWaiting.String(), Duration: "0s",
 				Needs:            []string{"prepare"},
-				IsReusableCaller: true, CallUses: "user2/lib-repo/.gitea/workflows/external.yml@main",
+				IsReusableCaller: true, CallUses: "user2/lib-repo/.hanzo/workflows/external.yml@main",
 			},
 			{
 				ID: externalJobID, Link: jobLink(externalJobID), JobID: "external_job", Name: "external job",

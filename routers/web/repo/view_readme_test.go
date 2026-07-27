@@ -18,7 +18,7 @@ import (
 )
 
 func TestFindReadmeFileInEntriesWithSymlinkInSubfolder(t *testing.T) {
-	for _, subdir := range []string{".github", ".gitea", "docs"} {
+	for _, subdir := range []string{".github", ".hanzo", "docs"} {
 		t.Run(subdir, func(t *testing.T) {
 			repoPath := t.TempDir()
 			stdin := fmt.Sprintf(`commit refs/heads/master

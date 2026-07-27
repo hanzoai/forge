@@ -47,12 +47,12 @@ func TestActionsRerun(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, repo.OwnerName, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wfTreePath := ".gitea/workflows/actions-rerun-workflow-1.yml"
+		wfTreePath := ".hanzo/workflows/actions-rerun-workflow-1.yml"
 		wfFileContent := `name: actions-rerun-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/actions-rerun-workflow-1.yml'
+      - '.hanzo/workflows/actions-rerun-workflow-1.yml'
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -209,7 +209,7 @@ func TestActionsRerunLegacyNoAttemptRun(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, repo.OwnerName, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wfTreePath := ".gitea/workflows/actions-rerun-legacy.yml"
+		wfTreePath := ".hanzo/workflows/actions-rerun-legacy.yml"
 		wfFileContent := `name: actions-rerun-legacy
 on:
   workflow_dispatch:

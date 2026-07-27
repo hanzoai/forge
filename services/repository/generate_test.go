@@ -17,7 +17,7 @@ import (
 )
 
 func TestGitTemplate(t *testing.T) {
-	giteaTemplate := []byte(`
+	gitTemplate := []byte(`
 # Header
 
 # All .go files
@@ -30,7 +30,7 @@ text/*.txt
 **/modules/*
 `)
 
-	gt := newGitTemplateFileMatcher("", giteaTemplate)
+	gt := newGitTemplateFileMatcher("", gitTemplate)
 	assert.Len(t, gt.globs, 3)
 
 	tt := []struct {
@@ -76,7 +76,7 @@ func TestFilePathSanitize(t *testing.T) {
 }
 
 func TestProcessGitTemplateFileGenerate(t *testing.T) {
-	tmpDir := filepath.Join(t.TempDir(), "gitea-template-test")
+	tmpDir := filepath.Join(t.TempDir(), "git-template-test")
 
 	assertFileContent := func(path, expected string) {
 		data, err := os.ReadFile(filepath.Join(tmpDir, path))
@@ -100,8 +100,8 @@ func TestProcessGitTemplateFileGenerate(t *testing.T) {
 
 	require.NoError(t, os.MkdirAll(tmpDir+"/.git", 0o755))
 	require.NoError(t, os.WriteFile(tmpDir+"/.git/config", []byte("git-config-dummy"), 0o644))
-	require.NoError(t, os.MkdirAll(tmpDir+"/.gitea", 0o755))
-	require.NoError(t, os.WriteFile(tmpDir+"/.gitea/template", []byte("*\ninclude/**"), 0o644))
+	require.NoError(t, os.MkdirAll(tmpDir+"/.hanzo", 0o755))
+	require.NoError(t, os.WriteFile(tmpDir+"/.hanzo/template", []byte("*\ninclude/**"), 0o644))
 	require.NoError(t, os.MkdirAll(tmpDir+"/sub", 0o755))
 	require.NoError(t, os.MkdirAll(tmpDir+"/include/foo/bar", 0o755))
 
@@ -169,7 +169,7 @@ func TestProcessGitTemplateFileGenerate(t *testing.T) {
 			"subst-TemplateRepoName-to-link",
 		}, skippedFiles)
 		assertFileContent(".git/config", "")
-		assertFileContent(".gitea/template", "")
+		assertFileContent(".hanzo/template", "")
 		assertFileContent("include/foo/bar/test.txt", "include subdir TemplateRepoName")
 	}
 
@@ -214,8 +214,8 @@ func TestProcessGitTemplateFileGenerate(t *testing.T) {
 
 func TestProcessGitTemplateFileRead(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Mkdir(tmpDir+"/.gitea", 0o755)
-	templateFilePath := tmpDir + "/.gitea/template"
+	_ = os.Mkdir(tmpDir+"/.hanzo", 0o755)
+	templateFilePath := tmpDir + "/.hanzo/template"
 	_ = os.Remove(templateFilePath)
 	_, err := os.Lstat(templateFilePath)
 	require.ErrorIs(t, err, fs.ErrNotExist)

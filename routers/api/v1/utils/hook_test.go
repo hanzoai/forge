@@ -25,7 +25,7 @@ func TestTestHookValidation(t *testing.T) {
 		contexttest.LoadUser(t, ctx, 2)
 
 		checkCreateHookOption(ctx, &structs.CreateHookOption{
-			Type: "gitea",
+			Type: "native",
 			Config: map[string]string{
 				"content_type": "json",
 				"url":          "https://example.com/webhook",
@@ -41,7 +41,7 @@ func TestTestHookValidation(t *testing.T) {
 		contexttest.LoadUser(t, ctx, 2)
 
 		checkCreateHookOption(ctx, &structs.CreateHookOption{
-			Type: "gitea",
+			Type: "native",
 			Config: map[string]string{
 				"content_type": "json",
 				"url":          "example.com/webhook",

@@ -168,14 +168,14 @@ func buildRunnerTask(ctx context.Context, t *actions_model.ActionTask) (*runnerv
 }
 
 func generateTaskContext(ctx context.Context, t *actions_model.ActionTask) (*structpb.Struct, error) {
-	giteaRuntimeToken, err := CreateAuthorizationToken(t.ID, t.Job.RunID, t.JobID)
+	gitRuntimeToken, err := CreateAuthorizationToken(t.ID, t.Job.RunID, t.JobID)
 	if err != nil {
 		return nil, err
 	}
 
 	gitCtx := GenerateGitContext(ctx, t.Job.Run, nil, t.Job)
 	gitCtx["token"] = t.Token
-	gitCtx["gitea_runtime_token"] = giteaRuntimeToken
+	gitCtx["git_runtime_token"] = gitRuntimeToken
 
 	return structpb.NewStruct(gitCtx)
 }

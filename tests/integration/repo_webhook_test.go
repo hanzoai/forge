@@ -76,7 +76,7 @@ func testAPICreateWebhookForRepo(t *testing.T, session *TestSession, userName, r
 		branchFilterString = branchFilter[0]
 	}
 	req := NewRequestWithJSON(t, "POST", "/v1/repos/"+userName+"/"+repoName+"/hooks", api.CreateHookOption{
-		Type: "gitea",
+		Type: "native",
 		Config: api.CreateHookOptionConfig{
 			"content_type": "json",
 			"url":          url,
@@ -102,7 +102,7 @@ func testCreateWebhookForRepo(t *testing.T, session *TestSession, webhookType, u
 func testAPICreateWebhookForOrg(t *testing.T, session *TestSession, userName, url, event string) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeAll)
 	req := NewRequestWithJSON(t, "POST", "/v1/orgs/"+userName+"/hooks", api.CreateHookOption{
-		Type: "gitea",
+		Type: "native",
 		Config: api.CreateHookOptionConfig{
 			"content_type": "json",
 			"url":          url,
@@ -1010,7 +1010,7 @@ func Test_WebhookWorkflowJob(t *testing.T) {
 
 		// add workflow file to the repo
 		// init the workflow
-		wfTreePath := ".gitea/workflows/push.yml"
+		wfTreePath := ".hanzo/workflows/push.yml"
 		wfFileContent := `name: Push
 on: push
 jobs:
@@ -1199,7 +1199,7 @@ func testWorkflowRunEvents(t *testing.T, webhookData *workflowRunWebhook) {
 
 	// add workflow file to the repo
 	// init the workflow
-	wfTreePath := ".gitea/workflows/push.yml"
+	wfTreePath := ".hanzo/workflows/push.yml"
 	wfFileContent := `on:
   push:
   workflow_dispatch:
@@ -1324,7 +1324,7 @@ func testWorkflowRunEventsOnRerun(t *testing.T, webhookData *workflowRunWebhook)
 
 	// add workflow file to the repo
 	// init the workflow
-	wfTreePath := ".gitea/workflows/push.yml"
+	wfTreePath := ".hanzo/workflows/push.yml"
 	wfFileContent := `on:
   push:
   workflow_dispatch:
@@ -1495,7 +1495,7 @@ func testWorkflowRunEventsOnCancellingAbandonedRun(t *testing.T, webhookData *wo
 	// add workflow file to the repo
 	// init the workflow
 	wfilename := "push.yml"
-	wfTreePath := ".gitea/workflows/" + wfilename
+	wfTreePath := ".hanzo/workflows/" + wfilename
 	wfFileContent := `on:
   push:
   workflow_dispatch:
@@ -1635,13 +1635,13 @@ func testWorkflowRunOnStoppingEndlessTasksForMultipleRuns(t *testing.T, webhookD
 		runners[i].registerAsRepoRunner(t, "user2", repoName, fmt.Sprintf("mock-runner-%d", i), []string{"ubuntu-latest"}, false)
 	}
 
-	workflowPath1 := ".gitea/workflows/endless-1.yml"
-	workflowPath2 := ".gitea/workflows/endless-2.yml"
+	workflowPath1 := ".hanzo/workflows/endless-1.yml"
+	workflowPath2 := ".hanzo/workflows/endless-2.yml"
 	workflowContent1 := `name: endless-1
 on:
   push:
     paths:
-      - '.gitea/workflows/endless-1.yml'
+      - '.hanzo/workflows/endless-1.yml'
 jobs:
   job-1:
     runs-on: ubuntu-latest
@@ -1652,7 +1652,7 @@ jobs:
 on:
   push:
     paths:
-      - '.gitea/workflows/endless-2.yml'
+      - '.hanzo/workflows/endless-2.yml'
 jobs:
   job-2:
     runs-on: ubuntu-latest
@@ -1725,13 +1725,13 @@ jobs:
     steps:
       - run: echo 'test the webhook'
 `)
-	createWorkflowFile(t, token, "user2", "repo1", ".gitea/workflows/dispatch.yml", opts)
+	createWorkflowFile(t, token, "user2", "repo1", ".hanzo/workflows/dispatch.yml", opts)
 
 	// 2.2 trigger the webhooks
 
 	// add workflow file to the repo
 	// init the workflow
-	wfTreePath := ".gitea/workflows/push.yml"
+	wfTreePath := ".hanzo/workflows/push.yml"
 	wfFileContent := `name: Push
 on: push
 jobs:
@@ -1813,7 +1813,7 @@ func testWebhookWorkflowRunDepthLimit(t *testing.T, webhookData *workflowRunWebh
 
 	// add workflow file to the repo
 	// init the workflow
-	wfTreePath := ".gitea/workflows/push.yml"
+	wfTreePath := ".hanzo/workflows/push.yml"
 	wfFileContent := `name: Endless Loop
 on:
   push:

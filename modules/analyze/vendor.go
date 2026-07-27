@@ -25,7 +25,7 @@ func IsVendor(treePath string) bool {
 	case ".gitignore", ".gitattributes", ".gitmodules":
 		return false
 	}
-	if strings.HasPrefix(treePath, ".github/") || strings.HasPrefix(treePath, ".gitea/") {
+	if strings.HasPrefix(treePath, ".github/") || strings.HasPrefix(treePath, ".hanzo/") {
 		return false
 	}
 	return true

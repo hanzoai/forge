@@ -41,12 +41,12 @@ func TestJobWithNeeds(t *testing.T) {
 		expectedStatuses map[string]string
 	}{
 		{
-			treePath: ".gitea/workflows/job-with-needs.yml",
+			treePath: ".hanzo/workflows/job-with-needs.yml",
 			fileContent: `name: job-with-needs
 on:
   push:
     paths:
-      - '.gitea/workflows/job-with-needs.yml'
+      - '.hanzo/workflows/job-with-needs.yml'
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -72,12 +72,12 @@ jobs:
 			},
 		},
 		{
-			treePath: ".gitea/workflows/job-with-needs-fail.yml",
+			treePath: ".hanzo/workflows/job-with-needs-fail.yml",
 			fileContent: `name: job-with-needs-fail
 on:
   push:
     paths:
-      - '.gitea/workflows/job-with-needs-fail.yml'
+      - '.hanzo/workflows/job-with-needs-fail.yml'
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -100,12 +100,12 @@ jobs:
 			},
 		},
 		{
-			treePath: ".gitea/workflows/job-with-needs-fail-if.yml",
+			treePath: ".hanzo/workflows/job-with-needs-fail-if.yml",
 			fileContent: `name: job-with-needs-fail-if
 on:
   push:
     paths:
-      - '.gitea/workflows/job-with-needs-fail-if.yml'
+      - '.hanzo/workflows/job-with-needs-fail-if.yml'
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -181,12 +181,12 @@ func TestJobNeedsMatrix(t *testing.T) {
 		expectedTaskNeeds map[string]*runnerv1.TaskNeed // jobID => TaskNeed
 	}{
 		{
-			treePath: ".gitea/workflows/jobs-outputs-with-matrix.yml",
+			treePath: ".hanzo/workflows/jobs-outputs-with-matrix.yml",
 			fileContent: `name: jobs-outputs-with-matrix
 on:
   push:
     paths:
-      - '.gitea/workflows/jobs-outputs-with-matrix.yml'
+      - '.hanzo/workflows/jobs-outputs-with-matrix.yml'
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -247,12 +247,12 @@ jobs:
 			},
 		},
 		{
-			treePath: ".gitea/workflows/jobs-outputs-with-matrix-failure.yml",
+			treePath: ".hanzo/workflows/jobs-outputs-with-matrix-failure.yml",
 			fileContent: `name: jobs-outputs-with-matrix-failure
 on:
   push:
     paths:
-      - '.gitea/workflows/jobs-outputs-with-matrix-failure.yml'
+      - '.hanzo/workflows/jobs-outputs-with-matrix-failure.yml'
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -433,7 +433,7 @@ func prepareRunnerDisableEnableTest(t *testing.T, user *user_model.User, authTok
 	runner := newMockRunner()
 	runner.registerAsRepoRunner(t, user.Name, apiRepo.Name, runnerName, []string{"ubuntu-latest"}, false)
 
-	wfTreePath := fmt.Sprintf(".gitea/workflows/%s.yml", workflowName)
+	wfTreePath := fmt.Sprintf(".hanzo/workflows/%s.yml", workflowName)
 	wfContent := fmt.Sprintf(`name: %s
 on: [push]
 jobs:
@@ -481,7 +481,7 @@ func TestActionsGitContext(t *testing.T) {
 		runner.registerAsRepoRunner(t, baseRepo.OwnerName, baseRepo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
 		// init the workflow
-		wfTreePath := ".gitea/workflows/pull.yml"
+		wfTreePath := ".hanzo/workflows/pull.yml"
 		wfFileContent := `name: Pull Request
 on: pull_request
 jobs:
@@ -569,7 +569,7 @@ func TestActionsGitContextEphemeral(t *testing.T) {
 		assert.NoError(t, err)
 
 		// init the workflow
-		wfTreePath := ".gitea/workflows/pull.yml"
+		wfTreePath := ".hanzo/workflows/pull.yml"
 		wfFileContent := `name: Pull Request
 on: pull_request
 jobs:

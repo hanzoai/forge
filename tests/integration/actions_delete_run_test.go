@@ -32,12 +32,12 @@ func TestActionsDeleteRun(t *testing.T) {
 		outcomes         map[string]*mockTaskOutcome
 		expectedStatuses map[string]string
 	}{
-		treePath: ".gitea/workflows/test1.yml",
+		treePath: ".hanzo/workflows/test1.yml",
 		fileContent: `name: test1
 on:
   push:
     paths:
-      - .gitea/workflows/test1.yml
+      - .hanzo/workflows/test1.yml
 jobs:
   job1:
     runs-on: ubuntu-latest

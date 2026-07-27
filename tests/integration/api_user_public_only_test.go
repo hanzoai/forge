@@ -93,7 +93,7 @@ func TestAPIPublicOnlySelfUserRoutes(t *testing.T) {
 
 		MakeRequest(t, NewRequest(t, "GET", "/v1/user/hooks").AddTokenAuth(privateReadUserToken), http.StatusForbidden)
 		hookReq := NewRequestWithJSON(t, "POST", "/v1/user/hooks", api.CreateHookOption{
-			Type: "gitea",
+			Type: "native",
 			Config: api.CreateHookOptionConfig{
 				"content_type": "json",
 				"url":          "http://example.com/",

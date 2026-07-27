@@ -27,7 +27,7 @@ import (
 
 type GitContext map[string]any
 
-// GenerateGitContext generate the gitea context without token and gitea_runtime_token.
+// GenerateGitContext generate the gitea context without token and git_runtime_token.
 // attempt and job can be nil when generating a context for parsing workflow-level expressions.
 //
 // The run_attempt value is resolved with the following precedence:
@@ -94,7 +94,7 @@ func GenerateGitContext(ctx context.Context, run *actions_model.ActionRun, attem
 		"workspace":         "",                                       // string, The default working directory on the runner for steps, and the default location of your repository when using the checkout action.
 
 		// additional contexts
-		"gitea_default_actions_url": setting.Actions.DefaultActionsURL.URL(),
+		"git_default_actions_url": setting.Actions.DefaultActionsURL.URL(),
 	}
 
 	if job != nil {

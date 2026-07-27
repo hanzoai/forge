@@ -41,7 +41,7 @@ func TestActionsLogFinalizeWithoutRows(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		const wfTreePath = ".gitea/workflows/finalize-no-rows.yml"
+		const wfTreePath = ".hanzo/workflows/finalize-no-rows.yml"
 		wfFileContent := fmt.Sprintf(`name: finalize-no-rows
 on:
   push:

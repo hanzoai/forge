@@ -38,7 +38,7 @@ func TestActionsCollaborativeOwner(t *testing.T) {
 		runner.registerAsRepoRunner(t, callerRepo.OwnerName, callerRepo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
 		// init the workflow for caller
-		wfTreePath := ".gitea/workflows/test_collaborative_owner.yml"
+		wfTreePath := ".hanzo/workflows/test_collaborative_owner.yml"
 		wfFileContent := `name: Test Collaborative Owner
 on: push
 jobs:

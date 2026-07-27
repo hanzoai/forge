@@ -24,7 +24,7 @@ func createIssueConfig(t *testing.T, user *user_model.User, repo *repo_model.Rep
 	config, err := yaml.Marshal(issueConfig)
 	assert.NoError(t, err)
 
-	err = createOrReplaceFileInBranch(user, repo, ".gitea/ISSUE_TEMPLATE/config.yaml", repo.DefaultBranch, string(config))
+	err = createOrReplaceFileInBranch(user, repo, ".hanzo/ISSUE_TEMPLATE/config.yaml", repo.DefaultBranch, string(config))
 	assert.NoError(t, err)
 }
 
@@ -114,8 +114,8 @@ func TestAPIRepoIssueConfigPaths(t *testing.T) {
 	owner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: repo.OwnerID})
 
 	templateConfigCandidates := []string{
-		".gitea/ISSUE_TEMPLATE/config",
-		".gitea/issue_template/config",
+		".hanzo/ISSUE_TEMPLATE/config",
+		".hanzo/issue_template/config",
 		".github/ISSUE_TEMPLATE/config",
 		".github/issue_template/config",
 	}

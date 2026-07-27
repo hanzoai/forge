@@ -52,12 +52,12 @@ func TestWorkflowConcurrency(t *testing.T) {
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)
 
-		wf1TreePath := ".gitea/workflows/concurrent-workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/concurrent-workflow-1.yml"
 		wf1FileContent := `name: concurrent-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-1.yml'
+      - '.hanzo/workflows/concurrent-workflow-1.yml'
 concurrency:
   group: workflow-main-abc123-user2
 jobs:
@@ -66,12 +66,12 @@ jobs:
     steps:
       - run: echo 'job from workflow1'
 `
-		wf2TreePath := ".gitea/workflows/concurrent-workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/concurrent-workflow-2.yml"
 		wf2FileContent := `name: concurrent-workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-2.yml'
+      - '.hanzo/workflows/concurrent-workflow-2.yml'
 concurrency:
   group: workflow-${{ gitea.ref_name }}-${{ vars.myvar }}-${{ gitea.event.pusher.username }}
 jobs:
@@ -80,12 +80,12 @@ jobs:
     steps:
       - run: echo 'job from workflow2'
 `
-		wf3TreePath := ".gitea/workflows/concurrent-workflow-3.yml"
+		wf3TreePath := ".hanzo/workflows/concurrent-workflow-3.yml"
 		wf3FileContent := `name: concurrent-workflow-3
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-3.yml'
+      - '.hanzo/workflows/concurrent-workflow-3.yml'
 concurrency:
   group: workflow-main-abc${{ 123 }}-${{ gitea.event.pusher.username }}
 jobs:
@@ -160,12 +160,12 @@ func TestWorkflowConcurrencyShort(t *testing.T) {
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)
 
-		wf1TreePath := ".gitea/workflows/concurrent-workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/concurrent-workflow-1.yml"
 		wf1FileContent := `name: concurrent-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-1.yml'
+      - '.hanzo/workflows/concurrent-workflow-1.yml'
 concurrency: workflow-main-abc123-user2
 jobs:
   wf1-job:
@@ -173,12 +173,12 @@ jobs:
     steps:
       - run: echo 'job from workflow1'
 `
-		wf2TreePath := ".gitea/workflows/concurrent-workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/concurrent-workflow-2.yml"
 		wf2FileContent := `name: concurrent-workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-2.yml'
+      - '.hanzo/workflows/concurrent-workflow-2.yml'
 concurrency: workflow-${{ gitea.ref_name }}-${{ vars.myvar }}-${{ gitea.event.pusher.username }}
 jobs:
   wf2-job:
@@ -186,12 +186,12 @@ jobs:
     steps:
       - run: echo 'job from workflow2'
 `
-		wf3TreePath := ".gitea/workflows/concurrent-workflow-3.yml"
+		wf3TreePath := ".hanzo/workflows/concurrent-workflow-3.yml"
 		wf3FileContent := `name: concurrent-workflow-3
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-3.yml'
+      - '.hanzo/workflows/concurrent-workflow-3.yml'
 concurrency: workflow-main-abc${{ 123 }}-${{ gitea.event.pusher.username }}
 jobs:
   wf3-job:
@@ -265,12 +265,12 @@ func TestWorkflowConcurrencyShortJson(t *testing.T) {
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)
 
-		wf1TreePath := ".gitea/workflows/concurrent-workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/concurrent-workflow-1.yml"
 		wf1FileContent := `name: concurrent-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-1.yml'
+      - '.hanzo/workflows/concurrent-workflow-1.yml'
 concurrency: |-
     ${{ fromjson('{
         "group": "workflow-main-abc123-user2",
@@ -282,12 +282,12 @@ jobs:
     steps:
       - run: echo 'job from workflow1'
 `
-		wf2TreePath := ".gitea/workflows/concurrent-workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/concurrent-workflow-2.yml"
 		wf2FileContent := `name: concurrent-workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-2.yml'
+      - '.hanzo/workflows/concurrent-workflow-2.yml'
 concurrency: |-
     ${{ fromjson('{
         "group": "workflow-main-abc123-user2",
@@ -299,12 +299,12 @@ jobs:
     steps:
       - run: echo 'job from workflow2'
 `
-		wf3TreePath := ".gitea/workflows/concurrent-workflow-3.yml"
+		wf3TreePath := ".hanzo/workflows/concurrent-workflow-3.yml"
 		wf3FileContent := `name: concurrent-workflow-3
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-3.yml'
+      - '.hanzo/workflows/concurrent-workflow-3.yml'
 concurrency: |-
     ${{ fromjson('{
         "group": "workflow-main-abc123-user2",
@@ -379,7 +379,7 @@ func TestPullRequestWorkflowConcurrency(t *testing.T) {
 		runner.registerAsRepoRunner(t, baseRepo.OwnerName, baseRepo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
 		// init the workflow
-		wfTreePath := ".gitea/workflows/pull.yml"
+		wfTreePath := ".hanzo/workflows/pull.yml"
 		wfFileContent := `name: Pull Request
 on: pull_request
 concurrency:
@@ -532,12 +532,12 @@ func TestJobConcurrency(t *testing.T) {
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)
 
-		wf1TreePath := ".gitea/workflows/concurrent-workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/concurrent-workflow-1.yml"
 		wf1FileContent := `name: concurrent-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-1.yml'
+      - '.hanzo/workflows/concurrent-workflow-1.yml'
 jobs:
   wf1-job1:
     runs-on: runner1
@@ -546,12 +546,12 @@ jobs:
     steps:
       - run: echo 'wf1-job1'
 `
-		wf2TreePath := ".gitea/workflows/concurrent-workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/concurrent-workflow-2.yml"
 		wf2FileContent := `name: concurrent-workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-2.yml'
+      - '.hanzo/workflows/concurrent-workflow-2.yml'
 jobs:
   wf2-job1:
     runs-on: runner2
@@ -568,12 +568,12 @@ jobs:
     steps:
       - run: echo 'wf2-job2'
 `
-		wf3TreePath := ".gitea/workflows/concurrent-workflow-3.yml"
+		wf3TreePath := ".hanzo/workflows/concurrent-workflow-3.yml"
 		wf3FileContent := `name: concurrent-workflow-3
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-3.yml'
+      - '.hanzo/workflows/concurrent-workflow-3.yml'
 jobs:
   wf3-job1:
     runs-on: runner1
@@ -681,12 +681,12 @@ func TestMatrixConcurrency(t *testing.T) {
 		darwinRunner := newMockRunner()
 		darwinRunner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-darwin-runner", []string{"darwin-runner"}, false)
 
-		wf1TreePath := ".gitea/workflows/concurrent-workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/concurrent-workflow-1.yml"
 		wf1FileContent := `name: concurrent-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-1.yml'
+      - '.hanzo/workflows/concurrent-workflow-1.yml'
 jobs:
   wf1-job:
     runs-on: ${{ matrix.os }}-runner
@@ -699,12 +699,12 @@ jobs:
       - run: echo 'wf1'
 `
 
-		wf2TreePath := ".gitea/workflows/concurrent-workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/concurrent-workflow-2.yml"
 		wf2FileContent := `name: concurrent-workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-2.yml'
+      - '.hanzo/workflows/concurrent-workflow-2.yml'
 jobs:
   wf2-job:
     runs-on: ${{ matrix.os }}-runner
@@ -770,7 +770,7 @@ func TestWorkflowDispatchConcurrency(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wf1TreePath := ".gitea/workflows/workflow-dispatch-concurrency.yml"
+		wf1TreePath := ".hanzo/workflows/workflow-dispatch-concurrency.yml"
 		wf1FileContent := `name: workflow-dispatch-concurrency
 on:
   workflow_dispatch:
@@ -860,7 +860,7 @@ func TestWorkflowDispatchRerunAllJobsConcurrency(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wf1TreePath := ".gitea/workflows/workflow-dispatch-concurrency.yml"
+		wf1TreePath := ".hanzo/workflows/workflow-dispatch-concurrency.yml"
 		wf1FileContent := `name: workflow-dispatch-concurrency
 on:
   workflow_dispatch:
@@ -998,7 +998,7 @@ func TestWorkflowDispatchRerunSingleJobConcurrency(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wf1TreePath := ".gitea/workflows/workflow-dispatch-concurrency.yml"
+		wf1TreePath := ".hanzo/workflows/workflow-dispatch-concurrency.yml"
 		wf1FileContent := `name: workflow-dispatch-concurrency
 on:
   workflow_dispatch:
@@ -1137,7 +1137,7 @@ func TestScheduleConcurrency(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wf1TreePath := ".gitea/workflows/schedule-concurrency.yml"
+		wf1TreePath := ".hanzo/workflows/schedule-concurrency.yml"
 		wf1FileContent := `name: schedule-concurrency
 on:
   push:
@@ -1241,12 +1241,12 @@ func TestWorkflowAndJobConcurrency(t *testing.T) {
 		runner2 := newMockRunner()
 		runner2.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner-2", []string{"runner2"}, false)
 
-		wf1TreePath := ".gitea/workflows/concurrent-workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/concurrent-workflow-1.yml"
 		wf1FileContent := `name: concurrent-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-1.yml'
+      - '.hanzo/workflows/concurrent-workflow-1.yml'
 concurrency:
   group: workflow-group-1
 jobs:
@@ -1263,12 +1263,12 @@ jobs:
     steps:
       - run: echo 'wf1-job2'
 `
-		wf2TreePath := ".gitea/workflows/concurrent-workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/concurrent-workflow-2.yml"
 		wf2FileContent := `name: concurrent-workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-2.yml'
+      - '.hanzo/workflows/concurrent-workflow-2.yml'
 concurrency:
   group: workflow-group-1
 jobs:
@@ -1285,12 +1285,12 @@ jobs:
     steps:
       - run: echo 'wf2-job2'
 `
-		wf3TreePath := ".gitea/workflows/concurrent-workflow-3.yml"
+		wf3TreePath := ".hanzo/workflows/concurrent-workflow-3.yml"
 		wf3FileContent := `name: concurrent-workflow-3
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-3.yml'
+      - '.hanzo/workflows/concurrent-workflow-3.yml'
 concurrency:
   group: workflow-group-2
 jobs:
@@ -1302,12 +1302,12 @@ jobs:
       - run: echo 'wf3-job1'
 `
 
-		wf4TreePath := ".gitea/workflows/concurrent-workflow-4.yml"
+		wf4TreePath := ".hanzo/workflows/concurrent-workflow-4.yml"
 		wf4FileContent := `name: concurrent-workflow-4
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-4.yml'
+      - '.hanzo/workflows/concurrent-workflow-4.yml'
 concurrency:
   group: workflow-group-2
 jobs:
@@ -1429,7 +1429,7 @@ func TestCancelConcurrentRun(t *testing.T) {
 		runner.registerAsRepoRunner(t, repo.OwnerName, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
 		// init the workflow
-		wfTreePath := ".gitea/workflows/run.yml"
+		wfTreePath := ".hanzo/workflows/run.yml"
 		wfFileContent := `name: Cancel Run
 on: push
 concurrency:
@@ -1505,12 +1505,12 @@ func TestAbandonConcurrentRun(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, repo.OwnerName, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wf1TreePath := ".gitea/workflows/workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/workflow-1.yml"
 		wf1FileContent := `name: Workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/workflow-1.yml'
+      - '.hanzo/workflows/workflow-1.yml'
 concurrency:
   group: test-group
 jobs:
@@ -1524,12 +1524,12 @@ jobs:
       - run: echo 'wf1-job1'
 `
 
-		wf2TreePath := ".gitea/workflows/workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/workflow-2.yml"
 		wf2FileContent := `name: Workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/workflow-2.yml'
+      - '.hanzo/workflows/workflow-2.yml'
 concurrency:
   group: test-group
 jobs:
@@ -1607,12 +1607,12 @@ func TestRunAndJobWithSameConcurrencyGroup(t *testing.T) {
 		runner := newMockRunner()
 		runner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
 
-		wf1TreePath := ".gitea/workflows/concurrent-workflow-1.yml"
+		wf1TreePath := ".hanzo/workflows/concurrent-workflow-1.yml"
 		wf1FileContent := `name: concurrent-workflow-1
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-1.yml'
+      - '.hanzo/workflows/concurrent-workflow-1.yml'
 jobs:
   wf1-job:
     runs-on: ubuntu-latest
@@ -1621,12 +1621,12 @@ jobs:
     steps:
       - run: echo 'wf1-job'
 `
-		wf2TreePath := ".gitea/workflows/concurrent-workflow-2.yml"
+		wf2TreePath := ".hanzo/workflows/concurrent-workflow-2.yml"
 		wf2FileContent := `name: concurrent-workflow-2
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-2.yml'
+      - '.hanzo/workflows/concurrent-workflow-2.yml'
 concurrency:
   group: test-group
 jobs:
@@ -1635,12 +1635,12 @@ jobs:
     steps:
       - run: echo 'wf2-job'
 `
-		wf3TreePath := ".gitea/workflows/concurrent-workflow-3.yml"
+		wf3TreePath := ".hanzo/workflows/concurrent-workflow-3.yml"
 		wf3FileContent := `name: concurrent-workflow-3
 on:
   push:
     paths:
-      - '.gitea/workflows/concurrent-workflow-3.yml'
+      - '.hanzo/workflows/concurrent-workflow-3.yml'
 jobs:
   wf3-job:
     runs-on: ubuntu-latest

@@ -29,7 +29,7 @@ func TestAPICreateHook(t *testing.T) {
 	session := loginUser(t, "user1")
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
 	req := NewRequestWithJSON(t, "POST", fmt.Sprintf("/v1/repos/%s/%s/%s", owner.Name, repo.Name, "hooks"), api.CreateHookOption{
-		Type: "gitea",
+		Type: "native",
 		Config: api.CreateHookOptionConfig{
 			"content_type": "json",
 			"url":          "http://example.com/",
@@ -64,7 +64,7 @@ func TestAPICreateHook(t *testing.T) {
 
 	// Create with Name field omitted: Name should be ""
 	req2 := NewRequestWithJSON(t, "POST", hooksURL, api.CreateHookOption{
-		Type: "gitea",
+		Type: "native",
 		Config: api.CreateHookOptionConfig{
 			"content_type": "json",
 			"url":          "http://example.com/",

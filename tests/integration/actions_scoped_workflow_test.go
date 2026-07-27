@@ -87,7 +87,7 @@ func TestActionsScopedWorkflows(t *testing.T) {
 			adminSession := loginUser(t, "user1")
 			source := createTestRepo(t, "sw-trigger-source", false)
 			// commit the scoped workflow BEFORE registering so the source's own push does not self-trigger.
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/push.yaml", scopedPushWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/push.yaml", scopedPushWorkflow)
 			adminAdd := NewRequestWithValues(t, "POST", "/-/admin/actions/scoped-workflows/add", map[string]string{"repo_name": source.FullName()})
 			adminSession.MakeRequest(t, adminAdd, http.StatusOK)
 			t.Cleanup(func() {
@@ -133,7 +133,7 @@ func TestActionsScopedWorkflows(t *testing.T) {
 		t.Run("Opt-out", func(t *testing.T) {
 			// opt-out: a consumer can disable a non-required scoped workflow, but a required one cannot be disabled.
 			source := createTestRepo(t, "sw-optout-source", false)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/push.yaml", scopedPushWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/push.yaml", scopedPushWorkflow)
 			registerUserScopedSource(t, source) // non-required
 
 			// non-required: the kebab "Disable Workflow" item is an active link; disabling then makes a push produce no scoped run.
@@ -150,7 +150,7 @@ func TestActionsScopedWorkflows(t *testing.T) {
 
 			// required: the kebab "Disable Workflow" item is rendered disabled (no link), and the disable endpoint rejects it.
 			reqSource := createTestRepo(t, "sw-optout-req-source", false)
-			createRepoWorkflowFile(t, user2, user2Token, reqSource, ".gitea/scoped_workflows/push.yaml", scopedPushWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, reqSource, ".hanzo/scoped_workflows/push.yaml", scopedPushWorkflow)
 			registerUserScopedSource(t, reqSource, "push.yaml") // required
 			reqConsumer := createTestRepo(t, "sw-optout-req-consumer", false)
 			requiredBody := user2Session.MakeRequest(t, NewRequest(t, "GET",
@@ -167,7 +167,7 @@ func TestActionsScopedWorkflows(t *testing.T) {
 			// uses: ./ in a scoped workflow resolves against the SOURCE repo, not the consumer.
 			// Here the reusable lib lives in the SCOPED workflow dir (allowed by ResolveUses), exercising that path end-to-end.
 			source := createTestRepo(t, "sw-uses-source", false)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/lib.yaml", `name: Lib
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/lib.yaml", `name: Lib
 on:
   workflow_call:
 jobs:
@@ -176,16 +176,16 @@ jobs:
     steps:
       - run: echo from-source
 `)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/caller.yaml", `name: Caller
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/caller.yaml", `name: Caller
 on: push
 jobs:
   caller_job:
-    uses: ./.gitea/scoped_workflows/lib.yaml
+    uses: ./.hanzo/scoped_workflows/lib.yaml
 `)
 
 			consumer := createTestRepo(t, "sw-uses-consumer", false)
 			// a DIFFERENT lib at the same path in the consumer; if uses:./ mis-resolved we would see this job
-			createRepoWorkflowFile(t, user2, user2Token, consumer, ".gitea/scoped_workflows/lib.yaml", `name: Lib
+			createRepoWorkflowFile(t, user2, user2Token, consumer, ".hanzo/scoped_workflows/lib.yaml", `name: Lib
 on:
   workflow_call:
 jobs:
@@ -211,7 +211,7 @@ jobs:
 		t.Run("Workflow dispatch", func(t *testing.T) {
 			// a scoped on:workflow_dispatch workflow can be triggered manually from the consumer, via both the web form and the API
 			source := createTestRepo(t, "sw-dispatch-source", false)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/dispatch.yaml", `name: Scoped Dispatch
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/dispatch.yaml", `name: Scoped Dispatch
 on: workflow_dispatch
 jobs:
   dispatch-job:
@@ -244,7 +244,7 @@ jobs:
 			// A required scoped workflow's check gates PR merges on a protected branch and cannot be bypassed,
 			// whether or not the branch enables its own status check. The scoped check is added to the required set dynamically.
 			source := createTestRepo(t, "sw-gate-source", false)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/pr.yaml", scopedPRWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/pr.yaml", scopedPRWorkflow)
 			registerUserScopedSource(t, source, "pr.yaml") // required
 
 			// protectAndOpenPR protects consumer's default branch and opens a PR on `branch`, returning a merge-request builder.
@@ -361,7 +361,7 @@ jobs:
       - run: echo scoped-filtered
 `
 			source := createTestRepo(t, "sw-filtered-source", false)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/pr.yaml", scopedFilteredPRWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/pr.yaml", scopedFilteredPRWorkflow)
 			registerUserScopedSource(t, source, "pr.yaml") // required
 
 			consumer := createTestRepo(t, "sw-filtered-consumer", false)
@@ -400,8 +400,8 @@ jobs:
 
 		t.Run("Settings page required patterns", func(t *testing.T) {
 			source := createTestRepo(t, "sw-settings-source", false)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/push.yaml", scopedPushWorkflow)
-			createRepoWorkflowFile(t, user2, user2Token, source, ".gitea/scoped_workflows/manual.yaml", `name: Manual
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/push.yaml", scopedPushWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, source, ".hanzo/scoped_workflows/manual.yaml", `name: Manual
 on: workflow_dispatch
 jobs:
   deploy:
@@ -476,9 +476,9 @@ jobs:
 		t.Run("Distinct sources same filename", func(t *testing.T) {
 			// two DIFFERENT source repos with the same filename run independently
 			s1 := createTestRepo(t, "sw-multi-s1", false)
-			createRepoWorkflowFile(t, user2, user2Token, s1, ".gitea/scoped_workflows/ci.yaml", scopedPushWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, s1, ".hanzo/scoped_workflows/ci.yaml", scopedPushWorkflow)
 			s2 := createTestRepo(t, "sw-multi-s2", false)
-			createRepoWorkflowFile(t, user2, user2Token, s2, ".gitea/scoped_workflows/ci.yaml", scopedPushWorkflow)
+			createRepoWorkflowFile(t, user2, user2Token, s2, ".hanzo/scoped_workflows/ci.yaml", scopedPushWorkflow)
 			registerUserScopedSource(t, s1)
 			registerUserScopedSource(t, s2)
 
@@ -493,7 +493,7 @@ jobs:
 		t.Run("Detection cache invalidates on source push", func(t *testing.T) {
 			// The detection parse is cached per (source, default-branch SHA).
 			source := createTestRepo(t, "sw-cache-source", false)
-			created := createWorkflowFile(t, user2Token, source.OwnerName, source.Name, ".gitea/scoped_workflows/ci.yaml",
+			created := createWorkflowFile(t, user2Token, source.OwnerName, source.Name, ".hanzo/scoped_workflows/ci.yaml",
 				getWorkflowCreateFileOptions(user2, source.DefaultBranch, "create ci", `name: CI
 on: pull_request
 jobs:
@@ -513,7 +513,7 @@ jobs:
 
 			// switch the source's trigger to push on its default branch
 			updateReq := NewRequestWithJSON(t, "PUT",
-				fmt.Sprintf("/v1/repos/%s/%s/contents/.gitea/scoped_workflows/ci.yaml", source.OwnerName, source.Name),
+				fmt.Sprintf("/v1/repos/%s/%s/contents/.hanzo/scoped_workflows/ci.yaml", source.OwnerName, source.Name),
 				&api.UpdateFileOptions{
 					SHA:         created.Content.SHA,
 					FileOptions: api.FileOptions{BranchName: source.DefaultBranch, Message: "switch to push"},

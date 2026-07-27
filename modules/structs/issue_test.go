@@ -17,19 +17,19 @@ func TestIssueTemplate_Type(t *testing.T) {
 		want     IssueTemplateType
 	}{
 		{
-			fileName: ".gitea/ISSUE_TEMPLATE/bug_report.yaml",
+			fileName: ".hanzo/ISSUE_TEMPLATE/bug_report.yaml",
 			want:     IssueTemplateTypeYaml,
 		},
 		{
-			fileName: ".gitea/ISSUE_TEMPLATE/bug_report.md",
+			fileName: ".hanzo/ISSUE_TEMPLATE/bug_report.md",
 			want:     IssueTemplateTypeMarkdown,
 		},
 		{
-			fileName: ".gitea/ISSUE_TEMPLATE/bug_report.txt",
+			fileName: ".hanzo/ISSUE_TEMPLATE/bug_report.txt",
 			want:     "",
 		},
 		{
-			fileName: ".gitea/ISSUE_TEMPLATE/config.yaml",
+			fileName: ".hanzo/ISSUE_TEMPLATE/config.yaml",
 			want:     "",
 		},
 	}
