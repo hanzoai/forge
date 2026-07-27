@@ -39,9 +39,14 @@ RUN --mount=type=secret,id=gh_token \
 COPY --exclude=.git/ . .
 COPY --from=frontend-build /src/public/assets public/assets
 
-# Build gitd, .git mount is required for version data
+# Build gitd. The Makefile reads the VERSION file when it exists and falls back
+# to `git describe` when it does not, so a build context without .git supplies
+# the version through the ARG instead of the repository. The native runner
+# fabric exports a tree rather than a clone, and a hard bind on .git fails there
+# with "/.git: not found".
 RUN --mount=type=cache,target="/root/.cache/go-build" \
-    --mount=type=bind,source=".git/",target=".git/" \
+    if [ -n "${GIT_VERSION}" ]; then echo "${GIT_VERSION}" > VERSION; \
+    elif [ ! -d .git ] && [ ! -f VERSION ]; then echo "0.0.0+unknown" > VERSION; fi && \
     make backend
 
 COPY docker/root /tmp/local
