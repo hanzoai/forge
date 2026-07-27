@@ -122,7 +122,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
-	github.com/hanzoai/dbx v1.16.0 // indirect
+	github.com/hanzoai/dbx v1.17.2 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
@@ -216,7 +216,7 @@ require (
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hanzoai/builder v0.3.13
-	github.com/hanzoai/orm v0.6.10
+	github.com/hanzoai/orm v0.6.14
 	github.com/hanzoai/xorm v1.4.4
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect

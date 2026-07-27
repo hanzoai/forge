@@ -421,12 +421,15 @@ github.com/hanzoai/csqlite v0.1.0 h1:suwC3dh0INlfP/U0Es6cDf6JNQ+2+GVLLATPWCUux6k
 github.com/hanzoai/csqlite v0.1.0/go.mod h1:H31a/O6VXuklR9UBkgY++bmAK5uzVfXPqU0F6P9Wsos=
 github.com/hanzoai/dbx v1.16.0 h1:C8wsb9BIiit4nYnXizpcB4SyzVaepPkQFwq5i9fxAV0=
 github.com/hanzoai/dbx v1.16.0/go.mod h1:ynP6HSiDDoFZ8M3DC+XvSglBPFRygfTd/gjTWabh4yA=
+github.com/hanzoai/dbx v1.17.2/go.mod h1:u7f8kFoy1tS6YRzVNEurA/NlkRF9Uq9ZhDEqOchFtSM=
 github.com/hanzoai/orm v0.6.4 h1:W9mEGe2IhQqHYbP6exhjLx4V5BWTNb0gqZ3AIqz7cEc=
 github.com/hanzoai/orm v0.6.4/go.mod h1:VNh0/u5iD+kttlI3eEEDKxfXmOt+NSWeNo16ne6r4Y0=
 github.com/hanzoai/orm v0.6.8 h1:llCC1r2lO3PQJqh50vUn209EpXSvpNL6fK2ySEQ5Z3c=
 github.com/hanzoai/orm v0.6.8/go.mod h1:jmszOBtvtaydmS6k3CuGAKgjAa7wjeIfeVQF3R3Ipy4=
 github.com/hanzoai/orm v0.6.10 h1:cYCm+fcx9hUf9ifki4x2eAn/uV6hRuw+676am387f7E=
 github.com/hanzoai/orm v0.6.10/go.mod h1:jmszOBtvtaydmS6k3CuGAKgjAa7wjeIfeVQF3R3Ipy4=
+github.com/hanzoai/orm v0.6.14 h1:7r+p/Bb4I/py0qGSdkWZ01AtlOW9u+Jh2Fiu0P6XNS8=
+github.com/hanzoai/orm v0.6.14/go.mod h1:NKK3w1Es0emqA2aE2GH/uL2yvVLD0Uf1iSwmJm6nFxI=
 github.com/hanzoai/s3-go v1.0.0 h1:bDdAsy76iWiraHX+zLZALxICDPtmci0ma6mIhdNlViw=
 github.com/hanzoai/s3-go v1.0.0/go.mod h1:2Lp7RS4JS2HSbZ1NEbS5Xx/hnO5PKbnn56D77kOdSBw=
 github.com/hanzoai/sqlcipher v0.1.0 h1:V9gKG3ZltN2ZCteDrOnXWfOeEe/YDhhUm9AorQEAuBo=
