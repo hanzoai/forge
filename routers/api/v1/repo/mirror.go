@@ -431,11 +431,12 @@ func ConvertPullMirror(ctx *context.APIContext) {
 	//   overwritten from upstream and starts accepting pushes and running
 	//   Actions. This is the API form of the web settings action.
 	//
-	//   Propagation from upstream STOPS the moment this returns: the mirror row
-	//   is gone, and a later sync request reports success without queueing
-	//   anything. A repository whose copy here is incomplete therefore becomes
-	//   authoritative while incomplete, so compare it against upstream before
-	//   converting.
+	//   Propagation from upstream STOPS the moment this returns. The mirror row
+	//   is gone, so mirror-sync answers 400 and the settings button 404, while
+	//   the /sync webhook receiver still answers ok without queueing anything —
+	//   nothing pulls from upstream again. A repository whose copy here is
+	//   incomplete therefore becomes authoritative while incomplete, so compare
+	//   it against upstream before converting.
 	// produces:
 	// - application/json
 	// parameters:

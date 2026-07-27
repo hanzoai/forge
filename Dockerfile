@@ -39,11 +39,14 @@ RUN --mount=type=secret,id=gh_token \
 COPY --exclude=.git/ . .
 COPY --from=frontend-build /src/public/assets public/assets
 
-# Build gitd. The Makefile reads the VERSION file when it exists and falls back
-# to `git describe` when it does not, so a build context without .git supplies
-# the version through the ARG instead of the repository. The native runner
-# fabric exports a tree rather than a clone, and a hard bind on .git fails there
-# with "/.git: not found".
+# Build gitd. The version comes from the GIT_VERSION arg, written to the VERSION
+# file the Makefile prefers over `git describe`. The native runner fabric exports
+# a tree rather than a clone, and the earlier bind on .git failed there with
+# "/.git: not found"; line 39 excludes .git from the COPY as well, so inside this
+# image the arg is the ONLY source of a version — a build that omits it gets
+# 0.0.0+unknown whether or not it started from a clone. hanzoai/cloud passes it
+# from the image tag (clients/platform buildFrontendCmd), which is why a tagged
+# build is versioned and an ad-hoc `docker build` is not.
 RUN --mount=type=cache,target="/root/.cache/go-build" \
     if [ -n "${GIT_VERSION}" ]; then echo "${GIT_VERSION}" > VERSION; \
     elif [ ! -d .git ] && [ ! -f VERSION ]; then echo "0.0.0+unknown" > VERSION; fi && \
