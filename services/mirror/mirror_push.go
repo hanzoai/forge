@@ -32,13 +32,14 @@ var stripExitStatus = regexp.MustCompile(`exit status \d+ - `)
 // AddPushMirrorRemote registers the push mirror remote.
 func AddPushMirrorRemote(ctx context.Context, m *repo_model.PushMirror, addr string) error {
 	addRemoteAndConfig := func(storageRepo gitrepo.Repository, addr string) error {
-		if err := gitrepo.GitRemoteAdd(ctx, storageRepo, m.RemoteName, addr, gitrepo.RemoteOptionMirrorPush); err != nil {
-			return err
-		}
-		if err := gitrepo.GitConfigAdd(ctx, storageRepo, "remote."+m.RemoteName+".push", "+refs/heads/*:refs/heads/*"); err != nil {
-			return err
-		}
-		return gitrepo.GitConfigAdd(ctx, storageRepo, "remote."+m.RemoteName+".push", "+refs/tags/*:refs/tags/*")
+		// RemoteOptionMirrorPush persists remote.<name>.mirror=true, which already
+		// means "push every ref". Adding explicit push refspecs on top is not just
+		// redundant — git refuses the combination outright ("--mirror can't be
+		// combined with refspecs"), so a mirror created this way could never sync
+		// and reported the failure only in the push-mirror record. Set the remote
+		// and stop; anything needing specific refspecs passes them per-push, which
+		// already overrides mirror mode for that invocation (see git.Push).
+		return gitrepo.GitRemoteAdd(ctx, storageRepo, m.RemoteName, addr, gitrepo.RemoteOptionMirrorPush)
 	}
 
 	if err := addRemoteAndConfig(m.Repo, addr); err != nil {
