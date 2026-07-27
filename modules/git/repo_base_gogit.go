@@ -10,7 +10,7 @@ import (
 	"context"
 	"path/filepath"
 
-	gitealog "github.com/hanzoai/git/modules/log"
+	gitlog "github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
@@ -90,7 +90,7 @@ func (repo *Repository) Close() error {
 		return nil
 	}
 	if err := repo.gogitStorage.Close(); err != nil {
-		gitealog.Error("Error closing storage: %v", err)
+		gitlog.Error("Error closing storage: %v", err)
 	}
 	repo.gogitStorage = nil
 	repo.LastCommitCache = nil

@@ -30,7 +30,7 @@ import (
 )
 
 func TestActionsRerun(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		userAdmin := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 		sessionAdmin := loginUser(t, userAdmin.Name)
 
@@ -196,7 +196,7 @@ jobs:
 }
 
 func TestActionsRerunLegacyNoAttemptRun(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

@@ -113,7 +113,7 @@ func InsertRun(ctx context.Context, run *actions_model.ActionRun, content []byte
 		}
 		run.LatestAttemptID = runAttempt.ID
 
-		giteaCtx := GenerateGiteaContext(ctx, run, runAttempt, nil)
+		giteaCtx := GenerateGitContext(ctx, run, runAttempt, nil)
 		jobs, err := jobparser.Parse(content, jobparser.WithVars(vars), jobparser.WithGitContext(giteaCtx.ToGitHubContext()), jobparser.WithInputs(inputs))
 		if err != nil {
 			return fmt.Errorf("parse workflow: %w", err)

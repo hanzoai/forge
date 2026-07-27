@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	gitealog "github.com/hanzoai/git/modules/log"
+	gitlog "github.com/hanzoai/git/modules/log"
 
 	commitgraph "github.com/go-git/go-git/v5/plumbing/format/commitgraph/v2"
 	cgobject "github.com/go-git/go-git/v5/plumbing/object/commitgraph"
@@ -30,7 +30,7 @@ func (repo *Repository) CommitNodeIndex() (cgobject.CommitNodeIndex, *os.File) {
 	}
 
 	if !os.IsNotExist(err) {
-		gitealog.Warn("Unable to read commit-graph for %s: %v", repo.Path, err)
+		gitlog.Warn("Unable to read commit-graph for %s: %v", repo.Path, err)
 	}
 
 	return cgobject.NewObjectCommitNodeIndex(repo.gogitRepo.Storer), nil

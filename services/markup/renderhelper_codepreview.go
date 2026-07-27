@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/git/modules/markup"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 )
 
 func renderRepoFileCodePreview(ctx context.Context, opts markup.RenderCodePreviewOptions) (template.HTML, error) {
@@ -36,7 +36,7 @@ func renderRepoFileCodePreview(ctx context.Context, opts markup.RenderCodePrevie
 		return "", err
 	}
 
-	webCtx := gitea_context.GetWebContext(ctx)
+	webCtx := git_context.GetWebContext(ctx)
 	if webCtx == nil {
 		return "", errors.New("context is not a web context")
 	}

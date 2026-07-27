@@ -27,7 +27,7 @@ import (
 )
 
 func TestAPIPullUpdate(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// Create PR to test
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		org26 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 26})
@@ -65,7 +65,7 @@ func TestAPIPullUpdate(t *testing.T) {
 // update (push into) a PR whose head repo is private, even when the base repo
 // named in the route is public.
 func TestAPIPullUpdatePublicOnlyToken(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		org26 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 26})
 		pr := createOutdatedPR(t, user, org26)
@@ -125,7 +125,7 @@ func setupOutdatedPRWithConfig(t *testing.T, mutate func(*repo_model.PullRequest
 }
 
 func TestAPIPullUpdateByRebase(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// Create PR to test
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		org26 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 26})
@@ -180,7 +180,7 @@ func TestAPIPullUpdateByRebase(t *testing.T) {
 // rebase, an API call with no `style` parameter must still perform a merge
 // update so existing API clients don't silently flip behavior.
 func TestAPIPullUpdateStyleSettings(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		pr := setupOutdatedPRWithConfig(t, func(c *repo_model.PullRequestsConfig) {
 			c.AllowMergeUpdate = false
 			c.AllowRebaseUpdate = true
@@ -305,7 +305,7 @@ func createOutdatedPR(t *testing.T, actor, forkOrg *user_model.User) *issues_mod
 		BaseBranch: "master",
 		HeadRepo:   headRepo,
 		BaseRepo:   baseRepo,
-		Type:       issues_model.PullRequestGitea,
+		Type:       issues_model.PullRequestNative,
 	}
 	prOpts := &pull_service.NewPullRequestOptions{Repo: baseRepo, Issue: pullIssue, PullRequest: pullRequest}
 	err = pull_service.NewPullRequest(t.Context(), prOpts)

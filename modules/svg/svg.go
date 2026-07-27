@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	gitea_html "github.com/hanzoai/git/modules/htmlutil"
+	git_html "github.com/hanzoai/git/modules/htmlutil"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/public"
 )
@@ -88,7 +88,7 @@ func renderHTML(icon string, others ...any) (_ template.HTML, usingCache bool) {
 	if icon == "" {
 		return "", false
 	}
-	size, class := gitea_html.ParseSizeAndClass(defaultSize, "", others...)
+	size, class := git_html.ParseSizeAndClass(defaultSize, "", others...)
 	if svgItem, ok := svgIcons[icon]; ok {
 		svgStr := svgItem.html
 		// fast path for default size and no classes

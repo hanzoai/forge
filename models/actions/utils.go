@@ -90,7 +90,7 @@ func calculateDuration(started, stopped timeutil.TimeStamp, status Status, fallb
 	return timeSince(s).Truncate(time.Second)
 }
 
-// best effort function to convert an action schedule to action run, to be used in GenerateGiteaContext
+// best effort function to convert an action schedule to action run, to be used in GenerateGitContext
 func (s *ActionSchedule) ToActionRun() *ActionRun {
 	return &ActionRun{
 		Title:         s.Title,

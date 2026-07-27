@@ -16,7 +16,7 @@ import (
 )
 
 func TestGitSSHRedirect(t *testing.T) {
-	onGiteaRun(t, testGitSSHRedirect)
+	onGitRun(t, testGitSSHRedirect)
 }
 
 func testGitSSHRedirect(t *testing.T, u *url.URL) {

@@ -169,8 +169,8 @@ func doNewKeywords(closeKeywords, reopenKeywords []string) {
 	issueReopenKeywordsPat = makeKeywordsPat(reopenKeywords)
 }
 
-// getGiteaHostName returns a normalized string with the local host name, with no scheme or port information
-func getGiteaHostName() string {
+// getGitHostName returns a normalized string with the local host name, with no scheme or port information
+func getGitHostName() string {
 	giteaHostInit.Do(func() {
 		if uapp, err := url.Parse(setting.AppURL); err == nil {
 			giteaHost = strings.ToLower(uapp.Host)
@@ -187,9 +187,9 @@ func getGiteaHostName() string {
 	return giteaHost
 }
 
-// getGiteaIssuePullPattern
-func getGiteaIssuePullPattern() *regexp.Regexp {
-	getGiteaHostName()
+// getGitIssuePullPattern
+func getGitIssuePullPattern() *regexp.Regexp {
+	getGitHostName()
 	return giteaIssuePullPattern
 }
 
@@ -321,7 +321,7 @@ func convertFullHTMLReferencesToShortRefs(re *regexp.Regexp, contentBytes *[]byt
 func FindAllIssueReferences(content string) []IssueReference {
 	// Need to convert fully qualified html references to local system to #/! short codes
 	contentBytes := []byte(content)
-	if re := getGiteaIssuePullPattern(); re != nil {
+	if re := getGitIssuePullPattern(); re != nil {
 		convertFullHTMLReferencesToShortRefs(re, &contentBytes)
 	} else {
 		log.Debug("No GiteaIssuePullPattern pattern")
@@ -449,7 +449,7 @@ func findAllIssueReferencesBytes(content []byte, links []string, originalContent
 		}
 	}
 
-	localhost := getGiteaHostName()
+	localhost := getGitHostName()
 	for _, link := range links {
 		if u, err := url.Parse(link); err == nil {
 			// Note: we're not attempting to match the URL scheme (http/https)

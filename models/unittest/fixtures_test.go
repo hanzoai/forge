@@ -12,8 +12,8 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/setting"
 
-	"github.com/stretchr/testify/require"
 	"github.com/hanzoai/xorm"
+	"github.com/stretchr/testify/require"
 )
 
 var NewFixturesLoaderVendor = func(e *xorm.Engine, opts unittest.FixturesOptions) (unittest.FixturesLoader, error) {
@@ -60,14 +60,14 @@ func NewFixturesLoaderVendorGoTestfixtures(e *xorm.Engine, opts unittest.Fixture
 */
 
 func TestMain(m *testing.M) {
-	setting.SetupGiteaTestEnv()
+	setting.SetupGitTestEnv()
 	os.Exit(m.Run())
 }
 
 func prepareTestFixturesLoaders(t testing.TB) unittest.FixturesOptions {
 	_ = user_model.User{}
-	giteaRoot := setting.GetGiteaTestSourceRoot()
-	opts := unittest.FixturesOptions{Dir: filepath.Join(giteaRoot, "models", "fixtures"), Files: []string{
+	gitRoot := setting.GetGitTestSourceRoot()
+	opts := unittest.FixturesOptions{Dir: filepath.Join(gitRoot, "models", "fixtures"), Files: []string{
 		"user.yml",
 	}}
 	require.NoError(t, unittest.CreateTestEngine(filepath.Join(t.TempDir(), "sqlite-test.db"), opts))

@@ -103,7 +103,7 @@ func testRepoWikiCloneSSH(t *testing.T, u *url.URL) {
 }
 
 func TestRepoWikiClonePush(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		t.Run("SSH", func(t *testing.T) { testRepoWikiCloneSSH(t, u) })
 		t.Run("HTTP", func(t *testing.T) { testRepoWikiCloneHTTP(t, u) })
 	})

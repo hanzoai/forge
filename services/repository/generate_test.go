@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGiteaTemplate(t *testing.T) {
+func TestGitTemplate(t *testing.T) {
 	giteaTemplate := []byte(`
 # Header
 
@@ -29,7 +29,7 @@ text/*.txt
 **/modules/*
 `)
 
-	gt := newGiteaTemplateFileMatcher("", giteaTemplate)
+	gt := newGitTemplateFileMatcher("", giteaTemplate)
 	assert.Len(t, gt.globs, 3)
 
 	tt := []struct {
@@ -74,7 +74,7 @@ func TestFilePathSanitize(t *testing.T) {
 	assert.Equal(t, ".", filePathSanitize("/"))
 }
 
-func TestProcessGiteaTemplateFileGenerate(t *testing.T) {
+func TestProcessGitTemplateFileGenerate(t *testing.T) {
 	tmpDir := filepath.Join(t.TempDir(), "gitea-template-test")
 
 	assertFileContent := func(path, expected string) {
@@ -156,8 +156,8 @@ func TestProcessGiteaTemplateFileGenerate(t *testing.T) {
 		templateRepo := &repo_model.Repository{Name: "TemplateRepoName"}
 		generatedRepo := &repo_model.Repository{Name: "/../.gIt/name"}
 		assertFileContent(".git/config", "git-config-dummy")
-		fileMatcher, _ := readGiteaTemplateFile(tmpDir)
-		skippedFiles, err := processGiteaTemplateFile(t.Context(), tmpDir, templateRepo, generatedRepo, fileMatcher)
+		fileMatcher, _ := readGitTemplateFile(tmpDir)
+		skippedFiles, err := processGitTemplateFile(t.Context(), tmpDir, templateRepo, generatedRepo, fileMatcher)
 		require.NoError(t, err)
 		assert.Equal(t, []string{
 			"include/subst-${TEMPLATE_NAME}-link-dir/real-file",
@@ -211,28 +211,28 @@ func TestProcessGiteaTemplateFileGenerate(t *testing.T) {
 	}
 }
 
-func TestProcessGiteaTemplateFileRead(t *testing.T) {
+func TestProcessGitTemplateFileRead(t *testing.T) {
 	tmpDir := t.TempDir()
 	_ = os.Mkdir(tmpDir+"/.gitea", 0o755)
 	templateFilePath := tmpDir + "/.gitea/template"
 	_ = os.Remove(templateFilePath)
 	_, err := os.Lstat(templateFilePath)
 	require.ErrorIs(t, err, fs.ErrNotExist)
-	_, err = readGiteaTemplateFile(tmpDir) // no template file
+	_, err = readGitTemplateFile(tmpDir) // no template file
 	require.ErrorIs(t, err, fs.ErrNotExist)
 
 	_ = os.WriteFile(templateFilePath+".target", []byte("test-data-target"), 0o644)
 	_ = os.Symlink(templateFilePath+".target", templateFilePath)
 	content, _ := os.ReadFile(templateFilePath)
 	require.Equal(t, "test-data-target", string(content))
-	_, err = readGiteaTemplateFile(tmpDir) // symlinked template file
+	_, err = readGitTemplateFile(tmpDir) // symlinked template file
 	require.ErrorIs(t, err, fs.ErrNotExist)
 
 	_ = os.Remove(templateFilePath)
 	_ = os.WriteFile(templateFilePath, []byte("test-data-regular"), 0o644)
 	content, _ = os.ReadFile(templateFilePath)
 	require.Equal(t, "test-data-regular", string(content))
-	fm, err := readGiteaTemplateFile(tmpDir) // regular template file
+	fm, err := readGitTemplateFile(tmpDir) // regular template file
 	require.NoError(t, err)
 	assert.Len(t, fm.globs, 1)
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/models/organization"
 	repo_model "github.com/hanzoai/git/models/repo"
 	user_model "github.com/hanzoai/git/models/user"
-	gitea_html "github.com/hanzoai/git/modules/htmlutil"
+	git_html "github.com/hanzoai/git/modules/htmlutil"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 )
@@ -37,7 +37,7 @@ func AvatarHTML(src string, size int, class, name string) template.HTML {
 
 // Avatar renders user avatars. args: user, size (int), class (string)
 func (au *AvatarUtils) Avatar(item any, others ...any) template.HTML {
-	size, class := gitea_html.ParseSizeAndClass(avatars.DefaultAvatarPixelSize, avatars.DefaultAvatarClass, others...)
+	size, class := git_html.ParseSizeAndClass(avatars.DefaultAvatarPixelSize, avatars.DefaultAvatarClass, others...)
 
 	switch t := item.(type) {
 	case *user_model.User:
@@ -68,7 +68,7 @@ func (au *AvatarUtils) AvatarByAction(action *activities_model.Action, others ..
 
 // AvatarByEmail renders avatars by email address. args: email, name, size (int), class (string)
 func (au *AvatarUtils) AvatarByEmail(email, name string, others ...any) template.HTML {
-	size, class := gitea_html.ParseSizeAndClass(avatars.DefaultAvatarPixelSize, avatars.DefaultAvatarClass, others...)
+	size, class := git_html.ParseSizeAndClass(avatars.DefaultAvatarPixelSize, avatars.DefaultAvatarClass, others...)
 	src := avatars.GenerateEmailAvatarFastLink(au.ctx, email, size*setting.Avatar.RenderedSizeFactor)
 
 	if src != "" {

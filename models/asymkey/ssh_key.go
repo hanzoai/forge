@@ -19,8 +19,8 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	"golang.org/x/crypto/ssh"
 	"github.com/hanzoai/builder"
+	"golang.org/x/crypto/ssh"
 )
 
 // KeyType specifies the key type
@@ -349,7 +349,7 @@ func SynchronizePublicKeys(ctx context.Context, usr *user_model.User, s *auth.So
 	log.Trace("synchronizePublicKeys[%s]: Handling Public SSH Key synchronization for user %s", s.Name, usr.Name)
 
 	// Get Public Keys from DB with the current auth source
-	var giteaKeys []string
+	var gitKeys []string
 	keys, err := db.Find[PublicKey](ctx, FindPublicKeyOptions{
 		OwnerID:       usr.ID,
 		LoginSourceID: s.ID,
@@ -359,7 +359,7 @@ func SynchronizePublicKeys(ctx context.Context, usr *user_model.User, s *auth.So
 	}
 
 	for _, v := range keys {
-		giteaKeys = append(giteaKeys, v.OmitEmail())
+		gitKeys = append(gitKeys, v.OmitEmail())
 	}
 
 	// Process the provided keys to remove duplicates and name part
@@ -375,16 +375,16 @@ func SynchronizePublicKeys(ctx context.Context, usr *user_model.User, s *auth.So
 	}
 
 	// Check if Public Key sync is needed
-	if util.SliceSortedEqual(giteaKeys, providedKeys) {
-		log.Trace("synchronizePublicKeys[%s]: Public Keys are already in sync for %s (Source:%v/DB:%v)", s.Name, usr.Name, len(providedKeys), len(giteaKeys))
+	if util.SliceSortedEqual(gitKeys, providedKeys) {
+		log.Trace("synchronizePublicKeys[%s]: Public Keys are already in sync for %s (Source:%v/DB:%v)", s.Name, usr.Name, len(providedKeys), len(gitKeys))
 		return false
 	}
-	log.Trace("synchronizePublicKeys[%s]: Public Key needs update for user %s (Source:%v/DB:%v)", s.Name, usr.Name, len(providedKeys), len(giteaKeys))
+	log.Trace("synchronizePublicKeys[%s]: Public Key needs update for user %s (Source:%v/DB:%v)", s.Name, usr.Name, len(providedKeys), len(gitKeys))
 
 	// Add new Public SSH Keys that doesn't already exist in DB
 	var newKeys []string
 	for _, key := range providedKeys {
-		if !util.SliceContainsString(giteaKeys, key) {
+		if !util.SliceContainsString(gitKeys, key) {
 			newKeys = append(newKeys, key)
 		}
 	}
@@ -393,16 +393,16 @@ func SynchronizePublicKeys(ctx context.Context, usr *user_model.User, s *auth.So
 	}
 
 	// Mark keys from DB that no longer exist in the source for deletion
-	var giteaKeysToDelete []string
-	for _, giteaKey := range giteaKeys {
+	var gitKeysToDelete []string
+	for _, giteaKey := range gitKeys {
 		if !util.SliceContainsString(providedKeys, giteaKey) {
 			log.Trace("synchronizePublicKeys[%s]: Marking Public SSH Key for deletion for user %s: %v", s.Name, usr.Name, giteaKey)
-			giteaKeysToDelete = append(giteaKeysToDelete, giteaKey)
+			gitKeysToDelete = append(gitKeysToDelete, giteaKey)
 		}
 	}
 
 	// Delete keys from DB that no longer exist in the source
-	needUpd, err := deleteKeysMarkedForDeletion(ctx, giteaKeysToDelete)
+	needUpd, err := deleteKeysMarkedForDeletion(ctx, gitKeysToDelete)
 	if err != nil {
 		log.Error("synchronizePublicKeys[%s]: Error deleting Public Keys marked for deletion for user %s: %v", s.Name, usr.Name, err)
 	}

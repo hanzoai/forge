@@ -24,12 +24,12 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/modules/web"
 	"github.com/hanzoai/git/services/agit"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 	pull_service "github.com/hanzoai/git/services/pull"
 )
 
 type preReceiveContext struct {
-	*gitea_context.PrivateContext
+	*git_context.PrivateContext
 
 	user                *user_model.User // the "pusher", it's the org user if a DeployKey is used
 	userPerm            access_model.Permission
@@ -107,7 +107,7 @@ func (ctx *preReceiveContext) AssertCreatePullRequest() bool {
 }
 
 // HookPreReceive checks whether a individual commit is acceptable
-func HookPreReceive(ctx *gitea_context.PrivateContext) {
+func HookPreReceive(ctx *git_context.PrivateContext) {
 	opts := web.GetForm(ctx).(*private.HookOptions)
 
 	ourCtx := &preReceiveContext{

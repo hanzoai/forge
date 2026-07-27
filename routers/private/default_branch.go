@@ -10,12 +10,12 @@ import (
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/modules/gitrepo"
 	"github.com/hanzoai/git/modules/private"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 	repo_service "github.com/hanzoai/git/services/repository"
 )
 
 // SetDefaultBranch updates the default branch
-func SetDefaultBranch(ctx *gitea_context.PrivateContext) {
+func SetDefaultBranch(ctx *git_context.PrivateContext) {
 	ownerName := ctx.PathParam("owner")
 	repoName := ctx.PathParam("repo")
 	branch := ctx.PathParam("branch")

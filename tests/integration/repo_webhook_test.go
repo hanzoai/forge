@@ -141,7 +141,7 @@ func (m *mockWebhookProvider) Close() {
 }
 
 func Test_WebhookCreate(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.CreatePayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -173,7 +173,7 @@ func Test_WebhookCreate(t *testing.T) {
 }
 
 func Test_WebhookDelete(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.DeletePayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -206,7 +206,7 @@ func Test_WebhookDelete(t *testing.T) {
 }
 
 func Test_WebhookFork(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.ForkPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -238,7 +238,7 @@ func Test_WebhookFork(t *testing.T) {
 }
 
 func Test_WebhookIssueComment(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.IssueCommentPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -320,7 +320,7 @@ func Test_WebhookIssueComment(t *testing.T) {
 }
 
 func Test_WebhookRelease(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.ReleasePayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -353,7 +353,7 @@ func Test_WebhookRelease(t *testing.T) {
 }
 
 func Test_WebhookPush(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.PushPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -397,7 +397,7 @@ func Test_WebhookPushDevBranch(t *testing.T) {
 	}, http.StatusOK)
 	defer provider.Close()
 
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// 1. create a new webhook with special webhook for repo1
 		session := loginUser(t, "user2")
 
@@ -453,7 +453,7 @@ func Test_WebhookPushToNewBranch(t *testing.T) {
 	}, http.StatusOK)
 	defer provider.Close()
 
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// 1. create a new webhook with special webhook for repo1
 		session := loginUser(t, "user2")
 
@@ -493,7 +493,7 @@ func Test_WebhookPushToNewBranch(t *testing.T) {
 }
 
 func Test_WebhookIssue(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.IssuePayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -528,7 +528,7 @@ func Test_WebhookIssue(t *testing.T) {
 }
 
 func Test_WebhookIssueDelete(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.IssuePayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -561,7 +561,7 @@ func Test_WebhookIssueDelete(t *testing.T) {
 }
 
 func Test_WebhookIssueAssign(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.PullRequestPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -610,7 +610,7 @@ func Test_WebhookIssueMilestone(t *testing.T) {
 	}, http.StatusOK)
 	defer provider.Close()
 
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// create a new webhook with special webhook for repo1
 		session := loginUser(t, "user2")
 		repo1 := unittest.AssertExistsAndLoadBean(t, &repo.Repository{ID: 1})
@@ -670,7 +670,7 @@ func Test_WebhookIssueMilestone(t *testing.T) {
 }
 
 func Test_WebhookPullRequest(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.PullRequestPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -724,7 +724,7 @@ func Test_WebhookPullRequest(t *testing.T) {
 }
 
 func Test_WebhookPullRequestDelete(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.PullRequestPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -762,7 +762,7 @@ func Test_WebhookPullRequestDelete(t *testing.T) {
 }
 
 func Test_WebhookPullRequestComment(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.IssueCommentPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -800,7 +800,7 @@ func Test_WebhookPullRequestComment(t *testing.T) {
 }
 
 func Test_WebhookWiki(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.WikiPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -832,7 +832,7 @@ func Test_WebhookWiki(t *testing.T) {
 }
 
 func Test_WebhookRepository(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.RepositoryPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -864,7 +864,7 @@ func Test_WebhookRepository(t *testing.T) {
 }
 
 func Test_WebhookPackage(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.PackagePayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -901,7 +901,7 @@ func Test_WebhookPackage(t *testing.T) {
 }
 
 func Test_WebhookStatus(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.CommitStatusPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -949,7 +949,7 @@ func Test_WebhookStatus(t *testing.T) {
 }
 
 func Test_WebhookStatus_NoWrongTrigger(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var trigger string
 		provider := newMockWebhookProvider(func(r *http.Request) {
 			assert.NotContains(t, r.Header["X-Github-Event-Type"], "status", "X-GitHub-Event-Type should not contain status")
@@ -974,7 +974,7 @@ func Test_WebhookStatus_NoWrongTrigger(t *testing.T) {
 }
 
 func Test_WebhookWorkflowJob(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		var payloads []api.WorkflowJobPayload
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
@@ -1158,7 +1158,7 @@ func Test_WebhookWorkflowRun(t *testing.T) {
 	}
 	for _, obj := range testCases {
 		t.Run(obj.name, func(t *testing.T) {
-			onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+			onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 				webhookData := &workflowRunWebhook{}
 				provider := newMockWebhookProvider(func(r *http.Request) {
 					assert.Contains(t, r.Header["X-Github-Event-Type"], "workflow_run", "X-GitHub-Event-Type should contain workflow_run")

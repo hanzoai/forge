@@ -351,7 +351,7 @@ func TestAPIGetRepoByIDUnauthorized(t *testing.T) {
 }
 
 func TestAPIRepoMigrate(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		// migrate from a local fixture repo (user2/repo1) via the live listener so the test runs offline
 		repo1 := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 		cloneAddr := fmt.Sprintf("%s%s/%s.git", u.String(), repo1.OwnerName, repo1.Name)
@@ -400,7 +400,7 @@ func TestAPIRepoMigrate(t *testing.T) {
 }
 
 func TestAPIRepoMigrateConflict(t *testing.T) {
-	onGiteaRun(t, testAPIRepoMigrateConflict)
+	onGitRun(t, testAPIRepoMigrateConflict)
 }
 
 func testAPIRepoMigrateConflict(t *testing.T, u *url.URL) {
@@ -485,7 +485,7 @@ func TestAPIOrgRepoCreate(t *testing.T) {
 }
 
 func TestAPIRepoCreateConflict(t *testing.T) {
-	onGiteaRun(t, testAPIRepoCreateConflict)
+	onGitRun(t, testAPIRepoCreateConflict)
 }
 
 func testAPIRepoCreateConflict(t *testing.T, u *url.URL) {

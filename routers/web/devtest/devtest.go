@@ -54,7 +54,7 @@ func FetchActionTest(ctx *context.Context) {
 	ctx.JSONRedirect("")
 }
 
-func prepareMockDataGiteaUI(_ *context.Context) {}
+func prepareMockDataGitUI(_ *context.Context) {}
 
 func prepareMockDataBadgeCommitSign(ctx *context.Context) {
 	var commits []*asymkey.SignCommit
@@ -238,8 +238,8 @@ func prepareMockDataRelativeTime(ctx *context.Context) {
 
 func prepareMockData(ctx *context.Context) {
 	switch ctx.Req.URL.Path {
-	case "/devtest/gitea-ui":
-		prepareMockDataGiteaUI(ctx)
+	case "/devtest/git-ui":
+		prepareMockDataGitUI(ctx)
 	case "/devtest/badge-commit-sign":
 		prepareMockDataBadgeCommitSign(ctx)
 	case "/devtest/badge-actions-svg":

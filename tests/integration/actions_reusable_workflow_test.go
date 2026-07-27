@@ -26,7 +26,7 @@ import (
 )
 
 func TestActionsReusableWorkflow(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		user2Session := loginUser(t, user2.Name)
 		user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

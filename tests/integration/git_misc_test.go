@@ -24,7 +24,7 @@ import (
 )
 
 func TestDataAsyncDoubleRead_Issue29101(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 
@@ -78,7 +78,7 @@ func TestDataAsyncDoubleRead_Issue29101(t *testing.T) {
 }
 
 func TestAgitPullPush(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		baseAPITestContext := NewAPITestContext(t, "user2", "repo1", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
 
 		u.Path = baseAPITestContext.GitPath()
@@ -141,7 +141,7 @@ func TestAgitPullPush(t *testing.T) {
 }
 
 func TestAgitReviewStaleness(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		baseAPITestContext := NewAPITestContext(t, "user2", "repo1", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
 
 		u.Path = baseAPITestContext.GitPath()

@@ -7,15 +7,15 @@ import (
 	"github.com/charmbracelet/git-lfs-transfer/transfer"
 )
 
-var _ transfer.Logger = (*GiteaLogger)(nil)
+var _ transfer.Logger = (*GitLogger)(nil)
 
 // noop logger for passing into transfer
-type GiteaLogger struct{}
+type GitLogger struct{}
 
 func newLogger() transfer.Logger {
-	return &GiteaLogger{}
+	return &GitLogger{}
 }
 
 // Log implements transfer.Logger
-func (g *GiteaLogger) Log(msg string, items ...any) {
+func (g *GitLogger) Log(msg string, items ...any) {
 }

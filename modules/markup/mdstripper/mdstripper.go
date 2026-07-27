@@ -173,7 +173,7 @@ func StripMarkdownBytes(rawBytes []byte) ([]byte, []string) {
 		stripParser = gdMarkdown.Parser()
 	})
 	stripper := &stripRenderer{
-		localhost: getGiteaHost(),
+		localhost: getGitHost(),
 		links:     make([]string, 0, 10),
 		empty:     true,
 	}
@@ -186,8 +186,8 @@ func StripMarkdownBytes(rawBytes []byte) ([]byte, []string) {
 	return buf.Bytes(), stripper.GetLinks()
 }
 
-// getGiteaHostName returns a normalized string with the local host name, with no scheme or port information
-func getGiteaHost() *url.URL {
+// getGitHostName returns a normalized string with the local host name, with no scheme or port information
+func getGitHost() *url.URL {
 	giteaHostInit.Do(func() {
 		var err error
 		if giteaHost, err = url.Parse(setting.AppURL); err != nil {

@@ -29,7 +29,7 @@ func InitIntegrationTest() error {
 		return err
 	}
 
-	setting.SetupGiteaTestEnv()
+	setting.SetupGitTestEnv()
 	setting.Repository.DefaultBranch = "master" // many test code still assume that default branch is called "master"
 
 	if err := git.InitFull(); err != nil {
@@ -70,7 +70,7 @@ func PrepareGitRepoDirectory(t testing.TB) {
 	if !assert.NotEmpty(t, setting.RepoRootPath) {
 		return
 	}
-	assert.NoError(t, unittest.SyncDirs(filepath.Join(setting.GetGiteaTestSourceRoot(), "tests/gitea-repositories-meta"), setting.RepoRootPath))
+	assert.NoError(t, unittest.SyncDirs(filepath.Join(setting.GetGitTestSourceRoot(), "tests/git-repositories-meta"), setting.RepoRootPath))
 }
 
 func PrepareArtifactsStorage(t testing.TB) {
@@ -91,7 +91,7 @@ func PrepareLFSStorage(t testing.TB) {
 	// load LFS object fixtures
 	// (LFS storage can be on any of several backends, including remote servers, so init it with the storage API)
 	lfsFixtures, err := storage.NewStorage(setting.LocalStorageType, &setting.Storage{
-		Path: filepath.Join(filepath.Dir(setting.AppPath), "tests/gitea-lfs-meta"),
+		Path: filepath.Join(filepath.Dir(setting.AppPath), "tests/git-lfs-meta"),
 	})
 	assert.NoError(t, err)
 	assert.NoError(t, storage.Clean(storage.LFS))

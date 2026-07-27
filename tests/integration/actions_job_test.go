@@ -131,7 +131,7 @@ jobs:
 			},
 		},
 	}
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
@@ -313,7 +313,7 @@ jobs:
 			},
 		},
 	}
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
@@ -352,7 +352,7 @@ jobs:
 }
 
 func TestRunnerDisableEnable(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, _ *url.URL) {
+	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
@@ -466,8 +466,8 @@ func getRepoRunnerID(t *testing.T, authToken, ownerName, repoName string) int64 
 	return runnerList.Entries[0].ID
 }
 
-func TestActionsGiteaContext(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+func TestActionsGitContext(t *testing.T) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		user2Session := loginUser(t, user2.Name)
 		user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
@@ -550,8 +550,8 @@ jobs:
 }
 
 // Ephemeral
-func TestActionsGiteaContextEphemeral(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+func TestActionsGitContextEphemeral(t *testing.T) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		user2Session := loginUser(t, user2.Name)
 		user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
@@ -760,7 +760,7 @@ func getTaskJobNameByTaskID(t *testing.T, authToken, ownerName, repoName string,
 // TestLegacyRunsInCronTasks verifies that the background cron tasks correctly handle runs/jobs
 // created before migration v331 (legacy data with LatestAttemptID=0 and jobs with RunAttemptID=0).
 func TestLegacyRunsInCronTasks(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, _ *url.URL) {
+	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

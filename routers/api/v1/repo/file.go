@@ -32,7 +32,7 @@ import (
 	files_service "github.com/hanzoai/git/services/repository/files"
 )
 
-const giteaObjectTypeHeader = "X-Gitea-Object-Type"
+const gitObjectTypeHeader = "X-Gitea-Object-Type"
 
 // GetRawFile get a file by path on a repository
 func GetRawFile(ctx *context.APIContext) {
@@ -80,7 +80,7 @@ func GetRawFile(ctx *context.APIContext) {
 		return
 	}
 
-	ctx.RespHeader().Set(giteaObjectTypeHeader, string(files_service.GetObjectTypeFromTreeEntry(entry)))
+	ctx.RespHeader().Set(gitObjectTypeHeader, string(files_service.GetObjectTypeFromTreeEntry(entry)))
 
 	if err := common.ServeBlob(ctx.Base, ctx.Repo.Repository, ctx.Repo.TreePath, blob, lastModified); err != nil {
 		ctx.APIErrorInternal(err)
@@ -133,7 +133,7 @@ func GetRawFileOrLFS(ctx *context.APIContext) {
 		return
 	}
 
-	ctx.RespHeader().Set(giteaObjectTypeHeader, string(files_service.GetObjectTypeFromTreeEntry(entry)))
+	ctx.RespHeader().Set(gitObjectTypeHeader, string(files_service.GetObjectTypeFromTreeEntry(entry)))
 
 	// LFS Pointer files are at most 1024 bytes - so any blob greater than 1024 bytes cannot be an LFS file
 	if blob.Size() > lfs.MetaFileMaxSize {

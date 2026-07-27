@@ -42,7 +42,7 @@ import (
 )
 
 func TestPullRequestTargetEvent(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2}) // owner of the base repo
 		user4 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4}) // owner of the forked repo
 
@@ -154,7 +154,7 @@ jobs:
 			BaseBranch: "main",
 			HeadRepo:   forkedRepo,
 			BaseRepo:   baseRepo,
-			Type:       issues_model.PullRequestGitea,
+			Type:       issues_model.PullRequestNative,
 		}
 		prOpts := &pull_service.NewPullRequestOptions{Repo: baseRepo, Issue: pullIssue, PullRequest: pullRequest}
 		err = pull_service.NewPullRequest(t.Context(), prOpts)
@@ -217,7 +217,7 @@ jobs:
 			BaseBranch: "main",
 			HeadRepo:   forkedRepo,
 			BaseRepo:   baseRepo,
-			Type:       issues_model.PullRequestGitea,
+			Type:       issues_model.PullRequestNative,
 		}
 		prOpts = &pull_service.NewPullRequestOptions{Repo: baseRepo, Issue: pullIssue, PullRequest: pullRequest}
 		err = pull_service.NewPullRequest(t.Context(), prOpts)
@@ -276,7 +276,7 @@ jobs:
 			BaseBranch: "main",
 			HeadRepo:   forkedRepo,
 			BaseRepo:   baseRepo,
-			Type:       issues_model.PullRequestGitea,
+			Type:       issues_model.PullRequestNative,
 		}
 		prOpts = &pull_service.NewPullRequestOptions{Repo: baseRepo, Issue: pullIssue, PullRequest: pullRequest}
 		err = pull_service.NewPullRequest(t.Context(), prOpts)
@@ -289,7 +289,7 @@ jobs:
 }
 
 func TestSkipCI(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		session := loginUser(t, "user2")
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
@@ -423,7 +423,7 @@ jobs:
 }
 
 func TestCreateDeleteRefEvent(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
 		// create the repo
@@ -540,7 +540,7 @@ jobs:
 }
 
 func TestPullRequestCommitStatusEvent(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2}) // owner of the repo
 		user4 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4}) // contributor of the repo
 
@@ -620,7 +620,7 @@ jobs:
 			BaseBranch: "main",
 			HeadRepo:   repo,
 			BaseRepo:   repo,
-			Type:       issues_model.PullRequestGitea,
+			Type:       issues_model.PullRequestNative,
 		}
 		prOpts := &pull_service.NewPullRequestOptions{Repo: repo, Issue: pullIssue, PullRequest: pullRequest}
 		err = pull_service.NewPullRequest(t.Context(), prOpts)
@@ -769,7 +769,7 @@ func insertFakeStatus(t *testing.T, repo *repo_model.Repository, sha string, pre
 }
 
 func TestPullRequestReviewCommitStatusEvent(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2}) // owner of the repo
 		user4 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4}) // reviewer
 
@@ -876,7 +876,7 @@ jobs:
 			BaseBranch: "main",
 			HeadRepo:   repo,
 			BaseRepo:   repo,
-			Type:       issues_model.PullRequestGitea,
+			Type:       issues_model.PullRequestNative,
 		}
 		prOpts := &pull_service.NewPullRequestOptions{Repo: repo, Issue: pullIssue, PullRequest: pullRequest}
 		err = pull_service.NewPullRequest(t.Context(), prOpts)
@@ -907,7 +907,7 @@ jobs:
 }
 
 func TestWorkflowDispatchPublicApi(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
@@ -1008,7 +1008,7 @@ jobs:
 }
 
 func TestWorkflowDispatchPublicApiRequiresWorkflowDispatchTrigger(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
@@ -1078,7 +1078,7 @@ jobs:
 }
 
 func TestWorkflowDispatchPublicApiWithInputs(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
@@ -1169,7 +1169,7 @@ jobs:
 }
 
 func TestWorkflowDispatchPublicApiJSON(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
@@ -1255,7 +1255,7 @@ jobs:
 }
 
 func TestWorkflowDispatchPublicApiWithInputsJSON(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
@@ -1349,7 +1349,7 @@ jobs:
 }
 
 func TestWorkflowDispatchPublicApiWithInputsNonDefaultBranchJSON(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
@@ -1480,7 +1480,7 @@ jobs:
 }
 
 func TestWorkflowApi(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository)
@@ -1677,7 +1677,7 @@ jobs:
 }
 
 func TestClosePullRequestWithPath(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		// user2 is the owner of the base repo
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		user2Token := getTokenForLoggedInUser(t, loginUser(t, user2.Name), auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
@@ -1754,7 +1754,7 @@ jobs:
 }
 
 func TestActionRunNameWithContextVariables(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
 		// create the repo
@@ -1828,7 +1828,7 @@ jobs:
 }
 
 func TestActionRunName(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
 		// create the repo
@@ -1902,7 +1902,7 @@ jobs:
 }
 
 func TestPullRequestWithPathsRebase(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

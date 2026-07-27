@@ -45,7 +45,7 @@ func fullIssuePatternProcessor(ctx *RenderContext, node *html.Node) {
 		}
 
 		link := node.Data[m[0]:m[1]]
-		if !httplib.IsCurrentGiteaSiteURL(ctx, link) {
+		if !httplib.IsCurrentGitSiteURL(ctx, link) {
 			return
 		}
 		text := "#" + node.Data[m[2]:m[3]]

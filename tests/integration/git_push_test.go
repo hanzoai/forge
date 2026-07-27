@@ -23,7 +23,7 @@ import (
 )
 
 func TestGitPush(t *testing.T) {
-	onGiteaRun(t, testGitPush)
+	onGitRun(t, testGitPush)
 }
 
 func testGitPush(t *testing.T, u *url.URL) {
@@ -142,7 +142,7 @@ func testGitPush(t *testing.T, u *url.URL) {
 }
 
 func TestGitPushVisibilityOption(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		repo, err := repo_service.CreateRepository(t.Context(), user, user, repo_service.CreateRepoOptions{
 			Name:          "repo-visibility-option",
@@ -238,7 +238,7 @@ func runTestGitPush(t *testing.T, u *url.URL, gitOperation func(t *testing.T, gi
 }
 
 func TestPushPullRefs(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		baseAPITestContext := NewAPITestContext(t, "user2", "repo1", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
 
 		u.Path = baseAPITestContext.GitPath()

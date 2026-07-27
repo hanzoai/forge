@@ -285,7 +285,7 @@ func TestCompareDownloadDiffOrPatch(t *testing.T) {
 }
 
 func TestCompareCodeExpand(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 		repo, err := repo_service.CreateRepositoryDirectly(t.Context(), user1, user1, repo_service.CreateRepoOptions{
 			Name:          "test_blob_excerpt",

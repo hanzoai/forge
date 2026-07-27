@@ -18,7 +18,7 @@ import (
 )
 
 func TestActionsCollaborativeOwner(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		// user2 is the owner of the private "reusable_workflow" repo
 		user2Session := loginUser(t, "user2")
 		user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

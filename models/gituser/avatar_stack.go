@@ -34,11 +34,11 @@ func BuildAvatarStackData(ctx context.Context, allParticipants []*git.CommitIden
 		Participants: make([]*CommitParticipant, 0, len(allParticipants)),
 	}
 	for _, p := range allParticipants {
-		var giteaUser *user.User
+		var gitUser *user.User
 		if emailUserMap != nil {
-			giteaUser = emailUserMap.GetByEmail(p.Email)
+			gitUser = emailUserMap.GetByEmail(p.Email)
 		}
-		ret.Participants = append(ret.Participants, &CommitParticipant{User: giteaUser, GitIdentity: p})
+		ret.Participants = append(ret.Participants, &CommitParticipant{User: gitUser, GitIdentity: p})
 	}
 	return ret
 }

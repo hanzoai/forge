@@ -123,7 +123,7 @@ func fullHashPatternProcessor(ctx *RenderContext, node *html.Node) {
 			text += " (" + ret.QueryHash + ")"
 		}
 		// only turn commit links to the current instance into hash link
-		if !httplib.IsCurrentGiteaSiteURL(ctx, ret.FullURL) {
+		if !httplib.IsCurrentGitSiteURL(ctx, ret.FullURL) {
 			node = node.NextSibling
 			continue
 		}
@@ -174,7 +174,7 @@ func comparePatternProcessor(ctx *RenderContext, node *html.Node) {
 		}
 
 		// only turn compare links to the current instance into hash link
-		if !httplib.IsCurrentGiteaSiteURL(ctx, urlFull) {
+		if !httplib.IsCurrentGitSiteURL(ctx, urlFull) {
 			node = node.NextSibling
 			continue
 		}

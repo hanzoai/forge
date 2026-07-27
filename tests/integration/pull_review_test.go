@@ -50,7 +50,7 @@ func TestPullView_ReviewerMissed(t *testing.T) {
 }
 
 func TestPullView_CodeOwner(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
 		// Create the repo.
@@ -234,7 +234,7 @@ func TestPullView_CodeOwner(t *testing.T) {
 }
 
 func TestPullView_GivenApproveOrRejectReviewOnClosedPR(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		user1Session := loginUser(t, "user1")
 		user2Session := loginUser(t, "user2")
 

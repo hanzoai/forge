@@ -68,7 +68,7 @@ func evaluateJobIf(ctx context.Context, run *actions_model.ActionRun, attempt *a
 	if err != nil {
 		return false, err
 	}
-	gitCtx := GenerateGiteaContext(ctx, run, attempt, job)
+	gitCtx := GenerateGitContext(ctx, run, attempt, job)
 	return jobparser.EvaluateJobIfExpression(job.JobID, parsedJob, gitCtx, jobResults, vars, inputs)
 }
 

@@ -123,7 +123,7 @@ func MigrateRepository(ctx context.Context, doer *user_model.User, ownerName str
 		return nil, err
 	}
 
-	uploader := NewGiteaLocalUploader(ctx, doer, ownerName, opts.RepoName)
+	uploader := NewGitLocalUploader(ctx, doer, ownerName, opts.RepoName)
 	uploader.gitServiceType = opts.GitServiceType
 
 	if err := migrateRepository(ctx, doer, downloader, uploader, opts, messenger); err != nil {

@@ -299,8 +299,8 @@ func TestDisplayName(t *testing.T) {
 
 func TestCreateUserInvalidEmail(t *testing.T) {
 	user := &user_model.User{
-		Name:               "GiteaBot",
-		Email:              "GiteaBot@gitea.io\r\n",
+		Name:               "GitBot",
+		Email:              "GitBot@gitea.io\r\n",
 		Passwd:             ";p['////..-++']",
 		IsAdmin:            false,
 		Theme:              setting.UI.DefaultTheme,

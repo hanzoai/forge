@@ -53,7 +53,7 @@ func createTestProfile(t *testing.T, orgName, profileRepoName, readmeContent str
 }
 
 func TestOrgProfile(t *testing.T) {
-	onGiteaRun(t, testOrgProfile)
+	onGitRun(t, testOrgProfile)
 }
 
 func testOrgProfile(t *testing.T, u *url.URL) {

@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/templates"
 	"github.com/hanzoai/git/services/auth/source/sspi"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 
 	gouuid "github.com/google/uuid"
 )
@@ -90,7 +90,7 @@ func (s *SSPI) Verify(req *http.Request, w http.ResponseWriter, store DataStore,
 		store.GetData()["EnableSSPI"] = true
 		// in this case, the Verify function is called in Gitea's web context
 		// FIXME: it doesn't look good to render the page here, why not redirect?
-		gitea_context.GetWebContext(req.Context()).HTML(http.StatusUnauthorized, tplSignIn)
+		git_context.GetWebContext(req.Context()).HTML(http.StatusUnauthorized, tplSignIn)
 		return nil, err
 	}
 	if outToken != "" {

@@ -24,16 +24,16 @@ import (
 	"gitea.com/gitea/runner/act/model"
 )
 
-type GiteaContext map[string]any
+type GitContext map[string]any
 
-// GenerateGiteaContext generate the gitea context without token and gitea_runtime_token.
+// GenerateGitContext generate the gitea context without token and gitea_runtime_token.
 // attempt and job can be nil when generating a context for parsing workflow-level expressions.
 //
 // The run_attempt value is resolved with the following precedence:
 //  1. attempt.Attempt - the explicit attempt argument, or run.GetLatestAttempt() as a fallback
 //  2. job.Attempt - only used when neither an explicit nor latest attempt is available
 //  3. "1" - when none of the above apply (first-run parse time, before the first attempt exists)
-func GenerateGiteaContext(ctx context.Context, run *actions_model.ActionRun, attempt *actions_model.ActionRunAttempt, job *actions_model.ActionRunJob) GiteaContext {
+func GenerateGitContext(ctx context.Context, run *actions_model.ActionRun, attempt *actions_model.ActionRunAttempt, job *actions_model.ActionRunJob) GitContext {
 	event := map[string]any{}
 	_ = json.Unmarshal([]byte(run.EventPayload), &event)
 
@@ -56,7 +56,7 @@ func GenerateGiteaContext(ctx context.Context, run *actions_model.ActionRun, att
 
 	refName := git.RefName(ref)
 
-	gitContext := GiteaContext{
+	gitContext := GitContext{
 		// standard contexts, see https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
 		"action":            "",                                       // string, The name of the action currently running, or the id of a step. GitHub removes special characters, and uses the name __run when the current step runs a script without an id. If you use the same action more than once in the same job, the name will include a suffix with the sequence number with underscore before it. For example, the first script you run will have the name __run, and the second script will be named __run_2. Similarly, the second invocation of actions/checkout will be actionscheckout2.
 		"action_path":       "",                                       // string, The path where an action is located. This property is only supported in composite actions. You can use this path to access files located in the same repository as the action.
@@ -108,11 +108,11 @@ func GenerateGiteaContext(ctx context.Context, run *actions_model.ActionRun, att
 			// If necessary, the caller can send these values to the called workflow via `with:`.
 			caller, err := actions_model.GetRunJobByRunAndID(ctx, job.RunID, job.ParentJobID)
 			if err != nil {
-				log.Error("GenerateGiteaContext: load caller job %d of job %d: %v", job.ParentJobID, job.ID, err)
+				log.Error("GenerateGitContext: load caller job %d of job %d: %v", job.ParentJobID, job.ID, err)
 			} else if caller.CallPayload != "" {
 				var cp api.WorkflowCallPayload
 				if err := json.Unmarshal([]byte(caller.CallPayload), &cp); err != nil {
-					log.Error("GenerateGiteaContext: decode CallPayload of caller %d: %v", caller.ID, err)
+					log.Error("GenerateGitContext: decode CallPayload of caller %d: %v", caller.ID, err)
 				} else if cp.Inputs != nil {
 					event["inputs"] = cp.Inputs
 				}
@@ -263,7 +263,7 @@ func computeReusableCallerOutputs(ctx context.Context, caller *actions_model.Act
 	if err := caller.Run.LoadAttributes(ctx); err != nil {
 		return nil, err
 	}
-	gitCtx := GenerateGiteaContext(ctx, caller.Run, nil, caller)
+	gitCtx := GenerateGitContext(ctx, caller.Run, nil, caller)
 	vars, err := actions_model.GetVariablesOfRun(ctx, caller.Run)
 	if err != nil {
 		return nil, err
@@ -314,7 +314,7 @@ func mergeTwoOutputs(o1, o2 map[string]string) map[string]string {
 	return ret
 }
 
-func (g *GiteaContext) ToGitHubContext() *model.GithubContext {
+func (g *GitContext) ToGitHubContext() *model.GithubContext {
 	return &model.GithubContext{
 		Event:            util.GetMapValueOrDefault(*g, "event", map[string]any(nil)),
 		EventPath:        util.GetMapValueOrDefault(*g, "event_path", ""),
@@ -337,11 +337,11 @@ func (g *GiteaContext) ToGitHubContext() *model.GithubContext {
 		ActionRef:        util.GetMapValueOrDefault(*g, "action_ref", ""),
 		ActionRepository: util.GetMapValueOrDefault(*g, "action_repository", ""),
 		Job:              util.GetMapValueOrDefault(*g, "job", ""),
-		JobName:          "", // not present in GiteaContext
+		JobName:          "", // not present in GitContext
 		RepositoryOwner:  util.GetMapValueOrDefault(*g, "repository_owner", ""),
 		RetentionDays:    util.GetMapValueOrDefault(*g, "retention_days", ""),
-		RunnerPerflog:    "", // not present in GiteaContext
-		RunnerTrackingID: "", // not present in GiteaContext
+		RunnerPerflog:    "", // not present in GitContext
+		RunnerTrackingID: "", // not present in GitContext
 		ServerURL:        util.GetMapValueOrDefault(*g, "server_url", ""),
 		APIURL:           util.GetMapValueOrDefault(*g, "api_url", ""),
 		GraphQLURL:       util.GetMapValueOrDefault(*g, "graphql_url", ""),

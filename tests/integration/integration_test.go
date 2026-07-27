@@ -31,7 +31,7 @@ import (
 	"github.com/hanzoai/git/modules/web"
 	"github.com/hanzoai/git/modules/web/middleware"
 	"github.com/hanzoai/git/routers"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/tests"
 
 	"github.com/PuerkitoBio/goquery"
@@ -55,7 +55,7 @@ func testMain(m *testing.M) int {
 
 	err = unittest.InitFixtures(
 		unittest.FixturesOptions{
-			Dir: filepath.Join(setting.GetGiteaTestSourceRoot(), "models/fixtures/"),
+			Dir: filepath.Join(setting.GetGitTestSourceRoot(), "models/fixtures/"),
 		},
 	)
 	if err != nil {
@@ -111,7 +111,7 @@ func (s *TestSession) GetSiteCookie(name string) string {
 }
 
 func (s *TestSession) GetCookieFlashMessage() *middleware.Flash {
-	cookie := s.GetSiteCookie(gitea_context.CookieNameFlash)
+	cookie := s.GetSiteCookie(git_context.CookieNameFlash)
 	return middleware.ParseCookieFlashMessage(cookie)
 }
 

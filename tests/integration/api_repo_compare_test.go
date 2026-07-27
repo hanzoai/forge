@@ -21,7 +21,7 @@ import (
 )
 
 func TestAPICompareBranches(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, _ *url.URL) {
+	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		session2 := loginUser(t, "user2")
 		token2 := getTokenForLoggedInUser(t, session2, auth_model.AccessTokenScopeWriteRepository)
 
@@ -99,7 +99,7 @@ func TestAPICompareBranches(t *testing.T) {
 }
 
 func TestAPIDownloadCompareDiffOrPatch(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, _ *url.URL) {
+	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		session := loginUser(t, "user2")
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeReadRepository)
 

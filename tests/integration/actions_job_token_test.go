@@ -104,7 +104,7 @@ func TestActionsJobTokenPermissiveAccess(t *testing.T) {
 		},
 	}
 
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		task := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: 47})
 
 		repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: task.RepoID})
@@ -187,7 +187,7 @@ func TestActionsJobTokenPermissiveAccess(t *testing.T) {
 }
 
 func TestActionsCrossRepoAccess(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		session := loginUser(t, "user2")
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteUser, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteOrganization)
 
@@ -364,7 +364,7 @@ func createActionTask(t *testing.T, repoID int64, isFork bool) *actions_model.Ac
 }
 
 func TestActionsTokenPermissionsPersistenceWithWorkflow(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

@@ -83,7 +83,7 @@ func testGitSigning(t *testing.T) {
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{Name: username})
 	baseAPITestContext := NewAPITestContext(t, username, "repo1")
 
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		u.Path = baseAPITestContext.GitPath()
 
 		t.Run("Unsigned-Initial", func(t *testing.T) {
@@ -326,7 +326,7 @@ func crudActionCreateFile(_ *testing.T, ctx APITestContext, user *user_model.Use
 }
 
 func importTestingKey() (*openpgp.Entity, error) {
-	keyPath := filepath.Join(setting.GetGiteaTestSourceRoot(), "tests/integration/private-testing.key")
+	keyPath := filepath.Join(setting.GetGitTestSourceRoot(), "tests/integration/private-testing.key")
 	if _, _, err := process.GetManager().Exec("gpg --import "+keyPath, "gpg", "--import", keyPath); err != nil {
 		return nil, err
 	}

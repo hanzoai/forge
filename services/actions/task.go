@@ -172,7 +172,7 @@ func generateTaskContext(ctx context.Context, t *actions_model.ActionTask) (*str
 		return nil, err
 	}
 
-	gitCtx := GenerateGiteaContext(ctx, t.Job.Run, nil, t.Job)
+	gitCtx := GenerateGitContext(ctx, t.Job.Run, nil, t.Job)
 	gitCtx["token"] = t.Token
 	gitCtx["gitea_runtime_token"] = giteaRuntimeToken
 

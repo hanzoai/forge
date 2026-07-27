@@ -210,7 +210,7 @@ func expandReusableWorkflowCaller(ctx context.Context, run *actions_model.Action
 		if err != nil {
 			return err
 		}
-		callerGitCtx := GenerateGiteaContext(ctx, run, attempt, caller)
+		callerGitCtx := GenerateGitContext(ctx, run, attempt, caller)
 		evaluated, err := jobparser.EvaluateCallerWith(
 			caller.JobID, parsedJob,
 			callerGitCtx, jobResults, vars, parentInputs,
@@ -267,7 +267,7 @@ func expandReusableWorkflowCaller(ctx context.Context, run *actions_model.Action
 // insertCallerChildren parses the called workflow with the caller's resolved inputs and inserts each parsed job.
 func insertCallerChildren(ctx context.Context, run *actions_model.ActionRun, attempt *actions_model.ActionRunAttempt, caller *actions_model.ActionRunJob, content []byte, sourceRepoID int64, sourceCommitSHA string, vars map[string]string, inputs map[string]any) error {
 	// Parse the called workflow with the caller's `inputs`
-	gitCtx := GenerateGiteaContext(ctx, run, attempt, nil)
+	gitCtx := GenerateGitContext(ctx, run, attempt, nil)
 	if event, ok := gitCtx["event"].(map[string]any); ok {
 		event["inputs"] = inputs
 	}
@@ -357,8 +357,8 @@ func insertCallerChildren(ctx context.Context, run *actions_model.ActionRun, att
 func ResolveUses(ctx context.Context, uses string) (*jobparser.UsesRef, error) {
 	// Rewrite a local-instance URL to the equivalent cross-repo form "owner/repo/.gitea/workflows/file.yml@ref".
 	if strings.HasPrefix(uses, "http://") || strings.HasPrefix(uses, "https://") {
-		// ParseGiteaSiteURL returns nil for URLs that do not belong to this instance.
-		gsu := httplib.ParseGiteaSiteURL(ctx, uses)
+		// ParseGitSiteURL returns nil for URLs that do not belong to this instance.
+		gsu := httplib.ParseGitSiteURL(ctx, uses)
 		if gsu == nil {
 			return nil, fmt.Errorf("unsupported reusable workflow URL %q: an absolute URL must point to this Hanzo Git instance (%s)", uses, setting.AppURL)
 		}

@@ -17,11 +17,11 @@ func FetchRedirectDelegate(resp http.ResponseWriter, req *http.Request) {
 	// The typical page is "issue comment" page. The backend responds "/owner/repo/issues/1#comment-2",
 	// then frontend needs this delegate to redirect to the new location with hash correctly.
 	redirect := req.FormValue("redirect")
-	if req.Method != http.MethodPost || !httplib.IsCurrentGiteaSiteURL(req.Context(), redirect) {
+	if req.Method != http.MethodPost || !httplib.IsCurrentGitSiteURL(req.Context(), redirect) {
 		http.Error(resp, "Bad Request", http.StatusBadRequest)
 		return
 	}
-	// no OpenRedirect, the "redirect" is validated by "IsCurrentGiteaSiteURL" above
+	// no OpenRedirect, the "redirect" is validated by "IsCurrentGitSiteURL" above
 	resp.Header().Set("Location", redirect)
 	resp.WriteHeader(http.StatusSeeOther)
 }

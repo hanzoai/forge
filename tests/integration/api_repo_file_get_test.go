@@ -23,7 +23,7 @@ func TestAPIGetRawFileOrLFS(t *testing.T) {
 	assert.Equal(t, "# repo1\n\nDescription for repo1", resp.Body.String())
 
 	// Test with LFS
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		createLFSTestRepository(t, "repo-lfs-test")
 		httpContext := NewAPITestContext(t, "user2", "repo-lfs-test", auth_model.AccessTokenScopeWriteRepository)
 		t.Run("repo-lfs-test", func(t *testing.T) {

@@ -59,7 +59,7 @@ func TestMigrateLocalPath(t *testing.T) {
 }
 
 func TestMigrateGiteaForm(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		// Gitea SDK (go-sdk) need to parse the AppVer from server response, so we must set it to a valid version string.
 		defer test.MockVariableValue(&setting.Migrations.AllowLocalNetworks, true)()
 		defer test.MockVariableValue(&setting.AppVer, "1.16.0")()
@@ -112,11 +112,11 @@ func Test_UpdateCommentsMigrationsByType(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-// setupGiteaMockServer creates a mock HTTP server that replays API responses from fixture files.
+// setupGitMockServer creates a mock HTTP server that replays API responses from fixture files.
 // If a GIT_TOKEN environment variable is set, the mock server proxies requests to the live
 // gitea.com instance and saves the responses as fixture files for future test runs.
 // Example: GIT_TOKEN=your_token go test -run Test_MigrateFromGiteaToGitea
-func setupGiteaMockServer(t *testing.T) *httptest.Server {
+func setupGitMockServer(t *testing.T) *httptest.Server {
 	t.Helper()
 
 	giteaToken := os.Getenv("GIT_TOKEN")
@@ -225,7 +225,7 @@ func Test_MigrateFromGiteaToGitea(t *testing.T) {
 	defer test.MockVariableValue(&setting.Migrations.AllowLocalNetworks, true)()
 	assert.NoError(t, migrations.Init())
 
-	mockServer := setupGiteaMockServer(t)
+	mockServer := setupGitMockServer(t)
 
 	owner := unittest.AssertExistsAndLoadBean(t, &user_model.User{Name: "user2"})
 	session := loginUser(t, owner.Name)

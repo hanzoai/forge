@@ -88,7 +88,7 @@ type PullRequestType int
 
 // Enumerate all the pull request types
 const (
-	PullRequestGitea PullRequestType = iota
+	PullRequestNative PullRequestType = iota
 	PullRequestGit
 )
 

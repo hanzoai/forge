@@ -315,17 +315,17 @@ func editWebhook(ctx *context.Context, params webhookParams) {
 	ctx.Redirect(fmt.Sprintf("%s/%d", orCtx.Link, w.ID))
 }
 
-// GiteaHooksNewPost response for creating Hanzo Git webhook
-func GiteaHooksNewPost(ctx *context.Context) {
-	createWebhook(ctx, giteaHookParams(ctx))
+// NativeHooksNewPost response for creating Hanzo Git webhook
+func NativeHooksNewPost(ctx *context.Context) {
+	createWebhook(ctx, gitHookParams(ctx))
 }
 
-// GiteaHooksEditPost response for editing Hanzo Git webhook
-func GiteaHooksEditPost(ctx *context.Context) {
-	editWebhook(ctx, giteaHookParams(ctx))
+// NativeHooksEditPost response for editing Hanzo Git webhook
+func NativeHooksEditPost(ctx *context.Context) {
+	editWebhook(ctx, gitHookParams(ctx))
 }
 
-func giteaHookParams(ctx *context.Context) webhookParams {
+func gitHookParams(ctx *context.Context) webhookParams {
 	form := web.GetForm(ctx).(*forms.NewWebhookForm)
 
 	contentType := webhook.ContentTypeJSON

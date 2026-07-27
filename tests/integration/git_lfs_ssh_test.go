@@ -25,7 +25,7 @@ import (
 )
 
 func TestGitLFSSSH(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		localRepoForUpload := filepath.Join(t.TempDir(), "test-upload")
 		localRepoForDownload := filepath.Join(t.TempDir(), "test-download")
 		apiTestContext := NewAPITestContext(t, "user2", "repo1", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

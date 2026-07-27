@@ -16,7 +16,7 @@ import (
 func Main(ctx context.Context, repo, verb, token string) error {
 	logger := newLogger()
 	pktline := transfer.NewPktline(os.Stdin, os.Stdout, logger)
-	giteaBackend, err := backend.New(ctx, repo, verb, token, logger)
+	gitBackend, err := backend.New(ctx, repo, verb, token, logger)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func Main(ctx context.Context, repo, verb, token string) error {
 	if err := pktline.WriteFlush(); err != nil {
 		logger.Log("error flushing capabilities:", err)
 	}
-	p := transfer.NewProcessor(pktline, giteaBackend, logger)
+	p := transfer.NewProcessor(pktline, gitBackend, logger)
 	defer logger.Log("done processing commands")
 	switch verb {
 	case "upload":

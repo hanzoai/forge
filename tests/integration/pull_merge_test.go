@@ -112,7 +112,7 @@ func assertPullMergeWebhookTask(t *testing.T, repoID int64) {
 }
 
 func TestPullMerge(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		preparePullMergeWebhook(t, 1)
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
@@ -144,7 +144,7 @@ func TestPullMerge(t *testing.T) {
 }
 
 func TestPullRebase(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		preparePullMergeWebhook(t, 1)
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
@@ -176,7 +176,7 @@ func TestPullRebase(t *testing.T) {
 }
 
 func TestPullRebaseMerge(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		preparePullMergeWebhook(t, 1)
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
@@ -208,7 +208,7 @@ func TestPullRebaseMerge(t *testing.T) {
 }
 
 func TestPullSquash(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		preparePullMergeWebhook(t, 1)
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
@@ -229,7 +229,7 @@ func TestPullSquash(t *testing.T) {
 }
 
 func TestPullSquashWithHeadCommitID(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		preparePullMergeWebhook(t, 1)
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
@@ -268,7 +268,7 @@ func TestPullSquashWithHeadCommitID(t *testing.T) {
 }
 
 func TestPullCleanUpAfterMerge(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "feature/test", "README.md", "Hello, World (Edited - TestPullCleanUpAfterMerge)\n")
@@ -314,7 +314,7 @@ func TestPullCleanUpAfterMerge(t *testing.T) {
 }
 
 func TestCantMergeWorkInProgress(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFile(t, session, "user1", "repo1", "master", "README.md", "Hello, World (Edited)\n")
@@ -330,7 +330,7 @@ func TestCantMergeWorkInProgress(t *testing.T) {
 }
 
 func TestCantMergeConflict(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "conflict", "README.md", "Hello, World (Edited Once)\n")
@@ -372,7 +372,7 @@ func TestCantMergeConflict(t *testing.T) {
 }
 
 func TestCantMergeUnrelated(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "base", "README.md", "Hello, World (Edited Twice)\n")
@@ -464,7 +464,7 @@ func TestCantMergeUnrelated(t *testing.T) {
 }
 
 func TestFastForwardOnlyMerge(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "update", "README.md", "Hello, World 2\n")
@@ -499,7 +499,7 @@ func TestFastForwardOnlyMerge(t *testing.T) {
 }
 
 func TestFastForwardOnlyMergeWithRequiredSignedCommits(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1")
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "update", "README.md", "Hello, signed\n")
@@ -585,7 +585,7 @@ func TestFastForwardOnlyMergeWithRequiredSignedCommits(t *testing.T) {
 }
 
 func TestCantFastForwardOnlyMergeDiverging(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "diverging", "README.md", "Hello, World diverged\n")
@@ -622,7 +622,7 @@ func TestCantFastForwardOnlyMergeDiverging(t *testing.T) {
 }
 
 func TestPullRetargetChildOnBranchDelete(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testEditFileToNewBranch(t, session, "user2", "repo1", "master", "base-pr", "README.md", "Hello, World\n(Edited - TestPullRetargetOnCleanup - base PR)\n")
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
@@ -659,7 +659,7 @@ func TestPullRetargetChildOnBranchDelete(t *testing.T) {
 }
 
 func TestPullDontRetargetChildOnWrongRepo(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "base-pr", "README.md", "Hello, World\n(Edited - TestPullDontRetargetChildOnWrongRepo - base PR)\n")
@@ -699,7 +699,7 @@ func TestPullDontRetargetChildOnWrongRepo(t *testing.T) {
 }
 
 func TestPullRequestMergedWithNoPermissionDeleteBranch(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		session := loginUser(t, "user4")
 		testRepoFork(t, session, "user2", "repo1", "user4", "repo1", "")
 		testEditFileToNewBranch(t, session, "user4", "repo1", "master", "base-pr", "README.md", "Hello, World\n(Edited - TestPullDontRetargetChildOnWrongRepo - base PR)\n")
@@ -723,7 +723,7 @@ func TestPullRequestMergedWithNoPermissionDeleteBranch(t *testing.T) {
 }
 
 func TestPullMergeIndexerNotifier(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// create a pull request
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
@@ -783,7 +783,7 @@ func TestPullMergeIndexerNotifier(t *testing.T) {
 }
 
 func TestPullAutoMergeAfterCommitStatusSucceed(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// create a pull request
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
@@ -864,7 +864,7 @@ func TestPullAutoMergeAfterCommitStatusSucceed(t *testing.T) {
 }
 
 func TestPullAutoMergeAfterCommitStatusSucceedAndApproval(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// create a pull request
 		baseUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		baseSession := loginUser(t, "user2")
@@ -943,7 +943,7 @@ func TestPullAutoMergeAfterCommitStatusSucceedAndApproval(t *testing.T) {
 }
 
 func TestPullAutoMergeAfterCommitStatusSucceedAndApprovalForAgitFlow(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		// create a pull request
 		baseAPITestContext := NewAPITestContext(t, "user2", "repo1", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
 
@@ -1054,7 +1054,7 @@ func TestPullAutoMergeAfterCommitStatusSucceedAndApprovalForAgitFlow(t *testing.
 }
 
 func TestPullNonMergeForAdminWithBranchProtection(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		// create a pull request
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		forkedName := "repo1-1"
@@ -1095,7 +1095,7 @@ func TestPullNonMergeForAdminWithBranchProtection(t *testing.T) {
 }
 
 func TestPullForceMergeForBypassAllowlistUser(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		ownerSession := loginUser(t, "user2")
 		ownerCtx := NewAPITestContext(t, "user2", "repo1", auth_model.AccessTokenScopeWriteRepository)
 
@@ -1160,7 +1160,7 @@ func TestPullForceMergeForBypassAllowlistUser(t *testing.T) {
 }
 
 func TestPullSquashMergeEmpty(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		session := loginUser(t, "user1") // FIXME: don't use admin user for testing
 		testEditFileToNewBranch(t, session, "user2", "repo1", "master", "pr-squash-empty", "README.md", "Hello, World (Edited)\n")
 		resp := testPullCreate(t, session, "user2", "repo1", false, "master", "pr-squash-empty", "This is a pull title")
@@ -1192,7 +1192,7 @@ func TestPullSquashMergeEmpty(t *testing.T) {
 }
 
 func TestPullSquashMessage(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		user2Session := loginUser(t, user2.Name)
 

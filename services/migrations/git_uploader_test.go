@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGiteaUploadRepo(t *testing.T) {
+func TestGitUploadRepo(t *testing.T) {
 	// FIXME: Since no accesskey or user/password will trigger rate limit of github, just skip
 	t.Skip()
 
@@ -37,7 +37,7 @@ func TestGiteaUploadRepo(t *testing.T) {
 	require.NoError(t, err)
 	var (
 		repoName = "builder-" + time.Now().Format("2006-01-02-15-04-05")
-		uploader = NewGiteaLocalUploader(graceful.GetManager().HammerContext(), user, user.Name, repoName)
+		uploader = NewGitLocalUploader(graceful.GetManager().HammerContext(), user, user.Name, repoName)
 	)
 
 	err = migrateRepository(t.Context(), user, downloader, uploader, base.MigrateOptions{
@@ -121,14 +121,14 @@ func TestGiteaUploadRepo(t *testing.T) {
 	assert.Len(t, pulls[0].Issue.Comments, 2)
 }
 
-func TestGiteaUploadRemapLocalUser(t *testing.T) {
+func TestGitUploadRemapLocalUser(t *testing.T) {
 	unittest.PrepareTestEnv(t)
 	doer := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
 	ctx := t.Context()
 	repoName := "migrated"
-	uploader := NewGiteaLocalUploader(ctx, doer, doer.Name, repoName)
+	uploader := NewGitLocalUploader(ctx, doer, doer.Name, repoName)
 	// call remapLocalUser
 	uploader.sameApp = true
 
@@ -172,12 +172,12 @@ func TestGiteaUploadRemapLocalUser(t *testing.T) {
 	assert.Equal(t, user.ID, target.GetUserID())
 }
 
-func TestGiteaUploadRemapExternalUser(t *testing.T) {
+func TestGitUploadRemapExternalUser(t *testing.T) {
 	unittest.PrepareTestEnv(t)
 	doer := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 	ctx := t.Context()
 	repoName := "migrated"
-	uploader := NewGiteaLocalUploader(ctx, doer, doer.Name, repoName)
+	uploader := NewGitLocalUploader(ctx, doer, doer.Name, repoName)
 	uploader.gitServiceType = structs.GiteaService
 	// call remapExternalUser
 	uploader.sameApp = false

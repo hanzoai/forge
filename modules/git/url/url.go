@@ -135,7 +135,7 @@ func ParseRepositoryURL(ctx context.Context, repoURL string) (*RepositoryURL, er
 
 	switch parsed.URL.Scheme {
 	case "http", "https":
-		if !httplib.IsCurrentGiteaSiteURL(ctx, repoURL) {
+		if !httplib.IsCurrentGitSiteURL(ctx, repoURL) {
 			return ret, nil
 		}
 		fillPathParts(strings.TrimPrefix(parsed.URL.Path, setting.AppSubURL))

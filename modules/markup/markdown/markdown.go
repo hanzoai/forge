@@ -17,7 +17,7 @@ import (
 	"github.com/hanzoai/git/modules/markup/common"
 	"github.com/hanzoai/git/modules/markup/markdown/math"
 	"github.com/hanzoai/git/modules/setting"
-	giteautil "github.com/hanzoai/git/modules/util"
+	gitutil "github.com/hanzoai/git/modules/util"
 
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/yuin/goldmark"
@@ -78,7 +78,7 @@ func (r *GoldmarkRender) Convert(source []byte, writer io.Writer, opts ...parser
 func (r *GoldmarkRender) highlightingRenderer(w util.BufWriter, c highlighting.CodeBlockContext, entering bool) {
 	if entering {
 		languageBytes, _ := c.Language()
-		languageStr := giteautil.IfZero(string(languageBytes), "text")
+		languageStr := gitutil.IfZero(string(languageBytes), "text")
 
 		preClasses := "code-block"
 		if languageStr == "mermaid" || languageStr == "math" {
@@ -193,7 +193,7 @@ func render(ctx *markup.RenderContext, input io.Reader, output io.Writer) error 
 		log.Error("Unable to ReadAll: %v", err)
 		return err
 	}
-	buf = giteautil.NormalizeEOL(buf)
+	buf = gitutil.NormalizeEOL(buf)
 
 	// FIXME: should we include a timeout to abort the renderer if it takes too long?
 	defer func() {
@@ -203,8 +203,8 @@ func render(ctx *markup.RenderContext, input io.Reader, output io.Writer) error 
 		}
 
 		log.Error("Panic in markdown: %v\n%s", err, log.Stack(2))
-		escapedHTML := template.HTMLEscapeString(giteautil.UnsafeBytesToString(buf))
-		_, _ = output.Write(giteautil.UnsafeStringToBytes(escapedHTML))
+		escapedHTML := template.HTMLEscapeString(gitutil.UnsafeBytesToString(buf))
+		_, _ = output.Write(gitutil.UnsafeStringToBytes(escapedHTML))
 	}()
 
 	pc := newParserContext(ctx)
@@ -267,7 +267,7 @@ func Render(ctx *markup.RenderContext, input io.Reader, output io.Writer) error 
 func RenderString(ctx *markup.RenderContext, content string) (template.HTML, error) {
 	var buf strings.Builder
 	if err := Render(ctx, strings.NewReader(content), &buf); err != nil {
-		log.Warn("Unable to RenderString: %v, content: %s", err, giteautil.TruncateRunes(content, 200))
+		log.Warn("Unable to RenderString: %v, content: %s", err, gitutil.TruncateRunes(content, 200))
 		err = nil
 		return htmlutil.EscapeString(content), err
 	}

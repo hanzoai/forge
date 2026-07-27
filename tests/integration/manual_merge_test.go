@@ -24,7 +24,7 @@ import (
 )
 
 func TestManualMergeAutodetect(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		// user2 is the repo owner
 		// user1 is the pusher/merger
 		user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
@@ -63,7 +63,7 @@ func TestManualMergeAutodetect(t *testing.T) {
 		// The first merge fast-forwards; the rest produce real merge commits,
 		// which generates multiple commits for "git rev-list --ancestry-path --merges ...".
 		dstPath := t.TempDir()
-		u, _ := url.Parse(giteaURL.String())
+		u, _ := url.Parse(gitURL.String())
 		u.Path = fmt.Sprintf("%s/%s.git", user2.Name, repoName)
 		u.User = url.UserPassword(user1.Name, userPassword)
 

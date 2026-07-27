@@ -105,7 +105,7 @@ func gitCommitChangesDeprecated(ctx context.Context, repoPath string, opts gitCo
 	return err
 }
 
-func onGiteaRun[T testing.TB](t T, callback func(T, *url.URL)) {
+func onGitRun[T testing.TB](t T, callback func(T, *url.URL)) {
 	defer tests.PrepareTestEnv(t, 1)()
 	s := http.Server{
 		Handler: testWebRoutes,

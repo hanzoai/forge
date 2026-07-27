@@ -11,13 +11,13 @@ import (
 	"github.com/hanzoai/git/modules/gitrepo"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/private"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 )
 
 // This file contains common functions relating to setting the Repository for the internal routes
 
 // RepoAssignment assigns the repository and git repository to the private context
-func RepoAssignment(ctx *gitea_context.PrivateContext) {
+func RepoAssignment(ctx *git_context.PrivateContext) {
 	ownerName := ctx.PathParam("owner")
 	repoName := ctx.PathParam("repo")
 
@@ -35,13 +35,13 @@ func RepoAssignment(ctx *gitea_context.PrivateContext) {
 		})
 		return
 	}
-	ctx.Repo = &gitea_context.Repository{
+	ctx.Repo = &git_context.Repository{
 		Repository: repo,
 		GitRepo:    gitRepo,
 	}
 }
 
-func loadRepository(ctx *gitea_context.PrivateContext, ownerName, repoName string) *repo_model.Repository {
+func loadRepository(ctx *git_context.PrivateContext, ownerName, repoName string) *repo_model.Repository {
 	repo, err := repo_model.GetRepositoryByOwnerAndName(ctx, ownerName, repoName)
 	if err != nil {
 		log.Error("Failed to get repository: %s/%s Error: %v", ownerName, repoName, err)

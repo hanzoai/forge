@@ -14,9 +14,9 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/testlogger"
 
+	"github.com/hanzoai/xorm/schemas"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/hanzoai/xorm/schemas"
 )
 
 // PrepareTestEnv prepares the test environment and reset the database. The skip parameter should usually be 0.
@@ -28,8 +28,8 @@ func PrepareTestEnv(t *testing.T, skip int, syncModels ...any) (db.EngineMigrati
 	ourSkip := 2
 	ourSkip += skip
 	deferFn := testlogger.PrintCurrentTest(t, ourSkip)
-	giteaRoot := setting.GetGiteaTestSourceRoot()
-	require.NoError(t, unittest.SyncDirs(filepath.Join(giteaRoot, "tests/gitea-repositories-meta"), setting.RepoRootPath))
+	gitRoot := setting.GetGitTestSourceRoot()
+	require.NoError(t, unittest.SyncDirs(filepath.Join(gitRoot, "tests/git-repositories-meta"), setting.RepoRootPath))
 
 	cleanup, err := unittest.ResetTestDatabase()
 	if err != nil {
@@ -64,7 +64,7 @@ func PrepareTestEnv(t *testing.T, skip int, syncModels ...any) (db.EngineMigrati
 		}
 	}
 
-	fixturesDir := filepath.Join(giteaRoot, "models", "migrations", "fixtures", t.Name())
+	fixturesDir := filepath.Join(gitRoot, "models", "migrations", "fixtures", t.Name())
 
 	if _, err := os.Stat(fixturesDir); err == nil {
 		t.Logf("initializing fixtures from: %s", fixturesDir)
@@ -104,7 +104,7 @@ func mainTest(m *testing.M) int {
 	if err != nil {
 		return testlogger.MainErrorf("Unable to prepare integration test config: %v", err)
 	}
-	setting.SetupGiteaTestEnv()
+	setting.SetupGitTestEnv()
 
 	if err = git.InitFull(); err != nil {
 		return testlogger.MainErrorf("Unable to InitFull: %v", err)

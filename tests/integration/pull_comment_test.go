@@ -96,7 +96,7 @@ func testPullCommentRetarget(t *testing.T, _ *url.URL, session *TestSession) {
 }
 
 func TestPullComment(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		session := loginUser(t, "user1")
 		testCreateBranch(t, session, "user2", "repo1", "branch/master", "test-branch/rebase", http.StatusSeeOther)
 		testCreateBranch(t, session, "user2", "repo1", "branch/master", "test-branch/retarget", http.StatusSeeOther)

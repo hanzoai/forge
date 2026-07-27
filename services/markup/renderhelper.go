@@ -8,7 +8,7 @@ import (
 
 	"github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/markup"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 )
 
 func FormalRenderHelperFuncs() *markup.RenderHelperFuncs {
@@ -21,7 +21,7 @@ func FormalRenderHelperFuncs() *markup.RenderHelperFuncs {
 				return false
 			}
 
-			giteaCtx := gitea_context.GetWebContext(ctx)
+			giteaCtx := git_context.GetWebContext(ctx)
 			if giteaCtx == nil {
 				// when using general context, use user's visibility to check
 				return mentionedUser.Visibility.IsPublic()

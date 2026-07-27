@@ -37,7 +37,7 @@ func TestExternalMarkupRenderer(t *testing.T) {
 	assert.NotEqual(t, binaryContent, strings.ToValidUTF8(binaryContent, "?"))
 	assert.Equal(t, "ISO-8859-2", detectedEncoding) // even if the binary content can be detected as text encoding, it shouldn't affect the raw rendering
 
-	onGiteaRun(t, func(t *testing.T, _ *url.URL) {
+	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		repo1 := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 		_, err := createFileInBranch(user2, repo1, createFileInBranchOptions{}, map[string]string{

@@ -239,7 +239,7 @@ func testScheduleUpdateDisableAndEnableActionsUnit(t *testing.T) {
 type scheduleUpdateTrigger func(t *testing.T, u *url.URL, testContext APITestContext, user *user_model.User, repo *repo_model.Repository) (commitID, expectedSpec string)
 
 func doTestScheduleUpdate(t *testing.T, updateTrigger scheduleUpdateTrigger) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)

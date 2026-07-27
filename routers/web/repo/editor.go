@@ -194,7 +194,7 @@ func prepareEditorCommitSubmittedForm[T forms.CommitCommonFormInterface](ctx *co
 // redirectForCommitChoice redirects after committing the edit to a branch
 func redirectForCommitChoice[T any](ctx *context.Context, parsed *preparedEditorCommitForm[T], treePath string) {
 	// when editing a file in a PR, it should return to the origin location
-	if returnURI := ctx.FormString("return_uri"); returnURI != "" && httplib.IsCurrentGiteaSiteURL(ctx, returnURI) {
+	if returnURI := ctx.FormString("return_uri"); returnURI != "" && httplib.IsCurrentGitSiteURL(ctx, returnURI) {
 		ctx.JSONRedirect(returnURI)
 		return
 	}

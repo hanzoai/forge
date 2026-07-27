@@ -157,7 +157,7 @@ func resetLocale(ctx *context.Context, u *user_model.User) error {
 func rememberAuthRedirectLink(ctx *context.Context) {
 	redirectTo := ctx.FormString("redirect_to")
 	if redirectTo == "" {
-		if ref, err := url.Parse(ctx.Req.Referer()); err == nil && httplib.IsCurrentGiteaSiteURL(ctx, ctx.Req.Referer()) {
+		if ref, err := url.Parse(ctx.Req.Referer()); err == nil && httplib.IsCurrentGitSiteURL(ctx, ctx.Req.Referer()) {
 			// the request paths starting with "/user/" are either:
 			// * auth related pages: don't redirect back to them
 			// * user settings pages: they have "require sign-in" protection already, no "referer redirect" would happen
@@ -181,7 +181,7 @@ func consumeAuthRedirectLink(ctx *context.Context) string {
 		redirects = append(redirects, setting.AppSubURL+string(setting.LandingPageURL))
 	}
 	for _, link := range redirects {
-		if link != "" && httplib.IsCurrentGiteaSiteURL(ctx, link) {
+		if link != "" && httplib.IsCurrentGitSiteURL(ctx, link) {
 			return link
 		}
 	}

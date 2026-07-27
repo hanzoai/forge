@@ -170,24 +170,24 @@ func detectURLRoutePath(ctx context.Context, s string) (routePath string, ut url
 	return "", urlTypeUnknown
 }
 
-func IsCurrentGiteaSiteURL(ctx context.Context, s string) bool {
+func IsCurrentGitSiteURL(ctx context.Context, s string) bool {
 	_, ut := detectURLRoutePath(ctx, s)
 	return ut != urlTypeUnknown
 }
 
-type GiteaSiteURL struct {
+type GitSiteURL struct {
 	RoutePath   string
 	OwnerName   string
 	RepoName    string
 	RepoSubPath string
 }
 
-func ParseGiteaSiteURL(ctx context.Context, s string) *GiteaSiteURL {
+func ParseGitSiteURL(ctx context.Context, s string) *GitSiteURL {
 	routePath, ut := detectURLRoutePath(ctx, s)
 	if ut == urlTypeUnknown || ut == urlTypeGiteaPageRelative {
 		return nil
 	}
-	ret := &GiteaSiteURL{RoutePath: routePath}
+	ret := &GitSiteURL{RoutePath: routePath}
 	fields := strings.SplitN(strings.TrimPrefix(ret.RoutePath, "/"), "/", 3)
 
 	// TODO: now it only does a quick check for some known reserved paths, should do more strict checks in the future

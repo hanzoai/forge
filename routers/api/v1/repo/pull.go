@@ -522,7 +522,7 @@ func CreatePullRequest(ctx *context.APIContext) {
 		HeadRepo:   compareResult.HeadRepo,
 		BaseRepo:   repo,
 		MergeBase:  compareResult.CompareBase,
-		Type:       issues_model.PullRequestGitea,
+		Type:       issues_model.PullRequestNative,
 	}
 
 	pr.AllowMaintainerEdit = optional.FromPtr(form.AllowMaintainerEdit).ValueOrDefault(unitPullRequest.PullRequestsConfig().DefaultAllowMaintainerEdit)

@@ -35,10 +35,10 @@ var currentEngine db.EngineMigration
 func initMigrationTest(t *testing.T) func() {
 	testlogger.Init()
 	require.NoError(t, setting.PrepareIntegrationTestConfig())
-	setting.SetupGiteaTestEnv()
+	setting.SetupGitTestEnv()
 
 	assert.NotEmpty(t, setting.RepoRootPath)
-	assert.NoError(t, unittest.SyncDirs(filepath.Join(setting.GetGiteaTestSourceRoot(), "tests/gitea-repositories-meta"), setting.RepoRootPath))
+	assert.NoError(t, unittest.SyncDirs(filepath.Join(setting.GetGitTestSourceRoot(), "tests/git-repositories-meta"), setting.RepoRootPath))
 	assert.NoError(t, git.InitFull())
 	setting.LoadDBSetting()
 	setting.InitLoggersForTest()
@@ -47,7 +47,7 @@ func initMigrationTest(t *testing.T) func() {
 }
 
 func availableVersions() ([]string, error) {
-	migrationsDir, err := os.Open(filepath.Join(setting.GetGiteaTestSourceRoot(), "tests/integration/migration-test"))
+	migrationsDir, err := os.Open(filepath.Join(setting.GetGitTestSourceRoot(), "tests/integration/migration-test"))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func availableVersions() ([]string, error) {
 
 func readSQLFromFile(version string) (string, error) {
 	filename := fmt.Sprintf("tests/integration/migration-test/gitea-v%s.%s.sql.gz", version, setting.Database.Type)
-	filename = filepath.Join(setting.GetGiteaTestSourceRoot(), filename)
+	filename = filepath.Join(setting.GetGitTestSourceRoot(), filename)
 
 	file, err := os.Open(filename)
 	if err != nil {

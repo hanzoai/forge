@@ -10,7 +10,7 @@ import (
 
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/models/user"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
@@ -38,8 +38,8 @@ func TestRenderHelperMention(t *testing.T) {
 	// when using web context, use user.IsUserVisibleToViewer to check
 	req, err := http.NewRequest(http.MethodGet, "/", nil)
 	assert.NoError(t, err)
-	base := gitea_context.NewBaseContextForTest(httptest.NewRecorder(), req)
-	giteaCtx := gitea_context.NewWebContext(base, &contexttest.MockRender{}, nil)
+	base := git_context.NewBaseContextForTest(httptest.NewRecorder(), req)
+	giteaCtx := git_context.NewWebContext(base, &contexttest.MockRender{}, nil)
 
 	assert.True(t, FormalRenderHelperFuncs().IsUsernameMentionable(giteaCtx, userPublic))
 	assert.False(t, FormalRenderHelperFuncs().IsUsernameMentionable(giteaCtx, userPrivate))

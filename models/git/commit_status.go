@@ -215,12 +215,12 @@ func (status *CommitStatus) LocaleString(lang translation.Locale) string {
 
 // HideActionsURL set `TargetURL` to an empty string if the status comes from Gitea Actions
 func (status *CommitStatus) HideActionsURL(ctx context.Context) {
-	if _, ok := status.cutTargetURLGiteaActionsPrefix(ctx); ok {
+	if _, ok := status.cutTargetURLGitActionsPrefix(ctx); ok {
 		status.TargetURL = ""
 	}
 }
 
-func (status *CommitStatus) cutTargetURLGiteaActionsPrefix(ctx context.Context) (string, bool) {
+func (status *CommitStatus) cutTargetURLGitActionsPrefix(ctx context.Context) (string, bool) {
 	if status.RepoID == 0 {
 		return "", false
 	}
@@ -238,7 +238,7 @@ func (status *CommitStatus) cutTargetURLGiteaActionsPrefix(ctx context.Context) 
 
 // ParseGiteaActionsTargetURL parses the commit status target URL as Gitea Actions link
 func (status *CommitStatus) ParseGiteaActionsTargetURL(ctx context.Context) (runID, jobID int64, ok bool) {
-	s, ok := status.cutTargetURLGiteaActionsPrefix(ctx)
+	s, ok := status.cutTargetURLGitActionsPrefix(ctx)
 	if !ok {
 		return 0, 0, false
 	}

@@ -28,10 +28,10 @@ var Capabilities = []string{
 	"locking",
 }
 
-var _ transfer.Backend = (*GiteaBackend)(nil)
+var _ transfer.Backend = (*GitBackend)(nil)
 
-// GiteaBackend is an adapter between git-lfs-transfer library and Gitea's internal LFS API
-type GiteaBackend struct {
+// GitBackend is an adapter between git-lfs-transfer library and Gitea's internal LFS API
+type GitBackend struct {
 	ctx          context.Context
 	server       *url.URL
 	op           string
@@ -47,11 +47,11 @@ func New(ctx context.Context, repo, op, token string, logger transfer.Logger) (t
 		return nil, err
 	}
 	server = server.JoinPath(internalRepoRoutePath, repo, "info/lfs")
-	return &GiteaBackend{ctx: ctx, server: server, op: op, authToken: token, internalAuth: "Bearer " + setting.InternalToken, logger: logger}, nil
+	return &GitBackend{ctx: ctx, server: server, op: op, authToken: token, internalAuth: "Bearer " + setting.InternalToken, logger: logger}, nil
 }
 
 // Batch implements transfer.Backend
-func (g *GiteaBackend) Batch(_ string, pointers []transfer.BatchItem, args transfer.Args) ([]transfer.BatchItem, error) {
+func (g *GitBackend) Batch(_ string, pointers []transfer.BatchItem, args transfer.Args) ([]transfer.BatchItem, error) {
 	reqBody := lfs.BatchRequest{Operation: g.op}
 	if transfer, ok := args[argTransfer]; ok {
 		reqBody.Transfers = []string{transfer}
@@ -157,7 +157,7 @@ func (g *GiteaBackend) Batch(_ string, pointers []transfer.BatchItem, args trans
 }
 
 // Download implements transfer.Backend. The returned reader must be closed by the caller.
-func (g *GiteaBackend) Download(oid string, args transfer.Args) (_ io.ReadCloser, _ int64, retErr error) {
+func (g *GitBackend) Download(oid string, args transfer.Args) (_ io.ReadCloser, _ int64, retErr error) {
 	idMapStr, exists := args[argID]
 	if !exists {
 		return nil, 0, ErrMissingID
@@ -209,7 +209,7 @@ func (g *GiteaBackend) Download(oid string, args transfer.Args) (_ io.ReadCloser
 }
 
 // Upload implements transfer.Backend.
-func (g *GiteaBackend) Upload(oid string, size int64, r io.Reader, args transfer.Args) error {
+func (g *GitBackend) Upload(oid string, size int64, r io.Reader, args transfer.Args) error {
 	idMapStr, exists := args[argID]
 	if !exists {
 		return ErrMissingID
@@ -251,7 +251,7 @@ func (g *GiteaBackend) Upload(oid string, size int64, r io.Reader, args transfer
 }
 
 // Verify implements transfer.Backend.
-func (g *GiteaBackend) Verify(oid string, size int64, args transfer.Args) (transfer.Status, error) {
+func (g *GitBackend) Verify(oid string, size int64, args transfer.Args) (transfer.Status, error) {
 	reqBody := lfs.Pointer{Oid: oid, Size: size}
 
 	bodyBytes, err := json.Marshal(reqBody)
@@ -297,6 +297,6 @@ func (g *GiteaBackend) Verify(oid string, size int64, args transfer.Args) (trans
 }
 
 // LockBackend implements transfer.Backend.
-func (g *GiteaBackend) LockBackend(_ transfer.Args) transfer.LockBackend {
-	return newGiteaLockBackend(g)
+func (g *GitBackend) LockBackend(_ transfer.Args) transfer.LockBackend {
+	return newGitLockBackend(g)
 }

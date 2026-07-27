@@ -25,7 +25,7 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/modules/web"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 	pull_service "github.com/hanzoai/git/services/pull"
 	repo_service "github.com/hanzoai/git/services/repository"
 )
@@ -55,7 +55,7 @@ func hookPostReceiveCollectPushUpdates(opts *private.HookOptions, repo *repo_mod
 	return updates
 }
 
-func hookPostReceiveSyncDatabaseBranches(ctx *gitea_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository, updates []*repo_module.PushUpdateOptions) bool {
+func hookPostReceiveSyncDatabaseBranches(ctx *git_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository, updates []*repo_module.PushUpdateOptions) bool {
 	branchesToSync := make([]*repo_module.PushUpdateOptions, 0, len(updates))
 	for _, update := range updates {
 		if !update.RefFullName.IsBranch() {
@@ -98,7 +98,7 @@ func hookPostReceiveSyncDatabaseBranches(ctx *gitea_context.PrivateContext, opts
 }
 
 // HookPostReceive updates services and users
-func HookPostReceive(ctx *gitea_context.PrivateContext) {
+func HookPostReceive(ctx *git_context.PrivateContext) {
 	opts := web.GetForm(ctx).(*private.HookOptions)
 	if opts.IsWiki {
 		setting.PanicInDevOrTesting("wiki hook-post-receive is not supported")
@@ -140,7 +140,7 @@ func HookPostReceive(ctx *gitea_context.PrivateContext) {
 	hookPostReceiveRespondWithTrailer(ctx, opts, repo)
 }
 
-func hookPostReceiveUpdateRepoByOptions(ctx *gitea_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository) bool {
+func hookPostReceiveUpdateRepoByOptions(ctx *git_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository) bool {
 	isPrivate := opts.GitPushOptions.Bool(private.GitPushOptionRepoPrivate)
 	isTemplate := opts.GitPushOptions.Bool(private.GitPushOptionRepoTemplate)
 	// Handle Push Options
@@ -186,7 +186,7 @@ func hookPostReceiveUpdateRepoByOptions(ctx *gitea_context.PrivateContext, opts 
 	return true
 }
 
-func hookPostReceiveRespondWithTrailer(ctx *gitea_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository) {
+func hookPostReceiveRespondWithTrailer(ctx *git_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository) {
 	results := make([]private.HookPostReceiveBranchResult, 0, len(opts.OldCommitIDs))
 	baseRepo := repo
 	if repo.IsFork {
@@ -250,7 +250,7 @@ func loadContextCacheUser(ctx context.Context, id int64) (*user_model.User, erro
 }
 
 // hookPostReceiveHandlePullRequestMerging handle pull request merging, a pull request action should push at least 1 commit
-func hookPostReceiveHandlePullRequestMerging(ctx *gitea_context.PrivateContext, opts *private.HookOptions, updates []*repo_module.PushUpdateOptions) bool {
+func hookPostReceiveHandlePullRequestMerging(ctx *git_context.PrivateContext, opts *private.HookOptions, updates []*repo_module.PushUpdateOptions) bool {
 	if len(updates) == 0 {
 		err := fmt.Errorf("Pushing a merged PR (pr:%d) no commits pushed ", opts.PullRequestID)
 		ctx.PrivateError(http.StatusInternalServerError, err, "no push update")
@@ -279,7 +279,7 @@ func hookPostReceiveHandlePullRequestMerging(ctx *gitea_context.PrivateContext, 
 	return true
 }
 
-func hookPostReceiveSyncRepoDefaultBranch(ctx *gitea_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository) {
+func hookPostReceiveSyncRepoDefaultBranch(ctx *git_context.PrivateContext, opts *private.HookOptions, repo *repo_model.Repository) {
 	hasBranch := false
 	for _, refFullName := range opts.RefFullNames {
 		if hasBranch = refFullName.IsBranch(); hasBranch {

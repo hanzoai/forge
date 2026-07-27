@@ -26,8 +26,8 @@ func (r *CheckerState) Name() string {
 	return "update-checker"
 }
 
-// GiteaUpdateChecker returns error when new version of Gitea is available
-func GiteaUpdateChecker(httpEndpoint string) error {
+// GitUpdateChecker returns error when new version of Gitea is available
+func GitUpdateChecker(httpEndpoint string) error {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			Proxy: proxy.Proxy(),

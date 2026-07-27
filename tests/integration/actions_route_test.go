@@ -23,7 +23,7 @@ import (
 )
 
 func TestActionsRoute(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		t.Run("testActionsRouteForIDBasedURL", testActionsRouteForIDBasedURL)
 		t.Run("testActionsRouteForLegacyIndexBasedURL", testActionsRouteForLegacyIndexBasedURL)
 	})

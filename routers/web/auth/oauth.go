@@ -172,7 +172,7 @@ func SignInOAuthCallback(ctx *context.Context) {
 				if gothUser.RawData == nil {
 					gothUser.RawData = make(map[string]any)
 				}
-				gothUser.RawData["__giteaAutoRegMissingFields"] = missingFields
+				gothUser.RawData["__gitAutoRegMissingFields"] = missingFields
 				showLinkingLogin(ctx, authSource.ID, gothUser)
 				return
 			}

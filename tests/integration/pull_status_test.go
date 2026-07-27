@@ -26,7 +26,7 @@ import (
 )
 
 func TestPullCreate_CommitStatus(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		session := loginUser(t, "user1")
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "status1", "README.md", "status1")
@@ -114,7 +114,7 @@ func TestPullCreate_EmptyChangesWithDifferentCommits(t *testing.T) {
 	// Reason: gitflow and merging master back into develop, where is high possibility, there are no changes
 	// but just commit saying "Merge branch". And this meta commit can be also tagged,
 	// so we need to have this meta commit also in develop branch.
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		session := loginUser(t, "user1")
 		testRepoFork(t, session, "user2", "repo1", "user1", "repo1", "")
 		testEditFileToNewBranch(t, session, "user1", "repo1", "master", "status1", "README.md", "status1")
@@ -138,7 +138,7 @@ func TestPullCreate_EmptyChangesWithDifferentCommits(t *testing.T) {
 }
 
 func TestPullCreate_EmptyChangesWithSameCommits(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		session := loginUser(t, "user1")
 
 		testCreateBranch(t, session, "user2", "repo1", "branch/master", "empty-pr-branch", http.StatusSeeOther)
@@ -167,7 +167,7 @@ func TestPullCreate_EmptyChangesWithSameCommits(t *testing.T) {
 }
 
 func TestPullStatusDelayCheck(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		defer test.MockVariableValue(&setting.Repository.PullRequest.DelayCheckForInactiveDays, 1)()
 		defer test.MockVariableValue(&pull.AddPullRequestToCheckQueue)()
 

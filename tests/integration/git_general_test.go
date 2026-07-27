@@ -45,7 +45,7 @@ const (
 )
 
 func TestGitGeneral(t *testing.T) {
-	onGiteaRun(t, testGitGeneral)
+	onGitRun(t, testGitGeneral)
 }
 
 func testGitGeneral(t *testing.T, u *url.URL) {

@@ -103,8 +103,8 @@ func TestPurgeUser(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	user := &user_model.User{
-		Name:               "GiteaBot",
-		Email:              "GiteaBot@gitea.io",
+		Name:               "GitBot",
+		Email:              "GitBot@gitea.io",
 		Passwd:             ";p['////..-++']",
 		IsAdmin:            false,
 		Theme:              setting.UI.DefaultTheme,
@@ -193,7 +193,7 @@ func TestCreateUser_Issue5882(t *testing.T) {
 		user               *user_model.User
 		disableOrgCreation bool
 	}{
-		{&user_model.User{Name: "GiteaBot", Email: "GiteaBot@gitea.io", Passwd: passwd, MustChangePassword: false}, false},
+		{&user_model.User{Name: "GitBot", Email: "GitBot@gitea.io", Passwd: passwd, MustChangePassword: false}, false},
 		{&user_model.User{Name: "GiteaBot2", Email: "GiteaBot2@gitea.io", Passwd: passwd, MustChangePassword: false}, true},
 	}
 

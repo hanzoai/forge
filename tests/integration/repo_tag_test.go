@@ -45,7 +45,7 @@ func TestCreateNewTagProtected(t *testing.T) {
 	})
 
 	t.Run("Git", func(t *testing.T) {
-		onGiteaRun(t, func(t *testing.T, u *url.URL) {
+		onGitRun(t, func(t *testing.T, u *url.URL) {
 			httpContext := NewAPITestContext(t, owner.Name, repo.Name)
 
 			dstPath := t.TempDir()
@@ -65,7 +65,7 @@ func TestCreateNewTagProtected(t *testing.T) {
 	})
 
 	t.Run("GitTagForce", func(t *testing.T) {
-		onGiteaRun(t, func(t *testing.T, u *url.URL) {
+		onGitRun(t, func(t *testing.T, u *url.URL) {
 			httpContext := NewAPITestContext(t, owner.Name, repo.Name)
 
 			dstPath := t.TempDir()
@@ -123,7 +123,7 @@ func TestCreateNewTagProtected(t *testing.T) {
 }
 
 func TestRepushTag(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 		owner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: repo.OwnerID})
 		session := loginUser(t, owner.LowerName)

@@ -19,24 +19,24 @@ import (
 	"github.com/charmbracelet/git-lfs-transfer/transfer"
 )
 
-var _ transfer.LockBackend = &giteaLockBackend{}
+var _ transfer.LockBackend = &gitLockBackend{}
 
-type giteaLockBackend struct {
+type gitLockBackend struct {
 	ctx          context.Context
-	g            *GiteaBackend
+	g            *GitBackend
 	server       *url.URL
 	authToken    string
 	internalAuth string
 	logger       transfer.Logger
 }
 
-func newGiteaLockBackend(g *GiteaBackend) transfer.LockBackend {
+func newGitLockBackend(g *GitBackend) transfer.LockBackend {
 	server := g.server.JoinPath("locks")
-	return &giteaLockBackend{ctx: g.ctx, g: g, server: server, authToken: g.authToken, internalAuth: g.internalAuth, logger: g.logger}
+	return &gitLockBackend{ctx: g.ctx, g: g, server: server, authToken: g.authToken, internalAuth: g.internalAuth, logger: g.logger}
 }
 
 // Create implements transfer.LockBackend
-func (g *giteaLockBackend) Create(path, refname string) (transfer.Lock, error) {
+func (g *gitLockBackend) Create(path, refname string) (transfer.Lock, error) {
 	reqBody := lfslock.LFSLockRequest{Path: path}
 
 	bodyBytes, err := json.Marshal(reqBody)
@@ -82,12 +82,12 @@ func (g *giteaLockBackend) Create(path, refname string) (transfer.Lock, error) {
 	if respLock.Owner != nil {
 		owner = respLock.Owner.Name
 	}
-	lock := newGiteaLock(g, respLock.ID, respLock.Path, respLock.LockedAt, owner)
+	lock := newGitLock(g, respLock.ID, respLock.Path, respLock.LockedAt, owner)
 	return lock, nil
 }
 
 // Unlock implements transfer.LockBackend
-func (g *giteaLockBackend) Unlock(lock transfer.Lock) error {
+func (g *gitLockBackend) Unlock(lock transfer.Lock) error {
 	reqBody := lfslock.LFSLockDeleteRequest{}
 
 	bodyBytes, err := json.Marshal(reqBody)
@@ -118,7 +118,7 @@ func (g *giteaLockBackend) Unlock(lock transfer.Lock) error {
 }
 
 // FromPath implements transfer.LockBackend
-func (g *giteaLockBackend) FromPath(path string) (transfer.Lock, error) {
+func (g *gitLockBackend) FromPath(path string) (transfer.Lock, error) {
 	v := url.Values{
 		argPath: []string{path},
 	}
@@ -135,7 +135,7 @@ func (g *giteaLockBackend) FromPath(path string) (transfer.Lock, error) {
 }
 
 // FromID implements transfer.LockBackend
-func (g *giteaLockBackend) FromID(id string) (transfer.Lock, error) {
+func (g *gitLockBackend) FromID(id string) (transfer.Lock, error) {
 	v := url.Values{
 		argID: []string{id},
 	}
@@ -152,7 +152,7 @@ func (g *giteaLockBackend) FromID(id string) (transfer.Lock, error) {
 }
 
 // Range implements transfer.LockBackend
-func (g *giteaLockBackend) Range(cursor string, limit int, iter func(transfer.Lock) error) (string, error) {
+func (g *gitLockBackend) Range(cursor string, limit int, iter func(transfer.Lock) error) (string, error) {
 	v := url.Values{
 		argLimit: []string{strconv.FormatInt(int64(limit), 10)},
 	}
@@ -174,7 +174,7 @@ func (g *giteaLockBackend) Range(cursor string, limit int, iter func(transfer.Lo
 	return cursor, nil
 }
 
-func (g *giteaLockBackend) queryLocks(v url.Values) ([]transfer.Lock, string, error) {
+func (g *gitLockBackend) queryLocks(v url.Values) ([]transfer.Lock, string, error) {
 	serverURLWithQuery := g.server.JoinPath() // get a copy
 	serverURLWithQuery.RawQuery = v.Encode()
 	headers := map[string]string{
@@ -212,57 +212,57 @@ func (g *giteaLockBackend) queryLocks(v url.Values) ([]transfer.Lock, string, er
 		if respLock.Owner != nil {
 			owner = respLock.Owner.Name
 		}
-		lock := newGiteaLock(g, respLock.ID, respLock.Path, respLock.LockedAt, owner)
+		lock := newGitLock(g, respLock.ID, respLock.Path, respLock.LockedAt, owner)
 		respLocks = append(respLocks, lock)
 	}
 	return respLocks, respBody.Next, nil
 }
 
-var _ transfer.Lock = &giteaLock{}
+var _ transfer.Lock = &gitLock{}
 
-type giteaLock struct {
-	g        *giteaLockBackend
+type gitLock struct {
+	g        *gitLockBackend
 	id       string
 	path     string
 	lockedAt time.Time
 	owner    string
 }
 
-func newGiteaLock(g *giteaLockBackend, id, path string, lockedAt time.Time, owner string) transfer.Lock {
-	return &giteaLock{g: g, id: id, path: path, lockedAt: lockedAt, owner: owner}
+func newGitLock(g *gitLockBackend, id, path string, lockedAt time.Time, owner string) transfer.Lock {
+	return &gitLock{g: g, id: id, path: path, lockedAt: lockedAt, owner: owner}
 }
 
 // Unlock implements transfer.Lock
-func (g *giteaLock) Unlock() error {
+func (g *gitLock) Unlock() error {
 	return g.g.Unlock(g)
 }
 
 // ID implements transfer.Lock
-func (g *giteaLock) ID() string {
+func (g *gitLock) ID() string {
 	return g.id
 }
 
 // Path implements transfer.Lock
-func (g *giteaLock) Path() string {
+func (g *gitLock) Path() string {
 	return g.path
 }
 
 // FormattedTimestamp implements transfer.Lock
-func (g *giteaLock) FormattedTimestamp() string {
+func (g *gitLock) FormattedTimestamp() string {
 	return g.lockedAt.UTC().Format(time.RFC3339)
 }
 
 // OwnerName implements transfer.Lock
-func (g *giteaLock) OwnerName() string {
+func (g *gitLock) OwnerName() string {
 	return g.owner
 }
 
-func (g *giteaLock) CurrentUser() (string, error) {
+func (g *gitLock) CurrentUser() (string, error) {
 	return userSelf, nil
 }
 
 // AsLockSpec implements transfer.Lock
-func (g *giteaLock) AsLockSpec(ownerID bool) ([]string, error) {
+func (g *gitLock) AsLockSpec(ownerID bool) ([]string, error) {
 	msgs := []string{
 		"lock " + g.ID(),
 		fmt.Sprintf("path %s %s", g.ID(), g.Path()),
@@ -284,7 +284,7 @@ func (g *giteaLock) AsLockSpec(ownerID bool) ([]string, error) {
 }
 
 // AsArguments implements transfer.Lock
-func (g *giteaLock) AsArguments() []string {
+func (g *gitLock) AsArguments() []string {
 	return []string{
 		"id=" + g.ID(),
 		"path=" + g.Path(),

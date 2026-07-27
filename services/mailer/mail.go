@@ -109,7 +109,7 @@ func (b64embedder *mailAttachmentBase64Embedder) Base64InlineImages(ctx context.
 }
 
 func (b64embedder *mailAttachmentBase64Embedder) AttachmentSrcToBase64DataURI(ctx context.Context, attachmentSrc string) (string, error) {
-	parsedSrc := httplib.ParseGiteaSiteURL(ctx, attachmentSrc)
+	parsedSrc := httplib.ParseGitSiteURL(ctx, attachmentSrc)
 	var attachmentUUID string
 	if parsedSrc != nil {
 		var ok bool

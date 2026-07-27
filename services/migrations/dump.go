@@ -719,7 +719,7 @@ func RestoreRepository(ctx context.Context, baseDir, ownerName, repoName string,
 	if err != nil {
 		return err
 	}
-	uploader := NewGiteaLocalUploader(ctx, doer, ownerName, repoName)
+	uploader := NewGitLocalUploader(ctx, doer, ownerName, repoName)
 	downloader, err := NewRepositoryRestorer(ctx, baseDir, ownerName, repoName, validation)
 	if err != nil {
 		return err

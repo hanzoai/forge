@@ -37,10 +37,10 @@ import (
 	"github.com/google/uuid"
 )
 
-var _ base.Uploader = &GiteaLocalUploader{}
+var _ base.Uploader = &GitLocalUploader{}
 
-// GiteaLocalUploader implements an Uploader to gitea sites
-type GiteaLocalUploader struct {
+// GitLocalUploader implements an Uploader to gitea sites
+type GitLocalUploader struct {
 	doer           *user_model.User
 	repoOwner      string
 	repoName       string
@@ -56,9 +56,9 @@ type GiteaLocalUploader struct {
 	gitServiceType structs.GitServiceType
 }
 
-// NewGiteaLocalUploader creates a gitea Uploader via gitea API v1
-func NewGiteaLocalUploader(_ context.Context, doer *user_model.User, repoOwner, repoName string) *GiteaLocalUploader {
-	return &GiteaLocalUploader{
+// NewGitLocalUploader creates a gitea Uploader via gitea API v1
+func NewGitLocalUploader(_ context.Context, doer *user_model.User, repoOwner, repoName string) *GitLocalUploader {
+	return &GitLocalUploader{
 		doer:        doer,
 		repoOwner:   repoOwner,
 		repoName:    repoName,
@@ -72,7 +72,7 @@ func NewGiteaLocalUploader(_ context.Context, doer *user_model.User, repoOwner, 
 }
 
 // MaxBatchInsertSize returns the table's max batch insert size
-func (g *GiteaLocalUploader) MaxBatchInsertSize(tp string) int {
+func (g *GitLocalUploader) MaxBatchInsertSize(tp string) int {
 	switch tp {
 	case "issue":
 		return db.MaxBatchInsertSize(new(issues_model.Issue))
@@ -91,7 +91,7 @@ func (g *GiteaLocalUploader) MaxBatchInsertSize(tp string) int {
 }
 
 // CreateRepo creates a repository
-func (g *GiteaLocalUploader) CreateRepo(ctx context.Context, repo *base.Repository, opts base.MigrateOptions) error {
+func (g *GitLocalUploader) CreateRepo(ctx context.Context, repo *base.Repository, opts base.MigrateOptions) error {
 	owner, err := user_model.GetUserByName(ctx, g.repoOwner)
 	if err != nil {
 		return err
@@ -154,14 +154,14 @@ func (g *GiteaLocalUploader) CreateRepo(ctx context.Context, repo *base.Reposito
 }
 
 // Close closes this uploader
-func (g *GiteaLocalUploader) Close() {
+func (g *GitLocalUploader) Close() {
 	if g.gitRepo != nil {
 		g.gitRepo.Close()
 	}
 }
 
 // CreateTopics creates topics
-func (g *GiteaLocalUploader) CreateTopics(ctx context.Context, topics ...string) error {
+func (g *GitLocalUploader) CreateTopics(ctx context.Context, topics ...string) error {
 	// Ignore topics too long for the db
 	c := 0
 	for _, topic := range topics {
@@ -177,7 +177,7 @@ func (g *GiteaLocalUploader) CreateTopics(ctx context.Context, topics ...string)
 }
 
 // CreateMilestones creates milestones
-func (g *GiteaLocalUploader) CreateMilestones(ctx context.Context, milestones ...*base.Milestone) error {
+func (g *GitLocalUploader) CreateMilestones(ctx context.Context, milestones ...*base.Milestone) error {
 	mss := make([]*issues_model.Milestone, 0, len(milestones))
 	for _, milestone := range milestones {
 		var deadline timeutil.TimeStamp
@@ -228,7 +228,7 @@ func (g *GiteaLocalUploader) CreateMilestones(ctx context.Context, milestones ..
 }
 
 // CreateLabels creates labels
-func (g *GiteaLocalUploader) CreateLabels(ctx context.Context, labels ...*base.Label) error {
+func (g *GitLocalUploader) CreateLabels(ctx context.Context, labels ...*base.Label) error {
 	lbs := make([]*issues_model.Label, 0, len(labels))
 	for _, l := range labels {
 		if color, err := label.NormalizeColor(l.Color); err != nil {
@@ -258,7 +258,7 @@ func (g *GiteaLocalUploader) CreateLabels(ctx context.Context, labels ...*base.L
 }
 
 // CreateReleases creates releases
-func (g *GiteaLocalUploader) CreateReleases(ctx context.Context, releases ...*base.Release) error {
+func (g *GitLocalUploader) CreateReleases(ctx context.Context, releases ...*base.Release) error {
 	rels := make([]*repo_model.Release, 0, len(releases))
 	for _, release := range releases {
 		if release.Created.IsZero() {
@@ -368,18 +368,18 @@ func (g *GiteaLocalUploader) CreateReleases(ctx context.Context, releases ...*ba
 }
 
 // SyncTags syncs releases with tags in the database
-func (g *GiteaLocalUploader) SyncTags(ctx context.Context) error {
+func (g *GitLocalUploader) SyncTags(ctx context.Context) error {
 	_, err := repo_module.SyncReleasesWithTags(ctx, g.repo, g.gitRepo)
 	return err
 }
 
-func (g *GiteaLocalUploader) SyncBranches(ctx context.Context) error {
+func (g *GitLocalUploader) SyncBranches(ctx context.Context) error {
 	_, _, err := repo_module.SyncRepoBranchesWithRepo(ctx, g.repo, g.gitRepo, g.doer.ID)
 	return err
 }
 
 // CreateIssues creates issues
-func (g *GiteaLocalUploader) CreateIssues(ctx context.Context, issues ...*base.Issue) error {
+func (g *GitLocalUploader) CreateIssues(ctx context.Context, issues ...*base.Issue) error {
 	iss := make([]*issues_model.Issue, 0, len(issues))
 	for _, issue := range issues {
 		var labels []*issues_model.Label
@@ -463,7 +463,7 @@ func (g *GiteaLocalUploader) CreateIssues(ctx context.Context, issues ...*base.I
 }
 
 // CreateComments creates comments of issues
-func (g *GiteaLocalUploader) CreateComments(ctx context.Context, comments ...*base.Comment) error {
+func (g *GitLocalUploader) CreateComments(ctx context.Context, comments ...*base.Comment) error {
 	cms := make([]*issues_model.Comment, 0, len(comments))
 	for _, comment := range comments {
 		var issue *issues_model.Issue
@@ -548,7 +548,7 @@ func (g *GiteaLocalUploader) CreateComments(ctx context.Context, comments ...*ba
 }
 
 // CreatePullRequests creates pull requests
-func (g *GiteaLocalUploader) CreatePullRequests(ctx context.Context, prs ...*base.PullRequest) error {
+func (g *GitLocalUploader) CreatePullRequests(ctx context.Context, prs ...*base.PullRequest) error {
 	gprs := make([]*issues_model.PullRequest, 0, len(prs))
 	for _, pr := range prs {
 		gpr, err := g.newPullRequest(ctx, pr)
@@ -572,7 +572,7 @@ func (g *GiteaLocalUploader) CreatePullRequests(ctx context.Context, prs ...*bas
 	return nil
 }
 
-func (g *GiteaLocalUploader) updateGitForPullRequest(ctx context.Context, pr *base.PullRequest) (head string, err error) {
+func (g *GitLocalUploader) updateGitForPullRequest(ctx context.Context, pr *base.PullRequest) (head string, err error) {
 	// SECURITY: this pr must have been must have been ensured safe
 	if !pr.EnsuredSafe {
 		log.Error("PR #%d in %s/%s has not been checked for safety.", pr.Number, g.repoOwner, g.repoName)
@@ -720,7 +720,7 @@ func (g *GiteaLocalUploader) updateGitForPullRequest(ctx context.Context, pr *ba
 	return head, nil
 }
 
-func (g *GiteaLocalUploader) newPullRequest(ctx context.Context, pr *base.PullRequest) (*issues_model.PullRequest, error) {
+func (g *GitLocalUploader) newPullRequest(ctx context.Context, pr *base.PullRequest) (*issues_model.PullRequest, error) {
 	var labels []*issues_model.Label
 	for _, label := range pr.Labels {
 		lb, ok := g.labels[label.Name]
@@ -843,7 +843,7 @@ func convertReviewState(state string) issues_model.ReviewType {
 }
 
 // CreateReviews create pull request reviews of currently migrated issues
-func (g *GiteaLocalUploader) CreateReviews(ctx context.Context, reviews ...*base.Review) error {
+func (g *GitLocalUploader) CreateReviews(ctx context.Context, reviews ...*base.Review) error {
 	cms := make([]*issues_model.Review, 0, len(reviews))
 	for _, review := range reviews {
 		var issue *issues_model.Issue
@@ -945,7 +945,7 @@ func (g *GiteaLocalUploader) CreateReviews(ctx context.Context, reviews ...*base
 }
 
 // Rollback when migrating failed, this will rollback all the changes.
-func (g *GiteaLocalUploader) Rollback() error {
+func (g *GitLocalUploader) Rollback() error {
 	if g.repo != nil && g.repo.ID > 0 {
 		g.gitRepo.Close()
 
@@ -955,7 +955,7 @@ func (g *GiteaLocalUploader) Rollback() error {
 }
 
 // Finish when migrating success, this will do some status update things.
-func (g *GiteaLocalUploader) Finish(ctx context.Context) error {
+func (g *GitLocalUploader) Finish(ctx context.Context) error {
 	if g.repo == nil || g.repo.ID <= 0 {
 		return ErrRepoNotCreated
 	}
@@ -973,7 +973,7 @@ func (g *GiteaLocalUploader) Finish(ctx context.Context) error {
 	return repo_model.UpdateRepositoryColsWithAutoTime(ctx, g.repo, "status")
 }
 
-func (g *GiteaLocalUploader) remapUser(ctx context.Context, source user_model.ExternalUserMigrated, target user_model.ExternalUserRemappable) error {
+func (g *GitLocalUploader) remapUser(ctx context.Context, source user_model.ExternalUserMigrated, target user_model.ExternalUserRemappable) error {
 	var userID int64
 	var err error
 	if g.sameApp {
@@ -991,7 +991,7 @@ func (g *GiteaLocalUploader) remapUser(ctx context.Context, source user_model.Ex
 	return target.RemapExternalUser(source.GetExternalName(), source.GetExternalID(), g.doer.ID)
 }
 
-func (g *GiteaLocalUploader) remapLocalUser(ctx context.Context, source user_model.ExternalUserMigrated) (int64, error) {
+func (g *GitLocalUploader) remapLocalUser(ctx context.Context, source user_model.ExternalUserMigrated) (int64, error) {
 	userid, ok := g.userMap[source.GetExternalID()]
 	if !ok {
 		user, err := user_model.GetUserByID(ctx, source.GetExternalID())
@@ -1012,7 +1012,7 @@ func (g *GiteaLocalUploader) remapLocalUser(ctx context.Context, source user_mod
 	return userid, nil
 }
 
-func (g *GiteaLocalUploader) remapExternalUser(ctx context.Context, source user_model.ExternalUserMigrated) (userid int64, err error) {
+func (g *GitLocalUploader) remapExternalUser(ctx context.Context, source user_model.ExternalUserMigrated) (userid int64, err error) {
 	userid, ok := g.userMap[source.GetExternalID()]
 	if !ok {
 		userid, err = user_model.GetUserIDByExternalUserID(ctx, g.gitServiceType.Name(), strconv.FormatInt(source.GetExternalID(), 10))

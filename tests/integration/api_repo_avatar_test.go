@@ -30,7 +30,7 @@ func TestAPIUpdateRepoAvatar(t *testing.T) {
 	token := getUserToken(t, user2.LowerName, auth_model.AccessTokenScopeWriteRepository)
 
 	// Test what happens if you use a valid image
-	avatar, err := os.ReadFile(filepath.Join(setting.GetGiteaTestSourceRoot(), "tests/integration/avatar.png"))
+	avatar, err := os.ReadFile(filepath.Join(setting.GetGitTestSourceRoot(), "tests/integration/avatar.png"))
 	assert.NoError(t, err)
 	if err != nil {
 		assert.FailNow(t, "Unable to open avatar.png")

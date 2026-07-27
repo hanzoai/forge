@@ -18,24 +18,24 @@ import (
 	"github.com/kballard/go-shellquote"
 )
 
-var giteaTestSourceRoot *string // intentionally use a pointer to make sure the uninitialized access panics
+var gitTestSourceRoot *string // intentionally use a pointer to make sure the uninitialized access panics
 
-func GetGiteaTestSourceRoot() string {
-	return *giteaTestSourceRoot
+func GetGitTestSourceRoot() string {
+	return *gitTestSourceRoot
 }
 
-func detectGiteaTestRoot() string {
+func detectGitTestRoot() string {
 	_, filename, _, _ := runtime.Caller(0)
-	giteaRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
-	fixturesDir := filepath.Join(giteaRoot, "models", "fixtures")
+	gitRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
+	fixturesDir := filepath.Join(gitRoot, "models", "fixtures")
 	if _, err := os.Stat(fixturesDir); err != nil {
 		panic("in gitea source code directory, fixtures directory not found: " + fixturesDir)
 	}
-	return giteaRoot
+	return gitRoot
 }
 
-func SetupGiteaTestEnv() {
-	if giteaTestSourceRoot != nil {
+func SetupGitTestEnv() {
+	if gitTestSourceRoot != nil {
 		return // already initialized
 	}
 
@@ -52,21 +52,21 @@ func SetupGiteaTestEnv() {
 	}
 
 	initGiteaRoot := func() string {
-		giteaRoot := os.Getenv("GIT_TEST_ROOT")
-		if giteaRoot == "" {
-			giteaRoot = detectGiteaTestRoot()
+		gitRoot := os.Getenv("GIT_TEST_ROOT")
+		if gitRoot == "" {
+			gitRoot = detectGitTestRoot()
 		}
-		giteaTestSourceRoot = &giteaRoot
-		return giteaRoot
+		gitTestSourceRoot = &gitRoot
+		return gitRoot
 	}
-	giteaRoot := initGiteaRoot()
+	gitRoot := initGiteaRoot()
 
 	initGiteaPaths := func() {
 		// need to load assets (options, public) from the source code directory for testing
-		StaticRootPath = giteaRoot
+		StaticRootPath = gitRoot
 		// during testing, the AppPath must point to the pre-built daemon in the source root
 		// it needs to be called by git hooks, so it must match the Makefile's EXECUTABLE
-		AppPath = filepath.Join(giteaRoot, "gitd") + util.Iif(IsWindows, ".exe", "")
+		AppPath = filepath.Join(gitRoot, "gitd") + util.Iif(IsWindows, ".exe", "")
 	}
 
 	initGiteaConf := func() string {
@@ -82,7 +82,7 @@ func SetupGiteaTestEnv() {
 		} else {
 			// CustomConf must be absolute path to make tests pass.
 			// At the moment, GIT_TEST_CONF is always in Gitea's source root
-			CustomConf = filepath.Join(giteaRoot, giteaConf)
+			CustomConf = filepath.Join(gitRoot, giteaConf)
 		}
 		return giteaConf
 	}
@@ -118,16 +118,16 @@ func SetupGiteaTestEnv() {
 	initWorkPathAndConfig()
 
 	if RepoRootPath == "" || AppDataPath == "" {
-		panic("SetupGiteaTestEnv failed, paths are not initialized")
+		panic("SetupGitTestEnv failed, paths are not initialized")
 	}
 
 	// TODO: some git repo hooks (test fixtures) still use these env variables, need to be refactored in the future
-	_ = os.Setenv("GIT_ROOT", giteaRoot)
+	_ = os.Setenv("GIT_ROOT", gitRoot)
 	_ = os.Setenv("GIT_CONF", giteaConf) // test fixture git hooks use "$GIT_ROOT/$GIT_CONF" in their scripts
 }
 
 func PrepareIntegrationTestConfig() error {
-	giteaTestRoot := detectGiteaTestRoot()
+	giteaTestRoot := detectGitTestRoot()
 	isInCI := os.Getenv("CI") != ""
 	testDatabase := os.Getenv("GIT_TEST_DATABASE")
 	if testDatabase == "" {

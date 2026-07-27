@@ -58,7 +58,7 @@ func LinkAccount(ctx *context.Context) {
 		return
 	}
 
-	if missingFields, ok := linkAccountData.GothUser.RawData["__giteaAutoRegMissingFields"].([]string); ok {
+	if missingFields, ok := linkAccountData.GothUser.RawData["__gitAutoRegMissingFields"].([]string); ok {
 		ctx.Data["AutoRegistrationFailedPrompt"] = ctx.Tr("auth.oauth_callback_unable_auto_reg", linkAccountData.GothUser.Provider, strings.Join(missingFields, ","))
 	}
 

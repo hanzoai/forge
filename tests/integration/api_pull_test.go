@@ -189,7 +189,7 @@ func TestAPIMergePullWIP(t *testing.T) {
 }
 
 func TestAPIMergePull(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 		owner := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: repo.OwnerID})
 		apiCtx := NewAPITestContext(t, repo.OwnerName, repo.Name, auth_model.AccessTokenScopeWriteRepository)
@@ -571,7 +571,7 @@ func TestAPICommitPullRequest(t *testing.T) {
 }
 
 func TestAPIViewPullFilesWithHeadRepoDeleted(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		baseRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 		user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 
@@ -624,7 +624,7 @@ func TestAPIViewPullFilesWithHeadRepoDeleted(t *testing.T) {
 			BaseBranch: "master",
 			HeadRepo:   forkedRepo,
 			BaseRepo:   baseRepo,
-			Type:       issues_model.PullRequestGitea,
+			Type:       issues_model.PullRequestNative,
 		}
 
 		prOpts := &pull_service.NewPullRequestOptions{Repo: baseRepo, Issue: pullIssue, PullRequest: pullRequest}

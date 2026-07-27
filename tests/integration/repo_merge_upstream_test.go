@@ -24,7 +24,7 @@ import (
 )
 
 func TestRepoMergeUpstream(t *testing.T) {
-	onGiteaRun(t, func(*testing.T, *url.URL) {
+	onGitRun(t, func(*testing.T, *url.URL) {
 		forkUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4})
 
 		baseRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})

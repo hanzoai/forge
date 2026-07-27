@@ -46,7 +46,7 @@ func SyncDirs(srcPath, destPath string) error {
 	if err != nil {
 		return err
 	}
-	devDataPathAbs, err := filepath.Abs(filepath.Join(setting.GetGiteaTestSourceRoot(), "data"))
+	devDataPathAbs, err := filepath.Abs(filepath.Join(setting.GetGitTestSourceRoot(), "data"))
 	if err != nil {
 		return err
 	}

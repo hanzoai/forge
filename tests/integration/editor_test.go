@@ -31,7 +31,7 @@ import (
 )
 
 func TestEditor(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		sessionUser2 := loginUser(t, "user2")
 		t.Run("EditFileNotAllowed", testEditFileNotAllowed)
 		t.Run("DiffPreview", testEditorDiffPreview)

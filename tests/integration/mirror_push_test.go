@@ -28,11 +28,11 @@ import (
 )
 
 func TestMirrorPush(t *testing.T) {
-	onGiteaRun(t, testMirrorPush)
+	onGitRun(t, testMirrorPush)
 }
 
 func TestMirrorPushWikiDefaultBranchMismatch(t *testing.T) {
-	onGiteaRun(t, testMirrorPushWikiDefaultBranchMismatch)
+	onGitRun(t, testMirrorPushWikiDefaultBranchMismatch)
 }
 
 func testMirrorPush(t *testing.T, u *url.URL) {

@@ -23,7 +23,7 @@ import (
 )
 
 func TestGitSmartHTTP(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		testGitSmartHTTP(t, u)
 		testGitSmartHTTPTokenScopes(t)
 		testRenamedRepoRedirect(t)

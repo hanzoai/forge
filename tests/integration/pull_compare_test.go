@@ -55,7 +55,7 @@ func TestPullCompare(t *testing.T) {
 		assert.Positive(t, editButtonCount, "Expected to find a button to edit a file in the PR diff view but there were none")
 	})
 
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		defer tests.PrepareTestEnv(t)()
 
 		session := loginUser(t, "user1")
@@ -88,7 +88,7 @@ func TestPullCompare(t *testing.T) {
 }
 
 func TestPullCompare_EnableAllowEditsFromMaintainer(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		// repo3 is private
 		repo3 := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 3})
 		assert.True(t, repo3.IsPrivate)

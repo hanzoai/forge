@@ -24,9 +24,9 @@ import (
 	"github.com/hanzoai/git/modules/testlogger"
 	"github.com/hanzoai/git/modules/util"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/hanzoai/xorm"
 	"github.com/hanzoai/xorm/names"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestOptions represents test options
@@ -52,10 +52,10 @@ func mainTest(m *testing.M, testOptsArg ...*TestOptions) int {
 	defer tempCleanup()
 
 	defer setting.MockBuiltinPaths(tempWorkPath, "", "")()
-	setting.SetupGiteaTestEnv()
+	setting.SetupGitTestEnv()
 
-	giteaRoot := setting.GetGiteaTestSourceRoot()
-	fixturesOpts := FixturesOptions{Dir: filepath.Join(giteaRoot, "models", "fixtures"), Files: testOpts.FixtureFiles}
+	gitRoot := setting.GetGitTestSourceRoot()
+	fixturesOpts := FixturesOptions{Dir: filepath.Join(gitRoot, "models", "fixtures"), Files: testOpts.FixtureFiles}
 	if err := CreateTestEngine(filepath.Join(tempWorkPath, "sqlite-test.db"), fixturesOpts); err != nil {
 		return testlogger.MainErrorf("Error creating test database engine: %v", err)
 	}
@@ -80,7 +80,7 @@ func mainTest(m *testing.M, testOptsArg ...*TestOptions) int {
 	if err = storage.Init(); err != nil {
 		return testlogger.MainErrorf("storage.Init: %v", err)
 	}
-	if err = SyncDirs(filepath.Join(giteaRoot, "tests", "gitea-repositories-meta"), setting.RepoRootPath); err != nil {
+	if err = SyncDirs(filepath.Join(gitRoot, "tests", "git-repositories-meta"), setting.RepoRootPath); err != nil {
 		return testlogger.MainErrorf("util.SyncDirs: %v", err)
 	}
 
@@ -238,6 +238,6 @@ func PrepareTestDatabase() error {
 // by tests that use the above MainTest(..) function.
 func PrepareTestEnv(t testing.TB) {
 	assert.NoError(t, PrepareTestDatabase())
-	metaPath := filepath.Join(setting.GetGiteaTestSourceRoot(), "tests", "gitea-repositories-meta")
+	metaPath := filepath.Join(setting.GetGitTestSourceRoot(), "tests", "git-repositories-meta")
 	assert.NoError(t, SyncDirs(metaPath, setting.RepoRootPath))
 }

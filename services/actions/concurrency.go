@@ -23,7 +23,7 @@ func EvaluateRunConcurrencyFillModel(ctx context.Context, run *actions_model.Act
 		return fmt.Errorf("run LoadAttributes: %w", err)
 	}
 
-	actionsRunCtx := GenerateGiteaContext(ctx, run, attempt, nil)
+	actionsRunCtx := GenerateGitContext(ctx, run, attempt, nil)
 	jobResults := map[string]*jobparser.JobResult{"": {}}
 	if inputs == nil {
 		var err error
@@ -56,7 +56,7 @@ func EvaluateJobConcurrencyFillModel(ctx context.Context, run *actions_model.Act
 		return fmt.Errorf("unmarshal raw concurrency: %w", err)
 	}
 
-	actionsJobCtx := GenerateGiteaContext(ctx, run, attempt, actionRunJob)
+	actionsJobCtx := GenerateGitContext(ctx, run, attempt, actionRunJob)
 
 	jobResults, err := findJobNeedsAndFillJobResults(ctx, actionRunJob)
 	if err != nil {

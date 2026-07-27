@@ -28,7 +28,7 @@ import (
 )
 
 func TestPackageCargo(t *testing.T) {
-	onGiteaRun(t, testPackageCargo)
+	onGitRun(t, testPackageCargo)
 }
 
 func testPackageCargo(t *testing.T, _ *neturl.URL) {

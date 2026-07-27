@@ -16,7 +16,7 @@ import (
 )
 
 func TestAPIPrivateNoServ(t *testing.T) {
-	onGiteaRun(t, func(*testing.T, *url.URL) {
+	onGitRun(t, func(*testing.T, *url.URL) {
 		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
 		key, user, err := private.ServNoCommand(ctx, 1)
@@ -38,7 +38,7 @@ func TestAPIPrivateNoServ(t *testing.T) {
 }
 
 func TestAPIPrivateServ(t *testing.T) {
-	onGiteaRun(t, func(*testing.T, *url.URL) {
+	onGitRun(t, func(*testing.T, *url.URL) {
 		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
 

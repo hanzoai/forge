@@ -14,11 +14,11 @@ import (
 	"github.com/hanzoai/git/modules/private"
 	"github.com/hanzoai/git/modules/web"
 	"github.com/hanzoai/git/services/agit"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 )
 
 // HookProcReceive proc-receive hook - only handles agit Proc-Receive requests at present
-func HookProcReceive(ctx *gitea_context.PrivateContext) {
+func HookProcReceive(ctx *git_context.PrivateContext) {
 	opts := web.GetForm(ctx).(*private.HookOptions)
 	if !git.DefaultFeatures().SupportProcReceive {
 		ctx.Status(http.StatusNotFound)

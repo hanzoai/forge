@@ -57,7 +57,7 @@ func TestUndoDeleteBranch(t *testing.T) {
 		return NewHTMLParser(t, resp.Body), linkURL.Query().Get("name")
 	}
 
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		htmlDoc, name := branchAction(t, ".delete-branch-button", "data-modal-form.url")
 		assert.Contains(t,
 			htmlDoc.doc.Find(".ui.positive.message").Text(),

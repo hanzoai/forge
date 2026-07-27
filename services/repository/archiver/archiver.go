@@ -25,7 +25,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/storage"
 	"github.com/hanzoai/git/modules/util"
-	gitea_context "github.com/hanzoai/git/services/context"
+	git_context "github.com/hanzoai/git/services/context"
 )
 
 // ArchiveRequest defines the parameters of an archive request, which notably
@@ -352,7 +352,7 @@ func DeleteRepositoryArchives(ctx context.Context) error {
 	return storage.Clean(storage.RepoArchives)
 }
 
-func ServeRepoArchive(ctx *gitea_context.Base, archiveReq *ArchiveRequest) error {
+func ServeRepoArchive(ctx *git_context.Base, archiveReq *ArchiveRequest) error {
 	// Add nix format link header so tarballs lock correctly:
 	// https://github.com/nixos/nix/blob/56763ff918eb308db23080e560ed2ea3e00c80a7/doc/manual/src/protocols/tarball-fetcher.md
 	ctx.Resp.Header().Add("Link", fmt.Sprintf(`<%s/archive/%s.%s?rev=%s>; rel="immutable"`,
@@ -397,7 +397,7 @@ func ServeRepoArchive(ctx *gitea_context.Base, archiveReq *ArchiveRequest) error
 	}
 	defer fr.Close()
 
-	ctx.ServeContent(fr, gitea_context.ServeHeaderOptions{
+	ctx.ServeContent(fr, git_context.ServeHeaderOptions{
 		Filename:     downloadName,
 		LastModified: archiver.CreatedUnix.AsLocalTime(),
 	})

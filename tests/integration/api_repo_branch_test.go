@@ -24,7 +24,7 @@ import (
 )
 
 func TestAPIRepoBranchesPlain(t *testing.T) {
-	onGiteaRun(t, func(*testing.T, *url.URL) {
+	onGitRun(t, func(*testing.T, *url.URL) {
 		repo3 := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 3})
 		user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})
 		session := loginUser(t, user1.LowerName)

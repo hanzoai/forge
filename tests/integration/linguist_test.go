@@ -23,7 +23,7 @@ import (
 )
 
 func TestLinguist(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, _ *url.URL) {
+	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
 		cppContent := "#include <iostream>\nint main() {\nstd::cout << \"Hello Gitea!\";\nreturn 0;\n}"

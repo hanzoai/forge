@@ -53,7 +53,7 @@ func getExpectedContentsListResponseForContents(ref, refType, lastCommitSHA stri
 }
 
 func TestAPIGetContentsList(t *testing.T) {
-	onGiteaRun(t, testAPIGetContentsList)
+	onGitRun(t, testAPIGetContentsList)
 }
 
 func testAPIGetContentsList(t *testing.T, u *url.URL) {

@@ -32,10 +32,10 @@ func testCreateBranch(t testing.TB, session *TestSession, user, repo, oldRefSubU
 }
 
 func TestCreateBranch(t *testing.T) {
-	onGiteaRun(t, testCreateBranches)
+	onGitRun(t, testCreateBranches)
 }
 
-func testCreateBranches(t *testing.T, giteaURL *url.URL) {
+func testCreateBranches(t *testing.T, gitURL *url.URL) {
 	tests := []struct {
 		OldRefSubURL   string
 		NewBranch      string
@@ -231,7 +231,7 @@ func checkRecentlyPushedNewBranches(t *testing.T, session *TestSession, repoPath
 }
 
 func TestRecentlyPushedNewBranches(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, u *url.URL) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
 		user12Session := loginUser(t, "user12")
 
 		// Same reposioty check

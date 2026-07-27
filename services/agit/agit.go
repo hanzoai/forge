@@ -177,7 +177,7 @@ func ProcReceive(ctx context.Context, repo *repo_model.Repository, gitRepo *git.
 				HeadRepo:     repo,
 				BaseRepo:     repo,
 				MergeBase:    "",
-				Type:         issues_model.PullRequestGitea,
+				Type:         issues_model.PullRequestNative,
 				Flow:         issues_model.PullRequestFlowAGit,
 			}
 			prOpts := &pull_service.NewPullRequestOptions{

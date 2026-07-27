@@ -38,7 +38,7 @@ func renderCodeBlock(ctx *RenderContext, node *html.Node) (urlPosStart, urlPosSt
 		CommitID:  node.Data[m[6]:m[7]],
 		FilePath:  node.Data[m[8]:m[9]],
 	}
-	if !httplib.IsCurrentGiteaSiteURL(ctx, opts.FullURL) {
+	if !httplib.IsCurrentGitSiteURL(ctx, opts.FullURL) {
 		return 0, 0, "", nil
 	}
 	u, err := url.Parse(opts.FilePath)

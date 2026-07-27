@@ -106,13 +106,13 @@ func TestAPIGetBranch(t *testing.T) {
 }
 
 func TestAPICreateBranch(t *testing.T) {
-	onGiteaRun(t, testAPICreateBranches)
+	onGitRun(t, testAPICreateBranches)
 }
 
-func testAPICreateBranches(t *testing.T, giteaURL *url.URL) {
+func testAPICreateBranches(t *testing.T, gitURL *url.URL) {
 	username := "user2"
 	ctx := NewAPITestContext(t, username, "my-noo-repo", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
-	giteaURL.Path = ctx.GitPath()
+	gitURL.Path = ctx.GitPath()
 
 	t.Run("CreateRepo", doAPICreateRepository(ctx, false))
 	testCases := []struct {
@@ -185,7 +185,7 @@ func testAPICreateBranch(t testing.TB, session *TestSession, user, repo, oldBran
 }
 
 func TestAPIRenameBranch(t *testing.T) {
-	onGiteaRun(t, func(t *testing.T, _ *url.URL) {
+	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		t.Run("RenameBranchWithEmptyRepo", func(t *testing.T) {
 			testAPIRenameBranch(t, "user10", "user10", "repo6", "master", "test", http.StatusNotFound)
 		})
@@ -276,9 +276,9 @@ func TestAPIRenameBranch(t *testing.T) {
 func TestAPIUpdateBranchReference(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		ctx := NewAPITestContext(t, "user2", "update-branch", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
-		giteaURL.Path = ctx.GitPath()
+		gitURL.Path = ctx.GitPath()
 
 		var defaultBranch string
 		t.Run("CreateRepo", doAPICreateRepository(ctx, false, func(t *testing.T, repo api.Repository) {
@@ -452,9 +452,9 @@ func TestAPICreateBranchWithSyncBranches(t *testing.T) {
 	_, err = db.DeleteByBean(t.Context(), git_model.Branch{RepoID: 1})
 	assert.NoError(t, err)
 
-	onGiteaRun(t, func(t *testing.T, giteaURL *url.URL) {
+	onGitRun(t, func(t *testing.T, gitURL *url.URL) {
 		ctx := NewAPITestContext(t, "user2", "repo1", auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
-		giteaURL.Path = ctx.GitPath()
+		gitURL.Path = ctx.GitPath()
 
 		testAPICreateBranch(t, ctx.Session, "user2", "repo1", "", "new_branch", http.StatusCreated)
 	})
