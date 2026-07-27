@@ -48,7 +48,7 @@ import (
 
 	_ "github.com/hanzoai/git/modules/session" // to register all internal adapters
 
-	"gitea.com/go-chi/captcha"
+	"github.com/hanzoai/git/modules/captcha"
 	chi_middleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/klauspost/compress/gzhttp"

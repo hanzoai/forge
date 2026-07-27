@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	chi_cache "gitea.com/go-chi/cache" //nolint:depguard // we wrap this package here
+	chi_cache "github.com/hanzoai/git/modules/cache/chi" //nolint:depguard // we wrap this package here
 )
 
 type GetJSONError struct {

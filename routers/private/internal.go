@@ -19,7 +19,7 @@ import (
 	"github.com/hanzoai/git/routers/web/misc"
 	"github.com/hanzoai/git/services/context"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 func authInternal(next http.Handler) http.Handler {

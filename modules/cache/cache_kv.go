@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/nosql"
 
-	"gitea.com/go-chi/cache" //nolint:depguard // we wrap this package here
+	"github.com/hanzoai/git/modules/cache/chi" //nolint:depguard // we wrap this package here
 	"github.com/hanzokv/go/v9"
 )
 

@@ -9,7 +9,7 @@ import (
 
 	"github.com/hanzoai/git/modules/glob"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 func getGlobPatternErrorString(pattern string) string {

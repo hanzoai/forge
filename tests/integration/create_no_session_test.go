@@ -17,7 +17,7 @@ import (
 	"github.com/hanzoai/git/routers"
 	"github.com/hanzoai/git/tests"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 	"github.com/stretchr/testify/assert"
 )
 

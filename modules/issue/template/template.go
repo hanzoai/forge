@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/container"
 	api "github.com/hanzoai/git/modules/structs"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 // Validate checks whether an IssueTemplate is considered valid, and returns the first error

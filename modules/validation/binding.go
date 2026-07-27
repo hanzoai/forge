@@ -15,7 +15,7 @@ import (
 	"github.com/hanzoai/git/modules/glob"
 	"github.com/hanzoai/git/modules/json"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 const (

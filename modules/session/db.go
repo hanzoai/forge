@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/modules/timeutil"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 )
 
 // DBStore represents a session store implementation based on the DB.

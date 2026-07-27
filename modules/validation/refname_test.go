@@ -7,7 +7,7 @@ package validation
 import (
 	"testing"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 func Test_GitRefNameValidation(t *testing.T) {

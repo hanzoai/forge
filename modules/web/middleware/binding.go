@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/modules/validation"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 // Form form binding interface

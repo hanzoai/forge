@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/modules/web/middleware"
 	"github.com/hanzoai/git/modules/web/types"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 	"github.com/go-chi/chi/v5"
 )
 

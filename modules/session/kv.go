@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/nosql"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 	"github.com/hanzokv/go/v9"
 )
 

@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/git/modules/storage"
 	"github.com/hanzoai/git/modules/util"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 	"github.com/urfave/cli/v3"
 )
 

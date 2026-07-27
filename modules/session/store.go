@@ -9,7 +9,7 @@ import (
 
 	"github.com/hanzoai/git/modules/setting"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 )
 
 type RawStore = session.RawStore

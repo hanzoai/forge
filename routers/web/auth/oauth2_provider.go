@@ -27,7 +27,7 @@ import (
 	"github.com/hanzoai/git/services/forms"
 	"github.com/hanzoai/git/services/oauth2_provider"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 

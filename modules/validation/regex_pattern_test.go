@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"testing"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 func getRegexPatternErrorString(pattern string) string {

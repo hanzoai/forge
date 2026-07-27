@@ -10,11 +10,11 @@ import (
 
 	"github.com/hanzoai/git/modules/json"
 
-	"gitea.com/go-chi/session"
-	couchbase "gitea.com/go-chi/session/couchbase"
-	memcache "gitea.com/go-chi/session/memcache"
-	mysql "gitea.com/go-chi/session/mysql"
-	postgres "gitea.com/go-chi/session/postgres"
+	"github.com/hanzoai/git/modules/session/chi"
+	couchbase "github.com/hanzoai/git/modules/session/chi/couchbase"
+	memcache "github.com/hanzoai/git/modules/session/chi/memcache"
+	mysql "github.com/hanzoai/git/modules/session/chi/mysql"
+	postgres "github.com/hanzoai/git/modules/session/chi/postgres"
 )
 
 // VirtualSessionProvider represents a shadowed session provider implementation.

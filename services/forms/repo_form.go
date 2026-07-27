@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/webhook"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 // CreateRepoForm form for creating repository

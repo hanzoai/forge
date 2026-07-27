@@ -9,7 +9,7 @@ import (
 	"encoding/gob"
 	"net/http"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 )
 
 type mockMemRawStore struct {

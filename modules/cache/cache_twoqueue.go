@@ -11,7 +11,7 @@ import (
 
 	"github.com/hanzoai/git/modules/json"
 
-	mc "gitea.com/go-chi/cache" //nolint:depguard // we wrap this package here
+	mc "github.com/hanzoai/git/modules/cache/chi" //nolint:depguard // we wrap this package here
 	lru "github.com/hashicorp/golang-lru/v2"
 )
 

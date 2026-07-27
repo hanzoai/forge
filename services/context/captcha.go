@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/templates"
 	"github.com/hanzoai/git/modules/turnstile"
 
-	"gitea.com/go-chi/captcha"
+	"github.com/hanzoai/git/modules/captcha"
 )
 
 var (

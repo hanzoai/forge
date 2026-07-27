@@ -6,10 +6,6 @@ require (
 	codeberg.org/gusted/mcaptcha v0.0.0-20220723083913-4f3072e1d570
 	connectrpc.com/connect v1.20.0
 	gitea.com/gitea/runner v1.0.8
-	gitea.com/go-chi/binding v0.0.0-20260414111559-654cea7ac60a
-	gitea.com/go-chi/cache v0.2.1
-	gitea.com/go-chi/captcha v0.0.0-20240315150714-fb487f629098
-	gitea.com/go-chi/session v0.0.0-20260708011333-ebced8a7a2d6
 	gitea.com/lunny/dingtalk_webhook v0.0.0-20171025031554-e3534c89ef96
 	gitea.com/lunny/levelqueue v0.4.2-0.20230414023320-3c0159fe0fe4
 	gitea.dev/sdk v1.2.0
@@ -50,6 +46,8 @@ require (
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.19.1
 	github.com/go-ldap/ldap/v3 v3.4.13
+	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/go-webauthn/webauthn v0.17.4
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f
@@ -91,6 +89,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/sassoftware/go-rpmutils v0.4.0
 	github.com/sergi/go-diff v1.4.0
+	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/tstranex/u2f v1.0.0
@@ -121,19 +120,16 @@ require (
 require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
-	github.com/hanzoai/dbx v1.17.2 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
+	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/rs/xid v1.6.0 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.72.0 // indirect
-	github.com/zap-proto/go v1.1.0 // indirect
-	github.com/zap-proto/http v0.2.0 // indirect
+	github.com/smartystreets/assertions v0.0.0-20190116191733-b6c0e53d7304 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	modernc.org/sqlite v1.53.0 // indirect
 )
 
 require (
@@ -178,14 +174,14 @@ require (
 	github.com/bodgit/sevenzip v1.6.4 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/boombuler/barcode v1.1.0 // indirect
-	github.com/bradfitz/gomemcache v0.0.0-20260422231931-4d751bb6e37c // indirect
+	github.com/bradfitz/gomemcache v0.0.0-20260422231931-4d751bb6e37c
 	github.com/caddyserver/zerossl v0.1.5 // indirect
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
-	github.com/couchbase/go-couchbase v0.1.1 // indirect
+	github.com/couchbase/go-couchbase v0.1.1
 	github.com/couchbase/gomemcached v0.3.4 // indirect
 	github.com/couchbase/goutils v0.3.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
@@ -248,7 +244,6 @@ require (
 	github.com/olekukonko/errors v1.3.0 // indirect
 	github.com/olekukonko/ll v0.1.8 // indirect
 	github.com/olekukonko/tablewriter v1.1.4 // indirect
-	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.27 // indirect
 	github.com/pjbgf/sha1cd v0.6.0 // indirect
@@ -268,7 +263,7 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/stangelandcl/ppmd v0.1.1 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
-	github.com/unknwon/com v1.0.1 // indirect
+	github.com/unknwon/com v1.0.1
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect

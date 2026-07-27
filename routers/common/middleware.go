@@ -19,7 +19,7 @@ import (
 	"github.com/hanzoai/git/modules/web/routing"
 	"github.com/hanzoai/git/services/context"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 	"github.com/chi-middleware/proxy"
 	"github.com/go-chi/chi/v5"
 )

@@ -99,7 +99,7 @@ import (
 
 	_ "github.com/hanzoai/git/routers/api/v1/swagger" // for swagger generation
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 	chi_middleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )

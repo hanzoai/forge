@@ -21,7 +21,7 @@ import (
 	"github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/mailer"
 
-	"gitea.com/go-chi/session"
+	"github.com/hanzoai/git/modules/session/chi"
 )
 
 const (

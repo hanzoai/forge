@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitea.com/go-chi/binding"
+	"github.com/hanzoai/git/modules/binding"
 	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
