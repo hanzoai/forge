@@ -345,9 +345,13 @@ func TestRender_emoji(t *testing.T) {
 	}
 
 	// Text that should be turned into or recognized as emoji
+	// :git:, not :gitea: — the rebrand renamed the shipped asset to git.png and
+	// set CustomEmojis to {git, gitlab, github}. The code was complete; this
+	// assertion was the last thing still asking for an emoji that no longer
+	// exists, so it rendered as literal text.
 	test(
-		":gitea:",
-		`<p><span class="emoji" aria-label="gitea"><img alt=":gitea:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/gitea.png"/></span></p>`)
+		":git:",
+		`<p><span class="emoji" aria-label="git"><img alt=":git:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/git.png"/></span></p>`)
 	test(
 		":custom-emoji:",
 		`<p>:custom-emoji:</p>`)
@@ -356,10 +360,10 @@ func TestRender_emoji(t *testing.T) {
 		":custom-emoji:",
 		`<p><span class="emoji" aria-label="custom-emoji"><img alt=":custom-emoji:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/custom-emoji.png"/></span></p>`)
 	test(
-		"这是字符:1::+1: some🐊 \U0001f44d:custom-emoji: :gitea:",
+		"这是字符:1::+1: some🐊 \U0001f44d:custom-emoji: :git:",
 		`<p>这是字符:1:<span class="emoji" aria-label="thumbs up">👍</span> some<span class="emoji" aria-label="crocodile">🐊</span> `+
 			`<span class="emoji" aria-label="thumbs up">👍</span><span class="emoji" aria-label="custom-emoji"><img alt=":custom-emoji:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/custom-emoji.png"/></span> `+
-			`<span class="emoji" aria-label="gitea"><img alt=":gitea:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/gitea.png"/></span></p>`)
+			`<span class="emoji" aria-label="git"><img alt=":git:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/git.png"/></span></p>`)
 	test(
 		"Some text with 😄 in the middle",
 		`<p>Some text with <span class="emoji" aria-label="grinning face with smiling eyes">😄</span> in the middle</p>`)
@@ -531,8 +535,8 @@ func TestPostProcess(t *testing.T) {
 
 	// Test that other post-processing still works.
 	test(
-		":gitea:",
-		`<span class="emoji" aria-label="gitea"><img alt=":gitea:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/gitea.png"/></span>`)
+		":git:",
+		`<span class="emoji" aria-label="git"><img alt=":git:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/git.png"/></span>`)
 	test(
 		"Some text with 😄 in the middle",
 		`Some text with <span class="emoji" aria-label="grinning face with smiling eyes">😄</span> in the middle`)

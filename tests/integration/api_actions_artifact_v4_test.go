@@ -35,17 +35,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-func toProtoJSON(m protoreflect.ProtoMessage) io.Reader {
-	resp, _ := protojson.Marshal(m)
-	buf := bytes.Buffer{}
-	buf.Write(resp)
-	return &buf
+// toJSON encodes an artifact-API message as a request body.
+//
+// Was toProtoJSON/protojson. routers/api/actions no longer speaks protobuf for
+// these types — CreateArtifactRequest and friends are plain structs carrying
+// their own MarshalJSON — so the wire format is ordinary JSON and protojson
+// could not even accept them (they are not protoreflect.ProtoMessage).
+func toJSON(m any) io.Reader {
+	body, _ := json.Marshal(m)
+	return bytes.NewReader(body)
 }
 
 func TestActionsArtifactV4UploadSingleFile(t *testing.T) {
@@ -130,16 +130,16 @@ func TestActionsArtifactV4UploadSingleFile(t *testing.T) {
 	for _, entry := range table {
 		t.Run(entry.name, func(t *testing.T) {
 			// acquire artifact upload url
-			req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toProtoJSON(&actions.CreateArtifactRequest{
+			req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toJSON(&actions.CreateArtifactRequest{
 				Version:                 entry.version,
 				Name:                    entry.name,
 				WorkflowRunBackendId:    "792",
 				WorkflowJobRunBackendId: "193",
-				MimeType:                util.Iif(entry.contentType != "", wrapperspb.String(entry.contentType), nil),
+				MimeType:                util.Iif(entry.contentType != "", &actions.StringValue{Value: entry.contentType}, nil),
 			})).AddTokenAuth(token)
 			resp := MakeRequest(t, req, http.StatusOK)
 			var uploadResp actions.CreateArtifactResponse
-			protojson.Unmarshal(resp.Body.Bytes(), &uploadResp)
+			json.Unmarshal(resp.Body.Bytes(), &uploadResp)
 			assert.True(t, uploadResp.Ok)
 			assert.Contains(t, uploadResp.SignedUploadUrl, "/twirp/github.actions.results.api.v1.ArtifactService/UploadArtifact")
 
@@ -189,17 +189,17 @@ func TestActionsArtifactV4UploadSingleFile(t *testing.T) {
 			t.Logf("Create artifact confirm")
 
 			// confirm artifact upload
-			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toProtoJSON(&actions.FinalizeArtifactRequest{
+			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toJSON(&actions.FinalizeArtifactRequest{
 				Name:                    entry.name,
 				Size:                    int64(entry.append+1) * 1024,
-				Hash:                    wrapperspb.String("sha256:" + hex.EncodeToString(sha)),
+				Hash:                    &actions.StringValue{Value: "sha256:" + hex.EncodeToString(sha)},
 				WorkflowRunBackendId:    "792",
 				WorkflowJobRunBackendId: "193",
 			})).
 				AddTokenAuth(token)
 			resp = MakeRequest(t, req, http.StatusOK)
 			var finalizeResp actions.FinalizeArtifactResponse
-			protojson.Unmarshal(resp.Body.Bytes(), &finalizeResp)
+			json.Unmarshal(resp.Body.Bytes(), &finalizeResp)
 			assert.True(t, finalizeResp.Ok)
 
 			artifact := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionArtifact{ID: finalizeResp.ArtifactId})
@@ -225,7 +225,7 @@ func TestActionsArtifactV4UploadSingleFileWrongChecksum(t *testing.T) {
 	assert.NoError(t, err)
 
 	// acquire artifact upload url
-	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toProtoJSON(&actions.CreateArtifactRequest{
+	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toJSON(&actions.CreateArtifactRequest{
 		Version:                 4,
 		Name:                    "artifact-invalid-checksum",
 		WorkflowRunBackendId:    "792",
@@ -233,7 +233,7 @@ func TestActionsArtifactV4UploadSingleFileWrongChecksum(t *testing.T) {
 	})).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var uploadResp actions.CreateArtifactResponse
-	protojson.Unmarshal(resp.Body.Bytes(), &uploadResp)
+	json.Unmarshal(resp.Body.Bytes(), &uploadResp)
 	assert.True(t, uploadResp.Ok)
 	assert.Contains(t, uploadResp.SignedUploadUrl, "/twirp/github.actions.results.api.v1.ArtifactService/UploadArtifact")
 
@@ -250,10 +250,10 @@ func TestActionsArtifactV4UploadSingleFileWrongChecksum(t *testing.T) {
 	sha := sha256.Sum256([]byte(strings.Repeat("A", 1024)))
 
 	// confirm artifact upload
-	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toProtoJSON(&actions.FinalizeArtifactRequest{
+	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toJSON(&actions.FinalizeArtifactRequest{
 		Name:                    "artifact-invalid-checksum",
 		Size:                    1024,
-		Hash:                    wrapperspb.String("sha256:" + hex.EncodeToString(sha[:])),
+		Hash:                    &actions.StringValue{Value: "sha256:" + hex.EncodeToString(sha[:])},
 		WorkflowRunBackendId:    "792",
 		WorkflowJobRunBackendId: "193",
 	})).
@@ -268,16 +268,16 @@ func TestActionsArtifactV4UploadSingleFileWithRetentionDays(t *testing.T) {
 	assert.NoError(t, err)
 
 	// acquire artifact upload url
-	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toProtoJSON(&actions.CreateArtifactRequest{
+	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toJSON(&actions.CreateArtifactRequest{
 		Version:                 4,
-		ExpiresAt:               timestamppb.New(time.Now().Add(5 * 24 * time.Hour)),
+		ExpiresAt:               actions.New(time.Now().Add(5 * 24 * time.Hour)),
 		Name:                    "artifactWithRetentionDays",
 		WorkflowRunBackendId:    "792",
 		WorkflowJobRunBackendId: "193",
 	})).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var uploadResp actions.CreateArtifactResponse
-	protojson.Unmarshal(resp.Body.Bytes(), &uploadResp)
+	json.Unmarshal(resp.Body.Bytes(), &uploadResp)
 	assert.True(t, uploadResp.Ok)
 	assert.Contains(t, uploadResp.SignedUploadUrl, "/twirp/github.actions.results.api.v1.ArtifactService/UploadArtifact")
 
@@ -294,17 +294,17 @@ func TestActionsArtifactV4UploadSingleFileWithRetentionDays(t *testing.T) {
 	sha := sha256.Sum256([]byte(body))
 
 	// confirm artifact upload
-	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toProtoJSON(&actions.FinalizeArtifactRequest{
+	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toJSON(&actions.FinalizeArtifactRequest{
 		Name:                    "artifactWithRetentionDays",
 		Size:                    1024,
-		Hash:                    wrapperspb.String("sha256:" + hex.EncodeToString(sha[:])),
+		Hash:                    &actions.StringValue{Value: "sha256:" + hex.EncodeToString(sha[:])},
 		WorkflowRunBackendId:    "792",
 		WorkflowJobRunBackendId: "193",
 	})).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	var finalizeResp actions.FinalizeArtifactResponse
-	protojson.Unmarshal(resp.Body.Bytes(), &finalizeResp)
+	json.Unmarshal(resp.Body.Bytes(), &finalizeResp)
 	assert.True(t, finalizeResp.Ok)
 }
 
@@ -315,7 +315,7 @@ func TestActionsArtifactV4UploadSingleFileWithPotentialHarmfulBlockID(t *testing
 	assert.NoError(t, err)
 
 	// acquire artifact upload url
-	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toProtoJSON(&actions.CreateArtifactRequest{
+	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toJSON(&actions.CreateArtifactRequest{
 		Version:                 4,
 		Name:                    "artifactWithPotentialHarmfulBlockID",
 		WorkflowRunBackendId:    "792",
@@ -323,7 +323,7 @@ func TestActionsArtifactV4UploadSingleFileWithPotentialHarmfulBlockID(t *testing
 	})).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var uploadResp actions.CreateArtifactResponse
-	protojson.Unmarshal(resp.Body.Bytes(), &uploadResp)
+	json.Unmarshal(resp.Body.Bytes(), &uploadResp)
 	assert.True(t, uploadResp.Ok)
 	assert.Contains(t, uploadResp.SignedUploadUrl, "/twirp/github.actions.results.api.v1.ArtifactService/UploadArtifact")
 
@@ -356,17 +356,17 @@ func TestActionsArtifactV4UploadSingleFileWithPotentialHarmfulBlockID(t *testing
 	sha := sha256.Sum256([]byte(body))
 
 	// confirm artifact upload
-	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toProtoJSON(&actions.FinalizeArtifactRequest{
+	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toJSON(&actions.FinalizeArtifactRequest{
 		Name:                    "artifactWithPotentialHarmfulBlockID",
 		Size:                    1024,
-		Hash:                    wrapperspb.String("sha256:" + hex.EncodeToString(sha[:])),
+		Hash:                    &actions.StringValue{Value: "sha256:" + hex.EncodeToString(sha[:])},
 		WorkflowRunBackendId:    "792",
 		WorkflowJobRunBackendId: "193",
 	})).
 		AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	var finalizeResp actions.FinalizeArtifactResponse
-	protojson.Unmarshal(resp.Body.Bytes(), &finalizeResp)
+	json.Unmarshal(resp.Body.Bytes(), &finalizeResp)
 	assert.True(t, finalizeResp.Ok)
 }
 
@@ -402,16 +402,16 @@ func TestActionsArtifactV4UploadSingleFileWithChunksOutOfOrder(t *testing.T) {
 				}
 			}
 			// acquire artifact upload url
-			req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toProtoJSON(&actions.CreateArtifactRequest{
+			req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toJSON(&actions.CreateArtifactRequest{
 				Version:                 util.Iif[int32](entry.contentType != "", 7, 4),
 				Name:                    entry.artifactName,
 				WorkflowRunBackendId:    "792",
 				WorkflowJobRunBackendId: "193",
-				MimeType:                util.Iif(entry.contentType != "", wrapperspb.String(entry.contentType), nil),
+				MimeType:                util.Iif(entry.contentType != "", &actions.StringValue{Value: entry.contentType}, nil),
 			})).AddTokenAuth(token)
 			resp := MakeRequest(t, req, http.StatusOK)
 			var uploadResp actions.CreateArtifactResponse
-			protojson.Unmarshal(resp.Body.Bytes(), &uploadResp)
+			json.Unmarshal(resp.Body.Bytes(), &uploadResp)
 			assert.True(t, uploadResp.Ok)
 			if !entry.serveDirect {
 				assert.Contains(t, uploadResp.SignedUploadUrl, "/twirp/github.actions.results.api.v1.ArtifactService/UploadArtifact")
@@ -472,17 +472,17 @@ func TestActionsArtifactV4UploadSingleFileWithChunksOutOfOrder(t *testing.T) {
 			sha := sha256.Sum256([]byte(bodya + bodyb))
 
 			// confirm artifact upload
-			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toProtoJSON(&actions.FinalizeArtifactRequest{
+			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toJSON(&actions.FinalizeArtifactRequest{
 				Name:                    entry.artifactName,
 				Size:                    2048,
-				Hash:                    wrapperspb.String("sha256:" + hex.EncodeToString(sha[:])),
+				Hash:                    &actions.StringValue{Value: "sha256:" + hex.EncodeToString(sha[:])},
 				WorkflowRunBackendId:    "792",
 				WorkflowJobRunBackendId: "193",
 			})).
 				AddTokenAuth(token)
 			resp = MakeRequest(t, req, http.StatusOK)
 			var finalizeResp actions.FinalizeArtifactResponse
-			protojson.Unmarshal(resp.Body.Bytes(), &finalizeResp)
+			json.Unmarshal(resp.Body.Bytes(), &finalizeResp)
 			assert.True(t, finalizeResp.Ok)
 
 			artifact := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionArtifact{ID: finalizeResp.ArtifactId})
@@ -534,28 +534,28 @@ func TestActionsArtifactV4DownloadSingle(t *testing.T) {
 			}
 
 			// list artifacts by name
-			req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toProtoJSON(&actions.ListArtifactsRequest{
-				NameFilter:              wrapperspb.String(entry.ArtifactName),
+			req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toJSON(&actions.ListArtifactsRequest{
+				NameFilter:              &actions.StringValue{Value: entry.ArtifactName},
 				WorkflowRunBackendId:    "792",
 				WorkflowJobRunBackendId: "193",
 			})).AddTokenAuth(token)
 			resp := MakeRequest(t, req, http.StatusOK)
 			var listResp actions.ListArtifactsResponse
-			require.NoError(t, protojson.Unmarshal(resp.Body.Bytes(), &listResp))
+			require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &listResp))
 			require.Len(t, listResp.Artifacts, 1)
 
 			// list artifacts by id
-			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toProtoJSON(&actions.ListArtifactsRequest{
-				IdFilter:                wrapperspb.Int64(listResp.Artifacts[0].DatabaseId),
+			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toJSON(&actions.ListArtifactsRequest{
+				IdFilter:                &actions.Int64Value{Value: listResp.Artifacts[0].DatabaseId},
 				WorkflowRunBackendId:    "792",
 				WorkflowJobRunBackendId: "193",
 			})).AddTokenAuth(token)
 			resp = MakeRequest(t, req, http.StatusOK)
-			require.NoError(t, protojson.Unmarshal(resp.Body.Bytes(), &listResp))
+			require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &listResp))
 			assert.Len(t, listResp.Artifacts, 1)
 
 			// acquire artifact download url
-			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/GetSignedArtifactURL", toProtoJSON(&actions.GetSignedArtifactURLRequest{
+			req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/GetSignedArtifactURL", toJSON(&actions.GetSignedArtifactURLRequest{
 				Name:                    entry.ArtifactName,
 				WorkflowRunBackendId:    "792",
 				WorkflowJobRunBackendId: "193",
@@ -563,7 +563,7 @@ func TestActionsArtifactV4DownloadSingle(t *testing.T) {
 				AddTokenAuth(token)
 			resp = MakeRequest(t, req, http.StatusOK)
 			var finalizeResp actions.GetSignedArtifactURLResponse
-			require.NoError(t, protojson.Unmarshal(resp.Body.Bytes(), &finalizeResp))
+			require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &finalizeResp))
 			assert.NotEmpty(t, finalizeResp.SignedUrl)
 
 			body := strings.Repeat("D", 1024)
@@ -804,18 +804,18 @@ func TestActionsArtifactV4Delete(t *testing.T) {
 	assert.NoError(t, err)
 
 	// delete artifact by name
-	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/DeleteArtifact", toProtoJSON(&actions.DeleteArtifactRequest{
+	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/DeleteArtifact", toJSON(&actions.DeleteArtifactRequest{
 		Name:                    "artifact-v4-download",
 		WorkflowRunBackendId:    "792",
 		WorkflowJobRunBackendId: "193",
 	})).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var deleteResp actions.DeleteArtifactResponse
-	protojson.Unmarshal(resp.Body.Bytes(), &deleteResp)
+	json.Unmarshal(resp.Body.Bytes(), &deleteResp)
 	assert.True(t, deleteResp.Ok)
 
 	// confirm artifact is no longer accessible by GetSignedArtifactURL
-	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/GetSignedArtifactURL", toProtoJSON(&actions.GetSignedArtifactURLRequest{
+	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/GetSignedArtifactURL", toJSON(&actions.GetSignedArtifactURLRequest{
 		Name:                    "artifact-v4-download",
 		WorkflowRunBackendId:    "792",
 		WorkflowJobRunBackendId: "193",
@@ -824,14 +824,14 @@ func TestActionsArtifactV4Delete(t *testing.T) {
 	_ = MakeRequest(t, req, http.StatusNotFound)
 
 	// confirm artifact is no longer enumerateable by ListArtifacts and returns length == 0 without error
-	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toProtoJSON(&actions.ListArtifactsRequest{
-		NameFilter:              wrapperspb.String("artifact-v4-download"),
+	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toJSON(&actions.ListArtifactsRequest{
+		NameFilter:              &actions.StringValue{Value: "artifact-v4-download"},
 		WorkflowRunBackendId:    "792",
 		WorkflowJobRunBackendId: "193",
 	})).AddTokenAuth(token)
 	resp = MakeRequest(t, req, http.StatusOK)
 	var listResp actions.ListArtifactsResponse
-	protojson.Unmarshal(resp.Body.Bytes(), &listResp)
+	json.Unmarshal(resp.Body.Bytes(), &listResp)
 	assert.Empty(t, listResp.Artifacts)
 }
 
@@ -918,7 +918,7 @@ func testActionRunAttemptArtifactV4(t *testing.T, repo *repo_model.Repository, s
 	assert.NotContains(t, attempt2Names, "artifact-attempt-1")
 
 	// "artifact-attempt-1" belongs to the first attempt, so the rerun token cannot access it
-	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/GetSignedArtifactURL", toProtoJSON(&actions.GetSignedArtifactURLRequest{
+	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/GetSignedArtifactURL", toJSON(&actions.GetSignedArtifactURLRequest{
 		Name:                    "artifact-attempt-1",
 		WorkflowRunBackendId:    strconv.FormatInt(run.ID, 10),
 		WorkflowJobRunBackendId: strconv.FormatInt(job2.ID, 10),
@@ -950,45 +950,45 @@ func testActionRunAttemptArtifactV4(t *testing.T, repo *repo_model.Repository, s
 func uploadTestArtifactFileV4(t *testing.T, runID, jobID int64, authToken, artifactName, content string) {
 	t.Helper()
 
-	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toProtoJSON(&actions.CreateArtifactRequest{
+	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/CreateArtifact", toJSON(&actions.CreateArtifactRequest{
 		Version:                 4,
 		Name:                    artifactName,
 		WorkflowRunBackendId:    strconv.FormatInt(runID, 10),
 		WorkflowJobRunBackendId: strconv.FormatInt(jobID, 10),
-		MimeType:                wrapperspb.String("application/zip"),
+		MimeType:                &actions.StringValue{Value: "application/zip"},
 	})).AddTokenAuth(authToken)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var uploadResp actions.CreateArtifactResponse
-	require.NoError(t, protojson.Unmarshal(resp.Body.Bytes(), &uploadResp))
+	require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &uploadResp))
 	require.True(t, uploadResp.Ok)
 
 	req = NewRequestWithBody(t, "PUT", uploadResp.SignedUploadUrl+"&comp=appendBlock", strings.NewReader(content))
 	MakeRequest(t, req, http.StatusCreated)
 
 	sum := sha256.Sum256([]byte(content))
-	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toProtoJSON(&actions.FinalizeArtifactRequest{
+	req = NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/FinalizeArtifact", toJSON(&actions.FinalizeArtifactRequest{
 		Name:                    artifactName,
 		Size:                    int64(len(content)),
-		Hash:                    wrapperspb.String("sha256:" + hex.EncodeToString(sum[:])),
+		Hash:                    &actions.StringValue{Value: "sha256:" + hex.EncodeToString(sum[:])},
 		WorkflowRunBackendId:    strconv.FormatInt(runID, 10),
 		WorkflowJobRunBackendId: strconv.FormatInt(jobID, 10),
 	})).AddTokenAuth(authToken)
 	resp = MakeRequest(t, req, http.StatusOK)
 	var finalizeResp actions.FinalizeArtifactResponse
-	require.NoError(t, protojson.Unmarshal(resp.Body.Bytes(), &finalizeResp))
+	require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &finalizeResp))
 	require.True(t, finalizeResp.Ok)
 }
 
 func listArtifactNamesForRunV4(t *testing.T, runID, jobID int64, taskToken string) []string {
 	t.Helper()
 
-	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toProtoJSON(&actions.ListArtifactsRequest{
+	req := NewRequestWithBody(t, "POST", "/twirp/github.actions.results.api.v1.ArtifactService/ListArtifacts", toJSON(&actions.ListArtifactsRequest{
 		WorkflowRunBackendId:    strconv.FormatInt(runID, 10),
 		WorkflowJobRunBackendId: strconv.FormatInt(jobID, 10),
 	})).AddTokenAuth(taskToken)
 	resp := MakeRequest(t, req, http.StatusOK)
 	var listResp actions.ListArtifactsResponse
-	require.NoError(t, protojson.Unmarshal(resp.Body.Bytes(), &listResp))
+	require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &listResp))
 
 	names := make([]string, 0, len(listResp.Artifacts))
 	for _, item := range listResp.Artifacts {

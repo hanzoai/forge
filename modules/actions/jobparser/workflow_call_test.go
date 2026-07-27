@@ -291,8 +291,13 @@ DB_PASS:    ${{ secrets.PROD_DB_PASS }}
 	})
 
 	t.Run("alias and source names are upper-cased", func(t *testing.T) {
+		// Both sides say git_, because this subtest is about CASE, not
+		// branding. The GITEA_ -> GIT_ rebrand rewrote the expectation and left
+		// the input as gitea_deploy_key, so it had been asserting that
+		// upper-casing also renames — which the code has never done and must
+		// not start doing.
 		inherit, mapping, err := ParseCallerSecrets(secretYAMLNode(t, `
-deploy_key: ${{ secrets.gitea_deploy_key }}
+deploy_key: ${{ secrets.git_deploy_key }}
 `))
 		require.NoError(t, err)
 		assert.False(t, inherit)

@@ -203,6 +203,6 @@ func TestResolveUses(t *testing.T) {
 
 	t.Run("ForeignURL", func(t *testing.T) {
 		_, err := ResolveUses(ctx, "https://other.gitea-example.com/owner/repo/.gitea/workflows/ci.yaml@v1")
-		assert.ErrorContains(t, err, "must point to this Gitea instance")
+		assert.ErrorContains(t, err, "must point to this Hanzo Git instance")
 	})
 }

@@ -20,14 +20,14 @@ import (
 )
 
 const (
-	name        = "gitea/composer-package"
+	name        = "hanzo/composer-package"
 	description = "Package Description"
 	readme      = "Package Readme"
 	comments    = "Package Comment"
 	packageType = "composer-plugin"
 	author      = "Gitea Authors"
-	email       = "no.reply@gitea.io"
-	homepage    = "https://gitea.io"
+	email       = "no.reply@hanzo.ai"
+	homepage    = "https://hanzo.ai"
 	license     = "MIT"
 )
 
@@ -138,7 +138,7 @@ func TestParsePackage(t *testing.T) {
 	})
 
 	t.Run("InvalidPackageVersion", func(t *testing.T) {
-		data := createArchive(map[string]string{"composer.json": `{"name": "gitea/composer-package", "version": "1.a.3"}`})
+		data := createArchive(map[string]string{"composer.json": `{"name": "hanzo/composer-package", "version": "1.a.3"}`})
 
 		cp, err := ParsePackage(bytes.NewReader(data))
 		assert.Nil(t, cp)
@@ -146,7 +146,7 @@ func TestParsePackage(t *testing.T) {
 	})
 
 	t.Run("InvalidReadmePath", func(t *testing.T) {
-		data := createArchive(map[string]string{"composer.json": `{"name": "gitea/composer-package", "readme": "sub/README.md"}`})
+		data := createArchive(map[string]string{"composer.json": `{"name": "hanzo/composer-package", "readme": "sub/README.md"}`})
 
 		cp, err := ParsePackage(bytes.NewReader(data))
 		assert.NoError(t, err)
