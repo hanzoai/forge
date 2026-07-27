@@ -1,3 +1,4 @@
+// Copyright 2026 Hanzo AI, Inc. All rights reserved.
 // Copyright 2020 The Gitea Authors. All rights reserved.
 // Copyright 2015 Kenneth Shaw
 // SPDX-License-Identifier: MIT

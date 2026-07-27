@@ -1,3 +1,4 @@
+// Copyright 2026 Hanzo AI, Inc. All rights reserved.
 // Copyright 2025 The Gitea Authors. All rights reserved.
 // Copyright (c) 2016 Sergey Kamardin
 // SPDX-License-Identifier: MIT

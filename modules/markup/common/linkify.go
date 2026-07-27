@@ -1,4 +1,5 @@
 // Copyright 2019 Yusuke Inuzuka
+// Copyright 2026 Hanzo AI, Inc. All rights reserved.
 // Copyright 2019 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 

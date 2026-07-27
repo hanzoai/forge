@@ -1,5 +1,6 @@
 // Copyright 2013 Beego Authors
 // Copyright 2014 The Macaron Authors
+// Copyright 2026 Hanzo AI, Inc. All rights reserved.
 // Copyright 2020 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
