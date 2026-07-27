@@ -86,6 +86,13 @@ STORED_VERSION_FILE := VERSION
 GITHUB_REF_TYPE ?= branch
 GITHUB_REF_NAME ?= $(shell git rev-parse --abbrev-ref HEAD)
 
+# An empty-but-set GIT_VERSION counts as set to ?=, so every fallback below is
+# skipped and the build stamps an empty version. A build system that exports the
+# variable unconditionally hands us exactly that, so treat empty as absent.
+ifeq ($(strip $(GIT_VERSION)),)
+  undefine GIT_VERSION
+endif
+
 ifneq ($(GITHUB_REF_TYPE),branch)
 	VERSION ?= $(subst v,,$(GITHUB_REF_NAME))
 	GIT_VERSION ?= $(VERSION)
