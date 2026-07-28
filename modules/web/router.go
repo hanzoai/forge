@@ -16,8 +16,8 @@ import (
 	"github.com/hanzoai/git/modules/web/middleware"
 	"github.com/hanzoai/git/modules/web/types"
 
-	"github.com/hanzoai/git/modules/binding"
 	"github.com/go-chi/chi/v5"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 // Bind binding an obj to a handler's context data
@@ -54,7 +54,34 @@ type Router struct {
 // NewRouter creates a new route
 func NewRouter() *Router {
 	r := chi.NewRouter()
-	return &Router{chiRouter: r}
+	router := &Router{chiRouter: r}
+	// Everything above this package reads path parameters through
+	// RouteContext, not through the router. This is the one place the two are
+	// joined, so swapping the mux out is a change to this function rather than
+	// to every handler that wants a parameter.
+	router.AfterRouting(syncRouteContext)
+	return router
+}
+
+// syncRouteContext copies the routed method and captured parameters into a
+// RouteContext on the request.
+func syncRouteContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
+		rc := NewRouteContext()
+		if chiCtx := chi.RouteContext(req.Context()); chiCtx != nil {
+			rc.RouteMethod = chiCtx.RouteMethod
+			rc.RoutePatterns = append(rc.RoutePatterns, chiCtx.RoutePatterns...)
+			for i, name := range chiCtx.URLParams.Keys {
+				if i < len(chiCtx.URLParams.Values) {
+					rc.SetParam(name, chiCtx.URLParams.Values[i])
+				}
+			}
+		}
+		if rc.RouteMethod == "" {
+			rc.RouteMethod = req.Method
+		}
+		next.ServeHTTP(resp, WithRouteContext(req, rc))
+	})
 }
 
 // BeforeRouting adds middlewares which will be executed before the request path gets routed

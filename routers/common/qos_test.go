@@ -5,13 +5,13 @@
 package common
 
 import (
+	"github.com/hanzoai/git/modules/web"
 	"testing"
 
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/web/middleware"
 	"github.com/hanzoai/git/services/contexttest"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -55,7 +55,7 @@ func TestRequestPriority(t *testing.T) {
 				data[middleware.ContextDataKeySignedUser] = tc.User
 			}
 
-			rctx := chi.RouteContext(ctx)
+			rctx := web.GetRouteContext(ctx)
 			rctx.RoutePatterns = []string{tc.RoutePattern}
 
 			assert.Exactly(t, tc.Expected, requestPriority(ctx))

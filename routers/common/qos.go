@@ -7,6 +7,7 @@ package common
 import (
 	"context"
 	"fmt"
+	"github.com/hanzoai/git/modules/web"
 	"net/http"
 	"strings"
 
@@ -18,7 +19,6 @@ import (
 	"github.com/hanzoai/git/modules/web/routing"
 
 	"github.com/bohde/codel"
-	"github.com/go-chi/chi/v5"
 )
 
 const tplStatus503 templates.TplName = "status/503"
@@ -102,7 +102,7 @@ func requestPriority(ctx context.Context) Priority {
 		return HighPriority
 	}
 
-	rctx := chi.RouteContext(ctx)
+	rctx := web.GetRouteContext(ctx)
 	if rctx == nil {
 		return DefaultPriority
 	}

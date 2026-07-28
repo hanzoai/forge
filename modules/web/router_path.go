@@ -12,8 +12,6 @@ import (
 
 	"github.com/hanzoai/git/modules/container"
 	"github.com/hanzoai/git/modules/util"
-
-	"github.com/go-chi/chi/v5"
 )
 
 type RouterPathGroup struct {
@@ -23,11 +21,11 @@ type RouterPathGroup struct {
 }
 
 func (g *RouterPathGroup) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	chiCtx := chi.RouteContext(req.Context())
-	path := chiCtx.URLParam(g.pathParam)
+	rc := GetRouteContext(req.Context())
+	path := rc.Param(g.pathParam)
 	for _, m := range g.matchers {
-		if m.matchPath(chiCtx, path) {
-			chiCtx.RoutePatterns = append(chiCtx.RoutePatterns, m.pattern)
+		if m.matchPath(rc, path) {
+			rc.RoutePatterns = append(rc.RoutePatterns, m.pattern)
 			executeMiddlewaresHandler(resp, req, m.middlewares, m.handlerFunc)
 			return
 		}
@@ -69,8 +67,8 @@ type routerPathMatcher struct {
 	handlerFunc http.HandlerFunc
 }
 
-func (p *routerPathMatcher) matchPath(chiCtx *chi.Context, path string) bool {
-	if !p.methods.Contains(chiCtx.RouteMethod) {
+func (p *routerPathMatcher) matchPath(rc *RouteContext, path string) bool {
+	if !p.methods.Contains(rc.RouteMethod) {
 		return false
 	}
 	if !strings.HasPrefix(path, "/") {
@@ -96,14 +94,14 @@ func (p *routerPathMatcher) matchPath(chiCtx *chi.Context, path string) bool {
 	for i, pm := range paramMatches {
 		groupIdx := p.params[i].captureGroup * 2
 		if pm[groupIdx] == -1 || pm[groupIdx+1] == -1 {
-			chiCtx.URLParams.Add(p.params[i].name, "")
+			rc.SetParam(p.params[i].name, "")
 			continue
 		}
 		val := path[pm[groupIdx]:pm[groupIdx+1]]
 		if p.params[i].pathSepEnd {
 			val = strings.TrimSuffix(val, "/")
 		}
-		chiCtx.URLParams.Add(p.params[i].name, val)
+		rc.SetParam(p.params[i].name, val)
 	}
 	return true
 }

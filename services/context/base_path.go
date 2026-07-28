@@ -11,7 +11,7 @@ import (
 
 	"github.com/hanzoai/git/modules/setting"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/hanzoai/git/modules/web"
 )
 
 // PathParam returns the param in request path, eg: "/{var}" => "/a%2fb", then `var == "a/b"`
@@ -29,7 +29,7 @@ func (b *Base) PathParamRaw(name string) string {
 		setting.PanicInDevOrTesting("path param should not start with ':'")
 		name = name[1:]
 	}
-	return chi.URLParam(b.Req, name)
+	return web.GetRouteContext(b.Req.Context()).Param(name)
 }
 
 // PathParamInt64 returns the param in request path as int64
@@ -45,9 +45,9 @@ func (b *Base) PathParamInt(p string) int {
 
 // SetPathParam set request path params into routes
 func (b *Base) SetPathParam(name, value string) {
-	chi.RouteContext(b).URLParams.Add(name, url.PathEscape(value))
+	web.GetRouteContext(b).SetParam(name, url.PathEscape(value))
 }
 
 func (b *Base) SetPathParamRaw(name, value string) {
-	chi.RouteContext(b).URLParams.Add(name, value)
+	web.GetRouteContext(b).SetParam(name, value)
 }

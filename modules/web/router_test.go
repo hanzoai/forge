@@ -16,27 +16,26 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/modules/web/types"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
-func chiURLParamsToMap(chiCtx *chi.Context) map[string]string {
-	pathParams := chiCtx.URLParams
-	m := make(map[string]string, len(pathParams.Keys))
-	for i, key := range pathParams.Keys {
-		if key == "*" && pathParams.Values[i] == "" {
-			continue // chi router will add an empty "*" key if there is a "Mount"
+func routeParamsToMap(rc *RouteContext) map[string]string {
+	names := rc.ParamNames()
+	m := make(map[string]string, len(names))
+	for _, key := range names {
+		if key == "*" && rc.Param(key) == "" {
+			continue // a Mount contributes an empty "*"
 		}
-		m[key] = pathParams.Values[i]
+		m[key] = rc.Param(key)
 	}
 	return util.Iif(len(m) == 0, nil, m)
 }
 
 type testResult struct {
-	method          string
-	pathParams      map[string]string
-	handlerMarks    []string
-	chiRoutePattern *string
+	method       string
+	pathParams   map[string]string
+	handlerMarks []string
+	routePattern *string
 }
 
 type testRecorder struct {
@@ -50,10 +49,10 @@ func (r *testRecorder) reset() {
 func (r *testRecorder) handle(optMark ...string) func(resp http.ResponseWriter, req *http.Request) {
 	mark := util.OptionalArg(optMark, "")
 	return func(resp http.ResponseWriter, req *http.Request) {
-		chiCtx := chi.RouteContext(req.Context())
+		rc := GetRouteContext(req.Context())
 		r.res.method = req.Method
-		r.res.pathParams = chiURLParamsToMap(chiCtx)
-		r.res.chiRoutePattern = new(chiCtx.RoutePattern())
+		r.res.pathParams = routeParamsToMap(rc)
+		r.res.routePattern = new(rc.RoutePattern())
 		if mark != "" {
 			r.res.handlerMarks = append(r.res.handlerMarks, mark)
 		}
@@ -91,20 +90,20 @@ func (r *testRecorder) test(t *testing.T, rt *Router, methodPath string, expecte
 	httpRecorder := httptest.NewRecorder()
 	httpRecorder.Body = buff
 	rt.ServeHTTP(httpRecorder, req)
-	if expected.chiRoutePattern == nil {
-		r.res.chiRoutePattern = nil
+	if expected.routePattern == nil {
+		r.res.routePattern = nil
 	}
 	assert.Equal(t, expected, r.res)
 }
 
 func TestPathProcessor(t *testing.T) {
 	testProcess := func(pattern, uri string, expectedPathParams map[string]string) {
-		chiCtx := chi.NewRouteContext()
-		chiCtx.RouteMethod = "GET"
+		rc := NewRouteContext()
+		rc.RouteMethod = "GET"
 		p := newRouterPathMatcher("GET", patternRegexp(pattern), http.NotFound)
 		shouldProcess := expectedPathParams != nil
-		assert.Equal(t, shouldProcess, p.matchPath(chiCtx, uri), "use pattern %s to process uri %s", pattern, uri)
-		assert.Equal(t, expectedPathParams, chiURLParamsToMap(chiCtx), "use pattern %s to process uri %s", pattern, uri)
+		assert.Equal(t, shouldProcess, p.matchPath(rc, uri), "use pattern %s to process uri %s", pattern, uri)
+		assert.Equal(t, expectedPathParams, routeParamsToMap(rc), "use pattern %s to process uri %s", pattern, uri)
 	}
 
 	// the "<...>" is intentionally designed to distinguish from chi's path parameters, because:
@@ -169,9 +168,9 @@ func TestRouter(t *testing.T) {
 
 	t.Run("RootRouter", func(t *testing.T) {
 		testRoute(t, "GET /the-user/the-repo/other", resultStruct{
-			method:          "GET",
-			handlerMarks:    []string{"not-found:/"},
-			chiRoutePattern: new(""),
+			method:       "GET",
+			handlerMarks: []string{"not-found:/"},
+			routePattern: new(""),
 		})
 		testRoute(t, "GET /the-user/the-repo/pulls", resultStruct{
 			method:       "GET",
@@ -179,10 +178,10 @@ func TestRouter(t *testing.T) {
 			handlerMarks: []string{"list-issues-b"},
 		})
 		testRoute(t, "GET /the-user/the-repo/issues/123", resultStruct{
-			method:          "GET",
-			pathParams:      map[string]string{"username": "the-user", "reponame": "the-repo", "type": "issues", "index": "123"},
-			handlerMarks:    []string{"view-issue"},
-			chiRoutePattern: new("/{username}/{reponame}/{type:issues|pulls}/{index}"),
+			method:       "GET",
+			pathParams:   map[string]string{"username": "the-user", "reponame": "the-repo", "type": "issues", "index": "123"},
+			handlerMarks: []string{"view-issue"},
+			routePattern: new("/{username}/{reponame}/{type:issues|pulls}/{index}"),
 		})
 		testRoute(t, "GET /the-user/the-repo/issues/123?stop=hijack", resultStruct{
 			method:       "GET",
@@ -257,10 +256,10 @@ func TestRouter(t *testing.T) {
 		})
 
 		testRoute(t, "GET /v1/repos/the-user/the-repo/branches/d1/d2/fn?stop=s3", resultStruct{
-			method:          "GET",
-			pathParams:      map[string]string{"username": "the-user", "reponame": "the-repo", "*": "d1/d2/fn", "dir": "d1/d2", "file": "fn"},
-			handlerMarks:    []string{"s1", "s2", "s3"},
-			chiRoutePattern: new("/v1/repos/{username}/{reponame}/branches/<dir:*>/<file:[a-z]{1,2}>"),
+			method:       "GET",
+			pathParams:   map[string]string{"username": "the-user", "reponame": "the-repo", "*": "d1/d2/fn", "dir": "d1/d2", "file": "fn"},
+			handlerMarks: []string{"s1", "s2", "s3"},
+			routePattern: new("/v1/repos/{username}/{reponame}/branches/<dir:*>/<file:[a-z]{1,2}>"),
 		})
 	})
 }

@@ -6,6 +6,7 @@ package common
 
 import (
 	"fmt"
+	"github.com/hanzoai/git/modules/web"
 	"net/http"
 	"strings"
 
@@ -19,9 +20,9 @@ import (
 	"github.com/hanzoai/git/modules/web/routing"
 	"github.com/hanzoai/git/services/context"
 
-	"github.com/hanzoai/git/modules/session/chi"
 	"github.com/chi-middleware/proxy"
 	"github.com/go-chi/chi/v5"
+	"github.com/hanzoai/git/modules/session/chi"
 )
 
 // ProtocolMiddlewares returns HTTP protocol related middlewares, and it provides a global panic recovery
@@ -77,8 +78,7 @@ func RequestContextHandler() func(h http.Handler) http.Handler {
 			ctx, span := gtprof.GetTracer().Start(ctx, gtprof.TraceSpanHTTP)
 			req = req.WithContext(ctx)
 			defer func() {
-				chiCtx := chi.RouteContext(req.Context())
-				span.SetAttributeString(gtprof.TraceAttrHTTPRoute, chiCtx.RoutePattern())
+				span.SetAttributeString(gtprof.TraceAttrHTTPRoute, web.GetRouteContext(req.Context()).RoutePattern())
 				span.End()
 			}()
 
@@ -110,6 +110,9 @@ func ChiRoutePathHandler() func(h http.Handler) http.Handler {
 	// make sure chi uses EscapedPath(RawPath) as RoutePath, then "%2f" could be handled correctly
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
+			// Still chi: this sets the path the MUX will route on, which is the
+			// one job chi still has here. Everything that only READS the routed
+			// result now goes through web.RouteContext.
 			chiCtx := chi.RouteContext(req.Context())
 			if req.URL.RawPath == "" {
 				chiCtx.RoutePath = req.URL.EscapedPath()

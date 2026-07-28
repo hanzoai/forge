@@ -7,6 +7,7 @@ package contexttest
 
 import (
 	gocontext "context"
+	"github.com/hanzoai/git/modules/web"
 	"io"
 	"maps"
 	"net/http"
@@ -30,7 +31,6 @@ import (
 	"github.com/hanzoai/git/modules/web/middleware"
 	"github.com/hanzoai/git/services/context"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -68,9 +68,9 @@ func MockContext(t *testing.T, reqPath string, opts ...MockContextOption) (*cont
 	base.Data = middleware.GetContextData(req.Context())
 	base.Locale = &translation.MockLocale{}
 
-	chiCtx := chi.NewRouteContext()
+	chiCtx := web.NewRouteContext()
 	ctx := context.NewWebContext(base, opt.Render, nil)
-	ctx.SetContextValue(chi.RouteCtxKey, chiCtx)
+	ctx.SetContextValue(web.RouteCtxKey, chiCtx)
 	if opt.SessionStore != nil {
 		ctx.SetContextValue(session.MockStoreContextKey, opt.SessionStore)
 		ctx.Session = opt.SessionStore
@@ -89,8 +89,8 @@ func MockAPIContext(t *testing.T, reqPath string) (*context.APIContext, *httptes
 	base.Data = middleware.GetContextData(req.Context())
 	base.Locale = &translation.MockLocale{}
 	ctx := &context.APIContext{Base: base, Repo: &context.Repository{}}
-	chiCtx := chi.NewRouteContext()
-	ctx.SetContextValue(chi.RouteCtxKey, chiCtx)
+	chiCtx := web.NewRouteContext()
+	ctx.SetContextValue(web.RouteCtxKey, chiCtx)
 	return ctx, resp
 }
 
@@ -101,8 +101,8 @@ func MockPrivateContext(t *testing.T, reqPath string) (*context.PrivateContext, 
 	base.Data = middleware.GetContextData(req.Context())
 	base.Locale = &translation.MockLocale{}
 	ctx := &context.PrivateContext{Base: base}
-	chiCtx := chi.NewRouteContext()
-	ctx.SetContextValue(chi.RouteCtxKey, chiCtx)
+	chiCtx := web.NewRouteContext()
+	ctx.SetContextValue(web.RouteCtxKey, chiCtx)
 	return ctx, resp
 }
 

@@ -5,6 +5,7 @@
 package common
 
 import (
+	"github.com/hanzoai/git/modules/web"
 	"net/http"
 	"strings"
 
@@ -13,8 +14,6 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/web/middleware"
 	"github.com/hanzoai/git/modules/web/routing"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func BlockExpensive() func(next http.Handler) http.Handler {
@@ -79,7 +78,7 @@ func determineRequestPriority(reqCtx reqctx.RequestContext) (ret struct {
 	LongPolling bool
 },
 ) {
-	chiRoutePath := chi.RouteContext(reqCtx).RoutePattern()
+	chiRoutePath := web.GetRouteContext(reqCtx).RoutePattern()
 	if _, ok := reqCtx.GetData()[middleware.ContextDataKeySignedUser].(*user_model.User); ok {
 		ret.SignedIn = true
 	} else {
