@@ -16,12 +16,10 @@ import (
 	api "github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/util"
 	webhook_module "github.com/hanzoai/git/modules/webhook"
-
-	dingtalk "gitea.com/lunny/dingtalk_webhook"
 )
 
 type (
-	DingtalkPayload   dingtalk.Payload
+	DingtalkPayload   DingtalkPayloadMsg
 	dingtalkConvertor struct{}
 )
 
@@ -192,7 +190,7 @@ func (dingtalkConvertor) WorkflowJob(p *api.WorkflowJobPayload) (DingtalkPayload
 func createDingtalkPayload(title, text, singleTitle, singleURL string) DingtalkPayload {
 	return DingtalkPayload{
 		MsgType: "actionCard",
-		ActionCard: dingtalk.ActionCard{
+		ActionCard: DingtalkActionCard{
 			Text:        strings.TrimSpace(text),
 			Title:       strings.TrimSpace(title),
 			HideAvatar:  "0",
