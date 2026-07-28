@@ -410,8 +410,6 @@ github.com/hanzoai/csqlite v0.1.0 h1:suwC3dh0INlfP/U0Es6cDf6JNQ+2+GVLLATPWCUux6k
 github.com/hanzoai/csqlite v0.1.0/go.mod h1:H31a/O6VXuklR9UBkgY++bmAK5uzVfXPqU0F6P9Wsos=
 github.com/hanzoai/orm v0.6.18 h1:yRVsJBp6xAzrugjxUWjK0OYY/f3BIIYTVcOYQ4nbbO4=
 github.com/hanzoai/orm v0.6.18/go.mod h1:PqGd9Jv+BOeBZ4UkR7lyb9hy45ROgF+EHk/fXFgwb4o=
-github.com/hanzoai/s3-go v1.0.0 h1:bDdAsy76iWiraHX+zLZALxICDPtmci0ma6mIhdNlViw=
-github.com/hanzoai/s3-go v1.0.0/go.mod h1:2Lp7RS4JS2HSbZ1NEbS5Xx/hnO5PKbnn56D77kOdSBw=
 github.com/hanzoai/sqlcipher v0.1.0 h1:V9gKG3ZltN2ZCteDrOnXWfOeEe/YDhhUm9AorQEAuBo=
 github.com/hanzoai/sqlcipher v0.1.0/go.mod h1:F0soUYM1i4sawOZUpRvVnWoUayPbeGVlGq01VXy9Aqg=
 github.com/hanzoai/sqlite v0.3.2 h1:B/TRunlIDZECEypmr6rHeNyWf37YZXvPJHBDEFMKn/g=
@@ -422,6 +420,8 @@ github.com/hanzokv/go/v9 v9.22.0 h1:zD4fh0NLBuVa8njIrXUivJCijlratzS1Yf7Y/uD5T00=
 github.com/hanzokv/go/v9 v9.22.0/go.mod h1:GV+nw+jX60sIrJ7LBkmOQw2WASXzkMstt52blcwNw6w=
 github.com/hanzokv/lock/v4 v4.17.2 h1:3TNw9eu0TLN476S/FqvL4pHngUvpk3JqYnAd7Xma0lU=
 github.com/hanzokv/lock/v4 v4.17.2/go.mod h1:I8NIPk2qmf8rwNPllvScBKBrYHa5iG//Lj+9y4OR07E=
+github.com/hanzos3/go v1.0.0 h1:wovg7HGKbp96PY2Yo1skh+YVFexyHbhK7BFQIGq5Xvo=
+github.com/hanzos3/go v1.0.0/go.mod h1:M6nsMxxy3jUrJN0FWsB7BNfFia7IDW1CRYFMUcboHak=
 github.com/hanzos3/go-sdk v1.0.2 h1:EOJQGVnwclkzIyRJyWqtqmA2muyaSsF4y+7KYC4Vhdw=
 github.com/hanzos3/go-sdk v1.0.2/go.mod h1:oOp/rYVDpZIv2Mn3ZacAUiIahRNOi+V/vlGukvIcuI0=
 github.com/hashicorp/go-cleanhttp v0.5.2 h1:035FKYIWjmULyFRBKPs8TBQoi0x6d9G4xc9neXJWAZQ=

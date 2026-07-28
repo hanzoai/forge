@@ -21,8 +21,8 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	minio "github.com/hanzoai/s3-go"
-	"github.com/hanzoai/s3-go/pkg/credentials"
+	minio "github.com/hanzos3/go"
+	"github.com/hanzos3/go/pkg/credentials"
 )
 
 var _ ObjectStorage = &S3Storage{}
@@ -40,7 +40,7 @@ func (m *s3Object) Stat() (os.FileInfo, error) {
 	return &s3FileInfo{oi}, nil
 }
 
-// S3Storage returns an S3 bucket storage backed by the hanzoai/s3-go client
+// S3Storage returns an S3 bucket storage backed by the hanzos3/go client
 type S3Storage struct {
 	cfg      *setting.S3StorageConfig
 	ctx      context.Context

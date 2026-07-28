@@ -57,7 +57,6 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/act v1.0.0
-	github.com/hanzoai/s3-go v1.0.0
 	github.com/hanzoai/sqlite v0.3.2
 	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hanzokv/lock/v4 v4.17.2
@@ -224,6 +223,7 @@ require (
 	github.com/hanzoai/builder v0.3.13
 	github.com/hanzoai/orm v0.6.18
 	github.com/hanzoai/xorm v1.4.4
+	github.com/hanzos3/go v1.0.0
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/inbucket/html2text v1.0.0 // indirect
