@@ -25,6 +25,10 @@ type RouteContext struct {
 	// order, so nested groups can be reconstructed for logging and metrics.
 	RoutePatterns []string
 
+	// RoutePath overrides the path the mux routes on. The normalising middleware
+	// sets it so an escaped path routes as its decoded form.
+	RoutePath string
+
 	params map[string]string
 	order  []string // insertion order; a repeated name keeps its first position
 }
@@ -97,6 +101,18 @@ func (rc *RouteContext) RoutePattern() string {
 		pattern = strings.TrimSuffix(pattern, "/")
 	}
 	return pattern
+}
+
+// deleteParam removes a parameter. Matching backtracks, so a capture made on a
+// branch that then fails must not be visible to the branch tried next.
+func (rc *RouteContext) deleteParam(name string) {
+	delete(rc.params, name)
+	for i, n := range rc.order {
+		if n == name {
+			rc.order = append(rc.order[:i], rc.order[i+1:]...)
+			break
+		}
+	}
 }
 
 // ParamNames returns the captured names in the order they were first set.

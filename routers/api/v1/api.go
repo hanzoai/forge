@@ -99,9 +99,8 @@ import (
 
 	_ "github.com/hanzoai/git/routers/api/v1/swagger" // for swagger generation
 
-	"github.com/hanzoai/git/modules/binding"
-	chi_middleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/hanzoai/git/modules/binding"
 )
 
 func sudo() func(ctx *context.APIContext) {
@@ -955,7 +954,6 @@ func Routes() *web.Router {
 	m := web.NewRouter()
 
 	// redirect HEAD requests to GET if no HEAD handler is defined (RFC 9110 §9.3.2)
-	m.BeforeRouting(chi_middleware.GetHead)
 
 	if setting.CORSConfig.Enabled {
 		m.BeforeRouting(cors.Handler(cors.Options{

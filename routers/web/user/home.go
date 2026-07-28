@@ -715,7 +715,7 @@ func ShowGPGKeys(ctx *context.Context) {
 
 func UsernameSubRoute(ctx *context.Context) {
 	// WORKAROUND to support usernames with "." in it
-	// https://github.com/go-chi/chi/issues/781
+	// (upstream router issue that motivated this workaround)
 	username := ctx.PathParam("username")
 	reloadParam := func(suffix string) (success bool) {
 		ctx.SetPathParam("username", strings.TrimSuffix(username, suffix))

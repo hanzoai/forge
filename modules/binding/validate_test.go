@@ -22,7 +22,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -583,7 +582,7 @@ func Test_Validation(t *testing.T) {
 
 func performValidationTest(t *testing.T, testCase validationTestCase) {
 	httpRecorder := httptest.NewRecorder()
-	m := chi.NewRouter()
+	m := newTestRouter()
 
 	m.Post(testRoute, func(resp http.ResponseWriter, req *http.Request) {
 		actual := Validate(req, testCase.data)

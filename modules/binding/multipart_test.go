@@ -25,7 +25,6 @@ import (
 	"strconv"
 	"testing"
 
-	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,7 +80,7 @@ func Test_MultipartForm(t *testing.T) {
 
 func performMultipartFormTest(t *testing.T, binder handlerFunc, testCase multipartFormTestCase) {
 	httpRecorder := httptest.NewRecorder()
-	m := chi.NewRouter()
+	m := newTestRouter()
 
 	m.Post(testRoute, func(resp http.ResponseWriter, req *http.Request) {
 		var actual BlogPost

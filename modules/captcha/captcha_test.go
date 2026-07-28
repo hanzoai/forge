@@ -20,7 +20,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	chi "github.com/go-chi/chi/v5"
 	"github.com/hanzoai/git/modules/cache/chi"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -30,7 +29,7 @@ func Test_Captcha(t *testing.T) {
 		c, err := cache.NewCacher(cache.Options{})
 		So(err, ShouldBeNil)
 
-		r := chi.NewRouter()
+		r := newTestRouter()
 		captcha := NewCaptcha(Options{})
 		captcha.Store = c
 		r.Use(Captchaer(captcha))

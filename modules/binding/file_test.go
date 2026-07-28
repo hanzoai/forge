@@ -23,7 +23,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,7 +74,7 @@ func Test_FileUploads(t *testing.T) {
 
 func performFileTest(t *testing.T, binder handlerFunc, testCase fileTestCase) {
 	httpRecorder := httptest.NewRecorder()
-	c := chi.NewRouter()
+	c := newTestRouter()
 
 	fileTestHandler := func(actual BlogPost, errs Errors) {
 		assertFileAsExpected(t, testCase, actual.HeaderImage, testCase.singleFile)

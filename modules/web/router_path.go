@@ -30,7 +30,7 @@ func (g *RouterPathGroup) ServeHTTP(resp http.ResponseWriter, req *http.Request)
 			return
 		}
 	}
-	g.r.chiRouter.NotFoundHandler().ServeHTTP(resp, req)
+	g.r.mux.NotFoundHandler().ServeHTTP(resp, req)
 }
 
 type RouterPathGroupPattern struct {

@@ -48,9 +48,8 @@ import (
 
 	_ "github.com/hanzoai/git/modules/session" // to register all internal adapters
 
-	"github.com/hanzoai/git/modules/captcha"
-	chi_middleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/hanzoai/git/modules/captcha"
 	"github.com/klauspost/compress/gzhttp"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -258,7 +257,6 @@ func Routes() *web.Router {
 	routes := web.NewRouter()
 
 	// GetHead allows a HEAD request redirect to GET if HEAD method is not defined for that route
-	routes.BeforeRouting(chi_middleware.GetHead)
 
 	routes.Head("/", misc.DummyOK) // for health check - doesn't need to be passed through gzip handler
 	routes.Methods("GET, HEAD", "/assets/site-manifest.json", misc.SiteManifest)

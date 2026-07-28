@@ -16,7 +16,6 @@ import (
 	"github.com/hanzoai/git/modules/web/middleware"
 	"github.com/hanzoai/git/modules/web/types"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/hanzoai/git/modules/binding"
 )
 
@@ -43,7 +42,7 @@ func GetForm(dataStore reqctx.RequestDataStore) any {
 
 // Router defines a route based on chi's router
 type Router struct {
-	chiRouter *chi.Mux
+	mux *Mux
 
 	afterRouting []any
 
@@ -53,34 +52,25 @@ type Router struct {
 
 // NewRouter creates a new route
 func NewRouter() *Router {
-	r := chi.NewRouter()
-	router := &Router{chiRouter: r}
+	router := &Router{mux: NewMux()}
 	// Everything above this package reads path parameters through
 	// RouteContext, not through the router. This is the one place the two are
 	// joined, so swapping the mux out is a change to this function rather than
 	// to every handler that wants a parameter.
-	router.AfterRouting(syncRouteContext)
+	router.mux.Use(ensureRouteContext)
 	return router
 }
 
-// syncRouteContext copies the routed method and captured parameters into a
-// RouteContext on the request.
-func syncRouteContext(next http.Handler) http.Handler {
+// ensureRouteContext attaches a RouteContext before routing, so the mux has
+// somewhere to record what it captures.
+func ensureRouteContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
-		rc := NewRouteContext()
-		if chiCtx := chi.RouteContext(req.Context()); chiCtx != nil {
-			rc.RouteMethod = chiCtx.RouteMethod
-			rc.RoutePatterns = append(rc.RoutePatterns, chiCtx.RoutePatterns...)
-			for i, name := range chiCtx.URLParams.Keys {
-				if i < len(chiCtx.URLParams.Values) {
-					rc.SetParam(name, chiCtx.URLParams.Values[i])
-				}
-			}
-		}
-		if rc.RouteMethod == "" {
+		if GetRouteContext(req.Context()) == nil {
+			rc := NewRouteContext()
 			rc.RouteMethod = req.Method
+			req = WithRouteContext(req, rc)
 		}
-		next.ServeHTTP(resp, WithRouteContext(req, rc))
+		next.ServeHTTP(resp, req)
 	})
 }
 
@@ -89,7 +79,7 @@ func syncRouteContext(next http.Handler) http.Handler {
 func (r *Router) BeforeRouting(middlewares ...any) {
 	for _, m := range middlewares {
 		if !isNilOrFuncNil(m) {
-			r.chiRouter.Use(toHandlerProvider(m))
+			r.mux.Use(toHandlerProvider(m))
 		}
 	}
 }
@@ -184,10 +174,10 @@ func (r *Router) Methods(methods, pattern string, h ...any) {
 	if strings.Contains(methods, ",") {
 		methods := strings.SplitSeq(methods, ",")
 		for method := range methods {
-			r.chiRouter.With(middlewares...).Method(strings.TrimSpace(method), fullPattern, handlerFunc)
+			r.mux.Method(strings.TrimSpace(method), fullPattern, chain(middlewares, handlerFunc))
 		}
 	} else {
-		r.chiRouter.With(middlewares...).Method(methods, fullPattern, handlerFunc)
+		r.mux.Method(methods, fullPattern, chain(middlewares, handlerFunc))
 	}
 }
 
@@ -198,13 +188,13 @@ func (r *Router) Mount(pattern string, subRouter *Router) {
 	handlerProviders = wrapMiddlewareAppendPre(handlerProviders, r.curMiddlewares)
 	handlerProviders = wrapMiddlewareAppendNormal(handlerProviders, r.afterRouting)
 	handlerProviders = wrapMiddlewareAppendNormal(handlerProviders, r.curMiddlewares)
-	r.chiRouter.With(handlerProviders...).Mount(r.getPattern(pattern), subRouter.chiRouter)
+	r.mux.Mount(r.getPattern(pattern), chain(handlerProviders, mountedHandler(subRouter)))
 }
 
 // Any delegate requests for all methods
 func (r *Router) Any(pattern string, h ...any) {
 	middlewares, handlerFunc, _ := wrapMiddlewareAndHandler(r.afterRouting, r.curMiddlewares, h)
-	r.chiRouter.With(middlewares...).HandleFunc(r.getPattern(pattern), handlerFunc)
+	r.mux.Method("", r.getPattern(pattern), chain(middlewares, handlerFunc))
 }
 
 // Delete delegate delete method
@@ -240,15 +230,15 @@ func (r *Router) Patch(pattern string, h ...any) {
 // ServeHTTP implements http.Handler
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// TODO: need to move it to the top-level common middleware, otherwise each "Mount" will cause it to be executed multiple times, which is inefficient.
-	r.normalizeRequestPath(w, req, r.chiRouter)
+	r.normalizeRequestPath(w, req, r.mux)
 }
 
 // NotFound defines a handler to respond whenever a route could not be found.
 func (r *Router) NotFound(h http.HandlerFunc) {
 	middlewares, handlerFunc, _ := wrapMiddlewareAndHandler(r.afterRouting, r.curMiddlewares, []any{h})
-	r.chiRouter.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		executeMiddlewaresHandler(w, r, middlewares, handlerFunc)
-	})
+	r.mux.NotFound(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		executeMiddlewaresHandler(w, req, middlewares, handlerFunc)
+	}))
 }
 
 func (r *Router) normalizeRequestPath(resp http.ResponseWriter, req *http.Request, next http.Handler) {
@@ -320,4 +310,30 @@ func (r *Router) PathGroup(pattern string, fn func(g *RouterPathGroup), h ...any
 	g := &RouterPathGroup{r: r, pathParam: "*"}
 	fn(g)
 	r.Any(pattern, append(h, g.ServeHTTP)...)
+}
+
+// chain wraps handlerFunc in middlewares, outermost first.
+func chain(middlewares []middlewareProvider, handlerFunc http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		executeMiddlewaresHandler(w, req, middlewares, handlerFunc)
+	})
+}
+
+// mountedHandler routes the REMAINDER of the path with the sub-router.
+//
+// A mount at "/v1" means the sub-router's own patterns are written relative to
+// it — "/repos/{username}" not "/v1/repos/{username}" — so handing it the full
+// path matches nothing. The mux records the unconsumed remainder as "*" when it
+// reaches a mount; this turns that into the path the sub-router routes on.
+//
+// The "*" is then cleared: it belongs to how the route was assembled, not to the
+// route, and a handler asking for a parameter should not find it.
+func mountedHandler(subRouter *Router) http.HandlerFunc {
+	return func(resp http.ResponseWriter, req *http.Request) {
+		if rc := GetRouteContext(req.Context()); rc != nil {
+			rc.RoutePath = "/" + strings.TrimPrefix(rc.Param("*"), "/")
+			rc.deleteParam("*")
+		}
+		subRouter.mux.ServeHTTP(resp, req)
+	}
 }

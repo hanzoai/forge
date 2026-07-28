@@ -22,13 +22,12 @@ import (
 	"testing"
 	"time"
 
-	chi "github.com/go-chi/chi/v5"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func Test_Sessioner(t *testing.T) {
 	Convey("Use session middleware", t, func() {
-		c := chi.NewRouter()
+		c := newTestRouter()
 		sessioner, err := Sessioner()
 		So(err, ShouldBeNil)
 		c.Use(sessioner)
@@ -68,7 +67,7 @@ func Test_Sessioner(t *testing.T) {
 
 func testProvider(opt Options) {
 	Convey("Basic operation", func() {
-		c := chi.NewRouter()
+		c := newTestRouter()
 		sessioner, err := Sessioner(opt)
 		So(err, ShouldBeNil)
 		c.Use(sessioner)
@@ -140,7 +139,7 @@ func testProvider(opt Options) {
 	})
 
 	Convey("Regenrate empty session", func() {
-		c := chi.NewRouter()
+		c := newTestRouter()
 		sessioner, err := Sessioner(opt)
 		So(err, ShouldBeNil)
 		c.Use(sessioner)
@@ -159,7 +158,7 @@ func testProvider(opt Options) {
 	})
 
 	Convey("GC session", func() {
-		c := chi.NewRouter()
+		c := newTestRouter()
 		opt2 := opt
 		opt2.Gclifetime = 1
 		sessioner, err := Sessioner(opt2)
@@ -191,7 +190,7 @@ func testProvider(opt Options) {
 	})
 
 	Convey("Detect invalid sid", func() {
-		c := chi.NewRouter()
+		c := newTestRouter()
 		sessioner, err := Sessioner(opt)
 		So(err, ShouldBeNil)
 		c.Use(sessioner)

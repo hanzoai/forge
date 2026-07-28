@@ -21,14 +21,13 @@ import (
 	"github.com/hanzoai/git/services/context"
 
 	"github.com/chi-middleware/proxy"
-	"github.com/go-chi/chi/v5"
 	"github.com/hanzoai/git/modules/session/chi"
 )
 
 // ProtocolMiddlewares returns HTTP protocol related middlewares, and it provides a global panic recovery
 func ProtocolMiddlewares() (handlers []any) {
 	// the order is important
-	handlers = append(handlers, ChiRoutePathHandler())   // make sure chi has correct paths
+	handlers = append(handlers, RoutePathHandler())      // route on the escaped path
 	handlers = append(handlers, RequestContextHandler()) //	prepare the context and panic recovery
 	handlers = append(handlers, SecurityHeadersHandler())
 
@@ -106,18 +105,24 @@ func RequestContextHandler() func(h http.Handler) http.Handler {
 	}
 }
 
-func ChiRoutePathHandler() func(h http.Handler) http.Handler {
-	// make sure chi uses EscapedPath(RawPath) as RoutePath, then "%2f" could be handled correctly
+// RoutePathHandler makes the mux route on the ESCAPED path.
+//
+// Without it a "%2f" inside a path parameter is decoded before routing and
+// splits the segment, so a branch called "feat/x" routes as two segments and
+// matches the wrong handler — or nothing.
+func RoutePathHandler() func(h http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
-			// Still chi: this sets the path the MUX will route on, which is the
-			// one job chi still has here. Everything that only READS the routed
-			// result now goes through web.RouteContext.
-			chiCtx := chi.RouteContext(req.Context())
+			rc := web.GetRouteContext(req.Context())
+			if rc == nil {
+				rc = web.NewRouteContext()
+				rc.RouteMethod = req.Method
+				req = web.WithRouteContext(req, rc)
+			}
 			if req.URL.RawPath == "" {
-				chiCtx.RoutePath = req.URL.EscapedPath()
+				rc.RoutePath = req.URL.EscapedPath()
 			} else {
-				chiCtx.RoutePath = req.URL.RawPath
+				rc.RoutePath = req.URL.RawPath
 			}
 			next.ServeHTTP(resp, req)
 		})

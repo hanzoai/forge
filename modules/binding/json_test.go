@@ -27,7 +27,6 @@ import (
 	"strings"
 	"testing"
 
-	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -140,7 +139,7 @@ func performJsonTest(t *testing.T, binder handlerFunc, testCase jsonTestCase) {
 	t.Run(testCase.description, func(t *testing.T) {
 		var payload io.Reader
 		httpRecorder := httptest.NewRecorder()
-		m := chi.NewRouter()
+		m := newTestRouter()
 
 		jsonTestHandler := func(actual interface{}, errs Errors) {
 			if fnName == "JSON" {

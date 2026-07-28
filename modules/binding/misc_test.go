@@ -23,7 +23,6 @@ import (
 	"strings"
 	"testing"
 
-	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,7 +57,7 @@ func Test_SetWithProperType(t *testing.T) {
 
 	for key, testCase := range testInputs {
 		httpRecorder := httptest.NewRecorder()
-		m := chi.NewRouter()
+		m := newTestRouter()
 
 		m.Post(testRoute, func(resp http.ResponseWriter, req *http.Request) {
 			var actual Everything

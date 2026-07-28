@@ -24,7 +24,6 @@ import (
 	"strings"
 	"testing"
 
-	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -182,7 +181,7 @@ func Test_Form(t *testing.T) {
 
 func performFormTest(t *testing.T, binder handlerFunc, testCase formTestCase) {
 	resp := httptest.NewRecorder()
-	m := chi.NewRouter()
+	m := newTestRouter()
 
 	formTestHandler := func(actual interface{}, errs Errors) {
 		if testCase.shouldSucceed {
@@ -301,7 +300,7 @@ type defaultForm struct {
 }
 
 func Test_Default(t *testing.T) {
-	m := chi.NewRouter()
+	m := newTestRouter()
 	m.Get("/", func(resp http.ResponseWriter, req *http.Request) {
 		var f defaultForm
 		Bind(req, &f)

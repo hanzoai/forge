@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/hanzoai/git/modules/binding"
-	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,7 +34,7 @@ type (
 
 func performValidationTest(t *testing.T, testCase validationTestCase) {
 	httpRecorder := httptest.NewRecorder()
-	m := chi.NewRouter()
+	m := newTestRouter()
 
 	m.Post(testRoute, func(resp http.ResponseWriter, req *http.Request) {
 		actual := binding.Validate(req, testCase.data)
