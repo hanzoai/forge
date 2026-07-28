@@ -222,7 +222,7 @@ require (
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hanzoai/builder v0.3.13
-	github.com/hanzoai/orm v0.6.14
+	github.com/hanzoai/orm v0.6.18
 	github.com/hanzoai/xorm v1.4.4
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
