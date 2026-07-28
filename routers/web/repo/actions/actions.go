@@ -34,7 +34,7 @@ import (
 	"github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/convert"
 
-	act_model "gitea.com/gitea/runner/act/model"
+	act_model "github.com/hanzoai/act/model"
 	"go.yaml.in/yaml/v4"
 )
 

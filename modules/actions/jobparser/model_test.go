@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.yaml.in/yaml/v4"

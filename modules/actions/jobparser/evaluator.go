@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	"gitea.com/gitea/runner/act/exprparser"
+	"github.com/hanzoai/act/exprparser"
 	"go.yaml.in/yaml/v4"
 )
 

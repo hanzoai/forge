@@ -34,7 +34,7 @@ import (
 	"github.com/hanzoai/git/services/convert"
 	secret_service "github.com/hanzoai/git/services/secrets"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 )
 
 // ListActionsSecrets list a repo's actions secrets

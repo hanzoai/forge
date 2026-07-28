@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/test"
 	web_context "github.com/hanzoai/git/services/context"
 
-	act_model "gitea.com/gitea/runner/act/model"
+	act_model "github.com/hanzoai/act/model"
 	"github.com/stretchr/testify/assert"
 )
 

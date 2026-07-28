@@ -11,7 +11,7 @@ import (
 	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/modules/actions/jobparser"
 
-	act_model "gitea.com/gitea/runner/act/model"
+	act_model "github.com/hanzoai/act/model"
 	"go.yaml.in/yaml/v4"
 )
 

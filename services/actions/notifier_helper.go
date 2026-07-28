@@ -30,7 +30,7 @@ import (
 	webhook_module "github.com/hanzoai/git/modules/webhook"
 	"github.com/hanzoai/git/services/convert"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 )
 
 type methodCtxKeyType struct{}

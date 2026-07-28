@@ -22,7 +22,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 	webhook_module "github.com/hanzoai/git/modules/webhook"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 	"go.yaml.in/yaml/v4"
 )
 

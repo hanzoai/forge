@@ -19,7 +19,7 @@ import (
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/util"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 	"go.yaml.in/yaml/v4"
 )
 

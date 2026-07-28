@@ -41,7 +41,7 @@ import (
 	asymkey_service "github.com/hanzoai/git/services/asymkey"
 	"github.com/hanzoai/git/services/gitdiff"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 )
 
 // ToEmail convert models.EmailAddress to api.Email

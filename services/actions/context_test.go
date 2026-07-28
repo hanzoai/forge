@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/json"
 	api "github.com/hanzoai/git/modules/structs"
 
-	act_model "gitea.com/gitea/runner/act/model"
+	act_model "github.com/hanzoai/act/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

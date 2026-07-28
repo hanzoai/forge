@@ -5,7 +5,6 @@ go 1.26.5
 require (
 	codeberg.org/gusted/mcaptcha v0.0.0-20220723083913-4f3072e1d570
 	connectrpc.com/connect v1.20.0
-	gitea.com/gitea/runner v1.0.8
 	gitea.dev/sdk v1.2.0
 	github.com/42wim/httpsig v1.2.4
 	github.com/42wim/sshsig v0.0.0-20260317195500-b9f38cf0d432
@@ -58,6 +57,7 @@ require (
 	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/sessions v1.4.0
 	github.com/hanzo-git/actions-proto-go v0.6.1
+	github.com/hanzoai/act v1.0.0
 	github.com/hanzoai/s3-go v1.0.0
 	github.com/hanzoai/sqlite v0.3.2
 	github.com/hanzokv/go/v9 v9.22.0
@@ -72,7 +72,7 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/luxfi/zapdb v1.10.3
 	github.com/markbates/goth v1.82.0
-	github.com/mattn/go-isatty v0.0.22
+	github.com/mattn/go-isatty v0.0.24
 	github.com/meilisearch/meilisearch-go v0.36.3
 	github.com/mholt/archives v0.1.5
 	github.com/microcosm-cc/bluemonday v1.0.27
@@ -134,6 +134,7 @@ require (
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/smartystreets/assertions v0.0.0-20190116191733-b6c0e53d7304 // indirect
+	github.com/stretchr/objx v0.5.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/metric v1.44.0 // indirect

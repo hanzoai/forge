@@ -22,7 +22,7 @@ import (
 	"github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/convert"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 	"go.yaml.in/yaml/v4"
 )
 

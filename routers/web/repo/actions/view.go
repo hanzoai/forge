@@ -43,7 +43,7 @@ import (
 	actions_service "github.com/hanzoai/git/services/actions"
 	context_module "github.com/hanzoai/git/services/context"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 )
 
 func findCurrentJobByPathParam(ctx *context_module.Context, jobs []*actions_model.ActionRunJob) (job *actions_model.ActionRunJob, hasPathParam bool) {

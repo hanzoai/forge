@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/util"
 
-	act_model "gitea.com/gitea/runner/act/model"
+	act_model "github.com/hanzoai/act/model"
 	"go.yaml.in/yaml/v4"
 )
 

@@ -22,7 +22,7 @@ import (
 	api "github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/util"
 
-	"gitea.com/gitea/runner/act/model"
+	"github.com/hanzoai/act/model"
 )
 
 type GitContext map[string]any
