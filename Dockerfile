@@ -95,7 +95,7 @@ COPY --from=build-env /tmp/local /
 COPY --from=build-env /go/src/hanzo-git/gitd /app/git/gitd
 
 ENV USER=git
-ENV GIT_CUSTOM=/data/gitea
+ENV GIT_CUSTOM=/data/git
 
 VOLUME ["/data"]
 
