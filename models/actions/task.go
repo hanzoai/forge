@@ -233,6 +233,22 @@ func makeTaskStepDisplayName(step *jobparser.Step, limit int) (name string) {
 // another runner won the optimistic-lock race; it is never returned to callers.
 var errJobAlreadyClaimed = errors.New("job already claimed by another runner")
 
+// errJobUnparsable is a sentinel used inside claimJobForRunner to signal that a
+// job's stored WorkflowPayload cannot be parsed.
+//
+// This is PERMANENT for that job and harmless to every other one. The payload is
+// a snapshot taken when the run was created and is never rewritten, so retrying
+// can only fail identically. Before this was separated out, the parse error was
+// returned as an ordinary error: it aborted the whole FetchTask request with a
+// 500, left the job Waiting, and the next poll picked the same job again — so a
+// single malformed workflow denied work to EVERY runner on the instance. One
+// repository with three invalid workflow files held the entire forge down for 29
+// hours that way.
+//
+// A job that cannot be parsed must fail on its own run, where its author can see
+// it, and the scheduler must move on to the next candidate.
+var errJobUnparsable = errors.New("job workflow payload cannot be parsed")
+
 // pickTaskBatchSize bounds how many waiting jobs each CreateTaskForRunner query loads,
 // so a large backlog is not fetched into memory on every runner poll.
 // It is a var only so tests can shrink it to exercise pagination cheaply.
@@ -285,6 +301,12 @@ func CreateTaskForRunner(ctx context.Context, runner *ActionRunner) (*ActionTask
 				continue
 			}
 			task, ok, err := claimJobForRunner(ctx, runner, v)
+			if errors.Is(err, errJobUnparsable) {
+				// One repository's malformed workflow must never deny work to
+				// every runner. Fail that job and keep scanning.
+				failUnparsableJob(ctx, v, err)
+				continue
+			}
 			if err != nil {
 				return nil, false, err
 			}
@@ -336,7 +358,10 @@ func claimJobForRunner(ctx context.Context, runner *ActionRunner, job *ActionRun
 
 		workflowJob, err := job.ParseJob()
 		if err != nil {
-			return fmt.Errorf("load job %d: %w", job.ID, err)
+			// Not an infrastructure failure: this job's payload is unusable and
+			// always will be. Signal the outer loop, which fails this job and
+			// continues, rather than failing the runner's whole request.
+			return fmt.Errorf("%w: %w", errJobUnparsable, err)
 		}
 
 		if _, err := e.Insert(task); err != nil {
@@ -388,6 +413,23 @@ func claimJobForRunner(ctx context.Context, runner *ActionRunner, job *ActionRun
 		return nil, false, err
 	}
 	return resultTask, true, nil
+}
+
+// failUnparsableJob marks a job whose payload cannot be parsed as failed, so it
+// leaves the waiting queue instead of being re-picked forever, and its run shows
+// the reason. Best-effort: if this write fails the scheduler still moves on, and
+// the job is simply retried on a later poll rather than wedging the instance.
+func failUnparsableJob(ctx context.Context, job *ActionRunJob, cause error) {
+	log.Error("actions: job %d has an unparsable workflow payload, failing it: %v", job.ID, cause)
+
+	job.Status = StatusFailure
+	job.Stopped = timeutil.TimeStampNow()
+	if _, err := UpdateRunJob(ctx, job, builder.And(
+		builder.Eq{"task_id": 0},
+		builder.Eq{"status": StatusWaiting},
+	), "status", "stopped"); err != nil {
+		log.Error("actions: failed to mark job %d failed: %v", job.ID, err)
+	}
 }
 
 // ReleaseTaskForRunner reverts a freshly-claimed but undelivered task: it deletes

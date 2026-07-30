@@ -443,3 +443,89 @@ func TestCreateTaskForRunnerPagination(t *testing.T) {
 	assert.Equal(t, StatusRunning, claimed.Status)
 	assert.Equal(t, task.ID, claimed.TaskID)
 }
+
+// A job whose stored workflow cannot be parsed must fail ITSELF and leave every
+// other job runnable.
+//
+// Before job-level isolation the parse error was returned as an ordinary error
+// from CreateTaskForRunner: the runner's whole FetchTask failed with a 500, the
+// bad job stayed Waiting, and the next poll picked it again. One repository with
+// three malformed workflow files held every runner on the instance idle for 29
+// hours — with a healthy backlog of 465 parseable jobs sitting behind it.
+//
+// The bad job is deliberately OLDER than the good one, so the scheduler is
+// guaranteed to reach it first: this fails if the fix is only "the good job
+// happens to be picked".
+func TestCreateTaskForRunnerSkipsUnparsableJob(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	run := &ActionRun{
+		Title:         "unparsable-test-run",
+		RepoID:        1,
+		OwnerID:       2,
+		WorkflowID:    "test.yaml",
+		Index:         9904,
+		TriggerUserID: 2,
+		Ref:           "refs/heads/main",
+		CommitSHA:     "c2d72f548424103f01ee1dc02889c1e2bff816b0",
+		Event:         "push",
+		TriggerEvent:  "push",
+		Status:        StatusWaiting,
+	}
+	require.NoError(t, db.Insert(t.Context(), run))
+
+	// Invalid YAML — the shape that jammed the instance: a mapping that never
+	// closes, so the parser fails rather than producing a workflow.
+	bad := &ActionRunJob{
+		RunID:           run.ID,
+		RepoID:          run.RepoID,
+		OwnerID:         run.OwnerID,
+		CommitSHA:       run.CommitSHA,
+		Name:            "unparsable-job",
+		Attempt:         1,
+		JobID:           "unparsable-job",
+		Status:          StatusWaiting,
+		RunsOn:          []string{"ubuntu-latest"},
+		WorkflowPayload: []byte("on: push\njobs:\n  unparsable-job:\n    runs-on: ubuntu-latest\n   steps:\n  -  - broken: [unclosed\n"),
+	}
+	require.NoError(t, db.Insert(t.Context(), bad))
+
+	good := &ActionRunJob{
+		RunID:           run.ID,
+		RepoID:          run.RepoID,
+		OwnerID:         run.OwnerID,
+		CommitSHA:       run.CommitSHA,
+		Name:            "healthy-job",
+		Attempt:         1,
+		JobID:           "healthy-job",
+		Status:          StatusWaiting,
+		RunsOn:          []string{"ubuntu-latest"},
+		WorkflowPayload: []byte("on: push\njobs:\n  healthy-job:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo hi\n"),
+	}
+	require.NoError(t, db.Insert(t.Context(), good))
+
+	// The bad job must be the older candidate, so it is scanned first.
+	_, err := db.GetEngine(t.Context()).ID(bad.ID).Cols("updated").
+		Update(&ActionRunJob{Updated: good.Updated - 60})
+	require.NoError(t, err)
+
+	runner := &ActionRunner{
+		UUID:        "unparsable-runner-uuid",
+		Name:        "unparsable-runner",
+		AgentLabels: []string{"ubuntu-latest"},
+	}
+	runner.GenerateAndFillToken()
+	require.NoError(t, db.Insert(t.Context(), runner))
+
+	task, ok, err := CreateTaskForRunner(t.Context(), runner)
+	require.NoError(t, err, "a malformed workflow must not fail the runner's request")
+	require.True(t, ok, "the healthy job must still be handed out")
+	require.NotNil(t, task)
+	require.Equal(t, good.ID, task.JobID, "the scheduler must skip the bad job and claim the good one")
+
+	// And the bad job must not sit in the queue being re-picked forever.
+	reloaded, err := GetRunJobByRunAndID(t.Context(), run.ID, bad.ID)
+	require.NoError(t, err)
+	require.Equal(t, StatusFailure, reloaded.Status,
+		"an unparsable job must fail on its own run, where its author can see it")
+}
