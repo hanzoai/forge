@@ -47,3 +47,64 @@ jobs:
             echo "::error::main DIVERGED between GitHub ($REMOTE) and canonical ($LOCAL) — refusing to force. Reconcile manually."
             exit 1
           fi
+
+      # Tags were not synced, only main. cicd.yml triggers a release build on
+      # `tags: ['v*']`, and that tag is created on GitHub — so it never arrived
+      # here, the trigger never fired, and no semver image was ever built. The
+      # forge sat at v1.26.24 while GitHub had v1.26.26: tagged, and not built.
+      # A version number that names no artifact is worse than no tag, because it
+      # reads as a release.
+      #
+      # Tags are immutable, so "fast-forward only" means: a tag we do not have is
+      # pushed, and a tag we do have that points somewhere else is a rewritten
+      # release — which must be loud, never silently adopted or silently ignored.
+      - name: Sync tags from github.com/hanzoai/git
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -euo pipefail
+
+          # Each side is fetched into its own namespace rather than over
+          # refs/tags/*. Two reasons, both of which broke a draft of this:
+          #
+          #   * A plain `fetch --tags` refuses to move a tag that already exists
+          #     locally and fails the step — turning the very case this step must
+          #     REPORT into a fetch error.
+          #
+          #   * `git fetch` auto-follows tags that point at fetched objects even
+          #     when given an explicit refspec, so refs/tags/ picks up GitHub's
+          #     tags as a side effect. Comparing against refs/tags/ then finds the
+          #     tag we just followed, calls a genuinely new tag unchanged, and
+          #     never pushes it — the exact failure this step exists to fix,
+          #     silently reintroduced. --no-tags turns that off, and reading the
+          #     canonical side from its own namespace means the comparison does
+          #     not depend on what checkout happened to leave behind either.
+          git fetch --quiet --prune --no-tags "https://x-access-token:${GH_PAT}@github.com/hanzoai/git.git" \
+            '+refs/tags/*:refs/gh-tags/*'
+          git fetch --quiet --prune --no-tags origin \
+            '+refs/tags/*:refs/canon-tags/*'
+
+          new=0 conflict=0
+          for ref in $(git for-each-ref --format='%(refname)' refs/gh-tags/); do
+            tag="${ref#refs/gh-tags/}"
+            # Compared unpeeled: for an annotated tag this is the tag object on
+            # both sides, so a tag is equal to itself and only a genuine rewrite
+            # differs.
+            theirs="$(git rev-parse "$ref")"
+            mine="$(git rev-parse -q --verify "refs/canon-tags/${tag}" || true)"
+
+            if [ -z "$mine" ]; then
+              echo "new tag ${tag} -> ${theirs}"
+              git push origin "${ref}:refs/tags/${tag}"
+              new=$((new+1))
+            elif [ "$mine" != "$theirs" ]; then
+              echo "::error::tag ${tag} is ${mine} here and ${theirs} on GitHub — a released tag was rewritten. Refusing to move it."
+              conflict=$((conflict+1))
+            fi
+          done
+
+          echo "${new} tag(s) pushed"
+          if [ "$conflict" -ne 0 ]; then
+            echo "::error::${conflict} tag(s) disagree between GitHub and canonical — reconcile manually."
+            exit 1
+          fi
