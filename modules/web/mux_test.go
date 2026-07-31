@@ -116,3 +116,40 @@ func TestMuxHeadFallsBackToGet(t *testing.T) {
 	m.ServeHTTP(resp, req)
 	assert.Equal(t, "get", resp.Header().Get("X-Hit"))
 }
+
+// A route constraint may contain "/", and splitting the pattern on every "/"
+// cuts it in half. This is the real registration from routers/web/githttp.go;
+// before splitPattern it made compileSegment panic at startup, so the forge
+// never opened a listener and git.hanzo.ai served 503.
+func TestMuxPatternConstraintContainingSlash(t *testing.T) {
+	m := NewMux()
+	m.Method("GET", "/objects/info/{file:[^/]*}", http.HandlerFunc(func(resp http.ResponseWriter, _ *http.Request) {
+		resp.WriteHeader(http.StatusTeapot)
+	}))
+
+	// The constraint must survive as ONE segment, not "{file:[^" + "]*}".
+	assert.Equal(t, []string{"objects", "info", "{file:[^/]*}"}, splitPattern("/objects/info/{file:[^/]*}"))
+
+	resp := httptest.NewRecorder()
+	m.ServeHTTP(resp, httptest.NewRequest("GET", "/objects/info/packs", nil))
+	assert.Equal(t, http.StatusTeapot, resp.Code)
+
+	// [^/]* must still refuse to span a separator.
+	resp = httptest.NewRecorder()
+	m.ServeHTTP(resp, httptest.NewRequest("GET", "/objects/info/a/b", nil))
+	assert.NotEqual(t, http.StatusTeapot, resp.Code)
+}
+
+// A constraint may nest one level of braces, so the split tracks depth rather
+// than a boolean "inside a brace" flag.
+func TestSplitPatternNestedBraces(t *testing.T) {
+	assert.Equal(t, []string{"a", "{n:[0-9]{2}}", "b"}, splitPattern("/a/{n:[0-9]{2}}/b"))
+	assert.Equal(t, []string{"repo", "{name}"}, splitPattern("/repo/{name}"))
+	assert.Nil(t, splitPattern("/"))
+}
+
+// splitPath stays brace-blind: in a REQUEST path "{" is an ordinary character
+// and "/" always separates, so it must NOT inherit splitPattern's behaviour.
+func TestSplitPathIsNotPatternAware(t *testing.T) {
+	assert.Equal(t, []string{"objects", "info", "{file:[^", "]*}"}, splitPath("/objects/info/{file:[^/]*}"))
+}

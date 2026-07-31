@@ -110,7 +110,7 @@ func (m *Mux) Mount(pattern string, h http.Handler) {
 // addRoute walks the tree to the node for pattern, creating it as needed.
 func (m *Mux) addRoute(pattern string) *muxNode {
 	cur := m.root
-	for _, seg := range splitPath(pattern) {
+	for _, seg := range splitPattern(pattern) {
 		switch {
 		case seg == "*":
 			if cur.wildcard == nil {
@@ -184,6 +184,48 @@ func splitPath(p string) []string {
 		return nil
 	}
 	return strings.Split(p, "/")
+}
+
+// splitPattern splits a route PATTERN into segments. It is deliberately not
+// splitPath: a segment may carry a regexp constraint that itself contains "/",
+// and splitting on every "/" cuts the constraint in half. The live example is
+// routers/web/githttp.go
+//
+//	m.Methods("GET,OPTIONS", "/objects/info/{file:[^/]*}", ...)
+//
+// which splitPath turns into "{file:[^" + "]*}". compileSegment then finds no
+// parameter in the fragment and panics — at registration, so the process dies
+// before it serves anything and the whole forge is down. splitPath must stay
+// brace-blind for REQUEST paths, where "{" is an ordinary character and "/" is
+// always a separator; only patterns get this treatment.
+//
+// Depth, not a boolean: a constraint may nest one level, as in {n:[0-9]{2}}.
+func splitPattern(p string) []string {
+	p = strings.Trim(p, "/")
+	if p == "" {
+		return nil
+	}
+	var (
+		segs  []string
+		depth int
+		start int
+	)
+	for i := range len(p) {
+		switch p[i] {
+		case '{':
+			depth++
+		case '}':
+			if depth > 0 {
+				depth--
+			}
+		case '/':
+			if depth == 0 {
+				segs = append(segs, p[start:i])
+				start = i + 1
+			}
+		}
+	}
+	return append(segs, p[start:])
 }
 
 // ServeHTTP routes the request.
