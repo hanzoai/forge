@@ -13,7 +13,6 @@ import (
 	"github.com/hanzoai/git/modules/process"
 
 	"github.com/hanzokv/go/v9"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 var manager *Manager
@@ -24,8 +23,7 @@ type Manager struct {
 	finished process.FinishedFunc
 	mutex    sync.Mutex
 
-	KVConnections      map[string]*kvClientHolder
-	LevelDBConnections map[string]*levelDBHolder
+	KVConnections map[string]*kvClientHolder
 }
 
 type kvClientHolder struct {
@@ -38,12 +36,6 @@ func (r *kvClientHolder) Close() error {
 	return manager.CloseKVClient(r.name[0])
 }
 
-type levelDBHolder struct {
-	name  []string
-	count int64
-	db    *leveldb.DB
-}
-
 func init() {
 	_ = GetManager()
 }
@@ -53,10 +45,9 @@ func GetManager() *Manager {
 	if manager == nil {
 		ctx, _, finished := process.GetManager().AddTypedContext(context.Background(), "Service: NoSQL", process.SystemProcessType, false)
 		manager = &Manager{
-			ctx:                ctx,
-			finished:           finished,
-			KVConnections:      make(map[string]*kvClientHolder),
-			LevelDBConnections: make(map[string]*levelDBHolder),
+			ctx:           ctx,
+			finished:      finished,
+			KVConnections: make(map[string]*kvClientHolder),
 		}
 	}
 	return manager
