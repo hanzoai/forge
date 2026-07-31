@@ -19,6 +19,7 @@ func initActionsTasks() {
 	registerStopZombieTasks()
 	registerStopEndlessTasks()
 	registerCancelAbandonedJobs()
+	registerFailUnsatisfiableJobs()
 	registerScheduleTasks()
 	registerActionsCleanup()
 }
@@ -50,6 +51,19 @@ func registerCancelAbandonedJobs() {
 		Schedule:   "@every 6h",
 	}, func(ctx context.Context, _ *user_model.User, cfg Config) error {
 		return actions_service.CancelAbandonedJobs(ctx)
+	})
+}
+
+// registerFailUnsatisfiableJobs sweeps often, because the jobs it fails are ones
+// no amount of waiting can help, and every one of them sits in the queue that
+// real work is scheduled from.
+func registerFailUnsatisfiableJobs() {
+	RegisterTaskFatal("fail_unsatisfiable_jobs", &BaseConfig{
+		Enabled:    true,
+		RunAtStart: true,
+		Schedule:   "@every 5m",
+	}, func(ctx context.Context, _ *user_model.User, cfg Config) error {
+		return actions_service.FailUnsatisfiableJobs(ctx)
 	})
 }
 

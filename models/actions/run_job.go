@@ -677,6 +677,35 @@ func CancelJobs(ctx context.Context, jobs []*ActionRunJob) ([]*ActionRunJob, err
 	return cancelledJobs, nil
 }
 
+// FailWaitingJobs marks jobs that are still waiting, and that no runner has
+// picked, as failed. It returns the jobs it actually changed.
+//
+// The update is conditioned on the row still being (task_id = 0, waiting), so a
+// runner claiming the job at the same moment simply wins: the condition matches
+// nothing, the job is left running, and it is absent from the returned slice. A
+// caller must therefore treat the result as the authority on what changed rather
+// than assuming every job it passed in was failed.
+func FailWaitingJobs(ctx context.Context, jobs []*ActionRunJob) ([]*ActionRunJob, error) {
+	failed := make([]*ActionRunJob, 0, len(jobs))
+
+	for _, job := range jobs {
+		job.Status = StatusFailure
+		job.Stopped = timeutil.TimeStampNow()
+
+		n, err := UpdateRunJob(ctx, job, builder.Eq{
+			"task_id": 0,
+			"status":  StatusWaiting,
+		}, "status", "stopped")
+		if err != nil {
+			return failed, err
+		}
+		if n == 1 {
+			failed = append(failed, job)
+		}
+	}
+	return failed, nil
+}
+
 // cancelOneJob cancels a single job and returns the post-cancel row
 func cancelOneJob(ctx context.Context, job *ActionRunJob) (*ActionRunJob, error) {
 	if job.Status.IsDone() {

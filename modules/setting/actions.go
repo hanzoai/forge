@@ -30,10 +30,16 @@ var (
 		ZombieTaskTimeout     time.Duration     `ini:"ZOMBIE_TASK_TIMEOUT"`
 		EndlessTaskTimeout    time.Duration     `ini:"ENDLESS_TASK_TIMEOUT"`
 		AbandonedJobTimeout   time.Duration     `ini:"ABANDONED_JOB_TIMEOUT"`
-		SkipWorkflowStrings   []string          `ini:"SKIP_WORKFLOW_STRINGS"`
-		WorkflowDirs          []string          `ini:"WORKFLOW_DIRS"`
-		ScopedWorkflowDirs    []string          `ini:"SCOPED_WORKFLOW_DIRS"`
-		MaxRerunAttempts      int64             `ini:"MAX_RERUN_ATTEMPTS"`
+		// UnsatisfiableJobGrace is how long a waiting job is given to find a runner
+		// carrying its labels before it is failed as unroutable. It only has to cover
+		// the window where a job is created before its runner has registered, such as
+		// during a fleet rollout — it is not a queueing allowance, since a job whose
+		// labels nothing carries is no more satisfiable an hour later.
+		UnsatisfiableJobGrace time.Duration `ini:"UNSATISFIABLE_JOB_GRACE"`
+		SkipWorkflowStrings   []string      `ini:"SKIP_WORKFLOW_STRINGS"`
+		WorkflowDirs          []string      `ini:"WORKFLOW_DIRS"`
+		ScopedWorkflowDirs    []string      `ini:"SCOPED_WORKFLOW_DIRS"`
+		MaxRerunAttempts      int64         `ini:"MAX_RERUN_ATTEMPTS"`
 		// MaxConcurrentTaskPicks bounds how many runners may run the task-assignment
 		// transaction at once per Gitea instance, to avoid a thundering herd when many
 		// runners poll together. It is a per-process limit, not a cluster-wide one.
@@ -131,6 +137,7 @@ func loadActionsFrom(rootCfg ConfigProvider) error {
 	Actions.ZombieTaskTimeout = sec.Key("ZOMBIE_TASK_TIMEOUT").MustDuration(10 * time.Minute)
 	Actions.EndlessTaskTimeout = sec.Key("ENDLESS_TASK_TIMEOUT").MustDuration(3 * time.Hour)
 	Actions.AbandonedJobTimeout = sec.Key("ABANDONED_JOB_TIMEOUT").MustDuration(24 * time.Hour)
+	Actions.UnsatisfiableJobGrace = sec.Key("UNSATISFIABLE_JOB_GRACE").MustDuration(15 * time.Minute)
 
 	if Actions.MaxRerunAttempts <= 0 {
 		Actions.MaxRerunAttempts = defaultMaxRerunAttempts

@@ -191,3 +191,92 @@ func CancelAbandonedJobs(ctx context.Context) error {
 
 	return nil
 }
+
+// FailUnsatisfiableJobs fails waiting jobs whose `runs-on` labels are carried by
+// no runner registered for their repository.
+//
+// CancelAbandonedJobs above already sweeps the waiting queue, but it decides by
+// elapsed time: a job is cancelled once it has gone unpicked for
+// ABANDONED_JOB_TIMEOUT, which is a day by default and is checked every six
+// hours. That is the right rule for a job nothing has got round to yet, and the
+// wrong one for a job nothing can ever run. Whether a runner exists that carries
+// `macos-13` is knowable the moment the job is created and does not become more
+// true by waiting thirty hours to ask.
+//
+// Left to time alone, such jobs accumulate. A repository whose workflow named a
+// matrix of platforms we own no runners for leaked two permanently-unclaimable
+// jobs per push; they built up across a day, and a release build queued behind
+// them. They also lie: a workflow that names a label nobody carries looks like it
+// is about to run, right up until it is quietly cancelled a day later.
+//
+// So the rule is that a job which no registered runner can match FAILS, promptly
+// and on its own run, where whoever wrote the label can see it. Registration is
+// what is checked, not liveness — an offline runner is coming back, and its jobs
+// must keep waiting for it. Only a label that nothing on the instance claims at
+// all is unsatisfiable.
+//
+// The grace period covers the ordinary window where a job is created before the
+// runner meant to serve it has registered, such as during a fleet rollout.
+func FailUnsatisfiableJobs(ctx context.Context) error {
+	jobs, err := db.Find[actions_model.ActionRunJob](ctx, actions_model.FindRunJobOptions{
+		Statuses:      []actions_model.Status{actions_model.StatusWaiting},
+		UpdatedBefore: timeutil.TimeStampNow().AddDuration(-setting.Actions.UnsatisfiableJobGrace),
+	})
+	if err != nil {
+		log.Warn("find unsatisfiable jobs: %v", err)
+		return err
+	}
+
+	// Many waiting jobs usually belong to few repositories, so the runner set is
+	// resolved once per repository rather than once per job.
+	runnersByRepo := make(map[int64][]*actions_model.ActionRunner)
+	var doomed []*actions_model.ActionRunJob
+
+	for _, job := range jobs {
+		runners, ok := runnersByRepo[job.RepoID]
+		if !ok {
+			runners, err = db.Find[actions_model.ActionRunner](ctx, actions_model.FindRunnerOptions{
+				RepoID:        job.RepoID,
+				WithAvailable: true, // repo runners, plus the owner's, plus global
+			})
+			if err != nil {
+				log.Warn("find runners for repo %d: %v", job.RepoID, err)
+				continue
+			}
+			runnersByRepo[job.RepoID] = runners
+		}
+
+		// A job with no labels at all is not unsatisfiable, it is unrouted, and
+		// that is a different fault; leave it to the abandoned sweep.
+		if len(job.RunsOn) == 0 {
+			continue
+		}
+
+		satisfiable := false
+		for _, runner := range runners {
+			if runner.CanMatchLabels(job.RunsOn) {
+				satisfiable = true
+				break
+			}
+		}
+		if !satisfiable {
+			log.Error("actions: job %d in repo %d wants runs-on %v, which no registered runner carries; failing it",
+				job.ID, job.RepoID, job.RunsOn)
+			doomed = append(doomed, job)
+		}
+	}
+
+	if len(doomed) == 0 {
+		return nil
+	}
+
+	updatedJobs, err := actions_model.FailWaitingJobs(ctx, doomed)
+	if err != nil {
+		log.Warn("fail unsatisfiable jobs: %v", err)
+	}
+
+	NotifyWorkflowJobsAndRunsStatusUpdate(ctx, updatedJobs)
+	EmitJobsIfReadyByJobs(updatedJobs)
+
+	return nil
+}
