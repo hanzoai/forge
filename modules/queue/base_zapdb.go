@@ -7,10 +7,12 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"sync"
 
-	"github.com/luxfi/zapdb"
+	"github.com/luxfi/database"
+	"github.com/luxfi/database/zapdb"
 )
 
 // baseZapDB is the durable queue backend: an embedded FIFO on ZapDB.
@@ -21,18 +23,35 @@ import (
 // already runs (kms, cloud, mpc). leveldb was a second embedded engine doing
 // the same job, reached through a third-party FIFO wrapper.
 //
+// It talks to ZapDB through github.com/luxfi/database rather than importing
+// github.com/luxfi/zapdb directly. That is not ceremony: holding a *zapdb.DB
+// pins this queue to one engine, and two engines able to open one directory is
+// precisely what took git.hanzo.ai down — each engine's recovery deletes the
+// files the other's manifest does not list, so goleveldb ate ZapDB's tables and
+// the forge died at boot on a dangling manifest. One interface, one engine
+// chosen in one place, and swapping it is a change here and nowhere else.
+//
 // Layout, all under one prefix per queue so RemoveAll is a single DropPrefix:
 //
 //	<name>/i/<be-uint64>  -> item payload   (ordered: iteration IS FIFO order)
 //	<name>/u/<payload>    -> {}             (unique index, only when unique)
 //
-// Ordering comes from a ZapDB sequence rather than a counter in memory, so
+// Ordering comes from a persisted sequence rather than a counter in memory, so
 // restarting mid-queue does not hand out an index that is already on disk and
 // silently overwrite an unread item.
 type baseZapDB struct {
-	db     *zapdb.DB
-	dir    string
-	seq    *zapdb.Sequence
+	db  database.Database
+	dir string
+
+	// The three capabilities this queue needs beyond plain key/value. They are
+	// optional interfaces, so they are asserted ONCE at open: a backend that
+	// cannot provide them fails to construct the queue, instead of failing the
+	// first time an item is pushed.
+	txn     database.Transactional
+	seqr    database.Sequencer
+	dropper database.PrefixDropper
+
+	seq    database.Sequence
 	cfg    *BaseConfig
 	unique bool
 
@@ -58,20 +77,21 @@ var (
 )
 
 type sharedZapDB struct {
-	db   *zapdb.DB
+	db   database.Database
 	refs int
 }
 
-func openSharedZapDB(dir string) (*zapdb.DB, error) {
+func openSharedZapDB(dir string) (database.Database, error) {
 	sharedMu.Lock()
 	defer sharedMu.Unlock()
 	if sh := sharedDB[dir]; sh != nil {
 		sh.refs++
 		return sh.db, nil
 	}
-	opts := zapdb.DefaultOptions(dir)
-	opts.Logger = nil // the queue logs its own lifecycle; ZapDB's is noise here
-	db, err := zapdb.Open(opts)
+	// nil config selects the backend's defaults and silences its logger — the
+	// queue logs its own lifecycle and ZapDB's is noise here. nil metrics is
+	// accepted; the backend does not register any.
+	db, err := zapdb.New(dir, nil, "queue", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -106,12 +126,31 @@ func newBaseZapDBGeneric(cfg *BaseConfig, unique bool) (baseQueue, error) {
 	if err != nil {
 		return nil, err
 	}
-	seq, err := db.GetSequence([]byte(cfg.QueueFullName+"/seq"), 100)
+
+	q := &baseZapDB{db: db, dir: dir, cfg: cfg, unique: unique}
+	// Assert every optional capability up front, and name the missing one: a
+	// bare "type assertion failed" here would be read as a bug in this file
+	// rather than as "the configured backend cannot back a durable queue".
+	var ok bool
+	if q.txn, ok = db.(database.Transactional); !ok {
+		_ = closeSharedZapDB(dir)
+		return nil, fmt.Errorf("queue: backend %T is not database.Transactional; a queue needs atomic read-then-delete", db)
+	}
+	if q.seqr, ok = db.(database.Sequencer); !ok {
+		_ = closeSharedZapDB(dir)
+		return nil, fmt.Errorf("queue: backend %T is not database.Sequencer; a queue needs crash-safe ordering", db)
+	}
+	if q.dropper, ok = db.(database.PrefixDropper); !ok {
+		_ = closeSharedZapDB(dir)
+		return nil, fmt.Errorf("queue: backend %T is not database.PrefixDropper; RemoveAll needs it", db)
+	}
+
+	q.seq, err = q.seqr.GetSequence([]byte(cfg.QueueFullName+"/seq"), 100)
 	if err != nil {
 		_ = closeSharedZapDB(dir)
 		return nil, err
 	}
-	return &baseZapDB{db: db, dir: dir, seq: seq, cfg: cfg, unique: unique}, nil
+	return q, nil
 }
 
 func newBaseZapDBSimple(cfg *BaseConfig) (baseQueue, error) {
@@ -153,12 +192,12 @@ func (q *baseZapDB) PushItem(ctx context.Context, data []byte) error {
 	if err != nil {
 		return err
 	}
-	return q.db.Update(func(txn *zapdb.Txn) error {
-		if err := txn.Set(q.itemKey(idx), data); err != nil {
+	return q.txn.Update(func(txn database.Txn) error {
+		if err := txn.Put(q.itemKey(idx), data); err != nil {
 			return err
 		}
 		if q.unique {
-			return txn.Set(q.uniqueKey(data), []byte{})
+			return txn.Put(q.uniqueKey(data), []byte{})
 		}
 		return nil
 	})
@@ -175,22 +214,30 @@ func (q *baseZapDB) PopItem(ctx context.Context) ([]byte, error) {
 			q.mu.Lock()
 			defer q.mu.Unlock()
 
-			err = q.db.Update(func(txn *zapdb.Txn) error {
-				opts := zapdb.DefaultIteratorOptions
-				opts.Prefix = q.itemPrefix()
-				it := txn.NewIterator(opts)
-				defer it.Close()
+			err = q.txn.Update(func(txn database.Txn) error {
+				it := txn.NewIteratorWithPrefix(q.itemPrefix())
 
-				it.Rewind()
-				if !it.ValidForPrefix(q.itemPrefix()) {
+				var key, val []byte
+				if it.Next() {
+					// Key/Value are only valid until Release, and the docs make no
+					// promise about the buffers outliving the iterator — copy both
+					// before releasing rather than aliasing into it.
+					key = append([]byte(nil), it.Key()...)
+					val = append([]byte(nil), it.Value()...)
+				}
+				iterErr := it.Error()
+				// Release BEFORE mutating the range being iterated. Deleting under
+				// a live iterator is the one thing backends define least
+				// consistently, and the queue does not need to hold it.
+				it.Release()
+				if iterErr != nil {
+					return iterErr
+				}
+				if key == nil {
 					return nil // empty; reported as retry below
 				}
-				item := it.Item()
-				val, verr := item.ValueCopy(nil)
-				if verr != nil {
-					return verr
-				}
-				if derr := txn.Delete(item.KeyCopy(nil)); derr != nil {
+
+				if derr := txn.Delete(key); derr != nil {
 					return derr
 				}
 				if q.unique {
@@ -215,9 +262,9 @@ func (q *baseZapDB) HasItem(ctx context.Context, data []byte) (bool, error) {
 		return false, nil
 	}
 	found := false
-	err := q.db.View(func(txn *zapdb.Txn) error {
+	err := q.txn.View(func(txn database.Txn) error {
 		_, err := txn.Get(q.uniqueKey(data))
-		if errors.Is(err, zapdb.ErrKeyNotFound) {
+		if errors.Is(err, database.ErrNotFound) {
 			return nil
 		}
 		if err != nil {
@@ -231,22 +278,22 @@ func (q *baseZapDB) HasItem(ctx context.Context, data []byte) (bool, error) {
 
 func (q *baseZapDB) Len(ctx context.Context) (int, error) {
 	n := 0
-	err := q.db.View(func(txn *zapdb.Txn) error {
-		opts := zapdb.DefaultIteratorOptions
-		opts.Prefix = q.itemPrefix()
-		opts.PrefetchValues = false // counting keys; the payloads are not read
-		it := txn.NewIterator(opts)
-		defer it.Close()
-		for it.Rewind(); it.ValidForPrefix(q.itemPrefix()); it.Next() {
+	err := q.txn.View(func(txn database.Txn) error {
+		// Counting keys, not reading payloads. The engine-specific
+		// "don't prefetch values" hint is not part of the interface, so this
+		// trades a little read amplification for not being pinned to one engine.
+		it := txn.NewIteratorWithPrefix(q.itemPrefix())
+		defer it.Release()
+		for it.Next() {
 			n++
 		}
-		return nil
+		return it.Error()
 	})
 	return n, err
 }
 
 func (q *baseZapDB) RemoveAll(ctx context.Context) error {
-	return q.db.DropPrefix(q.itemPrefix(), q.uniquePrefix())
+	return q.dropper.DropPrefix(q.itemPrefix(), q.uniquePrefix())
 }
 
 func (q *baseZapDB) Close() error {
