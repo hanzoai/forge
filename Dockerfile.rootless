@@ -1,6 +1,10 @@
 # syntax=docker/dockerfile:1
 # Build frontend on the native platform to avoid QEMU-related issues with nodejs ecosystem
-FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26-alpine3.24 AS frontend-build
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26.5-alpine3.24 AS frontend-build
+# go.mod pins the toolchain. The golang base image sets GOTOOLCHAIN=local,
+# which turns a `go` directive newer than the image into a hard build
+# failure instead of a download.
+ENV GOTOOLCHAIN=auto
 RUN apk --no-cache add build-base git nodejs pnpm
 WORKDIR /src
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -9,7 +13,11 @@ COPY --exclude=.git/ . .
 RUN make frontend
 
 # Build backend for each target platform
-FROM docker.io/library/golang:1.26-alpine3.24 AS build-env
+FROM docker.io/library/golang:1.26.5-alpine3.24 AS build-env
+# go.mod pins the toolchain. The golang base image sets GOTOOLCHAIN=local,
+# which turns a `go` directive newer than the image into a hard build
+# failure instead of a download.
+ENV GOTOOLCHAIN=auto
 
 ARG GIT_VERSION
 ARG TAGS=""
