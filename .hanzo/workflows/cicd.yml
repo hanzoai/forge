@@ -26,5 +26,5 @@ on:
   workflow_dispatch:
 jobs:
   cicd:
-    uses: hanzoai/ci/.hanzo/workflows/build.yml@v2
+    uses: hanzoai/ci/.hanzo/workflows/build.yml@v1
     secrets: inherit
