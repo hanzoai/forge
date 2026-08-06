@@ -30,11 +30,23 @@ RUN apk --no-cache add \
     git
 
 WORKDIR ${GOPATH}/src/hanzo-git
-# Sources private hanzoai modules (xorm, builder): mark them private
-# (direct VCS fetch, no proxy/sumdb) and, when gh_token is mounted, rewrite
-# github.com to an authenticated fetch so `go mod download` can read them. No-op
-# without the token, so public-only builds still work. gh_token is the secret id
-# the canonical hanzoai/ci reusable mounts (was GIT_AUTH_TOKEN, which ci never set).
+# Exactly ONE hanzoai module in this graph is private: github.com/hanzoai/act.
+# The other seven (xorm, builder, orm, sqlite, vfs, csqlite, sqlcipher) are public
+# and resolve anonymously. GOPRIVATE marks the whole prefix so act takes a direct
+# VCS fetch past the proxy and sumdb, and the gh_token rule below makes that fetch
+# authenticated. No-op without the token, so public-only builds still work.
+# gh_token is the secret id the canonical hanzoai/ci reusable mounts (was
+# GIT_AUTH_TOKEN, which ci never set).
+#
+# act answers at github.com/hanzoai/act only through a RENAME REDIRECT: the repo
+# now lives at github.com/hanzo-inc/act and still declares `module
+# github.com/hanzoai/act`, so the module path is right and go is happy — provided
+# the fetch can see the target. GitHub serves that 301 ONLY to an identity with
+# read on hanzo-inc/act and a bare 404 to everyone else, so a build credential
+# without it dies right here on "Repository not found" — which reads as a deleted
+# or misspelled module and is neither. The fleet identity in KMS GITHUB_TOKEN
+# (hanzo-dev) holds that read; if this line ever fails again, check that ACL
+# before you touch go.mod.
 ENV GOPRIVATE=github.com/hanzoai/*
 COPY go.mod go.sum ./
 RUN --mount=type=secret,id=gh_token \
