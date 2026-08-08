@@ -11,6 +11,7 @@ import (
 
 	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/modules/container"
 	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/log"
@@ -50,14 +51,38 @@ func EmitJobsIfReadyByJobs(jobs []*actions_model.ActionRunJob) {
 	}
 }
 
+// errGone marks work whose subject no longer exists. It is returned INSTEAD of
+// a plain error so the queue handler can tell "try again" from "there is
+// nothing to try": a deleted run or repository is never coming back, and an
+// item that reports a plain error is requeued forever.
+//
+// That is not hypothetical. A repository deleted from this forge left 72
+// action_run rows behind, and their queue items failed on every pass:
+//
+//	LoadRepo: repository does not exist [id: 3113, ...]
+//	Queue "actions_ready_job" failed to handle batch of 2 items, backoff
+//
+// 572 an hour, and a failing item fails its whole BATCH — so real jobs queued
+// behind it waited, and some were declared zombies at the 10m timeout and
+// failed with every step stamped at once and no log written at all.
+var errGone = errors.New("gone")
+
 func jobEmitterQueueHandler(items ...*jobUpdate) []*jobUpdate {
 	ctx := graceful.GetManager().ShutdownContext()
 	var ret []*jobUpdate
 	for _, update := range items {
-		if err := checkJobsByRunID(ctx, update.RunID); err != nil {
-			log.Error("check run %d: %v", update.RunID, err)
-			ret = append(ret, update)
+		err := checkJobsByRunID(ctx, update.RunID)
+		if err == nil {
+			continue
 		}
+		// Dropped, not requeued: retrying cannot make a deleted run exist, and
+		// the retry is what starves the jobs sharing its batch.
+		if errors.Is(err, errGone) || repo_model.IsErrRepoNotExist(err) {
+			log.Warn("check run %d: %v — dropping, the subject is gone", update.RunID, err)
+			continue
+		}
+		log.Error("check run %d: %v", update.RunID, err)
+		ret = append(ret, update)
 	}
 	return ret
 }
@@ -65,7 +90,7 @@ func jobEmitterQueueHandler(items ...*jobUpdate) []*jobUpdate {
 func checkJobsByRunID(ctx context.Context, runID int64) error {
 	run, exist, err := db.GetByID[actions_model.ActionRun](ctx, runID)
 	if !exist {
-		return fmt.Errorf("run %d does not exist", runID)
+		return fmt.Errorf("run %d does not exist: %w", runID, errGone)
 	}
 	if err != nil {
 		return fmt.Errorf("get action run: %w", err)

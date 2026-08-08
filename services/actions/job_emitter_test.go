@@ -15,6 +15,7 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_jobStatusResolver_Resolve(t *testing.T) {
@@ -352,4 +353,24 @@ jobs:
 
 	refreshed := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: blockedJob.ID})
 	assert.Equal(t, actions_model.StatusBlocked, refreshed.Status)
+}
+
+func Test_jobEmitterQueueHandler_DropsWorkWhoseRunIsGone(t *testing.T) {
+	// A queue item for a run that no longer exists must be DROPPED, not returned.
+	// Anything the handler returns is requeued, so a deleted run would be retried
+	// forever — and because a failing item fails its whole BATCH, the real jobs
+	// sharing that batch wait behind it. On this forge that starved jobs past the
+	// 10m zombie timeout: every step stamped failed at once, no log written.
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	const goneRunID int64 = 999999
+	_, exists, err := db.GetByID[actions_model.ActionRun](t.Context(), goneRunID)
+	assert.NoError(t, err)
+	require.False(t, exists, "the fixture must not contain this run, or the test proves nothing")
+
+	requeued := jobEmitterQueueHandler(&jobUpdate{RunID: goneRunID})
+	assert.Empty(t, requeued, "a run that cannot come back must not be requeued")
+
+	// And the classification is what does it — not a blanket swallow.
+	assert.ErrorIs(t, checkJobsByRunID(t.Context(), goneRunID), errGone)
 }
