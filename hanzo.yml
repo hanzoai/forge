@@ -18,3 +18,8 @@ images:
 test:
   - name: go-test-setting
     run: go test ./modules/setting/...
+  # Scoped by -run rather than taking the whole package: this gate exists for the
+  # task context a runner reads, and the actions suite is broad enough that an
+  # unrelated failure here would read as a config regression.
+  - name: go-test-actions-context
+    run: go test ./services/actions/ -run TestGitContext
