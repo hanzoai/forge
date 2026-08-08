@@ -5,6 +5,7 @@
 package actions
 
 import (
+	"net/url"
 	"strconv"
 	"testing"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/json"
+	"github.com/hanzoai/git/modules/setting"
 	api "github.com/hanzoai/git/modules/structs"
 
 	act_model "github.com/hanzoai/act/model"
@@ -318,4 +320,29 @@ func TestFindTaskNeeds(t *testing.T) {
 	assert.Len(t, ret["job1"].Outputs, 2)
 	assert.Equal(t, "abc", ret["job1"].Outputs["output_a"])
 	assert.Equal(t, "bbb", ret["job1"].Outputs["output_b"])
+}
+
+func TestGitContextCarriesTheActionsURLUnderBothNames(t *testing.T) {
+	// A runner composes an action's clone URL as <default_actions_url>/<owner>/<repo>.
+	// Find neither name and it composes "https://" + "" + "/actions/checkout", which
+	// fails as `http: no Host in request URL` — a missing field that reads as a broken
+	// runner. act_runner reads the gitea_ spelling; ours reads git_. Both must resolve.
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	run := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: 791})
+	require.NoError(t, run.LoadAttributes(t.Context()))
+
+	gitCtx := GenerateGitContext(t.Context(), run, nil, nil)
+	want := setting.Actions.DefaultActionsURL.URL()
+	require.NotEmpty(t, want, "the setting itself must resolve to a URL")
+
+	for _, name := range []string{"gitea_default_actions_url", "git_default_actions_url"} {
+		got, ok := gitCtx[name]
+		require.Truef(t, ok, "context is missing %q; a runner reading it gets an empty host", name)
+		assert.Equalf(t, want, got, "%q must carry the resolved URL", name)
+
+		u, err := url.Parse(got.(string))
+		require.NoErrorf(t, err, "%q must parse as a URL", name)
+		assert.NotEmptyf(t, u.Host, "%q has no host — this is the https:/// failure", name)
+	}
 }

@@ -94,7 +94,16 @@ func GenerateGitContext(ctx context.Context, run *actions_model.ActionRun, attem
 		"workspace":         "",                                       // string, The default working directory on the runner for steps, and the default location of your repository when using the checkout action.
 
 		// additional contexts
-		"git_default_actions_url": setting.Actions.DefaultActionsURL.URL(),
+		//
+		// One value under two names, because two kinds of runner read it. The
+		// `gitea_` spelling is the wire field act_runner has always read; ours
+		// reads `git_`. A runner that finds neither composes "https://" + ""
+		// + "/actions/checkout" and fails on `http: no Host in request URL`,
+		// which reads as a broken runner rather than an absent field — every
+		// stock v0.6.1 host on this forge was at zero successful jobs for it.
+		// Drop `git_` once no runner reads it; the protocol name is the keeper.
+		"gitea_default_actions_url": setting.Actions.DefaultActionsURL.URL(),
+		"git_default_actions_url":   setting.Actions.DefaultActionsURL.URL(),
 	}
 
 	if job != nil {
