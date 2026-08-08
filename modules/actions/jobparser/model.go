@@ -113,19 +113,58 @@ func (j *Job) GetContinueOnError() bool {
 	return v
 }
 
+// deepCopyYamlNode copies a node AND the nodes it points at.
+//
+// yaml.Node is a struct, so assigning one copies its fields — but Content is
+// []*yaml.Node, so a plain assignment leaves both copies pointing at the SAME
+// children. The expression evaluator rewrites nodes IN PLACE
+// (evaluateScalarYamlNode ends in node.Encode(res)), so a shallow clone means
+// the first evaluation edits the original, and every later clone starts from
+// the already-evaluated value.
+//
+// That is not theoretical: with
+//
+//	strategy: {matrix: {backend: [cuda, rocm, metal]}}
+//	runs-on: ["${{ matrix.backend }}"]
+//
+// the cuda leg rewrote the shared scalar to "cuda"; the rocm and metal legs
+// then found no "${{" and returned early, so all three jobs asked for `cuda`.
+// Two thirds of every GPU matrix ran on the wrong host and failed a backend
+// preflight, while the labels and the scheduler were both correct.
+func deepCopyYamlNode(n yaml.Node) yaml.Node {
+	out := n
+	if n.Content != nil {
+		out.Content = make([]*yaml.Node, len(n.Content))
+		for i, c := range n.Content {
+			if c == nil {
+				continue
+			}
+			cc := deepCopyYamlNode(*c)
+			out.Content[i] = &cc
+		}
+	}
+	if n.Alias != nil {
+		a := deepCopyYamlNode(*n.Alias)
+		out.Alias = &a
+	}
+	return out
+}
+
 func (j *Job) Clone() *Job {
 	if j == nil {
 		return nil
 	}
 	return &Job{
-		Name:               j.Name,
-		RawNeeds:           j.RawNeeds,
-		RawRunsOn:          j.RawRunsOn,
+		Name:     j.Name,
+		RawNeeds: j.RawNeeds,
+		// Deep-copied because the parser EVALUATES these two per matrix leg and
+		// the evaluator mutates in place. The rest are read, not rewritten.
+		RawRunsOn:          deepCopyYamlNode(j.RawRunsOn),
 		Env:                j.Env,
 		If:                 j.If,
 		Steps:              j.Steps,
 		TimeoutMinutes:     j.TimeoutMinutes,
-		RawContinueOnError: j.RawContinueOnError,
+		RawContinueOnError: deepCopyYamlNode(j.RawContinueOnError),
 		Services:           j.Services,
 		Strategy:           j.Strategy,
 		RawContainer:       j.RawContainer,
