@@ -22,4 +22,4 @@ test:
   # task context a runner reads, and the actions suite is broad enough that an
   # unrelated failure here would read as a config regression.
   - name: go-test-actions-context
-    run: go test ./services/actions/ -run TestGitContext
+    run: go test ./services/actions/ -run 'TestGitContext|Test_jobEmitterQueueHandler'
