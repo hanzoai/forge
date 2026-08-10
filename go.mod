@@ -142,7 +142,8 @@ require (
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
 	github.com/hanzoai/vfs v0.4.3 // indirect
-	github.com/hanzos3/go-sdk v1.0.2 // indirect
+	github.com/hanzos3/crc64nvme v1.1.2 // indirect
+	github.com/hanzos3/md5-simd v1.1.3 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/luxfi/accel v1.2.4 // indirect
@@ -159,9 +160,7 @@ require (
 	github.com/luxfi/metric v1.8.1 // indirect
 	github.com/luxfi/mock v0.1.1 // indirect
 	github.com/luxfi/zap v1.2.6 // indirect
-	github.com/luxfi/zapdb v1.10.3 // indirect
-	github.com/minio/crc64nvme v1.1.1 // indirect
-	github.com/minio/md5-simd v1.1.2 // indirect
+	github.com/luxfi/zapdb v1.10.4 // indirect
 	github.com/mr-tron/base58 v1.3.0 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/smartystreets/assertions v0.0.0-20190116191733-b6c0e53d7304 // indirect
@@ -259,7 +258,7 @@ require (
 	github.com/hanzoai/builder v0.3.13
 	github.com/hanzoai/orm v0.6.18
 	github.com/hanzoai/xorm v1.4.4
-	github.com/hanzos3/go v1.0.0
+	github.com/hanzos3/go v1.0.1
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/inbucket/html2text v1.0.0 // indirect
