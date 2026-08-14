@@ -11,6 +11,12 @@ on:
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch: {}
+# The job pushes main and tags back to this repository, so it has to say so.
+# With no permissions block the owner default applies, and that default is
+# AccessModeNone — the token could read and never write, which the pre-receive
+# hook reports as "Not allowed to push to protected branch main".
+permissions:
+  contents: write
 concurrency:
   group: sync-from-github
   cancel-in-progress: false
