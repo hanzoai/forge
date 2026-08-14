@@ -489,7 +489,7 @@ const maxDrops = 3
 // own and it stands.
 func RequeueDroppedTask(ctx context.Context, task *ActionTask) (bool, error) {
 	var job *ActionRunJob
-	requeued := false
+	requeued, atCap := false, false
 
 	err := db.WithTx(ctx, func(ctx context.Context) error {
 		steps, err := GetTaskStepsByTaskID(ctx, task.ID)
@@ -510,6 +510,7 @@ func RequeueDroppedTask(ctx context.Context, task *ActionTask) (bool, error) {
 			return err
 		}
 		if job.Drops >= maxDrops {
+			atCap = true
 			return nil
 		}
 
@@ -532,10 +533,13 @@ func RequeueDroppedTask(ctx context.Context, task *ActionTask) (bool, error) {
 		return false, err
 	}
 
+	// Both lines report a write that happened. Losing the guarded update says only
+	// that the job stopped being this task's to move, which is someone else's story
+	// to tell.
 	switch {
 	case requeued:
 		log.Info("actions: job %d re-queued after runner loss, attempt %d/%d", job.ID, job.Drops, maxDrops)
-	case job != nil && job.Drops >= maxDrops:
+	case atCap:
 		log.Warn("actions: job %d has been dropped %d times, failing it", job.ID, job.Drops)
 	}
 	return requeued, nil
@@ -657,12 +661,17 @@ func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.Task
 				}
 			}
 			if !requeued {
+				// Guarded on the job still pointing at this task. Not re-queued does
+				// not mean still ours: the sweep may have handed this job back and a
+				// second runner claimed it, and settling it here would fail a job that
+				// is running, skipping every job downstream of it against a build that
+				// then succeeds.
 				if _, err := UpdateRunJob(ctx, &ActionRunJob{
 					ID:      task.JobID,
 					RepoID:  task.RepoID,
 					Status:  task.Status,
 					Stopped: task.Stopped,
-				}, nil, "status", "stopped"); err != nil {
+				}, builder.Eq{"task_id": task.ID}, "status", "stopped"); err != nil {
 					return err
 				}
 			}

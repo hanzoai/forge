@@ -20,25 +20,37 @@ import (
 	webhook_module "github.com/hanzoai/git/modules/webhook"
 )
 
-// StopZombieTasks stops tasks in running/cancelling status that haven't been updated for a long time
+// The two sweeps below select on different evidence and must not reach the same
+// conclusion from it, so each says which one it is holding.
+const (
+	requeueDropped = true
+	keepFailed     = false
+)
+
+// StopZombieTasks stops tasks in running/cancelling status that haven't been updated for a long time.
+// A runner that stopped reporting is a runner that went away, so a task of its that never started a
+// step is a job that never ran and belongs back in the queue.
 func StopZombieTasks(ctx context.Context) error {
 	return stopTasksByStatuses(ctx, actions_model.FindTaskOptions{
 		UpdatedBefore: timeutil.TimeStamp(time.Now().Add(-setting.Actions.ZombieTaskTimeout).Unix()),
-	}, actions_model.StatusRunning, actions_model.StatusCancelling)
+	}, requeueDropped, actions_model.StatusRunning, actions_model.StatusCancelling)
 }
 
-// StopEndlessTasks stops tasks in running/cancelling status with continuous updates that don't end for a long time
+// StopEndlessTasks stops tasks in running/cancelling status with continuous updates that don't end for a long time.
+// This one selects on start time alone: the runner is still reporting and has been for hours, so the
+// job is wedged rather than lost. Handing it back would spend hours more of a shared runner arriving
+// at the same wedge, so it fails here as it always has.
 func StopEndlessTasks(ctx context.Context) error {
 	return stopTasksByStatuses(ctx, actions_model.FindTaskOptions{
 		StartedBefore: timeutil.TimeStamp(time.Now().Add(-setting.Actions.EndlessTaskTimeout).Unix()),
-	}, actions_model.StatusRunning, actions_model.StatusCancelling)
+	}, keepFailed, actions_model.StatusRunning, actions_model.StatusCancelling)
 }
 
-func stopTasksByStatuses(ctx context.Context, opts actions_model.FindTaskOptions, statuses ...actions_model.Status) error {
+func stopTasksByStatuses(ctx context.Context, opts actions_model.FindTaskOptions, requeue bool, statuses ...actions_model.Status) error {
 	for _, status := range statuses {
 		optsByStatus := opts
 		optsByStatus.Status = status
-		if err := stopTasks(ctx, optsByStatus); err != nil {
+		if err := stopTasks(ctx, optsByStatus, requeue); err != nil {
 			return err
 		}
 	}
@@ -125,7 +137,7 @@ func PrepareToStartRunWithConcurrency(ctx context.Context, attempt *actions_mode
 	return util.Iif(shouldBlock, actions_model.StatusBlocked, actions_model.StatusWaiting), jobs, nil
 }
 
-func stopTasks(ctx context.Context, opts actions_model.FindTaskOptions) error {
+func stopTasks(ctx context.Context, opts actions_model.FindTaskOptions, requeue bool) error {
 	tasks, err := db.Find[actions_model.ActionTask](ctx, opts)
 	if err != nil {
 		return fmt.Errorf("find tasks: %w", err)
@@ -138,12 +150,11 @@ func stopTasks(ctx context.Context, opts actions_model.FindTaskOptions) error {
 			if task.Status == actions_model.StatusCancelling {
 				stopStatus = actions_model.StatusCancelled
 			}
-			// A runner that stopped reporting without ever starting a step leaves
-			// its job re-runnable, so hand that job back to the queue first, while
-			// the steps still show that none of them began — StopTask below stamps
-			// the unfinished ones. A task being cancelled is the user's decision
-			// and is never re-queued.
-			if stopStatus == actions_model.StatusFailure {
+			// A dropped task whose steps never began leaves its job re-runnable, so
+			// hand that job back first, while the steps still show that none of them
+			// started — StopTask below stamps the unfinished ones. A task being
+			// cancelled is the user's decision and is never re-queued.
+			if requeue && stopStatus == actions_model.StatusFailure {
 				if _, err := actions_model.RequeueDroppedTask(ctx, task); err != nil {
 					return err
 				}
