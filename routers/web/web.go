@@ -126,6 +126,12 @@ func newWebAuthMiddleware() *AuthMiddleware {
 		if allowOAuth2 {
 			group.Add(&auth_service.OAuth2{})
 		}
+		// A Hanzo IAM token arrives either as a bearer token or as the basic password
+		// git over HTTP sends, so it belongs wherever those do. It goes ahead of Basic
+		// so a token is recognised as one rather than offered to a password source.
+		if allowOAuth2 || allowBasic {
+			group.Add(&auth_service.IAM{})
+		}
 		if allowBasic {
 			group.Add(&auth_service.Basic{})
 		}

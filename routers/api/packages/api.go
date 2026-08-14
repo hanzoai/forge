@@ -124,6 +124,7 @@ func CommonRoutes() *web.Router {
 
 	verifyAuth(r, []auth.Method{
 		&auth.OAuth2{},
+		&auth.IAM{},
 		&auth.Basic{},
 		&nuget.Auth{},
 		&Auth{},
@@ -562,6 +563,9 @@ func ContainerRoutes() *web.Router {
 
 	r.AfterRouting(context.PackageContexter())
 
+	// No IAM here: /v2/token turns whatever authenticated into a 24 hour registry
+	// token of its own, which would outlive the short-lived IAM token it came from
+	// and survive its revocation.
 	verifyAuth(r, []auth.Method{
 		&auth.Basic{},
 		// container auth requires token, so container.Authenticate issues a Ghost user token for anonymous access

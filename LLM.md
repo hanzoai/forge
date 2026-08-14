@@ -32,6 +32,44 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   the IAM `owner` claim (`--group-claim-name owner --group-team-map …
   --group-team-map-removal`), reconciled declaratively by the deploy's `oauth-sync`
   init container. hanzo.id IAM app: `hanzo-gitea`.
+- **IAM tokens are git credentials too.** `services/auth.IAM` (`services/auth/iam.go`)
+  takes a hanzo.id access token as the git-over-HTTP password, and as a bearer
+  token on the API and package routes, so CI and buildkit stop needing a
+  hand-made PAT. All three of `[iam] ISSUER` / `LOGIN_SOURCE` / `AUDIENCE` are
+  required together (`GIT__iam__ISSUER=https://hanzo.id`,
+  `GIT__iam__LOGIN_SOURCE=hanzo`, `GIT__iam__AUDIENCE=hanzo-git`); an empty ISSUER
+  means the method never runs, and a half-configured or non-https one refuses to
+  boot. AUDIENCE is the app's clientId rather than its name — the authorize
+  redirect from `/user/oauth2/hanzo` carries `client_id=hanzo-git` — and
+  LOGIN_SOURCE is the auth source that redirect comes from.
+  - **`AUDIENCE` is what keeps this forge from being everyone's deputy.**
+    hanzo.id publishes NINE org signing certs under one issuer (`cert-hanzo`,
+    `cert-lux`, `cert-zoo`, `cert-pars`, `cert-superuser`, …), all RS256, and
+    mints `aud` = the app's clientId. Checking `iss` alone would make a token
+    from any app in any org a credential here. `tokenType` must be
+    `access-token` for the same reason: an id_token carries the same iss, sub,
+    aud and signature but is handed to browsers.
+  - Checking lives in `modules/auth/iam` and touches no database: OIDC discovery
+    off the issuer for `jwks_uri` (which must be on the issuer's own origin, no
+    redirects), an hour-bounded key cache refreshed on an unknown `kid` at most
+    every 30s, and a token whose algorithm must equal the one its published key
+    declares. Only asymmetric algorithms are considered — `none` and every HMAC
+    are refused twice over, at the parser's algorithm list and again at the key.
+    An issuer that cannot be read refuses every token; it never falls back on
+    keys past their lifetime. The cache read and the network read take different
+    locks, so a slow issuer cannot stall requests whose key is already in hand.
+  - The token names an identity, never a permission: `sub` resolves through the
+    OAuth2 login source the same two ways `handleOAuth2SignIn` resolves it
+    (`login_source`+`login_name`, then `external_login_user`), and the source's
+    `RequiredClaimName`/`Value` is applied the same way, so a token cannot
+    outlive the group membership browser sign-in depends on. Reach comes from
+    the token's own `scope` claim where it names forge scopes. No account is
+    created, no admin is read from a claim.
+  - Ordered ahead of `&auth.Basic{}` in every group so a token is recognised as
+    one rather than offered to a password source. Anything that is not a token
+    from this issuer is passed straight through untouched. Deliberately NOT on
+    the container routes: `/v2/token` mints a 24h registry token of its own,
+    which would outlive the short-lived IAM token and survive its revocation.
 - **Config = env.** `GIT__<section>__<KEY>` (upstream's app.ini API under our
   prefix; `modules/setting.EnvConfigKeyPrefixGit`). `GITEA__*` is NOT accepted —
   there is no fallback, so a stale `GITEA__` var is silently ignored. No
