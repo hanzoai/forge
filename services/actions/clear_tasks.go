@@ -138,6 +138,16 @@ func stopTasks(ctx context.Context, opts actions_model.FindTaskOptions) error {
 			if task.Status == actions_model.StatusCancelling {
 				stopStatus = actions_model.StatusCancelled
 			}
+			// A runner that stopped reporting without ever starting a step leaves
+			// its job re-runnable, so hand that job back to the queue first, while
+			// the steps still show that none of them began — StopTask below stamps
+			// the unfinished ones. A task being cancelled is the user's decision
+			// and is never re-queued.
+			if stopStatus == actions_model.StatusFailure {
+				if _, err := actions_model.RequeueDroppedTask(ctx, task); err != nil {
+					return err
+				}
+			}
 			if err := actions_model.StopTask(ctx, task.ID, stopStatus); err != nil {
 				return err
 			}

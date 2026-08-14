@@ -529,3 +529,191 @@ func TestCreateTaskForRunnerSkipsUnparsableJob(t *testing.T) {
 	require.Equal(t, StatusFailure, reloaded.Status,
 		"an unparsable job must fail on its own run, where its author can see it")
 }
+
+// newDroppedTask builds what a runner leaves behind when it accepts a task and
+// is stopped before the first step: a running job holding a running task whose
+// steps have not begun. drops seeds how many times the job has been handed back
+// already.
+func newDroppedTask(t *testing.T, name string, runIndex, drops int64) (*ActionTask, *ActionRunJob) {
+	t.Helper()
+
+	run := &ActionRun{
+		Title:         name,
+		RepoID:        1,
+		OwnerID:       2,
+		WorkflowID:    "test.yaml",
+		Index:         runIndex,
+		TriggerUserID: 2,
+		Ref:           "refs/heads/main",
+		CommitSHA:     "c2d72f548424103f01ee1dc02889c1e2bff816b0",
+		Event:         "push",
+		TriggerEvent:  "push",
+		Status:        StatusRunning,
+		Started:       timeutil.TimeStampNow(),
+	}
+	require.NoError(t, db.Insert(t.Context(), run))
+
+	job := &ActionRunJob{
+		RunID:     run.ID,
+		RepoID:    run.RepoID,
+		OwnerID:   run.OwnerID,
+		CommitSHA: run.CommitSHA,
+		Name:      name,
+		Attempt:   1,
+		JobID:     name,
+		Status:    StatusRunning,
+		Started:   timeutil.TimeStampNow(),
+		Drops:     drops,
+	}
+	require.NoError(t, db.Insert(t.Context(), job))
+
+	runner := &ActionRunner{
+		UUID:                 "runner-" + name,
+		Name:                 "runner-" + name,
+		HasCancellingSupport: true,
+	}
+	require.NoError(t, db.Insert(t.Context(), runner))
+
+	task := &ActionTask{
+		JobID:     job.ID,
+		Attempt:   1,
+		RunnerID:  runner.ID,
+		Status:    StatusRunning,
+		Started:   timeutil.TimeStampNow(),
+		RepoID:    run.RepoID,
+		OwnerID:   run.OwnerID,
+		CommitSHA: run.CommitSHA,
+	}
+	require.NoError(t, db.Insert(t.Context(), task))
+
+	for i := int64(0); i < 2; i++ {
+		require.NoError(t, db.Insert(t.Context(), &ActionTaskStep{
+			Name:   "Run true",
+			TaskID: task.ID,
+			Index:  i,
+			RepoID: task.RepoID,
+			Status: StatusWaiting,
+		}))
+	}
+
+	job.TaskID = task.ID
+	_, err := UpdateRunJob(t.Context(), job, nil, "task_id")
+	require.NoError(t, err)
+
+	return task, job
+}
+
+// droppedState is what act_runner sends when it is stopped before the first
+// step: the task failed, and every step is cancelled without ever having started.
+func droppedState(taskID int64) *runnerv1.TaskState {
+	return &runnerv1.TaskState{
+		Id:        taskID,
+		Result:    runnerv1.Result_RESULT_FAILURE,
+		StoppedAt: timestamppb.Now(),
+		Steps: []*runnerv1.StepState{
+			{Id: 0, Result: runnerv1.Result_RESULT_CANCELLED},
+			{Id: 1, Result: runnerv1.Result_RESULT_CANCELLED},
+		},
+	}
+}
+
+// A runner stopped between accepting a task and starting its first step reports
+// the task failed with every step untouched. Nothing ran, so the job goes back
+// to the queue for a healthy runner instead of ending red with nothing built.
+func TestUpdateTaskByStateRequeuesDroppedTask(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	task, job := newDroppedTask(t, "dropped-at-pickup", 9920, 0)
+
+	updated, err := UpdateTaskByState(t.Context(), task.RunnerID, droppedState(task.ID))
+	require.NoError(t, err)
+
+	// The task keeps the runner's own account of itself; only the job moves.
+	assert.Equal(t, StatusFailure, updated.Status)
+	assert.Equal(t, StatusFailure, unittest.AssertExistsAndLoadBean(t, &ActionTask{ID: task.ID}).Status)
+
+	after := unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID})
+	assert.Equal(t, StatusWaiting, after.Status, "a job that ran nothing belongs back in the queue")
+	assert.Zero(t, after.TaskID, "the lost runner's task must be cleared for another runner to claim the job")
+	assert.Zero(t, after.Started)
+	assert.Zero(t, after.Stopped)
+	assert.EqualValues(t, 1, after.Drops)
+}
+
+// The other half of the rule. A step that ran and exited non-zero is a real
+// failure and stands, even when the whole task lives and dies inside a single
+// report — which is the only chance such a step has to be seen at all.
+func TestUpdateTaskByStateKeepsGenuineFailure(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	task, job := newDroppedTask(t, "step-exited-nonzero", 9921, 0)
+
+	state := droppedState(task.ID)
+	state.Steps[0] = &runnerv1.StepState{
+		Id:        0,
+		Result:    runnerv1.Result_RESULT_FAILURE,
+		StartedAt: timestamppb.Now(),
+		StoppedAt: timestamppb.Now(),
+	}
+
+	updated, err := UpdateTaskByState(t.Context(), task.RunnerID, state)
+	require.NoError(t, err)
+	assert.Equal(t, StatusFailure, updated.Status)
+
+	after := unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID})
+	assert.Equal(t, StatusFailure, after.Status, "a job whose step ran and failed must stay failed")
+	assert.Equal(t, task.ID, after.TaskID)
+	assert.Zero(t, after.Drops)
+}
+
+// A job nothing can get through must not circulate. At the cap it fails like any
+// other, and the count stops moving.
+func TestUpdateTaskByStateFailsAtDropCap(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	task, job := newDroppedTask(t, "out-of-attempts", 9922, maxDrops)
+
+	_, err := UpdateTaskByState(t.Context(), task.RunnerID, droppedState(task.ID))
+	require.NoError(t, err)
+
+	after := unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID})
+	assert.Equal(t, StatusFailure, after.Status, "past the cap a dropped job fails like any other")
+	assert.EqualValues(t, maxDrops, after.Drops)
+	assert.Equal(t, task.ID, after.TaskID)
+}
+
+// A cancel is a decision someone made. The runner reports failure for the
+// cleanup phase of it, and that must not read as a job worth running again.
+func TestUpdateTaskByStateDoesNotRequeueCancelledTask(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	task, job := newDroppedTask(t, "user-cancelled", 9923, 0)
+	require.NoError(t, StopTask(t.Context(), task.ID, StatusCancelling))
+
+	_, err := UpdateTaskByState(t.Context(), task.RunnerID, droppedState(task.ID))
+	require.NoError(t, err)
+
+	after := unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID})
+	assert.Equal(t, StatusCancelled, after.Status, "a cancel must not be undone by a re-queue")
+	assert.Zero(t, after.Drops)
+}
+
+// A job the sweep has already handed back is not this task's to settle any more.
+// Calling twice must not double-count or drag the job out of the queue.
+func TestRequeueDroppedTaskIsIdempotent(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	task, job := newDroppedTask(t, "requeued-twice", 9924, 0)
+
+	requeued, err := RequeueDroppedTask(t.Context(), task)
+	require.NoError(t, err)
+	assert.True(t, requeued)
+
+	requeued, err = RequeueDroppedTask(t.Context(), task)
+	require.NoError(t, err)
+	assert.False(t, requeued, "a job that no longer references this task is not its to move")
+
+	after := unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID})
+	assert.Equal(t, StatusWaiting, after.Status)
+	assert.EqualValues(t, 1, after.Drops)
+}
