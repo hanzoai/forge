@@ -292,11 +292,10 @@ func withZombieTimeout(t *testing.T, d time.Duration, f func()) {
 	f()
 }
 
-// newZombieTask builds a task whose runner has stopped reporting: a running job
-// holding a running task. stepStarted stamps its one step as having begun, which
-// is the difference between a runner that died doing nothing and one that died
-// part-way through real work.
-func newZombieTask(t *testing.T, name string, runIndex int64, stepStarted bool) (*actions_model.ActionTask, *actions_model.ActionRunJob) {
+// newRunningTask builds a running job holding a running task. stepStarted stamps
+// its one step as having begun, which is the difference between a task that had
+// done nothing when it was stopped and one that was part-way through real work.
+func newRunningTask(t *testing.T, name string, runIndex int64, stepStarted bool) (*actions_model.ActionTask, *actions_model.ActionRunJob) {
 	t.Helper()
 
 	run := &actions_model.ActionRun{
@@ -369,7 +368,7 @@ func newZombieTask(t *testing.T, name string, runIndex int64, stepStarted bool) 
 func TestStopZombieTasksRequeuesDroppedTask(t *testing.T) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
 
-	task, job := newZombieTask(t, "runner-vanished", 9930, false)
+	task, job := newRunningTask(t, "runner-vanished", 9930, false)
 
 	withZombieTimeout(t, -time.Hour, func() {
 		require.NoError(t, StopZombieTasks(t.Context()))
@@ -390,7 +389,7 @@ func TestStopZombieTasksRequeuesDroppedTask(t *testing.T) {
 func TestStopZombieTasksKeepsPartlyRunJobFailed(t *testing.T) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
 
-	_, job := newZombieTask(t, "runner-died-mid-step", 9931, true)
+	_, job := newRunningTask(t, "runner-died-mid-step", 9931, true)
 
 	withZombieTimeout(t, -time.Hour, func() {
 		require.NoError(t, StopZombieTasks(t.Context()))
@@ -399,4 +398,31 @@ func TestStopZombieTasksKeepsPartlyRunJobFailed(t *testing.T) {
 	after := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: job.ID})
 	assert.Equal(t, actions_model.StatusFailure, after.Status, "a job whose step began must not be silently run again")
 	assert.Zero(t, after.Drops)
+}
+
+func withEndlessTimeout(t *testing.T, d time.Duration, f func()) {
+	t.Helper()
+	initJobEmitter(t)
+	prev := setting.Actions.EndlessTaskTimeout
+	setting.Actions.EndlessTaskTimeout = d
+	defer func() { setting.Actions.EndlessTaskTimeout = prev }()
+	f()
+}
+
+// The endless sweep selects on start time alone, so what it finds is a task whose
+// runner is alive and has been reporting for hours. That job is wedged, not lost:
+// handing it back would spend hours more of a shared runner arriving at the same
+// wedge, so it fails where it stands.
+func TestStopEndlessTasksKeepsWedgedJobFailed(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	_, job := newRunningTask(t, "runner-still-talking", 9932, false)
+
+	withEndlessTimeout(t, -time.Hour, func() {
+		require.NoError(t, StopEndlessTasks(t.Context()))
+	})
+
+	after := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: job.ID})
+	assert.Equal(t, actions_model.StatusFailure, after.Status, "a wedged job is not a dropped one")
+	assert.Zero(t, after.Drops, "an endless task must not spend a drop")
 }

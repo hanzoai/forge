@@ -95,6 +95,16 @@ func TestCloneRunJobForAttempt(t *testing.T) {
 		clone := cloneRunJobForAttempt(template, attempt)
 		assert.False(t, clone.ContinueOnError)
 	})
+
+	// Drops budgets one attempt's worth of runner losses. Someone asking for the
+	// job again is asking for a fresh attempt, so the count starts over. It does
+	// today because the fields above are listed one by one; this is what says so
+	// if that ever becomes a copy of everything.
+	t.Run("a new attempt starts with no drops", func(t *testing.T) {
+		template := &actions_model.ActionRunJob{Drops: 2}
+		clone := cloneRunJobForAttempt(template, attempt)
+		assert.Zero(t, clone.Drops)
+	})
 }
 
 func TestRerunValidation(t *testing.T) {

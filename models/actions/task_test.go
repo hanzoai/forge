@@ -7,11 +7,14 @@ package actions
 import (
 	"strings"
 	"testing"
+	"time"
 
 	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/actions/jobparser"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/test"
 	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
@@ -584,6 +587,7 @@ func newDroppedTask(t *testing.T, name string, runIndex, drops int64) (*ActionTa
 		OwnerID:   run.OwnerID,
 		CommitSHA: run.CommitSHA,
 	}
+	task.GenerateAndFillToken()
 	require.NoError(t, db.Insert(t.Context(), task))
 
 	for i := int64(0); i < 2; i++ {
@@ -716,4 +720,65 @@ func TestRequeueDroppedTaskIsIdempotent(t *testing.T) {
 	after := unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID})
 	assert.Equal(t, StatusWaiting, after.Status)
 	assert.EqualValues(t, 1, after.Drops)
+}
+
+// A task that has let go of its job must not settle it later. The sweep hands a
+// dropped job back, a second runner claims it, and only then does the first
+// runner's report land. Settling it there fails a job that is actively running,
+// and the run's downstream jobs are skipped against a build that then succeeds.
+func TestUpdateTaskByStateLeavesJobClaimedByAnotherTask(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	first, job := newDroppedTask(t, "let-go-of-its-job", 9925, 0)
+
+	// The job has been re-queued and claimed again: it now runs someone else's task.
+	second := &ActionTask{
+		JobID:     job.ID,
+		Attempt:   1,
+		RunnerID:  first.RunnerID,
+		Status:    StatusRunning,
+		Started:   timeutil.TimeStampNow(),
+		RepoID:    job.RepoID,
+		OwnerID:   job.OwnerID,
+		CommitSHA: job.CommitSHA,
+	}
+	second.GenerateAndFillToken()
+	require.NoError(t, db.Insert(t.Context(), second))
+	job.TaskID = second.ID
+	_, err := UpdateRunJob(t.Context(), job, nil, "task_id")
+	require.NoError(t, err)
+
+	// The first runner reports at last.
+	_, err = UpdateTaskByState(t.Context(), first.RunnerID, droppedState(first.ID))
+	require.NoError(t, err)
+
+	after := unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID})
+	assert.Equal(t, StatusRunning, after.Status, "a job running another task must not be settled by the task it let go")
+	assert.Equal(t, second.ID, after.TaskID, "the claim of the runner actually doing the work must survive")
+	assert.Zero(t, after.Drops, "a job this task no longer holds must not be charged a drop")
+}
+
+// Losing the guarded update says the job stopped being this task's to move. It
+// does not say the job ran out of attempts, and the log must not say so either.
+func TestRequeueDroppedTaskDoesNotClaimTheCapItDidNotReach(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	task, job := newDroppedTask(t, "lost-the-row", 9926, maxDrops-1)
+
+	// The job moves on between this task letting go and the update landing.
+	job.TaskID = 0
+	_, err := UpdateRunJob(t.Context(), job, nil, "task_id")
+	require.NoError(t, err)
+
+	lc, cleanup := test.NewLogChecker(log.DEFAULT)
+	lc.Filter("failing it", "re-queued after runner loss")
+	defer cleanup()
+
+	requeued, err := RequeueDroppedTask(t.Context(), task)
+	require.NoError(t, err)
+	assert.False(t, requeued)
+
+	seen, _ := lc.Check(100 * time.Millisecond)
+	assert.False(t, seen[0], "the cap was never reached, so nothing may report reaching it")
+	assert.False(t, seen[1], "nothing was re-queued, so nothing may report re-queueing")
 }
