@@ -7,6 +7,7 @@ package git
 import (
 	"testing"
 
+	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/models/db"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
@@ -202,4 +203,27 @@ func TestCanBypassBranchProtection(t *testing.T) {
 
 	// User does not bypass when not in allowlisted teams.
 	testBypass(t, false, pb, user, false)
+}
+
+func TestCanUserPushActionsTask(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	task := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: 47})
+	own := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: task.RepoID})
+	foreign := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	assert.NotEqual(t, own.OwnerID, foreign.OwnerID)
+
+	rule := func(repoID int64) *ProtectedBranch {
+		return &ProtectedBranch{RepoID: repoID, RuleName: "master", CanPush: true}
+	}
+	doer := user_model.NewActionsUserWithTaskID(task.ID)
+
+	// The task pushes to the repository it runs for.
+	assert.True(t, rule(own.ID).CanUserPush(t.Context(), doer))
+
+	// The same token against someone else's repository is read-only.
+	assert.False(t, rule(foreign.ID).CanUserPush(t.Context(), doer))
+
+	// The bot identity on its own carries no task and no write access.
+	assert.False(t, rule(own.ID).CanUserPush(t.Context(), user_model.NewActionsUser()))
 }

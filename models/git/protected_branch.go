@@ -134,12 +134,14 @@ func (protectBranch *ProtectedBranch) CanUserPush(ctx context.Context, user *use
 			return false
 		}
 
-		writeAccess, err := access_model.HasAccessUnit(ctx, user, protectBranch.Repo, unit.TypeCode, perm.AccessModeWrite)
+		// The pusher can be an Actions task instead of a person, and its access comes from
+		// the task's token rather than from the access table, so resolve it as the doer.
+		doerPerm, err := access_model.GetDoerRepoPermission(ctx, protectBranch.Repo, user)
 		if err != nil {
-			log.Error("HasAccessUnit: %v", err)
+			log.Error("GetDoerRepoPermission: %v", err)
 			return false
 		}
-		return writeAccess
+		return doerPerm.CanWrite(unit.TypeCode)
 	}
 
 	if slices.Contains(protectBranch.WhitelistUserIDs, user.ID) {

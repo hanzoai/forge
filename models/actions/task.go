@@ -468,6 +468,83 @@ func ReleaseTaskForRunner(ctx context.Context, task *ActionTask) error {
 	})
 }
 
+// maxDrops bounds how many times one job may be handed back to the queue. Past
+// it the job fails like any other, so a job that no runner can ever get through
+// cannot circulate forever.
+const maxDrops = 3
+
+// RequeueDroppedTask returns task's job to the waiting queue when the task ran
+// none of its steps, and reports whether it did.
+//
+// act_runner's graceful shutdown protects a job that is executing, not one still
+// being set up, so a runner stopped in that window — a pod rolling, a node going
+// away — cancels the task and reports it failed. Failing the job there is wrong
+// twice over: nothing ran, and nothing tells it apart from a job whose steps ran
+// and failed.
+//
+// The steps' own record tells them apart. A step carries a Started stamp from the
+// moment it begins, so a task whose every step is unstamped executed no user
+// code: nothing it could have done has been done, and another runner may take the
+// job without repeating anything. One stamp vetoes — that failure is the job's
+// own and it stands.
+func RequeueDroppedTask(ctx context.Context, task *ActionTask) (bool, error) {
+	var job *ActionRunJob
+	requeued, atCap := false, false
+
+	err := db.WithTx(ctx, func(ctx context.Context) error {
+		steps, err := GetTaskStepsByTaskID(ctx, task.ID)
+		if err != nil {
+			return err
+		}
+		// No steps recorded is no evidence, not evidence of nothing.
+		if len(steps) == 0 {
+			return nil
+		}
+		for _, step := range steps {
+			if step.Started != 0 {
+				return nil
+			}
+		}
+
+		if job, err = GetRunJobByRepoAndID(ctx, task.RepoID, task.JobID); err != nil {
+			return err
+		}
+		if job.Drops >= maxDrops {
+			atCap = true
+			return nil
+		}
+
+		job.Status = StatusWaiting
+		job.Started = 0
+		job.Stopped = 0
+		job.TaskID = 0
+		job.Drops++
+		// Guarded on the job still being this task's running job, so one that has
+		// been cancelled, or claimed by someone else, is left where it is.
+		n, err := UpdateRunJob(ctx, job, builder.Eq{"task_id": task.ID, "status": StatusRunning},
+			"status", "started", "stopped", "task_id", "drops")
+		if err != nil {
+			return err
+		}
+		requeued = n == 1
+		return nil
+	})
+	if err != nil {
+		return false, err
+	}
+
+	// Both lines report a write that happened. Losing the guarded update says only
+	// that the job stopped being this task's to move, which is someone else's story
+	// to tell.
+	switch {
+	case requeued:
+		log.Info("actions: job %d re-queued after runner loss, attempt %d/%d", job.ID, job.Drops, maxDrops)
+	case atCap:
+		log.Warn("actions: job %d has been dropped %d times, failing it", job.ID, job.Drops)
+	}
+	return requeued, nil
+}
+
 func UpdateTask(ctx context.Context, task *ActionTask, cols ...string) error {
 	sess := db.GetEngine(ctx).ID(task.ID)
 	if len(cols) > 0 {
@@ -537,14 +614,6 @@ func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.Task
 			if err := UpdateTask(ctx, task, "status", "stopped"); err != nil {
 				return err
 			}
-			if _, err := UpdateRunJob(ctx, &ActionRunJob{
-				ID:      task.JobID,
-				RepoID:  task.RepoID,
-				Status:  task.Status,
-				Stopped: task.Stopped,
-			}, nil, "status", "stopped"); err != nil {
-				return err
-			}
 		} else {
 			// Force update ActionTask.Updated to avoid the task being judged as a zombie task
 			task.Updated = timeutil.TimeStampNow()
@@ -553,11 +622,17 @@ func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.Task
 			}
 		}
 
-		if err := task.LoadAttributes(ctx); err != nil {
+		// Record the reported step states before settling the job below. Whether any
+		// step started decides that settlement, so the steps have to already say
+		// everything this report has to say about them — a step that starts and
+		// fails between two reports is only ever seen here.
+		steps, err := GetTaskStepsByTaskID(ctx, task.ID)
+		if err != nil {
 			return err
 		}
+		task.Steps = steps
 
-		for _, step := range task.Steps {
+		for _, step := range steps {
 			var result runnerv1.Result
 			if v, ok := stepStates[step.Index]; ok {
 				result = v.Result
@@ -575,7 +650,35 @@ func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.Task
 				return err
 			}
 		}
-		return nil
+
+		if state.Result != runnerv1.Result_RESULT_UNSPECIFIED {
+			// A runner stopped before it started a step reports the task failed. Its
+			// job ran nothing, so it goes back to the queue instead of ending red.
+			requeued := false
+			if task.Status == StatusFailure {
+				if requeued, err = RequeueDroppedTask(ctx, task); err != nil {
+					return err
+				}
+			}
+			if !requeued {
+				// Guarded on the job still pointing at this task. Not re-queued does
+				// not mean still ours: the sweep may have handed this job back and a
+				// second runner claimed it, and settling it here would fail a job that
+				// is running, skipping every job downstream of it against a build that
+				// then succeeds.
+				if _, err := UpdateRunJob(ctx, &ActionRunJob{
+					ID:      task.JobID,
+					RepoID:  task.RepoID,
+					Status:  task.Status,
+					Stopped: task.Stopped,
+				}, builder.Eq{"task_id": task.ID}, "status", "stopped"); err != nil {
+					return err
+				}
+			}
+		}
+
+		// Load the job last: callers read the settled status off it.
+		return task.LoadAttributes(ctx)
 	})
 	return task, err
 }
@@ -609,6 +712,11 @@ func StopTask(ctx context.Context, taskID int64, status Status) error {
 		}
 	}
 
+	// Both job writes below are guarded on the job still pointing at this task, so
+	// stopping a task never settles a job that has moved on — in particular one
+	// RequeueDroppedTask has just handed back to the queue.
+	stillOurs := builder.Eq{"task_id": taskID}
+
 	if status == StatusCancelling {
 		task.Status = StatusCancelling
 
@@ -616,7 +724,7 @@ func StopTask(ctx context.Context, taskID int64, status Status) error {
 			ID:     task.JobID,
 			RepoID: task.RepoID,
 			Status: StatusCancelling,
-		}, nil, "status"); err != nil {
+		}, stillOurs, "status"); err != nil {
 			return err
 		}
 
@@ -630,7 +738,7 @@ func StopTask(ctx context.Context, taskID int64, status Status) error {
 		RepoID:  task.RepoID,
 		Status:  task.Status,
 		Stopped: task.Stopped,
-	}, nil); err != nil {
+	}, stillOurs); err != nil {
 		return err
 	}
 
