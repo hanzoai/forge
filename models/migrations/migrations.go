@@ -422,6 +422,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(341, "Convert legacy MSSQL DATETIME columns to DATETIME2", v1_27.FixLegacyMSSQLDateTimeColumns),
 		newMigration(342, "Add scoped workflows schema", v1_27.AddScopedWorkflowsSchema),
 		newMigration(343, "Rename gitea-* built-in themes to hanzo-*", v1_27.RenameGiteaThemesToHanzo),
+		newMigration(344, "Add Drops column to ActionRunJob", v1_27.AddDropsToActionRunJob),
 	}
 	return preparedMigrations
 }

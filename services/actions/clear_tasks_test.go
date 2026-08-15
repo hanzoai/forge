@@ -14,6 +14,7 @@ import (
 	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/queue"
 	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -280,4 +281,148 @@ func TestFailWaitingJobs_LeavesClaimedJobAlone(t *testing.T) {
 	assert.Empty(t, failed, "a claimed job must not be reported as failed")
 	assert.Equal(t, actions_model.StatusWaiting, jobStatus(t, job.ID),
 		"a job a runner has claimed must not be failed out from under it")
+}
+
+func withZombieTimeout(t *testing.T, d time.Duration, f func()) {
+	t.Helper()
+	initJobEmitter(t)
+	prev := setting.Actions.ZombieTaskTimeout
+	setting.Actions.ZombieTaskTimeout = d
+	defer func() { setting.Actions.ZombieTaskTimeout = prev }()
+	f()
+}
+
+// newRunningTask builds a running job holding a running task. stepStarted stamps
+// its one step as having begun, which is the difference between a task that had
+// done nothing when it was stopped and one that was part-way through real work.
+func newRunningTask(t *testing.T, name string, runIndex int64, stepStarted bool) (*actions_model.ActionTask, *actions_model.ActionRunJob) {
+	t.Helper()
+
+	run := &actions_model.ActionRun{
+		Title:         name,
+		RepoID:        1,
+		OwnerID:       2,
+		TriggerUserID: 2,
+		WorkflowID:    "test.yml",
+		Index:         runIndex,
+		Ref:           "refs/heads/main",
+		CommitSHA:     "c2d72f548424103f01ee1dc02889c1e2bff816b0",
+		Status:        actions_model.StatusRunning,
+	}
+	require.NoError(t, db.Insert(t.Context(), run))
+
+	job := &actions_model.ActionRunJob{
+		RunID:     run.ID,
+		RepoID:    run.RepoID,
+		OwnerID:   run.OwnerID,
+		CommitSHA: run.CommitSHA,
+		Name:      name,
+		JobID:     name,
+		Attempt:   1,
+		Status:    actions_model.StatusRunning,
+		Started:   timeutil.TimeStampNow(),
+	}
+	require.NoError(t, db.Insert(t.Context(), job))
+
+	runner := &actions_model.ActionRunner{
+		UUID: "runner-" + name,
+		Name: "runner-" + name,
+	}
+	require.NoError(t, db.Insert(t.Context(), runner))
+
+	task := &actions_model.ActionTask{
+		JobID:     job.ID,
+		Attempt:   1,
+		RunnerID:  runner.ID,
+		Status:    actions_model.StatusRunning,
+		Started:   timeutil.TimeStampNow(),
+		RepoID:    run.RepoID,
+		OwnerID:   run.OwnerID,
+		CommitSHA: run.CommitSHA,
+	}
+	require.NoError(t, db.Insert(t.Context(), task))
+
+	step := &actions_model.ActionTaskStep{
+		Name:   "Run true",
+		TaskID: task.ID,
+		Index:  0,
+		RepoID: task.RepoID,
+		Status: actions_model.StatusWaiting,
+	}
+	if stepStarted {
+		step.Started = timeutil.TimeStampNow()
+		step.Status = actions_model.StatusRunning
+	}
+	require.NoError(t, db.Insert(t.Context(), step))
+
+	job.TaskID = task.ID
+	_, err := actions_model.UpdateRunJob(t.Context(), job, nil, "task_id")
+	require.NoError(t, err)
+
+	return task, job
+}
+
+// A runner pod that goes away without a word leaves its task running until the
+// zombie sweep finds it. If it went before any step began, the work is still
+// undone and untouched, so the job is handed to another runner.
+func TestStopZombieTasksRequeuesDroppedTask(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	task, job := newRunningTask(t, "runner-vanished", 9930, false)
+
+	withZombieTimeout(t, -time.Hour, func() {
+		require.NoError(t, StopZombieTasks(t.Context()))
+	})
+
+	after := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: job.ID})
+	assert.Equal(t, actions_model.StatusWaiting, after.Status, "a job whose runner died before it ran anything belongs back in the queue")
+	assert.Zero(t, after.TaskID)
+	assert.EqualValues(t, 1, after.Drops)
+
+	// Stopping the task must not settle a job that has moved on.
+	afterTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.ID})
+	assert.Equal(t, actions_model.StatusFailure, afterTask.Status, "the task itself still stops")
+}
+
+// A runner that died part-way through real work leaves a job that may have done
+// something. Re-running it could repeat that, so the failure stands.
+func TestStopZombieTasksKeepsPartlyRunJobFailed(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	_, job := newRunningTask(t, "runner-died-mid-step", 9931, true)
+
+	withZombieTimeout(t, -time.Hour, func() {
+		require.NoError(t, StopZombieTasks(t.Context()))
+	})
+
+	after := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: job.ID})
+	assert.Equal(t, actions_model.StatusFailure, after.Status, "a job whose step began must not be silently run again")
+	assert.Zero(t, after.Drops)
+}
+
+func withEndlessTimeout(t *testing.T, d time.Duration, f func()) {
+	t.Helper()
+	initJobEmitter(t)
+	prev := setting.Actions.EndlessTaskTimeout
+	setting.Actions.EndlessTaskTimeout = d
+	defer func() { setting.Actions.EndlessTaskTimeout = prev }()
+	f()
+}
+
+// The endless sweep selects on start time alone, so what it finds is a task whose
+// runner is alive and has been reporting for hours. That job is wedged, not lost:
+// handing it back would spend hours more of a shared runner arriving at the same
+// wedge, so it fails where it stands.
+func TestStopEndlessTasksKeepsWedgedJobFailed(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	_, job := newRunningTask(t, "runner-still-talking", 9932, false)
+
+	withEndlessTimeout(t, -time.Hour, func() {
+		require.NoError(t, StopEndlessTasks(t.Context()))
+	})
+
+	after := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: job.ID})
+	assert.Equal(t, actions_model.StatusFailure, after.Status, "a wedged job is not a dropped one")
+	assert.Zero(t, after.Drops, "an endless task must not spend a drop")
 }
