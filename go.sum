@@ -459,6 +459,8 @@ github.com/hanzo-git/actions-proto-go v0.6.1 h1:EqnLI1p2nabG2cgokVW+18H4pXrxzaMD
 github.com/hanzo-git/actions-proto-go v0.6.1/go.mod h1:nzX2hzsN4ghiM1ud3sxe2Ksa68T/fQVth0RE9RcyDAs=
 github.com/hanzoai/act v1.0.0 h1:sJ6ROq95yLgqraICMahb69aqIk1a3AmoafEZIwOPLkY=
 github.com/hanzoai/act v1.0.0/go.mod h1:VeRCgi9nLUh4NOnHpzyhvDDdTnvp3u+eGw3UI2Xh/x8=
+github.com/hanzoai/authz v1.10.29 h1:b4vWtI9g4Mvay1zizW7cwly/hDk06r+oAdA/y+317Do=
+github.com/hanzoai/authz v1.10.29/go.mod h1:xkzFdiIFx4UQMlU0NkmSRz0dgRQYqSXpKgVjn8ijn3E=
 github.com/hanzoai/builder v0.3.13 h1:tAOJ+0Q0xrrovk7lkvaZxuKZ4lqENIB6tE0Rr9+6Bo8=
 github.com/hanzoai/builder v0.3.13/go.mod h1:TWZaiP0Y9tCMwtLH2EvQqBAeT1f3aJI5Y0XPM8S0wcE=
 github.com/hanzoai/csqlite v0.1.0 h1:suwC3dh0INlfP/U0Es6cDf6JNQ+2+GVLLATPWCUux6k=
@@ -592,6 +594,8 @@ github.com/luxfi/ids v1.3.2 h1:c6Rft5kZB4XqiCtWaGH47bfhaNFm3FGRfhEzI01GVeI=
 github.com/luxfi/ids v1.3.2/go.mod h1:+5l8cYMbKpORJbQ2r98CYJo9TQATgUdnmzpYFZWMwwc=
 github.com/luxfi/log v1.4.3 h1:xkUKRWvQ4ZwvlUC2e0/RTtHYZOYSMvSQ9W9lbjwBmiI=
 github.com/luxfi/log v1.4.3/go.mod h1:myIkufyiQomSQH34K981kbz6cG4WUoerRUh7F4XhlQI=
+github.com/luxfi/log v1.5.0 h1:zC0cE9ICThVd8NOxp1h1M1TgpiZ+ZbTgguHGqlxU17k=
+github.com/luxfi/log v1.5.0/go.mod h1:7EqCd7gmIpIPMEV7YPMFH3YqbrlcV2hwiPWUssJaF5c=
 github.com/luxfi/math v1.5.1 h1:FDOY75e4vn/Xra1ij99xOS/9XdxQGCPP6HONHRkCwfg=
 github.com/luxfi/math v1.5.1/go.mod h1:3j9R24hVfPhrbvs45YSJP7jAyVNfwx/cj/+lAO8IGro=
 github.com/luxfi/math/big v0.1.0 h1:Vz4c0RsZVPdIKPsHPgAJChH/R3p15WHRUz7LkLf+NIQ=

@@ -139,6 +139,7 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
+	github.com/hanzoai/authz v1.10.29 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
 	github.com/hanzoai/vfs v0.4.3 // indirect
@@ -153,7 +154,7 @@ require (
 	github.com/luxfi/concurrent v0.1.1 // indirect
 	github.com/luxfi/crypto v1.20.2 // indirect
 	github.com/luxfi/ids v1.3.2 // indirect
-	github.com/luxfi/log v1.4.3 // indirect
+	github.com/luxfi/log v1.5.0 // indirect
 	github.com/luxfi/math v1.5.1 // indirect
 	github.com/luxfi/math/big v0.1.0 // indirect
 	github.com/luxfi/mdns v0.1.1 // indirect

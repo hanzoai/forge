@@ -117,6 +117,19 @@ func (b *Basic) VerifyAuthToken(req *http.Request, w http.ResponseWriter, store 
 		store.GetData()["LoginMethod"] = ActionTokenMethodName
 		return user_model.NewActionsUserWithTaskID(task.ID), nil
 	}
+
+	// check a Hanzo IAM access token — the credential a user signed in with, which
+	// on an externally-authenticated instance is the only one they hold without
+	// first going and making a second. Asked LAST, after every local lookup has
+	// declined, so a token this instance issued itself is never sent to a verifier
+	// that would only reject it. Repository scope: see iam.go.
+	if u := iamUser(req.Context(), authToken); u != nil {
+		log.Trace("Basic Authorization: Valid IAM token for user[%d]", u.ID)
+		store.GetData()["LoginMethod"] = IAMTokenMethodName
+		store.GetData()["IsApiToken"] = true
+		store.GetData()["ApiTokenScope"] = auth_model.AccessTokenScopeWriteRepository
+		return u, nil
+	}
 	return nil, nil //nolint:nilnil // the auth method is not applicable
 }
 
