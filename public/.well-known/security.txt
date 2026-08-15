@@ -1,6 +1,11 @@
-# This site is running Hanzo Git.
-# Hanzo Git related security problems could be reported to the Hanzo Git maintainers.
-# Site related security problems should be reported to this site's admin.
-Contact: https://github.com/hanzoai/git/blob/main/SECURITY.md
-Policy: https://github.com/hanzoai/git/blob/main/SECURITY.md
+# Hanzo AI — how to report a security problem.
+#
+# RFC 9116. Machine-readable on purpose: scanners and researchers look here
+# first, and a site without this file gets reported to whatever address someone
+# can guess, or not at all.
+
+Contact: mailto:security@hanzo.ai
+Expires: 2027-08-01T00:00:00.000Z
 Preferred-Languages: en
+Canonical: https://git.hanzo.ai/.well-known/security.txt
+Policy: https://hanzo.ai/security
