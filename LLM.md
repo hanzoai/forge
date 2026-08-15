@@ -123,6 +123,43 @@ Operator-managed in `hanzoai/universe` (DOKS `hanzo-k8s`, namespace `hanzo`):
 The migration (fork becomes THE git server, replacing the raw upstream-image deploy
 and the cloud embedded git seam as the host) is STAGED — the coordinator flips it.
 
+## Credentials over https: the token a user already holds
+
+Sign-in here is EXTERNAL (`ENABLE_PASSWORD_SIGNIN_FORM=false`,
+`ALLOW_ONLY_EXTERNAL_REGISTRATION=true`), so a user has no password to hand git
+over https and the only credential left used to be a personal access token they
+had to go and make. `services/auth/iam.go` reads the one they already have: a
+Hanzo IAM access token is accepted as the basic-auth password, so
+
+```
+git clone https://x:$(hanzo auth token)@git.hanzo.ai/<org>/<repo>.git
+```
+
+works from anywhere the CLI is signed in — a laptop, a CI job, a leased sandbox
+(cloud's `apps/sandbox/cred.go` points a credential helper at it, which is what
+makes git work in a shell with no browser).
+
+- **Read once, by the platform's own verifier.** `hanzoai/authz` over the issuer's
+  JWKS: algorithm, key id, signature, issuer, expiry. Issuer and keys come from
+  THIS instance's OIDC login source, so what is accepted is what the provider
+  users sign in through mints, and changing that provider changes this with it.
+- **Resolved only through the link sign-in already wrote** — the token's `sub`
+  against `external_login_user`. No claim NAMES a user; email and username are
+  mutable and a match on one would land a renamed identity on another account. A
+  subject that never signed in here resolves to nobody, and nothing is created
+  from a credential: registration stays the web flow's, which is the only place
+  that applies the whole policy (auto-registration, account linking, group and
+  team mapping).
+- **Scope is `write:repository`.** Clone, fetch, push. A credential that exists so
+  a checkout works does not mint tokens, add keys, or administer anything.
+- **Asked LAST**, after the OAuth2 token, the personal access token and the task
+  token have each declined, and only for a credential shaped like a JWT — so a
+  token this instance issued itself is never sent to a verifier that would reject
+  it, and a PAT costs no network call.
+- The AUDIENCE is not checked, matching `authz`'s documented position: IAM sets
+  `aud` to the client that ASKED for the token, not to the server that may accept
+  it.
+
 ## Cloud-native, multi-tenant: the house pattern, not Postgres
 
 Measured 2026-07-26 against the running deploy. An earlier draft of this section
