@@ -165,3 +165,40 @@ func TestIAMDeclinesCredentialsThatAreNotTokens(t *testing.T) {
 		assert.Nil(t, iamUser(t.Context(), cred), "credential %q", cred)
 	}
 }
+
+// AN UNREACHABLE PROVIDER IS DIALLED ONCE, not once per request. Without that, a
+// credential that is merely JWT-shaped is enough to make every request wait out a
+// network timeout while holding the lock the next one needs.
+func TestAnUnreachableProviderIsLeftAlone(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	var down bool
+	var dials int
+	mux := http.NewServeMux()
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+	mux.HandleFunc("/.well-known/openid-configuration", func(w http.ResponseWriter, _ *http.Request) {
+		if down {
+			dials++
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"issuer": srv.URL, "jwks_uri": srv.URL + "/jwks"})
+	})
+
+	// Registered while the provider answers — CreateSource discovers it too.
+	src := &auth_model.Source{
+		Type: auth_model.OAuth2, Name: "down-" + t.Name(), IsActive: true,
+		Cfg: &oauth2.Source{Provider: "openidConnect", ClientID: "hanzo-git",
+			OpenIDConnectAutoDiscoveryURL: srv.URL + "/.well-known/openid-configuration"},
+	}
+	require.NoError(t, auth_model.CreateSource(t.Context(), src))
+	down = true
+	reader.Lock()
+	reader.verifier, reader.sourceID, reader.discover = nil, 0, ""
+	reader.Unlock()
+
+	for range 5 {
+		assert.Nil(t, iamUser(t.Context(), "eyJhbGciOiJSUzI1NiJ9.e30.sig"))
+	}
+	assert.Equal(t, 1, dials, "the provider was dialled once per request")
+}

@@ -62,6 +62,13 @@ const IAMTokenMethodName = "iam_token"
 // every other reader of the same JWKS.
 const jwksTTL = 15 * time.Minute
 
+// quiet is how long a FAILED discovery is remembered. Without it an unreachable
+// provider is re-dialled by every request that carries anything JWT-shaped, each
+// waiting out the timeout while holding the lock the next one needs — one
+// unreachable host turning into a queue. Short, because the provider coming back
+// should not take a quarter of an hour to notice.
+const quiet = 30 * time.Second
+
 // reader holds the verifier built from a login source, and the source it was built
 // from so a re-registered provider rebuilds it instead of verifying against the
 // old one forever.
@@ -127,10 +134,15 @@ func verifier(ctx context.Context) (*edge.Verifier, int64) {
 	if src == nil {
 		return nil, 0
 	}
-	if reader.verifier != nil && reader.sourceID == src.ID &&
-		reader.discover == cfg.OpenIDConnectAutoDiscoveryURL && time.Since(reader.built) < jwksTTL {
+	fresh := reader.discover == cfg.OpenIDConnectAutoDiscoveryURL && reader.sourceID == src.ID
+	if fresh && reader.verifier != nil && time.Since(reader.built) < jwksTTL {
 		return reader.verifier, reader.sourceID
 	}
+	if fresh && reader.verifier == nil && time.Since(reader.built) < quiet {
+		return nil, 0 // the last attempt failed and the provider is still being left alone
+	}
+	reader.verifier, reader.sourceID, reader.discover = nil, src.ID, cfg.OpenIDConnectAutoDiscoveryURL
+	reader.built = time.Now()
 	issuer, jwks := discover(ctx, cfg.OpenIDConnectAutoDiscoveryURL)
 	if issuer == "" || jwks == "" {
 		return nil, 0
@@ -138,9 +150,6 @@ func verifier(ctx context.Context) (*edge.Verifier, int64) {
 	// No audience allowlist — see the file comment. The issuer list is what fails
 	// closed, and it always has exactly this instance's provider in it.
 	reader.verifier = edge.NewVerifier(jwks, []string{issuer}, nil, jwksTTL)
-	reader.sourceID = src.ID
-	reader.discover = cfg.OpenIDConnectAutoDiscoveryURL
-	reader.built = time.Now()
 	return reader.verifier, reader.sourceID
 }
 
