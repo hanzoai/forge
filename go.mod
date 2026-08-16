@@ -57,6 +57,7 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/act v1.0.0
+	github.com/hanzoai/authz v1.10.29
 	github.com/hanzoai/sqlite v0.3.2
 	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hanzokv/lock/v4 v4.17.2
@@ -139,7 +140,6 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
-	github.com/hanzoai/authz v1.10.29 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.0 // indirect
 	github.com/hanzoai/vfs v0.4.3 // indirect
