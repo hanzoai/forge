@@ -98,6 +98,18 @@ func RunCronJobActivity(ctx context.Context, name string) error {
 // degraded cron into an outage.
 func startBackend() {
 	backendOnce.Do(func() {
+		// This runs on the boot path of the server every repository in the
+		// estate pushes to. A scheduler that cannot start is a degraded server;
+		// a scheduler that panics while starting is no server at all, and the
+		// difference between those two is this recover.
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("cron: Hanzo Tasks backend panicked during start, continuing without scheduling: %v", r)
+				tasksWorker = nil
+				tasksClient = nil
+			}
+		}()
+
 		addr := tasksAddress()
 		if addr == "" {
 			log.Info("cron: HANZO_TASKS_HOSTPORT is unset — jobs are registered but nothing will fire them")
