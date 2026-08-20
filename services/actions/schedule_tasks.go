@@ -75,24 +75,35 @@ func startTasks(ctx context.Context) error {
 				continue
 			}
 
-			if err := CreateScheduleTask(ctx, row); err != nil {
-				log.Error("CreateScheduleTask: %v", err)
-				return err
-			}
-
-			// Parse the spec
+			// ADVANCE FIRST, THEN RUN, AND KEEP GOING PAST A FAILURE.
+			//
+			// Reversed, one unresolvable workflow stops every schedule in the
+			// instance. `return` abandons the paged scan rather than the row,
+			// and specs are ordered id DESC, so the newest failure starves every
+			// older one. Because the advance sat AFTER the call that failed, the
+			// same row also re-armed every minute forever — the two together
+			// wedge rather than degrade.
+			//
+			// Measured before this change: a mirrored fork calling a reusable
+			// workflow that does not exist here held 108 of the 116 specs below
+			// it overdue across 60 repositories, for eleven days, while every
+			// spec above it ran normally. A row we cannot run is one row.
 			schedule, err := row.Parse()
 			if err != nil {
 				log.Error("Parse: %v", err)
-				return err
+				continue
 			}
 
-			// Update the spec's next run time and previous run time
 			row.Prev = row.Next
 			row.Next = timeutil.TimeStamp(schedule.Next(now.Add(1 * time.Minute)).Unix())
 			if err := actions_model.UpdateScheduleSpec(ctx, row, "prev", "next"); err != nil {
 				log.Error("UpdateScheduleSpec: %v", err)
-				return err
+				continue
+			}
+
+			if err := CreateScheduleTask(ctx, row); err != nil {
+				log.Error("CreateScheduleTask: %v", err)
+				continue
 			}
 		}
 
