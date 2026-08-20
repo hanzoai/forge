@@ -11,6 +11,7 @@ import (
 
 	auth_model "github.com/hanzoai/git/models/auth"
 	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/urfave/cli/v3"
 )
@@ -50,8 +51,13 @@ func runGenerateAccessToken(ctx context.Context, c *cli.Command) error {
 		return errors.New("you must provide a username to generate a token for")
 	}
 
-	if err := initDB(ctx); err != nil {
-		return err
+	// Guarded like every other admin command: the test harness supplies its own
+	// database, and initDB there re-enters MustInstalled, which fatals on a tree
+	// that was never "installed".
+	if !setting.IsInTesting {
+		if err := initDB(ctx); err != nil {
+			return err
+		}
 	}
 
 	user, err := user_model.GetUserByName(ctx, c.String("username"))
