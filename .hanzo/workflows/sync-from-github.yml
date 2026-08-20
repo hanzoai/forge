@@ -1,5 +1,5 @@
 name: Sync from GitHub
-# git.hanzo.ai is canonical for this fork (the forge reports mirror=false — it is
+# git.hanzo.ai is canonical for this fork (Hanzo Git reports mirror=false — it is
 # not a pull mirror of GitHub, it owns main); development also lands on
 # github.com/hanzoai/git. ONE deterministic direction: an in-cluster PULL. The
 # runner reaches both ends (GitHub outbound, this instance via the URL
@@ -51,7 +51,7 @@ jobs:
       # Tags were not synced, only main. cicd.yml triggers a release build on
       # `tags: ['v*']`, and that tag is created on GitHub — so it never arrived
       # here, the trigger never fired, and no semver image was ever built. The
-      # forge sat at v1.26.24 while GitHub had v1.26.26: tagged, and not built.
+      # Hanzo Git sat at v1.26.24 while GitHub had v1.26.26: tagged, and not built.
       # A version number that names no artifact is worse than no tag, because it
       # reads as a release.
       #
