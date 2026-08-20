@@ -37,7 +37,6 @@ require (
 	github.com/getkin/kin-openapi v0.140.0
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-chi/cors v1.2.2
-	github.com/go-co-op/gocron/v2 v2.21.2
 	github.com/go-enry/go-enry/v2 v2.9.6
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.19.1
@@ -59,6 +58,7 @@ require (
 	github.com/hanzoai/act v1.0.0
 	github.com/hanzoai/authz v1.10.29
 	github.com/hanzoai/sqlite v0.3.2
+	github.com/hanzoai/tasks v1.52.0
 	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hanzokv/lock/v4 v4.17.2
 	github.com/hashicorp/go-version v1.9.0
@@ -264,7 +264,6 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/inbucket/html2text v1.0.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect

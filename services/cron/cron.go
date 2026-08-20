@@ -11,22 +11,11 @@ import (
 	"time"
 
 	"github.com/hanzoai/git/modules/graceful"
-	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/process"
 	"github.com/hanzoai/git/modules/translation"
 
-	"github.com/go-co-op/gocron/v2"
+	"github.com/robfig/cron/v3"
 )
-
-var scheduler gocron.Scheduler
-
-func init() {
-	var err error
-	scheduler, err = gocron.NewScheduler(gocron.WithLocation(time.Local))
-	if err != nil {
-		log.Fatal("Unable to create cron scheduler: %v", err)
-	}
-}
 
 // Init begins cron tasks
 // Each cron task is run within the shutdown context as a running server
@@ -34,6 +23,12 @@ func init() {
 func Init(original context.Context) {
 	defer pprof.SetGoroutineLabels(original)
 	_, _, finished := process.GetManager().AddTypedContext(graceful.GetManager().ShutdownContext(), "Service: Cron", process.SystemProcessType, true)
+
+	// The worker comes up BEFORE the jobs register, because registering is
+	// what declares each schedule to Hanzo Tasks and a schedule with nothing
+	// serving its queue is a run that times out rather than one that waits.
+	startBackend()
+
 	initBasicTasks()
 	initExtendedTasks()
 	initActionsTasks()
@@ -45,13 +40,10 @@ func Init(original context.Context) {
 		}
 	}
 
-	scheduler.Start()
 	started = true
 	lock.Unlock()
 	graceful.GetManager().RunAtShutdown(context.Background(), func() {
-		if err := scheduler.Shutdown(); err != nil {
-			log.Error("Unable to shutdown cron scheduler: %v", err)
-		}
+		stopBackend()
 		lock.Lock()
 		started = false
 		lock.Unlock()
@@ -83,48 +75,39 @@ func (t *TaskTableRow) FormatLastMessage(locale translation.Locale) string {
 // TaskTable represents a table of tasks
 type TaskTable []*TaskTableRow
 
-// ListTasks returns all running cron tasks.
+// ListTasks returns every registered cron task for the admin table.
+//
+// The schedule of record is Hanzo Tasks; this reads the DECLARATION, which is
+// the same string that was handed to CreateSchedule, and computes the next
+// occurrence from it. That is arithmetic on a cron expression, not a second
+// scheduler — nothing here decides when anything runs, and a describe call per
+// row would put thirty round trips behind a page load to learn what the spec
+// already says.
 func ListTasks() TaskTable {
-	jobs := scheduler.Jobs()
-	jobMap := map[string]gocron.Job{}
-	for _, job := range jobs {
-		// the first tag is the task name
-		tags := job.Tags()
-		if len(tags) == 0 { // should never happen
-			continue
-		}
-		jobMap[tags[0]] = job
-	}
-
 	lock.Lock()
 	defer lock.Unlock()
 
+	parser := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor)
+	now := time.Now()
+
 	tTable := make([]*TaskTableRow, 0, len(tasks))
 	for _, task := range tasks {
-		spec := "-"
-		var (
-			next time.Time
-			prev time.Time
-		)
-		if e, ok := jobMap[task.Name]; ok {
-			tags := e.Tags()
-			if len(tags) > 1 {
-				spec = tags[1] // the second tag is the task spec
-			}
-			next, _ = e.NextRun()
-			prev, _ = e.LastRunStartedAt()
+		spec := task.config.GetSchedule()
+		if spec == "" {
+			spec = "-"
+		}
+
+		var next time.Time
+		if sched, err := parser.Parse(task.config.GetSchedule()); err == nil {
+			next = sched.Next(now)
 		}
 
 		task.lock.Lock()
-		// If the manual run is after the cron run, use that instead.
-		if prev.Before(task.LastRun) {
-			prev = task.LastRun
-		}
 		tTable = append(tTable, &TaskTableRow{
 			Name:        task.Name,
 			Spec:        spec,
 			Next:        next,
-			Prev:        prev,
+			Prev:        task.LastRun,
 			ExecTimes:   task.ExecTimes,
 			LastMessage: task.LastMessage,
 			Status:      task.Status,
