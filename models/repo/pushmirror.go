@@ -25,10 +25,13 @@ type PushMirror struct {
 	RemoteName    string
 	RemoteAddress string `xorm:"VARCHAR(2048)"`
 
-	SyncOnCommit   bool `xorm:"NOT NULL DEFAULT true"`
-	Interval       time.Duration
-	CreatedUnix    timeutil.TimeStamp `xorm:"created"`
-	LastUpdateUnix timeutil.TimeStamp `xorm:"INDEX last_update"`
+	SyncOnCommit bool `xorm:"NOT NULL DEFAULT true"`
+	Interval     time.Duration
+	CreatedUnix  timeutil.TimeStamp `xorm:"created"`
+	// Zero means the epoch, which is due now: a mirror nothing has synced yet
+	// is owed its first run. The scheduler compares this to the wall clock, and
+	// no comparison against NULL is ever true, so the column must never hold one.
+	LastUpdateUnix timeutil.TimeStamp `xorm:"INDEX NOT NULL DEFAULT 0 last_update"`
 	LastError      string             `xorm:"text"`
 }
 
