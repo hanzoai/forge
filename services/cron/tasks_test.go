@@ -5,68 +5,38 @@
 package cron
 
 import (
-	"sort"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddTaskToScheduler(t *testing.T) {
-	assert.Empty(t, scheduler.Jobs())
-	defer func() {
-		for _, j := range scheduler.Jobs() {
-			_ = scheduler.RemoveJob(j.ID())
-		}
-	}()
+// What a registered job declares to Hanzo Tasks. The predecessor of this test
+// asserted that gocron held a tagged job; that scheduler is gone, and the thing
+// worth pinning now is the shape of the schedule itself — its id addresses one
+// row across restarts, and its input is what tells the one workflow type which
+// job to run.
+func TestScheduleOptionsFor(t *testing.T) {
+	opts := scheduleOptionsFor(&Task{
+		Name:   "task 1",
+		config: &BaseConfig{Schedule: "5 4 * * *"},
+	})
 
-	// no seconds
-	err := addTaskToScheduler(&Task{
-		Name: "task 1",
-		config: &BaseConfig{
-			Schedule: "5 4 * * *",
-		},
-	})
-	assert.NoError(t, err)
-	jobs := scheduler.Jobs()
-	assert.Len(t, jobs, 1)
-	assert.Equal(t, "task 1", jobs[0].Tags()[0])
-	assert.Equal(t, "5 4 * * *", jobs[0].Tags()[1])
-
-	// with seconds
-	err = addTaskToScheduler(&Task{
-		Name: "task 2",
-		config: &BaseConfig{
-			Schedule: "30 5 4 * * *",
-		},
-	})
-	assert.NoError(t, err)
-	jobs = scheduler.Jobs() // the item order is not guaranteed, so we need to sort it before "assert"
-	sort.Slice(jobs, func(i, j int) bool {
-		return jobs[i].Tags()[0] < jobs[j].Tags()[0]
-	})
-	assert.Len(t, jobs, 2)
-	assert.Equal(t, "task 2", jobs[1].Tags()[0])
-	assert.Equal(t, "30 5 4 * * *", jobs[1].Tags()[1])
+	assert.Equal(t, "git-cron-task 1", opts.ID)
+	assert.Equal(t, []string{"5 4 * * *"}, opts.CronExpressions)
+	assert.Equal(t, workflowType, opts.WorkflowType)
+	assert.Equal(t, taskQueue, opts.TaskQueue)
+	assert.Equal(t, []any{"task 1"}, opts.Input)
 }
 
-func TestScheduleHasSeconds(t *testing.T) {
-	tests := []struct {
-		schedule  string
-		hasSecond bool
-	}{
-		{"* * * * * *", true},
-		{"* * * * *", false},
-		{"5 4 * * *", false},
-		{"5 4 * * *", false},
-		{"5,8 4 * * *", false},
-		{"*   *   *  * * *", true},
-		{"5,8 4   *  *   *", false},
-	}
+// A second job is a second schedule, not a second scheduler: same workflow
+// type, same queue, distinguished only by id and input.
+func TestScheduleOptionsAreDistinctPerJob(t *testing.T) {
+	a := scheduleOptionsFor(&Task{Name: "alpha", config: &BaseConfig{Schedule: "@daily"}})
+	b := scheduleOptionsFor(&Task{Name: "beta", config: &BaseConfig{Schedule: "@hourly"}})
 
-	for i, test := range tests {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			assert.Equal(t, test.hasSecond, scheduleHasSeconds(test.schedule))
-		})
-	}
+	assert.NotEqual(t, a.ID, b.ID)
+	assert.Equal(t, a.WorkflowType, b.WorkflowType)
+	assert.Equal(t, a.TaskQueue, b.TaskQueue)
+	assert.Equal(t, []any{"alpha"}, a.Input)
+	assert.Equal(t, []any{"beta"}, b.Input)
 }
