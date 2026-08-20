@@ -54,16 +54,22 @@ var (
 	tasksWorker worker.Worker
 )
 
-// tasksAddress is the Hanzo Tasks frontend. Empty disables the backend, which
-// is what a test binary and a laptop want: jobs stay registered and runnable by
-// hand, nothing dials out.
-func tasksAddress() string { return os.Getenv("HANZO_TASKS_HOSTPORT") }
+// tasksAddress is where tasksd listens. TASKS_ADDR is the name the Tasks
+// contract gives this, so it is the name used here — a second spelling of one
+// address is the same drift this file exists to remove.
+//
+// Empty is in-process mode by the contract's own definition: a test binary and
+// a laptop keep their jobs registered and hand-runnable, and nothing dials out.
+func tasksAddress() string { return os.Getenv("TASKS_ADDR") }
 
+// tasksNamespace is the IAM org, 1:1, which the contract calls non-negotiable.
+// This server belongs to `hanzo`; TASKS_NAMESPACE exists for a cluster that
+// runs it under another org rather than to make the mapping optional.
 func tasksNamespace() string {
-	if ns := os.Getenv("HANZO_TASKS_NAMESPACE"); ns != "" {
+	if ns := os.Getenv("TASKS_NAMESPACE"); ns != "" {
 		return ns
 	}
-	return "git"
+	return "hanzo"
 }
 
 // GitCronJobWorkflow is what every schedule fires. It carries the job's name
@@ -112,7 +118,7 @@ func startBackend() {
 
 		addr := tasksAddress()
 		if addr == "" {
-			log.Info("cron: HANZO_TASKS_HOSTPORT is unset — jobs are registered but nothing will fire them")
+			log.Info("cron: TASKS_ADDR is unset — jobs are registered but nothing will fire them")
 			return
 		}
 
