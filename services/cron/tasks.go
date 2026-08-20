@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"strings"
 	"sync"
 	"time"
 
@@ -21,8 +20,6 @@ import (
 	"github.com/hanzoai/git/modules/process"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/translation"
-
-	"github.com/go-co-op/gocron/v2"
 )
 
 var (
@@ -225,21 +222,10 @@ func RegisterTaskFatal(name string, config Config, fun func(context.Context, *us
 	}
 }
 
+// addTaskToScheduler declares the job to Hanzo Tasks. Registration is a
+// declaration, not a subscription: the schedule outlives this process, and the
+// worker started in backend.go is what answers when it fires.
 func addTaskToScheduler(task *Task) error {
-	tags := []string{task.Name, task.config.GetSchedule()} // name and schedule can't be get from job, so we add them as tag
-	withSeconds := scheduleHasSeconds(task.config.GetSchedule())
-	_, err := scheduler.NewJob(
-		gocron.CronJob(task.config.GetSchedule(), withSeconds),
-		gocron.NewTask(task.Run),
-		gocron.WithTags(tags...),
-	)
-	if err != nil {
-		log.Error("Unable to register cron task with name: %s Error: %v", task.Name, err)
-		return err
-	}
+	scheduleTask(task)
 	return nil
-}
-
-func scheduleHasSeconds(schedule string) bool {
-	return len(strings.Fields(schedule)) >= 6
 }
