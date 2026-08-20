@@ -43,11 +43,9 @@ func MakePushMirrorLastUpdateNotNull(x db.EngineMigration) error {
 		return err
 	}
 
-	// Ahead of the constraint, or the copy below has nowhere to put these.
-	if _, err := sess.Exec("UPDATE `push_mirror` SET `last_update` = 0 WHERE `last_update` IS NULL"); err != nil {
-		return err
-	}
-
+	// The rebuild carries each row over as COALESCE(column, its default), so the
+	// rows that predate the constraint are filled by the same zero that now
+	// stands behind every insert. One statement of it, in the column.
 	if err := base.RecreateTable(sess, new(PushMirror)); err != nil {
 		return err
 	}
