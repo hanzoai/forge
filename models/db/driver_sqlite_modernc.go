@@ -4,19 +4,18 @@
 
 //go:build !sqlite_mattn
 
-// hanzoai/sqlite is the default driver: a pure-Go (CGO-free) SQLite engine that
-// self-registers the "sqlite" database/sql driver name on import. It is the
-// default because it needs no CGO; the optional mattn build path (sqlite_mattn
-// tag) remains for CGO builds that need sqlite_unlock_notify.
+// hanzoai/sqlite is the default driver. It registers the "sqlite" database/sql
+// name on import and answers on either build — its own cgo backend when cgo is
+// on, a pure-Go engine when it is not. The optional sqlite_mattn build path
+// remains for CGO builds that need sqlite_unlock_notify.
 
 package db
 
 import (
-	"fmt"
-	"strings"
+	"strconv"
 
-	// blank import registers the "sqlite" database/sql driver (pure-Go backend).
-	_ "github.com/hanzoai/sqlite"
+	// registers the "sqlite" database/sql driver, and builds its DSN.
+	"github.com/hanzoai/sqlite"
 )
 
 func init() {
@@ -25,16 +24,21 @@ func init() {
 }
 
 func makeSQLiteConnStrModerncCCGO(opts SQLiteConnStrOptions) (string, string, error) {
-	var params []string
 	// TODO: there is a changed behavior from mattn driver:
 	// * mattn driver can wait for pretty long time for concurrent accesses (not limited by the busy timeout)
 	// * but other drivers will report something like "database is locked (5) (SQLITE_BUSY)" if the timeout is reached
 	// Maybe we need to relax the busy timeout to a reasonable long time in the future
-	params = append(params, fmt.Sprintf("_pragma=busy_timeout(%d)", opts.BusyTimeout))
-	params = append(params, "_txlock=immediate")
+
+	// The driver builds the pragma half. Its two backends spell a pragma
+	// differently in a DSN and each ignores the other's spelling silently, and
+	// which one is linked turns on cgo — not on the sqlite_mattn tag that selects
+	// this file — so either spelling written here is right on one build and
+	// evaporates on the other. _txlock is a driver parameter, not a pragma, and
+	// both backends read it.
+	pragmas := []sqlite.Pragma{{Name: "busy_timeout", Value: strconv.Itoa(opts.BusyTimeout)}}
 	if opts.JournalMode != "" {
-		params = append(params, fmt.Sprintf("_pragma=journal_mode(%s)", opts.JournalMode))
+		pragmas = append(pragmas, sqlite.Pragma{Name: "journal_mode", Value: opts.JournalMode})
 	}
-	connStr := fmt.Sprintf("file:%s?%s", opts.FilePath, strings.Join(params, "&"))
+	connStr := sqlite.PragmaDSN(opts.FilePath, pragmas) + "&_txlock=immediate"
 	return sqlDriverSQLite3, connStr, nil
 }
