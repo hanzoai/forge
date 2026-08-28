@@ -32,6 +32,40 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   the IAM `owner` claim (`--group-claim-name owner --group-team-map …
   --group-team-map-removal`), reconciled declaratively by the deploy's `oauth-sync`
   init container. hanzo.id IAM app: `hanzo-gitea`.
+- **A Hanzo IAM access token IS a git credential.** `iamUser` (`services/auth/iam.go`),
+  called from the basic-auth path (`services/auth/basic.go`), takes a hanzo.id access
+  token as the git-over-HTTP password so CI and buildkit stop needing a hand-made PAT.
+  Sign-in here is external, so a user has no password to give git and a PAT was a
+  second credential with a second lifetime for an identity IAM already issues tokens
+  for.
+  - **It is not its own auth Method, and must not become one.** It is asked LAST in
+    `parseAuthBasic`'s chain, after every local lookup has declined, so a token this
+    instance minted is never sent to a verifier that would only reject it. A parallel
+    `auth.IAM{}` registered across the router groups was written and dropped: it is the
+    same feature a second time, and the two would disagree about ordering and scope.
+  - **Verification is the shared reader**, `hanzoai/authz`'s `edge.Verifier` over the
+    issuer's JWKS — algorithm, kid, signature, issuer, expiry. Issuer and keys come from
+    THIS instance's own OIDC login source via discovery, so the tokens accepted are the
+    ones minted by the provider users already sign in through, and no `[iam]` config
+    exists to drift from it. There is no bespoke verifier; building one is the custom
+    auth the house rules forbid.
+  - **`aud` is deliberately NOT checked.** IAM sets it to the client that ASKED for the
+    token, not the server that accepts it, so an allowlist here would mean enumerating
+    every client in the estate and 401ing every user of the next one. What bounds the
+    credential instead is its SCOPE: `basic.go` sets `ApiTokenScope` to
+    `write:repository`, so it clones, fetches and pushes and cannot mint tokens, add
+    keys or administer anything.
+  - **Whose token it is** comes from the link sign-in already wrote — `sub` against
+    `external_login_user` for that source. No claim is trusted to NAME a user; email and
+    username are mutable and a match on one would land a renamed identity on somebody
+    else's account. An account that may not sign in is refused here too
+    (`!IsIndividual || !IsActive || ProhibitLogin`), the same question db, ldap and
+    signin each ask — without it one credential would outlive a suspension.
+  - **Owed: bearer on the API.** `parseAuthBasic` returns early unless the header is
+    Basic, so `Authorization: Bearer <iam token>` is not accepted on `/api/v1` or the
+    package routes. That is additive on top of this, not a reason for a second method.
+    Deliberately NOT for the container routes: `/v2/token` mints a 24h registry token of
+    its own, which would outlive the short-lived IAM token and survive its revocation.
 - **Config = env.** `GIT__<section>__<KEY>` (upstream's app.ini API under our
   prefix; `modules/setting.EnvConfigKeyPrefixGit`). `GITEA__*` is NOT accepted —
   there is no fallback, so a stale `GITEA__` var is silently ignored. No

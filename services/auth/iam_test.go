@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/services/auth/source/oauth2"
@@ -201,4 +202,43 @@ func TestAnUnreachableProviderIsLeftAlone(t *testing.T) {
 		assert.Nil(t, iamUser(t.Context(), "eyJhbGciOiJSUzI1NiJ9.e30.sig"))
 	}
 	assert.Equal(t, 1, dials, "the provider was dialled once per request")
+}
+
+// TestIAMTokenRefusedWhenTheAccountMayNotSignIn pins the gate every other source
+// in this chain applies (db, ldap, signin). Without it this is the one credential
+// that outlives a suspension: the password form is already closed to these
+// accounts and their tokens can be revoked, but the IAM token they hold would go
+// on answering. The subtests are the three separate ways an account is not
+// somebody who signs in, so a fix that catches one and misses the others fails
+// here rather than in production.
+func TestIAMTokenRefusedWhenTheAccountMayNotSignIn(t *testing.T) {
+	for name, set := range map[string]func(t *testing.T, u *user_model.User){
+		"prohibited": func(t *testing.T, u *user_model.User) {
+			_, err := db.GetEngine(t.Context()).ID(u.ID).Cols("prohibit_login").Update(&user_model.User{ProhibitLogin: true})
+			require.NoError(t, err)
+		},
+		"deactivated": func(t *testing.T, u *user_model.User) {
+			_, err := db.GetEngine(t.Context()).ID(u.ID).Cols("is_active").Update(&user_model.User{IsActive: false})
+			require.NoError(t, err)
+		},
+		"not an individual": func(t *testing.T, u *user_model.User) {
+			_, err := db.GetEngine(t.Context()).ID(u.ID).Cols("type").Update(&user_model.User{Type: user_model.UserTypeOrganization})
+			require.NoError(t, err)
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			require.NoError(t, unittest.PrepareTestDatabase())
+			p := newIDP(t)
+			src := register(t, p)
+			u := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
+			link(t, src.ID, "sub-of-user-2", u)
+
+			// The same token that resolves in TestIAMTokenResolvesTheLinkedAccount.
+			token := p.sign(t, p.url, "sub-of-user-2", time.Hour)
+			require.NotNil(t, iamUser(t.Context(), token), "the token resolves before the account is changed")
+
+			set(t, u)
+			assert.Nil(t, iamUser(t.Context(), token), "an account that may not sign in must not authenticate")
+		})
+	}
 }

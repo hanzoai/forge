@@ -7,6 +7,7 @@ package runner
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"slices"
 
@@ -22,8 +23,6 @@ import (
 
 	"connectrpc.com/connect"
 	gouuid "github.com/google/uuid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -144,7 +143,7 @@ func (s *Service) Declare(
 ) (*connect.Response[runnerv1.DeclareResponse], error) {
 	runner := GetRunner(ctx)
 	if err := actions_model.UpdateRunner(ctx, runner, applyDeclareRequestToRunner(runner, req.Msg)...); err != nil {
-		return nil, status.Errorf(codes.Internal, "update runner: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("update runner: %v", err))
 	}
 
 	resp := connect.NewResponse(&runnerv1.DeclareResponse{
@@ -174,10 +173,10 @@ func (s *Service) FetchTask(
 	tasksVersion := req.Msg.TasksVersion // task version from runner
 	latestVersion, err := actions_model.GetTasksVersionByScope(ctx, runner.OwnerID, runner.RepoID)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "query tasks version failed: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("query tasks version failed: %v", err))
 	} else if latestVersion == 0 {
 		if err := actions_model.IncreaseTaskVersion(ctx, runner.OwnerID, runner.RepoID); err != nil {
-			return nil, status.Errorf(codes.Internal, "fail to increase task version: %v", err)
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("fail to increase task version: %v", err))
 		}
 		// if we don't increase the value of `latestVersion` here,
 		// the response of FetchTask will return tasksVersion as zero.
@@ -190,14 +189,14 @@ func (s *Service) FetchTask(
 		// (avoids race where disable commits while this request still has stale runner).
 		freshRunner, err := actions_model.GetRunnerByUUID(ctx, runner.UUID)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "get runner: %v", err)
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get runner: %v", err))
 		}
 		// if the task version in request is not equal to the version in db,
 		// it means there may still be some tasks that haven't been assigned.
 		// try to pick a task for the runner that send the request.
 		if t, ok, throttled, err := actions_service.TryPickTask(ctx, freshRunner); err != nil {
 			log.Error("pick task failed: %v", err)
-			return nil, status.Errorf(codes.Internal, "pick task: %v", err)
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("pick task: %v", err))
 		} else if throttled {
 			// Concurrency limit reached: don't advance the runner's tasks version,
 			// so it retries on its next poll instead of sleeping until the next bump.
@@ -224,7 +223,7 @@ func (s *Service) UpdateTask(
 
 	task, err := actions_model.UpdateTaskByState(ctx, runner.ID, req.Msg.State)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "update task: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("update task: %v", err))
 	}
 
 	for k, v := range req.Msg.Outputs {
@@ -253,10 +252,10 @@ func (s *Service) UpdateTask(
 	}
 
 	if err := task.LoadJob(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "load job: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("load job: %v", err))
 	}
 	if err := task.Job.LoadAttributes(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "load run: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("load run: %v", err))
 	}
 
 	actions_service.CreateCommitStatusForRunJobs(ctx, task.Job.Run, task.Job)
@@ -294,9 +293,9 @@ func (s *Service) UpdateLog(
 
 	task, err := actions_model.GetTaskByID(ctx, req.Msg.TaskId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "get task: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get task: %v", err))
 	} else if runner.ID != task.RunnerID {
-		return nil, status.Errorf(codes.Internal, "invalid runner for task")
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid runner for task"))
 	}
 	ack := task.LogLength
 
@@ -309,7 +308,7 @@ func (s *Service) UpdateLog(
 	// Ack a re-sent finalize idempotently. Appending new rows past the seal errors.
 	if task.LogInStorage {
 		if len(rows) > 0 {
-			return nil, status.Errorf(codes.AlreadyExists, "log file has been archived")
+			return nil, connect.NewError(connect.CodeAlreadyExists, fmt.Errorf("log file has been archived"))
 		}
 		res.Msg.AckIndex = ack
 		return res, nil
@@ -328,7 +327,7 @@ func (s *Service) UpdateLog(
 	// the runner finalizes a task that produced no log output.
 	ns, err := actions.WriteLogs(ctx, task.LogFilename, task.LogSize, rows)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "unable to append logs to dbfs file: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("unable to append logs to dbfs file: %v", err))
 	}
 	task.LogLength += int64(len(rows))
 	for _, n := range ns {
@@ -343,12 +342,12 @@ func (s *Service) UpdateLog(
 		task.LogInStorage = true
 		remove, err = actions.TransferLogs(ctx, task.LogFilename)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "transfer logs: %v", err)
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("transfer logs: %v", err))
 		}
 	}
 
 	if err := actions_model.UpdateTask(ctx, task, "log_indexes", "log_length", "log_size", "log_in_storage"); err != nil {
-		return nil, status.Errorf(codes.Internal, "update task: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("update task: %v", err))
 	}
 	if remove != nil {
 		remove()

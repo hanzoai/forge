@@ -118,6 +118,16 @@ func iamUser(ctx context.Context, token string) *user_model.User {
 		log.Error("GetUserByID: %v", err)
 		return nil
 	}
+	// An account that may not sign in may not sign in HERE either. Every other
+	// source in this chain asks (db, ldap, signin), and skipping it would leave
+	// one credential that outlives a suspension: the password form is closed to
+	// them and their tokens can be revoked, but the IAM token they already hold
+	// would keep answering. Deactivation and prohibition are the same answer,
+	// and an organisation is not somebody who signs in at all.
+	if !u.IsIndividual() || !u.IsActive || u.ProhibitLogin {
+		log.Trace("IAM Authorization: account may not sign in")
+		return nil
+	}
 	return u
 }
 
