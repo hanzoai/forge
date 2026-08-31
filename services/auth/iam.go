@@ -216,3 +216,48 @@ func discover(ctx context.Context, url string) (issuer, jwks string) {
 	}
 	return strings.TrimRight(doc.Issuer, "/"), doc.JWKSURI
 }
+
+// IAM accepts a Hanzo IAM access token the way every other service in the estate
+// takes one — as a Bearer.
+//
+// The credential was already accepted here, but only through HTTP Basic, because
+// that is how git hands a password over https and the check was written where git
+// arrives (basic.go). Every other Hanzo service reads a Bearer, so an API caller
+// sent one and got 401 — indistinguishable from a bad token, while the SAME token
+// as Basic answered 200. Nothing in the refusal named the scheme, so the shape of
+// the credential looked like the problem when only its envelope was.
+//
+// Scope is unchanged: write:repository, decided in one place below. This method
+// widens HOW the token may be presented, never WHAT it may do.
+type IAM struct{}
+
+var _ Method = &IAM{}
+
+// Name returns the name of this authentication method.
+func (*IAM) Name() string { return IAMTokenMethodName }
+
+// Verify reads a Bearer (or ?token=) credential and accepts it when IAM signed it
+// for a subject linked to an account here. Declines everything else so the rest of
+// the chain still runs — a Gitea token reaching this method is not ours to answer.
+func (*IAM) Verify(req *http.Request, _ http.ResponseWriter, store DataStore, _ SessionStore) (*user_model.User, error) {
+	token, ok := parseToken(req)
+	if !ok {
+		return nil, nil //nolint:nilnil // the auth method is not applicable
+	}
+	u := iamUser(req.Context(), token)
+	if u == nil {
+		return nil, nil //nolint:nilnil // not an IAM token, or its subject is unlinked
+	}
+	log.Trace("IAM Authorization: Valid IAM token for user[%d]", u.ID)
+	setIAMTokenScope(store)
+	return u, nil
+}
+
+// setIAMTokenScope is the ONE place an IAM token's authority is stated, so the git
+// path (basic.go) and the API path above cannot drift into granting different
+// things for the same credential.
+func setIAMTokenScope(store DataStore) {
+	store.GetData()["LoginMethod"] = IAMTokenMethodName
+	store.GetData()["IsApiToken"] = true
+	store.GetData()["ApiTokenScope"] = auth_model.AccessTokenScopeWriteRepository
+}
