@@ -8,6 +8,7 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/hanzoai/git/modules/reqctx"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
@@ -241,4 +242,58 @@ func TestIAMTokenRefusedWhenTheAccountMayNotSignIn(t *testing.T) {
 			assert.Nil(t, iamUser(t.Context(), token), "an account that may not sign in must not authenticate")
 		})
 	}
+}
+
+// mockDataStore is the smallest ContextDataProvider a Method needs: the map it
+// writes LoginMethod and the token scope into.
+type mockDataStore struct{ data reqctx.ContextData }
+
+func (m *mockDataStore) GetData() reqctx.ContextData {
+	if m.data == nil {
+		m.data = reqctx.ContextData{}
+	}
+	return m.data
+}
+
+// TestIAMTokenIsAcceptedAsABearer pins the scheme, which is the half that was
+// missing.
+//
+// The credential was only ever offered to the verifier through HTTP Basic, because
+// that is how git hands a password over https and the check lived where git
+// arrives. Every other Hanzo service reads a Bearer, so an API caller sent one and
+// got 401 — the same answer a forged token gets — while the SAME token presented
+// as Basic answered 200. The refusal never named the scheme, so the credential
+// looked wrong when only its envelope was.
+func TestIAMTokenIsAcceptedAsABearer(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	p := newIDP(t)
+	src := register(t, p)
+	u := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
+	link(t, src.ID, "sub-of-user-2", u)
+
+	req := httptest.NewRequest("GET", "/v1/user", nil)
+	req.Header.Set("Authorization", "Bearer "+p.sign(t, p.url, "sub-of-user-2", time.Hour))
+	store := &mockDataStore{}
+
+	got, err := (&IAM{}).Verify(req, nil, store, nil)
+	require.NoError(t, err)
+	require.NotNil(t, got, "a Bearer carrying an IAM token resolves its account")
+	assert.Equal(t, u.ID, got.ID)
+
+	// The scope is unchanged by the scheme: presenting it as a Bearer must not
+	// buy more than presenting it to git did.
+	assert.Equal(t, auth_model.AccessTokenScopeWriteRepository, store.GetData()["ApiTokenScope"])
+	assert.Equal(t, IAMTokenMethodName, store.GetData()["LoginMethod"])
+}
+
+// TestIAMDeclinesABearerItDidNotSign leaves the rest of the chain its turn.
+func TestIAMDeclinesABearerItDidNotSign(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	newIDP(t)
+
+	req := httptest.NewRequest("GET", "/v1/user", nil)
+	req.Header.Set("Authorization", "Bearer 0123456789abcdef0123456789abcdef01234567")
+	got, err := (&IAM{}).Verify(req, nil, &mockDataStore{}, nil)
+	require.NoError(t, err)
+	assert.Nil(t, got, "a Gitea token is not ours to answer")
 }

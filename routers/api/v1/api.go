@@ -839,6 +839,9 @@ func buildAuthGroup() *auth.Group {
 		&auth.OAuth2{},
 		&auth.HTTPSign{},
 		&auth.Basic{}, // FIXME: this should be removed once we don't allow basic auth in API
+		// Last, for the same reason basic.go asks last: a token this instance
+		// issued itself is never sent to a verifier that would only reject it.
+		&auth.IAM{},
 	)
 	if setting.Service.EnableReverseProxyAuthAPI {
 		group.Add(&auth.ReverseProxy{}) // TODO: does it still make sense to support reverse proxy auth in API?
