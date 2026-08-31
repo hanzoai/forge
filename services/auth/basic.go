@@ -125,9 +125,7 @@ func (b *Basic) VerifyAuthToken(req *http.Request, w http.ResponseWriter, store 
 	// that would only reject it. Repository scope: see iam.go.
 	if u := iamUser(req.Context(), authToken); u != nil {
 		log.Trace("Basic Authorization: Valid IAM token for user[%d]", u.ID)
-		store.GetData()["LoginMethod"] = IAMTokenMethodName
-		store.GetData()["IsApiToken"] = true
-		store.GetData()["ApiTokenScope"] = auth_model.AccessTokenScopeWriteRepository
+		setIAMTokenScope(store)
 		return u, nil
 	}
 	return nil, nil //nolint:nilnil // the auth method is not applicable
