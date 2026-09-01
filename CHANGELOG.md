@@ -4016,7 +4016,7 @@ Key highlights of this release encompass significant changes categorized under `
   * Return `404` in the API if the requested webhooks were not found (#24823) (#24830)
   * Fix `organization` field being `null` in `GET /api/v1/teams/{id}` (#24694) (#24696)
 * ENHANCEMENTS
-  * Set `--font-weight-bold` to 600 (#24840)
+  * Set `--font-sans` to 600 (#24840)
   * Make mailer SMTP check have timed context (#24751) (#24759)
   * Do not select line numbers when selecting text from the action run logs (#24594) (#24596)
 * BUGFIXES
@@ -4082,7 +4082,7 @@ Key highlights of this release encompass significant changes categorized under `
   * Fix Monaco IOS keyboard button (#24341) (#24347)
   * Don't set meta `theme-color` by default (#24340) (#24346)
   * Wrap too long push mirror addresses (#21120) (#24334)
-  * Add --font-weight-bold and set previous bold to 601 (#24307) (#24331)
+  * Add --font-sans and set previous bold to 601 (#24307) (#24331)
   * Unify nightly naming across binaries and docker images (#24116) (#24308)
   * Fix footer display (#24251) (#24269)
   * Fix label color, fix divider in dropdown (#24215) (#24244)
