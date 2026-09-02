@@ -1,7 +1,25 @@
+/* Hanzo estate typeface — Zen / Zen Mono, self-hosted from the design estate
+   (design/assets/fonts). Variable weight axis; served from custom/public at the
+   runtime /assets path so no Google Fonts request leaves the login page. */
+@font-face {
+  font-family: "Zen";
+  src: url("/assets/fonts/Zen-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Zen Mono";
+  src: url("/assets/fonts/ZenMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* fonts */
-  --fonts-proportional: -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial;
-  --fonts-monospace: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace, var(--fonts-emoji);
+  --fonts-proportional: "Zen", -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial;
+  --fonts-monospace: "Zen Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace, var(--fonts-emoji);
   /* GitHub explicitly sets font names like: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla";
   Actually "Twemoji Mozilla" emoji font is widely used by browsers like Firefox, Pale Moon, and it is more likely up-to-dated than the system emoji font.
   So not setting emoji font seems to be the best choice, here we just use a non-existing dummy font name and let browsers choose. */
