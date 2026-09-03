@@ -7,15 +7,12 @@ package security
 
 import (
 	"net/http"
-	"sort"
 
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/db"
 	user_model "github.com/hanzoai/git/models/user"
-	"github.com/hanzoai/git/modules/optional"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/templates"
-	"github.com/hanzoai/git/services/auth/source/oauth2"
 	"github.com/hanzoai/git/services/context"
 )
 
@@ -36,7 +33,6 @@ func Security(ctx *context.Context) {
 	ctx.Data["PageIsSettingsSecurity"] = true
 
 	if ctx.FormString("openid.return_to") != "" {
-		settingsOpenIDVerify(ctx)
 		return
 	}
 
@@ -123,33 +119,12 @@ func loadSecurityData(ctx *context.Context) {
 	}
 	ctx.Data["AccountLinks"] = sources
 
-	authSources, err := db.Find[auth_model.Source](ctx, auth_model.FindSourcesOptions{
-		IsActive:  optional.None[bool](),
-		LoginType: auth_model.OAuth2,
-	})
-	if err != nil {
-		ctx.ServerError("FindSources", err)
-		return
-	}
-
+	// Linked OAuth2 providers used to be listed here. This instance has no login
+	// sources: identity is Hanzo IAM's, verified from the issuer's keys, so there
+	// is no per-user link to show or revoke.
 	var orderedOAuth2Names []string
-	oauth2Providers := make(map[string]oauth2.Provider)
-	for _, source := range authSources {
-		provider, err := oauth2.CreateProviderFromSource(source)
-		if err != nil {
-			ctx.ServerError("CreateProviderFromSource", err)
-			return
-		}
-		oauth2Providers[source.Name] = provider
-		if source.IsActive {
-			orderedOAuth2Names = append(orderedOAuth2Names, source.Name)
-		}
-	}
-
-	sort.Strings(orderedOAuth2Names)
 
 	ctx.Data["OrderedOAuth2Names"] = orderedOAuth2Names
-	ctx.Data["OAuth2Providers"] = oauth2Providers
 
 	openid, err := user_model.GetUserOpenIDs(ctx, ctx.Doer.ID)
 	if err != nil {
