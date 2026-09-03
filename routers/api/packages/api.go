@@ -10,7 +10,6 @@ import (
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/perm"
 	"github.com/hanzoai/git/modules/log"
-	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/web"
 	"github.com/hanzoai/git/routers/api/packages/alpine"
 	"github.com/hanzoai/git/routers/api/packages/arch"
@@ -97,9 +96,6 @@ type verifyAuthOptions struct {
 }
 
 func verifyAuth(r *web.Router, authMethods []auth.Method, opts verifyAuthOptions) {
-	if setting.Service.EnableReverseProxyAuth {
-		authMethods = append(authMethods, &auth.ReverseProxy{})
-	}
 	authGroup := auth.NewGroup(authMethods...)
 
 	r.AfterRouting(func(ctx *context.Context) {

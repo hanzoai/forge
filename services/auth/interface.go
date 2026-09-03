@@ -31,10 +31,6 @@ type Method interface {
 	Name() string
 }
 
-// PasswordAuthenticator represents a source of authentication
-type PasswordAuthenticator interface {
-	Authenticate(ctx context.Context, user *user_model.User, login, password string) (*user_model.User, error)
-}
 
 // SynchronizableSource represents a source that can synchronize users
 type SynchronizableSource interface {
