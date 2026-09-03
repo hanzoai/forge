@@ -22,8 +22,6 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/web"
 	"github.com/hanzoai/git/services/auth"
-	"github.com/hanzoai/git/services/auth/source/db"
-	"github.com/hanzoai/git/services/auth/source/smtp"
 	"github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/forms"
 	"github.com/hanzoai/git/services/mailer"
@@ -247,12 +245,11 @@ func DeleteAccount(ctx *context.Context) {
 		switch {
 		case user_model.IsErrUserNotExist(err):
 			ctx.JSONError(ctx.Tr("form.user_not_exist"))
-		case errors.Is(err, smtp.ErrUnsupportedLoginType):
-			ctx.JSONError(ctx.Tr("form.unsupported_login_type"))
-		case errors.As(err, &db.ErrUserPasswordNotSet{}):
-			ctx.JSONError(ctx.Tr("form.unset_password"))
-		case errors.As(err, &db.ErrUserPasswordInvalid{}):
-			ctx.JSONError(ctx.Tr("form.enterred_invalid_password"))
+		case errors.Is(err, auth.ErrPasswordAuth):
+			// Identity is Hanzo IAM's, so there is no local password to confirm
+			// against. The gate holds shut rather than opening on a check it can
+			// no longer make; re-confirmation wants an IAM step-up instead.
+			ctx.JSONError(err.Error())
 		default:
 			ctx.ServerError("UserSignIn", err)
 		}
