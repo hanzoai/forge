@@ -46,12 +46,10 @@ import (
 	"github.com/hanzoai/authz/edge"
 
 	auth_model "github.com/hanzoai/git/models/auth"
-	"github.com/hanzoai/git/models/db"
 	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/auth/httpauth"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
-	"github.com/hanzoai/git/modules/optional"
-	"github.com/hanzoai/git/services/auth/source/oauth2"
 )
 
 // IAMTokenMethodName names this credential in the request's LoginMethod, so an
@@ -150,9 +148,7 @@ func verifier(ctx context.Context) (*edge.Verifier, int64) {
 	// package pull were all unverifiable, though not one of them presents
 	// anything but a bearer.
 	discover, sourceID := "", int64(0)
-	if src, cfg := oidcSource(ctx); src != nil {
-		discover, sourceID = cfg.OpenIDConnectAutoDiscoveryURL, src.ID
-	} else if iss := strings.TrimRight(strings.TrimSpace(setting.IAM.Issuer), "/"); iss != "" {
+	if iss := strings.TrimRight(strings.TrimSpace(setting.IAM.Issuer), "/"); iss != "" {
 		discover = iss + "/.well-known/openid-configuration"
 	}
 	if discover == "" {
@@ -177,27 +173,6 @@ func verifier(ctx context.Context) (*edge.Verifier, int64) {
 	return reader.verifier, reader.sourceID
 }
 
-// oidcSource is the active OpenID Connect login source, or nil when this instance
-// has none. The FIRST such source is the one: a deployment signs its users in
-// through one identity provider, and accepting tokens from a second would accept
-// an identity the first never issued.
-func oidcSource(ctx context.Context) (*auth_model.Source, *oauth2.Source) {
-	sources, err := db.Find[auth_model.Source](ctx, auth_model.FindSourcesOptions{
-		IsActive:  optional.Some(true),
-		LoginType: auth_model.OAuth2,
-	})
-	if err != nil {
-		log.Error("FindSources: %v", err)
-		return nil, nil
-	}
-	for _, s := range sources {
-		cfg, ok := s.Cfg.(*oauth2.Source)
-		if ok && cfg.OpenIDConnectAutoDiscoveryURL != "" {
-			return s, cfg
-		}
-	}
-	return nil, nil
-}
 
 // discover reads the issuer and the key set address out of an OIDC discovery
 // document. Both empty on any failure, which leaves the credential unresolved
@@ -274,4 +249,32 @@ func setIAMTokenScope(store DataStore) {
 	store.GetData()["LoginMethod"] = IAMTokenMethodName
 	store.GetData()["IsApiToken"] = true
 	store.GetData()["ApiTokenScope"] = auth_model.AccessTokenScopeWriteRepository
+}
+
+// parseToken pulls the presented bearer out of a request.
+//
+// It moved here from the deleted oauth2 method, which was its only other caller:
+// with the forge no longer issuing tokens, reading one is something only the IAM
+// verifier does. The query-string forms stay because a git client and a package
+// client both use them where a header is awkward, and DISABLE_QUERY_AUTH_TOKEN
+// still governs whether they are honoured.
+func parseToken(req *http.Request) (string, bool) {
+	_ = req.ParseForm()
+	if !setting.DisableQueryAuthToken {
+		if token := req.Form.Get("token"); token != "" {
+			return token, true
+		}
+		if token := req.Form.Get("access_token"); token != "" {
+			return token, true
+		}
+	} else if req.Form.Get("token") != "" || req.Form.Get("access_token") != "" {
+		log.Warn("API token sent in query string but DISABLE_QUERY_AUTH_TOKEN=true")
+	}
+	if auHead := req.Header.Get("Authorization"); auHead != "" {
+		parsed, ok := httpauth.ParseAuthorizationHeader(auHead)
+		if ok && parsed.BearerToken != nil {
+			return parsed.BearerToken.Token, true
+		}
+	}
+	return "", false
 }

@@ -19,7 +19,6 @@ import (
 	"github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/templates"
 	"github.com/hanzoai/git/modules/web/middleware"
-	"github.com/hanzoai/git/routers/web/auth"
 	"github.com/hanzoai/git/routers/web/user"
 	"github.com/hanzoai/git/services/context"
 )
@@ -34,7 +33,6 @@ func Home(ctx *context.Context) {
 	if ctx.IsSigned {
 		if !ctx.Doer.IsActive && setting.Service.RegisterEmailConfirm {
 			ctx.Data["Title"] = ctx.Tr("auth.active_your_account")
-			ctx.HTML(http.StatusOK, auth.TplActivate)
 		} else if !ctx.Doer.IsActive || ctx.Doer.ProhibitLogin {
 			log.Info("Failed authentication attempt for %s from %s", ctx.Doer.Name, ctx.RemoteAddr())
 			ctx.Data["Title"] = ctx.Tr("auth.prohibit_login")

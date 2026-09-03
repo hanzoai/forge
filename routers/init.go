@@ -40,7 +40,6 @@ import (
 	actions_service "github.com/hanzoai/git/services/actions"
 	asymkey_service "github.com/hanzoai/git/services/asymkey"
 	"github.com/hanzoai/git/services/auth"
-	"github.com/hanzoai/git/services/auth/source/oauth2"
 	"github.com/hanzoai/git/services/automerge"
 	"github.com/hanzoai/git/services/cron"
 	feed_service "github.com/hanzoai/git/services/feed"
@@ -50,7 +49,6 @@ import (
 	markup_service "github.com/hanzoai/git/services/markup"
 	repo_migrations "github.com/hanzoai/git/services/migrations"
 	mirror_service "github.com/hanzoai/git/services/mirror"
-	"github.com/hanzoai/git/services/oauth2_provider"
 	packages_spec "github.com/hanzoai/git/services/packages/pkgspec"
 	pull_service "github.com/hanzoai/git/services/pull"
 	release_service "github.com/hanzoai/git/services/release"
@@ -141,8 +139,6 @@ func InitWebInstalled(ctx context.Context) {
 	mustInitCtx(ctx, common.InitDBEngine)
 	log.Info("ORM engine initialization successful!")
 	mustInit(system.Init)
-	mustInitCtx(ctx, oauth2.Init)
-	mustInitCtx(ctx, oauth2_provider.Init)
 	mustInit(release_service.Init)
 
 	mustInitCtx(ctx, models.Init)

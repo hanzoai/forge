@@ -119,7 +119,6 @@ func CommonRoutes() *web.Router {
 	r.AfterRouting(context.PackageContexter())
 
 	verifyAuth(r, []auth.Method{
-		&auth.OAuth2{},
 		&auth.Basic{},
 		&nuget.Auth{},
 		&Auth{},

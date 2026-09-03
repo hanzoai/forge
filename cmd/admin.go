@@ -57,8 +57,6 @@ func newAuthCommand() *cli.Command {
 		Name:  "auth",
 		Usage: "Modify external auth providers",
 		Commands: []*cli.Command{
-			microcmdAuthAddOauth(),
-			microcmdAuthUpdateOauth(),
 			newAuthListCommand(),
 			newAuthDeleteCommand(),
 		},

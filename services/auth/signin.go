@@ -11,10 +11,13 @@ import (
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/util"
 
-	_ "github.com/hanzoai/git/services/auth/source/oauth2" // registers the OIDC source Hanzo IAM is configured as
 )
 
 // ErrPasswordAuth is returned for every username-and-password sign-in attempt.
+//
+// There are no login sources left to check one against: db, ldap, pam, smtp and
+// sspi were removed as competing identity, and oauth2 went with the forge's own
+// provider. A credential is verified in exactly one place, iam.go.
 //
 // Identity on this instance is Hanzo IAM's, reached over OIDC and presented as a
 // bearer this instance verifies rather than issues (see iam.go). There is no local

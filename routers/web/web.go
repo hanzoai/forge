@@ -121,7 +121,6 @@ func newWebAuthMiddleware() *AuthMiddleware {
 		// Most auth methods should ignore the user id stored in the session.
 		// If the auth succeeds, it must use the user id from the auth method to make sure the new login succeeds.
 		if allowOAuth2 {
-			group.Add(&auth_service.OAuth2{})
 		}
 		if allowBasic {
 			group.Add(&auth_service.Basic{})
@@ -315,26 +314,12 @@ var optSignInFromAnyOrigin = verifyAuthWithOptions(&common.VerifyOptions{Disable
 func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 	// required to be signed in or signed out
 	reqSignIn := verifyAuthWithOptions(&common.VerifyOptions{SignInRequired: true})
-	reqSignOut := verifyAuthWithOptions(&common.VerifyOptions{SignOutRequired: true})
 	// optional sign in (if signed in, use the user as doer, if not, no doer)
 	optSignIn := verifyAuthWithOptions(&common.VerifyOptions{SignInRequired: setting.Service.RequireSignInViewStrict})
 	optExploreSignIn := verifyAuthWithOptions(&common.VerifyOptions{SignInRequired: setting.Service.RequireSignInViewStrict || setting.Service.Explore.RequireSigninView})
 
 	validation.AddBindingRules()
 
-	openIDSignInEnabled := func(ctx *context.Context) {
-		if !setting.Service.EnableOpenIDSignIn {
-			ctx.HTTPError(http.StatusForbidden)
-			return
-		}
-	}
-
-	openIDSignUpEnabled := func(ctx *context.Context) {
-		if !setting.Service.EnableOpenIDSignUp {
-			ctx.HTTPError(http.StatusForbidden)
-			return
-		}
-	}
 
 	oauth2Enabled := func(ctx *context.Context) {
 		if !setting.OAuth2.Enabled {
@@ -501,7 +486,6 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 	m.Get("/", Home)
 	m.Get("/sitemap.xml", sitemapEnabled, optExploreSignIn, HomeSitemap)
 	m.Group("/.well-known", func() {
-		m.Get("/openid-configuration", auth.OIDCWellKnown)
 		m.Group("", func() {
 			m.Get("/nodeinfo", NodeInfoLinks)
 			m.Get("/webfinger", WebfingerQuery)
@@ -545,69 +529,17 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 	m.Get("/milestones", reqSignIn, reqMilestonesDashboardPageEnabled, user.Milestones)
 
 	// ***** START: User *****
-	// "user/login" doesn't need signOut, then logged-in users can still access this route for redirection purposes by "/user/login?redirec_to=..."
-	m.Get("/user/login", auth.SignIn)
-	m.Group("/user", func() {
-		m.Post("/login", web.Bind(forms.SignInForm{}), auth.SignInPost)
-		m.Group("", func() {
-			m.Combo("/login/openid").
-				Get(auth.SignInOpenID).
-				Post(web.Bind(forms.SignInOpenIDForm{}), auth.SignInOpenIDPost)
-		}, openIDSignInEnabled)
-		m.Group("/openid", func() {
-			m.Combo("/connect").
-				Get(auth.ConnectOpenID).
-				Post(web.Bind(forms.ConnectOpenIDForm{}), auth.ConnectOpenIDPost)
-			m.Group("/register", func() {
-				m.Combo("").
-					Get(auth.RegisterOpenID, openIDSignUpEnabled).
-					Post(web.Bind(forms.SignUpOpenIDForm{}), auth.RegisterOpenIDPost)
-			}, openIDSignUpEnabled)
-		}, openIDSignInEnabled)
-		m.Get("/sign_up", auth.SignUp)
-		m.Post("/sign_up", web.Bind(forms.RegisterForm{}), auth.SignUpPost)
-		m.Get("/link_account", auth.LinkAccount)
-		m.Post("/link_account_signin", web.Bind(forms.SignInForm{}), auth.LinkAccountPostSignIn)
-		m.Post("/link_account_signup", web.Bind(forms.RegisterForm{}), auth.LinkAccountPostRegister)
-		m.Group("/two_factor", func() {
-			m.Get("", auth.TwoFactor)
-			m.Post("", web.Bind(forms.TwoFactorAuthForm{}), auth.TwoFactorPost)
-			m.Get("/scratch", auth.TwoFactorScratch)
-			m.Post("/scratch", web.Bind(forms.TwoFactorScratchAuthForm{}), auth.TwoFactorScratchPost)
-		})
-		m.Group("/webauthn", func() {
-			m.Get("", auth.WebAuthn)
-			m.Get("/passkey/assertion", auth.WebAuthnPasskeyAssertion)
-			m.Post("/passkey/login", auth.WebAuthnPasskeyLogin)
-			m.Get("/assertion", auth.WebAuthnLoginAssertion)
-			m.Post("/assertion", auth.WebAuthnLoginAssertionPost)
-		})
-	}, reqSignOut)
-
+	// Sign-in, sign-up, account linking, TOTP, WebAuthn and OpenID used to be
+	// registered here. This instance authenticates against Hanzo IAM alone, so it
+	// serves none of them: there is nothing to check a password against and no
+	// second factor of our own to demand.
 	m.Any("/user/events", routing.MarkLongPolling(), events.Events)
 
-	m.Group("/login/oauth", func() {
-		m.Group("", func() {
-			m.Get("/authorize", web.Bind(forms.AuthorizationForm{}), auth.AuthorizeOAuth)
-			m.Post("/grant", web.Bind(forms.GrantApplicationForm{}), auth.GrantApplicationOAuth)
-			// TODO manage redirection
-			m.Post("/authorize", web.Bind(forms.AuthorizationForm{}), auth.AuthorizeOAuth)
-		}, reqSignIn)
-
-		m.Group("", func() {
-			m.Methods("GET, POST, OPTIONS", "/userinfo", auth.InfoOAuth)
-			m.Methods("POST, OPTIONS", "/access_token", web.Bind(forms.AccessTokenForm{}), auth.AccessTokenOAuth)
-			m.Methods("GET, OPTIONS", "/keys", auth.OIDCKeys)
-			m.Methods("POST, OPTIONS", "/introspect", web.Bind(forms.IntrospectTokenForm{}), auth.IntrospectOAuth)
-		}, optionsCorsHandler(), webAuth.AllowOAuth2, optSignInFromAnyOrigin)
-	}, oauth2Enabled)
 
 	m.Group("/user/settings", func() {
 		m.Get("", user_setting.Profile)
 		m.Post("", web.Bind(forms.UpdateProfileForm{}), user_setting.ProfilePost)
 		m.Post("/update_preferences", user_setting.UpdatePreferences)
-		m.Get("/change_password", auth.MustChangePassword)
-		m.Post("/change_password", web.Bind(forms.MustChangePasswordForm{}), auth.MustChangePasswordPost)
 		m.Post("/avatar", web.Bind(forms.AvatarForm{}), user_setting.AvatarPost)
 		m.Post("/avatar/delete", user_setting.DeleteAvatar)
 		m.Group("/account", func() {
@@ -629,22 +561,9 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 		})
 		m.Group("/security", func() {
 			m.Get("", security.Security)
-			m.Group("/two_factor", func() {
-				m.Post("/regenerate_scratch", security.RegenerateScratchTwoFactor)
-				m.Post("/disable", security.DisableTwoFactor)
-				m.Get("/enroll", security.EnrollTwoFactor)
-				m.Post("/enroll", web.Bind(forms.TwoFactorAuthForm{}), security.EnrollTwoFactorPost)
-			})
-			m.Group("/webauthn", func() {
-				m.Post("/request_register", web.Bind(forms.WebauthnRegistrationForm{}), security.WebAuthnRegister)
-				m.Post("/register", security.WebauthnRegisterPost)
-				m.Post("/delete", security.WebauthnDelete)
-			})
-			m.Group("/openid", func() {
-				m.Post("", web.Bind(forms.AddOpenIDForm{}), security.OpenIDPost)
-				m.Post("/delete", security.DeleteOpenID)
-				m.Post("/toggle_visibility", security.ToggleOpenIDVisibility)
-			}, openIDSignInEnabled)
+			// Second factors, passkeys and OpenID links were registered here.
+			// This instance enrols no credential of its own: identity is Hanzo
+			// IAM's, and a second factor belongs to whoever authenticates.
 			m.Post("/account_link", security.DeleteAccountLink)
 		})
 
@@ -722,21 +641,10 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 	}, reqSignIn, user_setting.SettingsCtxData)
 
 	m.Group("/user", func() {
-		m.Get("/activate", auth.Activate)
-		m.Post("/activate", auth.ActivatePost)
-		m.Any("/activate_email", auth.ActivateEmail)
 		m.Get("/avatar/{username}/{size}", user.AvatarByUsernameSize)
-		m.Get("/recover_account", auth.ResetPasswd)
-		m.Post("/recover_account", auth.ResetPasswdPost)
-		m.Get("/forgot_password", auth.ForgotPasswd)
-		m.Post("/forgot_password", auth.ForgotPasswdPost)
 		m.Get("/logout", auth.SignOut)
 		m.Get("/stopwatches", reqSignIn, user.GetStopwatches)
 		m.Get("/search_candidates", optExploreSignIn, user.SearchCandidates)
-		m.Group("/oauth2", func() {
-			m.Get("/{provider}", auth.SignInOAuth)
-			m.Get("/{provider}/callback", auth.SignInOAuthCallback)
-		})
 	})
 	// ***** END: User *****
 
