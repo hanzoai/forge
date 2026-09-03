@@ -6,139 +6,26 @@ package auth
 
 import (
 	"context"
-	"strings"
 
 	"github.com/hanzoai/git/models/auth"
-	"github.com/hanzoai/git/models/db"
 	user_model "github.com/hanzoai/git/models/user"
-	"github.com/hanzoai/git/modules/log"
-	"github.com/hanzoai/git/modules/optional"
-	"github.com/hanzoai/git/services/auth/source/oauth2"
-	"github.com/hanzoai/git/services/auth/source/smtp"
+	"github.com/hanzoai/git/modules/util"
 
-	_ "github.com/hanzoai/git/services/auth/source/db"   // register the sources (and below)
-	_ "github.com/hanzoai/git/services/auth/source/ldap" // register the ldap source
-	_ "github.com/hanzoai/git/services/auth/source/pam"  // register the pam source
-	_ "github.com/hanzoai/git/services/auth/source/sspi" // register the sspi source
-
-	"github.com/hanzoai/builder"
+	_ "github.com/hanzoai/git/services/auth/source/oauth2" // registers the OIDC source Hanzo IAM is configured as
 )
 
-// UserSignIn validates user name and password.
-func UserSignIn(ctx context.Context, username, password string) (*user_model.User, *auth.Source, error) {
-	var user *user_model.User
-	isEmail := false
-	if strings.Contains(username, "@") {
-		isEmail = true
-		// check same email
-		emailAddress, has, err := db.Get[user_model.EmailAddress](ctx, builder.Eq{"lower_email": strings.ToLower(strings.TrimSpace(username))})
-		if err != nil {
-			return nil, nil, err
-		}
-		if has {
-			if !emailAddress.IsActivated {
-				return nil, nil, user_model.ErrEmailAddressNotExist{
-					Email: username,
-				}
-			}
-			user = &user_model.User{ID: emailAddress.UID}
-		}
-	} else {
-		trimmedUsername := strings.TrimSpace(username)
-		if len(trimmedUsername) == 0 {
-			return nil, nil, user_model.ErrUserNotExist{Name: username}
-		}
+// ErrPasswordAuth is returned for every username-and-password sign-in attempt.
+//
+// Identity on this instance is Hanzo IAM's, reached over OIDC and presented as a
+// bearer this instance verifies rather than issues (see iam.go). There is no local
+// credential to check a password against: the sources that held one — db, ldap,
+// pam, smtp, sspi — are gone rather than disabled, so this refuses by construction
+// instead of by configuration.
+var ErrPasswordAuth = util.NewInvalidArgumentErrorf("password authentication is not available; sign in with Hanzo IAM")
 
-		user = &user_model.User{LowerName: strings.ToLower(trimmedUsername)}
-	}
-
-	if user != nil {
-		var hasUser bool
-		var err error
-		if user.ID > 0 {
-			user, err = user_model.GetUserByID(ctx, user.ID)
-			if err != nil && !user_model.IsErrUserNotExist(err) {
-				return nil, nil, err
-			}
-			if user != nil && user.Type != user_model.UserTypeIndividual {
-				return nil, nil, user_model.ErrUserNotExist{Name: username}
-			}
-			hasUser = user != nil
-		} else if user.LowerName != "" {
-			user, err = user_model.GetIndividualUserByName(ctx, user.LowerName)
-			if err != nil && !user_model.IsErrUserNotExist(err) {
-				return nil, nil, err
-			}
-			hasUser = user != nil
-		}
-
-		if hasUser {
-			source, err := auth.GetSourceByID(ctx, user.LoginSource)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			if !source.IsActive {
-				return nil, nil, oauth2.ErrAuthSourceNotActivated
-			}
-
-			authenticator, ok := source.Cfg.(PasswordAuthenticator)
-			if !ok {
-				return nil, nil, smtp.ErrUnsupportedLoginType
-			}
-
-			user, err := authenticator.Authenticate(ctx, user, user.LoginName, password)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			// WARN: DON'T check user.IsActive, that will be checked on reqSign so that
-			// user could be hint to resend confirm email.
-			if user.ProhibitLogin {
-				return nil, nil, user_model.ErrUserProhibitLogin{UID: user.ID, Name: user.Name}
-			}
-
-			return user, source, nil
-		}
-	}
-
-	sources, err := db.Find[auth.Source](ctx, auth.FindSourcesOptions{
-		IsActive: optional.Some(true),
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	for _, source := range sources {
-		if !source.IsActive {
-			// don't try to authenticate non-active sources
-			continue
-		}
-
-		authenticator, ok := source.Cfg.(PasswordAuthenticator)
-		if !ok {
-			continue
-		}
-
-		authUser, err := authenticator.Authenticate(ctx, nil, username, password)
-
-		if err == nil {
-			if !authUser.ProhibitLogin {
-				return authUser, source, nil
-			}
-			err = user_model.ErrUserProhibitLogin{UID: authUser.ID, Name: authUser.Name}
-		}
-
-		if user_model.IsErrUserNotExist(err) {
-			log.Debug("Failed to login '%s' via '%s': %v", username, source.Name, err)
-		} else {
-			log.Warn("Failed to login '%s' via '%s': %v", username, source.Name, err)
-		}
-	}
-
-	if isEmail {
-		return nil, nil, user_model.ErrEmailAddressNotExist{Email: username}
-	}
-
-	return nil, nil, user_model.ErrUserNotExist{Name: username}
+// UserSignIn refuses. It survives only so the callers that still reference a
+// password form fail closed while their routes and templates are removed; it
+// authenticates nobody and has no path that can.
+func UserSignIn(_ context.Context, _, _ string) (*user_model.User, *auth.Source, error) {
+	return nil, nil, ErrPasswordAuth
 }

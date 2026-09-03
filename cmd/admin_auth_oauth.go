@@ -17,6 +17,26 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+// authService is the small seam the auth CLI writes through, so a command can be
+// exercised without a database. It lived beside the LDAP command until that and
+// the other competing identity sources were removed; OAuth2 — the source Hanzo
+// IAM is registered as — is the only one left, so it lives here with its caller.
+type authService struct {
+	initDB            func(ctx context.Context) error
+	createAuthSource  func(context.Context, *auth_model.Source) error
+	updateAuthSource  func(context.Context, *auth_model.Source) error
+	getAuthSourceByID func(ctx context.Context, id int64) (*auth_model.Source, error)
+}
+
+func newAuthService() *authService {
+	return &authService{
+		initDB:            initDB,
+		createAuthSource:  auth_model.CreateSource,
+		updateAuthSource:  auth_model.UpdateSource,
+		getAuthSourceByID: auth_model.GetSourceByID,
+	}
+}
+
 func oauthCLIFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
