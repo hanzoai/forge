@@ -128,6 +128,7 @@ func loadCommonSettingsFrom(cfg ConfigProvider) error {
 	mustCurrentRunUserMatch(cfg) // it depends on the SSH config, only non-builtin SSH server requires this check
 
 	loadOAuth2From(cfg)
+	loadIAMFrom(cfg)
 	loadSecurityFrom(cfg)
 	if err := loadAttachmentFrom(cfg); err != nil {
 		return err
