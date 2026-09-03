@@ -25,7 +25,7 @@
 .chroma .go { color: var(--color-syntax-output); } /* GenericOutput */
 .chroma .gp { color: var(--color-syntax-prompt); } /* GenericPrompt */
 .chroma .gr { color: var(--color-syntax-invalid); } /* GenericError */
-.chroma .gs { color: var(--color-syntax-strong); font-weight: var(--font-weight-semibold); } /* GenericStrong */
+.chroma .gs { color: var(--color-syntax-strong); font-weight: var(--font-sans); } /* GenericStrong */
 .chroma .gt { color: var(--color-syntax-traceback); } /* GenericTraceback */
 .chroma .gu { color: var(--color-syntax-subheading); } /* GenericSubheading */
 .chroma .il { color: var(--color-syntax-number); } /* LiteralNumberIntegerLong */
