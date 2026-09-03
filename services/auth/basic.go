@@ -6,7 +6,6 @@
 package auth
 
 import (
-	"errors"
 	"net/http"
 
 	actions_model "github.com/hanzoai/git/models/actions"
@@ -15,8 +14,6 @@ import (
 	"github.com/hanzoai/git/modules/auth/httpauth"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
-	"github.com/hanzoai/git/modules/timeutil"
-	"github.com/hanzoai/git/modules/util"
 )
 
 // Ensure the struct implements the interface.
@@ -70,47 +67,16 @@ func (b *Basic) parseAuthBasic(req *http.Request) (ret struct{ authToken, uname,
 
 // VerifyAuthToken only the access token provided as parameter, used by other auth methods that want to reuse access token verification logic
 func (b *Basic) VerifyAuthToken(req *http.Request, w http.ResponseWriter, store DataStore, sess SessionStore, authToken string) (*user_model.User, error) {
-	// get oauth2 token's user's ID
-	accessTokenScope, uid := GetOAuthAccessTokenScopeAndUserID(req.Context(), authToken)
-	if uid != 0 {
-		log.Trace("Basic Authorization: Valid OAuthAccessToken for user[%d]", uid)
+	// IAM issues the JWT behind every access token and API key, so a credential
+	// this instance minted for itself is a second authority for an identity that
+	// already has one — a second lifetime to track and a second thing to revoke.
+	// The OAuth2 access token and the personal access token that were read here
+	// are gone; what a caller presents is an IAM token or nothing.
 
-		u, err := user_model.GetUserByID(req.Context(), uid)
-		if err != nil {
-			log.Error("GetUserByID:  %v", err)
-			return nil, err
-		}
-
-		store.GetData()["LoginMethod"] = OAuth2TokenMethodName
-		store.GetData()["IsApiToken"] = true
-		store.GetData()["ApiTokenScope"] = accessTokenScope
-		return u, nil
-	}
-
-	// check personal access token
-	token, err := auth_model.GetAccessTokenBySHA(req.Context(), authToken)
-	if err == nil {
-		log.Trace("Basic Authorization: Valid AccessToken for user[%d]", uid)
-		u, err := user_model.GetUserByID(req.Context(), token.UID)
-		if err != nil {
-			log.Error("GetUserByID:  %v", err)
-			return nil, err
-		}
-
-		token.UpdatedUnix = timeutil.TimeStampNow()
-		if err = auth_model.UpdateAccessToken(req.Context(), token); err != nil {
-			log.Error("UpdateAccessToken:  %v", err)
-		}
-
-		store.GetData()["LoginMethod"] = AccessTokenMethodName
-		store.GetData()["IsApiToken"] = true
-		store.GetData()["ApiTokenScope"] = token.Scope
-		return u, nil
-	} else if !errors.Is(err, util.ErrNotExist) {
-		log.Error("GetAccessTokenBySHA: %v", err)
-	}
-
-	// check task token
+	// A task token is not a user credential and is not IAM's to issue: the
+	// Actions protocol mints it per job, scoped to that job, and hands it to the
+	// runner that is already executing it. Reading it here is upstream's
+	// protocol, not an identity this instance is asserting.
 	task, err := actions_model.GetRunningTaskByToken(req.Context(), authToken)
 	if err == nil && task != nil {
 		log.Trace("Basic Authorization: Valid AccessToken for task[%d]", task.ID)
