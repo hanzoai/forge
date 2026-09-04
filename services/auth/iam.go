@@ -49,6 +49,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/optional"
 	"github.com/hanzoai/git/services/auth/source/oauth2"
 )
@@ -140,20 +141,33 @@ func iamUser(ctx context.Context, token string) *user_model.User {
 func verifier(ctx context.Context) (*edge.Verifier, int64) {
 	reader.Lock()
 	defer reader.Unlock()
-	src, cfg := oidcSource(ctx)
-	if src == nil {
+	// The login SOURCE if this instance has one, otherwise the configured issuer.
+	//
+	// Verifying a bearer needs the issuer's public keys and nothing else — no
+	// client credential, no registered source. Requiring a source row here made
+	// every credential this instance can verify depend on the prerequisites of
+	// BROWSER SIGN-IN, so with no source configured a git push, a CI clone and a
+	// package pull were all unverifiable, though not one of them presents
+	// anything but a bearer.
+	discover, sourceID := "", int64(0)
+	if src, cfg := oidcSource(ctx); src != nil {
+		discover, sourceID = cfg.OpenIDConnectAutoDiscoveryURL, src.ID
+	} else if iss := strings.TrimRight(strings.TrimSpace(setting.IAM.Issuer), "/"); iss != "" {
+		discover = iss + "/.well-known/openid-configuration"
+	}
+	if discover == "" {
 		return nil, 0
 	}
-	fresh := reader.discover == cfg.OpenIDConnectAutoDiscoveryURL && reader.sourceID == src.ID
+	fresh := reader.discover == discover && reader.sourceID == sourceID
 	if fresh && reader.verifier != nil && time.Since(reader.built) < jwksTTL {
 		return reader.verifier, reader.sourceID
 	}
 	if fresh && reader.verifier == nil && time.Since(reader.built) < quiet {
 		return nil, 0 // the last attempt failed and the provider is still being left alone
 	}
-	reader.verifier, reader.sourceID, reader.discover = nil, src.ID, cfg.OpenIDConnectAutoDiscoveryURL
+	reader.verifier, reader.sourceID, reader.discover = nil, sourceID, discover
 	reader.built = time.Now()
-	issuer, jwks := discover(ctx, cfg.OpenIDConnectAutoDiscoveryURL)
+	issuer, jwks := discoverAt(ctx, discover)
 	if issuer == "" || jwks == "" {
 		return nil, 0
 	}
@@ -188,7 +202,7 @@ func oidcSource(ctx context.Context) (*auth_model.Source, *oauth2.Source) {
 // discover reads the issuer and the key set address out of an OIDC discovery
 // document. Both empty on any failure, which leaves the credential unresolved
 // rather than verified against a guess.
-func discover(ctx context.Context, url string) (issuer, jwks string) {
+func discoverAt(ctx context.Context, url string) (issuer, jwks string) {
 	c, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(c, http.MethodGet, url, nil)

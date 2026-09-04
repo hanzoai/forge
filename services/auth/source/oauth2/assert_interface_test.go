@@ -6,7 +6,6 @@ package oauth2_test
 
 import (
 	auth_model "github.com/hanzoai/git/models/auth"
-	"github.com/hanzoai/git/services/auth"
 	"github.com/hanzoai/git/services/auth/source/oauth2"
 )
 
@@ -16,7 +15,6 @@ import (
 type sourceInterface interface {
 	auth_model.Config
 	auth_model.RegisterableSource
-	auth.PasswordAuthenticator
 }
 
 var _ (sourceInterface) = &oauth2.Source{}
