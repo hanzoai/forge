@@ -38,11 +38,23 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   Sign-in here is external, so a user has no password to give git and a PAT was a
   second credential with a second lifetime for an identity IAM already issues tokens
   for.
-  - **It is not its own auth Method, and must not become one.** It is asked LAST in
-    `parseAuthBasic`'s chain, after every local lookup has declined, so a token this
-    instance minted is never sent to a verifier that would only reject it. A parallel
-    `auth.IAM{}` registered across the router groups was written and dropped: it is the
-    same feature a second time, and the two would disagree about ordering and scope.
+  - **Two wire shapes, one credential.** `basic.go` takes the token as the Basic
+    PASSWORD, which is what git-over-https sends; `auth.IAM{}` (`iam.go`) takes it as a
+    BEARER, which is what the API takes. That Method is registered in the API group and
+    is NOT the same feature twice — `3dd8a290b8` added it to close the bearer gap this
+    file used to list as owed. An earlier draft of this bullet said the Method "must not
+    become one"; it was written before that gap was closed, and the commit supersedes it.
+  - **No local credential is asked before it, because none is left.** The OAuth2 access
+    token and the personal access token are gone from BOTH readers — `parseAuthBasic`
+    and `OAuth2.userFromToken` — since IAM signs the JWT behind every access token and
+    API key, and a credential this instance mints for itself is a second authority for
+    an identity that already has one. Removing it from one reader only would have left
+    the other answering: they are two paths to the same two credentials, which is why
+    the change is not complete until both are cut.
+  - **What those readers still accept is the Actions task credential**, in both its
+    shapes — the JWT a current runner carries and the opaque token an older one sends.
+    It is not a user identity and not IAM's to issue: the protocol mints it per job,
+    scoped to that job, for the runner already executing it.
   - **Verification is the shared reader**, `hanzoai/authz`'s `edge.Verifier` over the
     issuer's JWKS — algorithm, kid, signature, issuer, expiry. Issuer and keys come from
     THIS instance's own OIDC login source via discovery, so the tokens accepted are the
@@ -61,11 +73,9 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
     else's account. An account that may not sign in is refused here too
     (`!IsIndividual || !IsActive || ProhibitLogin`), the same question db, ldap and
     signin each ask — without it one credential would outlive a suspension.
-  - **Owed: bearer on the API.** `parseAuthBasic` returns early unless the header is
-    Basic, so `Authorization: Bearer <iam token>` is not accepted on `/api/v1` or the
-    package routes. That is additive on top of this, not a reason for a second method.
-    Deliberately NOT for the container routes: `/v2/token` mints a 24h registry token of
-    its own, which would outlive the short-lived IAM token and survive its revocation.
+  - **The container routes stay out, deliberately.** `/v2/token` mints a 24h registry
+    token of its own, which would outlive the short-lived IAM token and survive its
+    revocation, so a longer-lived credential is not issued off a shorter-lived one.
 - **Config = env.** `GIT__<section>__<KEY>` (upstream's app.ini API under our
   prefix; `modules/setting.EnvConfigKeyPrefixGit`). `GITEA__*` is NOT accepted —
   there is no fallback, so a stale `GITEA__` var is silently ignored. No

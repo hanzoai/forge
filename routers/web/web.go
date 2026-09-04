@@ -8,11 +8,9 @@ import (
 	"net/http"
 	"strings"
 
-	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/perm"
 	"github.com/hanzoai/git/models/unit"
 	"github.com/hanzoai/git/modules/git"
-	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/metrics"
 	"github.com/hanzoai/git/modules/public"
@@ -114,7 +112,6 @@ func newWebAuthMiddleware() *AuthMiddleware {
 	webAuth.AllowBasic = middlewareSetContextValue(keyAllowBasic{}, true)
 	webAuth.AllowOAuth2 = middlewareSetContextValue(keyAllowOAuth2{}, true)
 
-	enableSSPI := setting.IsWindows && auth_model.IsSSPIEnabled(graceful.GetManager().ShutdownContext())
 	webAuth.MiddlewareHandler = func(ctx *context.Context) {
 		allowBasic := ctx.GetContextValue(keyAllowBasic{}) == true
 		allowOAuth2 := ctx.GetContextValue(keyAllowOAuth2{}) == true
@@ -132,20 +129,9 @@ func newWebAuthMiddleware() *AuthMiddleware {
 
 		// Sessionless means the route's auth can be done without web ui, then it doesn't need to create a session
 		// For example: accessing git via http, access rss feeds, downloading attachments, etc
-		isSessionless := allowOAuth2 || allowBasic
-
-		if setting.Service.EnableReverseProxyAuth {
-			// reverse-proxy should before Session, otherwise the header will be ignored if user has login
-			group.Add(&auth_service.ReverseProxy{CreateSession: !isSessionless})
-		}
 
 		// The Session plugin will skip authentication for users that have already signed in.
 		group.Add(&auth_service.Session{})
-
-		if enableSSPI {
-			// it MUST be the last, see the comment of SSPI
-			group.Add(&auth_service.SSPI{CreateSession: !isSessionless})
-		}
 
 		ar, err := common.AuthShared(ctx.Base, ctx.Session, group)
 		if err != nil {
@@ -844,14 +830,6 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 
 		m.Group("/{configType:default-hooks|system-hooks}", func() {
 			addWebhookAddRoutes()
-		})
-
-		m.Group("/auths", func() {
-			m.Get("", admin.Authentications)
-			m.Combo("/new").Get(admin.NewAuthSource).Post(web.Bind(forms.AuthenticationForm{}), admin.NewAuthSourcePost)
-			m.Combo("/{authid}").Get(admin.EditAuthSource).
-				Post(web.Bind(forms.AuthenticationForm{}), admin.EditAuthSourcePost)
-			m.Post("/{authid}/delete", admin.DeleteAuthSource)
 		})
 
 		m.Group("/notices", func() {

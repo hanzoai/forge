@@ -6,7 +6,6 @@
 package auth
 
 import (
-	"errors"
 	"net/http"
 
 	actions_model "github.com/hanzoai/git/models/actions"
@@ -15,8 +14,6 @@ import (
 	"github.com/hanzoai/git/modules/auth/httpauth"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
-	"github.com/hanzoai/git/modules/timeutil"
-	"github.com/hanzoai/git/modules/util"
 )
 
 // Ensure the struct implements the interface.
@@ -70,47 +67,16 @@ func (b *Basic) parseAuthBasic(req *http.Request) (ret struct{ authToken, uname,
 
 // VerifyAuthToken only the access token provided as parameter, used by other auth methods that want to reuse access token verification logic
 func (b *Basic) VerifyAuthToken(req *http.Request, w http.ResponseWriter, store DataStore, sess SessionStore, authToken string) (*user_model.User, error) {
-	// get oauth2 token's user's ID
-	accessTokenScope, uid := GetOAuthAccessTokenScopeAndUserID(req.Context(), authToken)
-	if uid != 0 {
-		log.Trace("Basic Authorization: Valid OAuthAccessToken for user[%d]", uid)
+	// IAM issues the JWT behind every access token and API key, so a credential
+	// this instance minted for itself is a second authority for an identity that
+	// already has one — a second lifetime to track and a second thing to revoke.
+	// The OAuth2 access token and the personal access token that were read here
+	// are gone; what a caller presents is an IAM token or nothing.
 
-		u, err := user_model.GetUserByID(req.Context(), uid)
-		if err != nil {
-			log.Error("GetUserByID:  %v", err)
-			return nil, err
-		}
-
-		store.GetData()["LoginMethod"] = OAuth2TokenMethodName
-		store.GetData()["IsApiToken"] = true
-		store.GetData()["ApiTokenScope"] = accessTokenScope
-		return u, nil
-	}
-
-	// check personal access token
-	token, err := auth_model.GetAccessTokenBySHA(req.Context(), authToken)
-	if err == nil {
-		log.Trace("Basic Authorization: Valid AccessToken for user[%d]", uid)
-		u, err := user_model.GetUserByID(req.Context(), token.UID)
-		if err != nil {
-			log.Error("GetUserByID:  %v", err)
-			return nil, err
-		}
-
-		token.UpdatedUnix = timeutil.TimeStampNow()
-		if err = auth_model.UpdateAccessToken(req.Context(), token); err != nil {
-			log.Error("UpdateAccessToken:  %v", err)
-		}
-
-		store.GetData()["LoginMethod"] = AccessTokenMethodName
-		store.GetData()["IsApiToken"] = true
-		store.GetData()["ApiTokenScope"] = token.Scope
-		return u, nil
-	} else if !errors.Is(err, util.ErrNotExist) {
-		log.Error("GetAccessTokenBySHA: %v", err)
-	}
-
-	// check task token
+	// A task token is not a user credential and is not IAM's to issue: the
+	// Actions protocol mints it per job, scoped to that job, and hands it to the
+	// runner that is already executing it. Reading it here is upstream's
+	// protocol, not an identity this instance is asserting.
 	task, err := actions_model.GetRunningTaskByToken(req.Context(), authToken)
 	if err == nil && task != nil {
 		log.Trace("Basic Authorization: Valid AccessToken for task[%d]", task.ID)
@@ -137,7 +103,7 @@ func (b *Basic) VerifyAuthToken(req *http.Request, w http.ResponseWriter, store 
 // Returns nil if header is empty or validation fails.
 func (b *Basic) Verify(req *http.Request, w http.ResponseWriter, store DataStore, sess SessionStore) (*user_model.User, error) {
 	parseBasicRet := b.parseAuthBasic(req)
-	authToken, uname, passwd := parseBasicRet.authToken, parseBasicRet.uname, parseBasicRet.passwd
+	authToken, uname := parseBasicRet.authToken, parseBasicRet.uname
 	if authToken == "" && uname == "" {
 		return nil, nil //nolint:nilnil // the auth method is not applicable
 	}
@@ -150,53 +116,14 @@ func (b *Basic) Verify(req *http.Request, w http.ResponseWriter, store DataStore
 		return nil, nil //nolint:nilnil // the auth method is not applicable
 	}
 
-	log.Trace("Basic Authorization: Attempting SignIn for %s", uname)
-	u, source, err := UserSignIn(req.Context(), uname, passwd)
-	if err != nil {
-		if !user_model.IsErrUserNotExist(err) {
-			log.Error("UserSignIn: %v", err)
-		}
-		return nil, err
-	}
-
-	if !source.TwoFactorShouldSkip() {
-		// Check if the user has WebAuthn registration
-		hasWebAuthn, err := auth_model.HasWebAuthnRegistrationsByUID(req.Context(), u.ID)
-		if err != nil {
-			return nil, err
-		}
-		if hasWebAuthn {
-			return nil, ErrUserAuthMessage("basic authorization is not allowed while WebAuthn enrolled")
-		}
-
-		if err := validateTOTP(req, u); err != nil {
-			return nil, err
-		}
-	}
-
-	store.GetData()["LoginMethod"] = BasicMethodName
-	log.Trace("Basic Authorization: Logged in user %-v", u)
-
-	return u, nil
+	// Identity on this instance is Hanzo IAM's alone, so a username and password
+	// pair authenticates nobody here. The token path above is the whole of Basic
+	// auth — an IAM access token, a repository access token, or an Actions task
+	// token — which is what `docker login` and `npm publish` present. Anything
+	// else declines rather than falling back to a local credential.
+	return nil, nil //nolint:nilnil // the auth method is not applicable
 }
 
-func validateTOTP(req *http.Request, u *user_model.User) error {
-	twofa, err := auth_model.GetTwoFactorByUID(req.Context(), u.ID)
-	if err != nil {
-		if auth_model.IsErrTwoFactorNotEnrolled(err) {
-			// No 2FA enrollment for this user
-			return nil
-		}
-		return err
-	}
-	// Consume the passcode atomically so a captured OTP cannot be replayed within its validity window.
-	if ok, err := twofa.ValidateAndConsumeTOTP(req.Context(), req.Header.Get("X-Gitea-OTP")); err != nil {
-		return err
-	} else if !ok {
-		return util.NewInvalidArgumentErrorf("invalid provided OTP")
-	}
-	return nil
-}
 
 func GetAccessScope(store DataStore) auth_model.AccessTokenScope {
 	if v, ok := store.GetData()["ApiTokenScope"]; ok {
