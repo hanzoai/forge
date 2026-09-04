@@ -18,7 +18,6 @@ import (
 	"github.com/hanzoai/git/modules/auth/httpauth"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
-	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/services/actions"
 	"github.com/hanzoai/git/services/oauth2_provider"
@@ -110,42 +109,26 @@ func parseToken(req *http.Request) (string, bool) {
 // It will set 'IsApiToken' to true if the token is an API token and
 // set 'ApiTokenScope' to the scope of the access token (TODO: this behavior should be fixed, don't set ctx.Data)
 func (o *OAuth2) userFromToken(ctx context.Context, tokenSHA string, store DataStore) (*user_model.User, error) {
-	// Let's see if token is valid.
-	if strings.Contains(tokenSHA, ".") {
-		// First attempt to decode an actions JWT, returning the actions user
-		if taskID, err := actions.TokenToTaskID(tokenSHA); err == nil {
-			if CheckTaskIsRunning(ctx, taskID) {
-				return user_model.NewActionsUserWithTaskID(taskID), nil
-			}
+	// Only the Actions task credential is read here. It is not a user identity and
+	// is not IAM's to issue: the protocol mints it per job, scoped to that job, and
+	// hands it to the runner already executing it. Both shapes are the same fact —
+	// the JWT the runner carries, and the opaque token an older one presents.
+	//
+	// The OAuth2 access token and the personal access token this instance used to
+	// issue are gone. IAM signs the JWT behind every access token and API key, so a
+	// credential minted here is a second authority for an identity that already has
+	// one, with a second lifetime and a second revocation. A caller presenting
+	// anything else declines through to the IAM reader rather than being answered
+	// locally.
+	if taskID, err := actions.TokenToTaskID(tokenSHA); err == nil {
+		if CheckTaskIsRunning(ctx, taskID) {
+			return user_model.NewActionsUserWithTaskID(taskID), nil
 		}
-
-		// Otherwise, check if this is an OAuth access token
-		accessTokenScope, uid := GetOAuthAccessTokenScopeAndUserID(ctx, tokenSHA)
-		if uid != 0 {
-			store.GetData()["IsApiToken"] = true
-			store.GetData()["ApiTokenScope"] = accessTokenScope
-		}
-		return user_model.GetUserByID(ctx, uid)
 	}
-	t, err := auth_model.GetAccessTokenBySHA(ctx, tokenSHA)
-	if err != nil {
-		if errors.Is(err, util.ErrNotExist) {
-			// check task token
-			if task, err := actions_model.GetRunningTaskByToken(ctx, tokenSHA); err == nil {
-				log.Trace("Basic Authorization: Valid AccessToken for task[%d]", task.ID)
-				return user_model.NewActionsUserWithTaskID(task.ID), nil
-			}
-		}
-		return nil, err
+	if task, err := actions_model.GetRunningTaskByToken(ctx, tokenSHA); err == nil && task != nil {
+		return user_model.NewActionsUserWithTaskID(task.ID), nil
 	}
-
-	t.UpdatedUnix = timeutil.TimeStampNow()
-	if err = auth_model.UpdateAccessToken(ctx, t); err != nil {
-		log.Error("UpdateAccessToken: %v", err)
-	}
-	store.GetData()["IsApiToken"] = true
-	store.GetData()["ApiTokenScope"] = t.Scope
-	return user_model.GetUserByID(ctx, t.UID)
+	return nil, nil //nolint:nilnil // the auth method is not applicable
 }
 
 // Verify extracts the user ID from the OAuth token in the query parameters
