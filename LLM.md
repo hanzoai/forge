@@ -25,11 +25,19 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 - **`[actions]` intact:** `services/actions`, `models/actions`,
   `routers/api/actions` — full runner registration + job API. Enabled via
   `GIT__actions__ENABLED=true`.
-- **The runner protocol is ours: five typed operations at `/v1/runner`** —
-  `register`, `declare`, `task`, `state`, `logs`, a POST each, JSON in and JSON
-  out, where the address IS the operation and the body is the whole input. It is
-  spoken only between this forge and `hanzoai/git-runner`, so it is written to
-  suit us: no protobuf, no generated code, no service name in the path.
+- **The runner protocol is ours: five typed zip operations at `/v1/runner`** —
+  `register`, `declare`, `task`, `state`, `log`, declared once with `zip.Post`
+  and answered on two faces: `POST /v1/runner/<name>` for a runner over HTTP, and
+  `post_runner_<name>` on ZAP's own call plane at `/.well-known/zip/op/`. Both
+  are the same app on the forge's one listener — `routers/init.go` hangs it on
+  two chi routes with `adaptor.FiberApp`, registered with `Post` and never
+  `Mount`, because Mount strips the prefix and the operations declare absolute
+  paths. It is spoken only between this forge and `hanzoai/git-runner`, so it is
+  written to suit us: no protobuf, no generated code, no service name in the path.
+  Two rules govern every value on it, and a test in `routers/api/actions` holds
+  both: no `map`, which the ZAP layout refuses outright, and no `time.Time`,
+  which it accepts and then silently blanks because every field of one is
+  unexported. Named values cross as `[]Pair`; instants as int64 unix nanoseconds.
   `routers/api/actions/runner.go` holds the handlers; the messages live in
   `modules/actions/runner`, a NESTED MODULE
   (`github.com/hanzoai/git/modules/actions/runner`) with an empty `require`
@@ -39,6 +47,14 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   breaks the runner outright — the forge pins `go.yaml.in/yaml/v4` forward with
   a `replace`, a dependent does not inherit a `replace`, and `actionlint` then
   fails to compile.
+- **A runner's job context is a struct, and that is the point.** As a map the
+  two sides could disagree in silence, and did: the forge wrote
+  `git_runtime_token` while the runner read `gitea_runtime_token` and quietly
+  fell back to the task token. `runner.Context` names the twenty-one values the
+  forge computes AND the runner reads, so a missing one is a compile error.
+  `GenerateGitContext` keeps its map — the forge evaluates workflow expressions
+  against it — and `generateTaskContext` is the ONE place the two vocabularies
+  meet.
 - **The forge and the runner share that wire, so they are deployed together.**
   The forge serves one runner protocol and the runner speaks one; nothing
   negotiates a version and there is no shim, deliberately. So a protocol change
@@ -127,7 +143,7 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 `routers.NormalRoutes` (`routers/init.go`) allocates the whole top level, and it
 is the only place that may: chi matches the most specific mount first, so a
 `/v1/…` route declared inside `routers/web` would be swallowed by the `/v1`
-mount. Four prefixes:
+mount. Five prefixes:
 
 - **`/` — the browser.** Every page a person sees (`routers/web`), plus
   `/-/fetch-redirect`, the delegate that lets a `fetch` response redirect to a
@@ -139,6 +155,9 @@ mount. Four prefixes:
   hook or the SSH command, holding the internal token), `/v1/sync` (HMAC-SHA256
   over the payload), `/v1/healthz` (no auth and no database, so a probe stays a
   probe), `/v1/packages`, `/v1/runner` and `/v1/artifact`.
+- **`/.well-known/zip/op/` — ZAP's call plane**, the second face of the same five
+  runner operations. It is a top-level path because that is where zip addresses
+  an operation by name, and it rides the forge's existing listener.
 - **`/v2` — the OCI distribution spec.** The registry API fixes this at the root
   of the host, so a sub-path deploy has to map it there in the proxy. Not ours to
   place.

@@ -27,6 +27,14 @@ import (
 
 type GitContext map[string]any
 
+// Text reads one value as the string it is, and the empty string when the key
+// carries something else or nothing at all. Every value a runner is sent is a
+// string; this is where the map's any becomes one.
+func (c GitContext) Text(key string) string {
+	s, _ := c[key].(string)
+	return s
+}
+
 // GenerateGitContext generate the gitea context without token and git_runtime_token.
 // attempt and job can be nil when generating a context for parsing workflow-level expressions.
 //
@@ -92,18 +100,6 @@ func GenerateGitContext(ctx context.Context, run *actions_model.ActionRun, attem
 		"triggering_actor":  "",                                       // string, The username of the user that initiated the workflow run. If the workflow run is a re-run, this value may differ from github.actor. Any workflow re-runs will use the privileges of github.actor, even if the actor initiating the re-run (github.triggering_actor) has different privileges.
 		"workflow":          run.WorkflowID,                           // string, The name of the workflow. If the workflow file doesn't specify a name, the value of this property is the full path of the workflow file in the repository.
 		"workspace":         "",                                       // string, The default working directory on the runner for steps, and the default location of your repository when using the checkout action.
-
-		// additional contexts
-		//
-		// One value under two names, because two kinds of runner read it. The
-		// `gitea_` spelling is the wire field act_runner has always read; ours
-		// reads `git_`. A runner that finds neither composes "https://" + ""
-		// + "/actions/checkout" and fails on `http: no Host in request URL`,
-		// which reads as a broken runner rather than an absent field — every
-		// stock v0.6.1 host on this forge was at zero successful jobs for it.
-		// Drop `git_` once no runner reads it; the protocol name is the keeper.
-		"gitea_default_actions_url": setting.Actions.DefaultActionsURL.URL(),
-		"git_default_actions_url":   setting.Actions.DefaultActionsURL.URL(),
 	}
 
 	if job != nil {

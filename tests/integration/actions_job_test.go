@@ -172,12 +172,20 @@ jobs:
 	})
 }
 
+// wantNeed is what one entry of a task's needs should say. It keeps outputs as a
+// map because this is test data a human reads, while the wire carries an ordered
+// list.
+type wantNeed struct {
+	Result  runner_module.Result
+	Outputs map[string]string
+}
+
 func TestJobNeedsMatrix(t *testing.T) {
 	testCases := []struct {
 		treePath          string
 		fileContent       string
 		outcomes          map[string]*mockTaskOutcome
-		expectedTaskNeeds map[string]runner_module.Need // jobID => Need
+		expectedTaskNeeds map[string]wantNeed // jobID => what that need should say
 	}{
 		{
 			treePath: ".hanzo/workflows/jobs-outputs-with-matrix.yml",
@@ -234,7 +242,7 @@ jobs:
 					},
 				},
 			},
-			expectedTaskNeeds: map[string]runner_module.Need{
+			expectedTaskNeeds: map[string]wantNeed{
 				"job1": {
 					Result: runner_module.Success,
 					Outputs: map[string]string{
@@ -301,7 +309,7 @@ jobs:
 					},
 				},
 			},
-			expectedTaskNeeds: map[string]runner_module.Need{
+			expectedTaskNeeds: map[string]wantNeed{
 				"job1": {
 					Result: runner_module.Failure,
 					Outputs: map[string]string{
@@ -336,14 +344,17 @@ jobs:
 				}
 
 				task := runner.fetchTask(t)
-				actualTaskNeeds := task.Needs
-				assert.Len(t, actualTaskNeeds, len(tc.expectedTaskNeeds))
-				for jobID, tn := range tc.expectedTaskNeeds {
-					actualNeed := actualTaskNeeds[jobID]
-					assert.Equal(t, tn.Result, actualNeed.Result)
-					assert.Len(t, actualNeed.Outputs, len(tn.Outputs))
-					for outputKey, outputValue := range tn.Outputs {
-						assert.Equal(t, outputValue, actualNeed.Outputs[outputKey])
+				assert.Len(t, task.Needs, len(tc.expectedTaskNeeds))
+				byJob := make(map[string]runner_module.Need, len(task.Needs))
+				for _, need := range task.Needs {
+					byJob[need.Job] = need
+				}
+				for jobID, want := range tc.expectedTaskNeeds {
+					got := byJob[jobID]
+					assert.Equal(t, want.Result, got.Result)
+					assert.Len(t, got.Outputs, len(want.Outputs))
+					for _, out := range got.Outputs {
+						assert.Equal(t, want.Outputs[out.Name], out.Value)
 					}
 				}
 			})
@@ -520,32 +531,7 @@ jobs:
 		actionRun := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: actionRunJob.RunID})
 		assert.NoError(t, actionRun.LoadAttributes(t.Context()))
 
-		assert.Equal(t, user2.Name, gtCtx["actor"])
-		assert.Equal(t, setting.AppURL+"v1", gtCtx["api_url"])
-		assert.Equal(t, apiPull.Base.Ref, gtCtx["base_ref"])
-		runEvent := map[string]any{}
-		assert.NoError(t, json.Unmarshal([]byte(actionRun.EventPayload), &runEvent))
-		assert.True(t, reflect.DeepEqual(gtCtx["event"], runEvent))
-		assert.Equal(t, actionRun.TriggerEvent, gtCtx["event_name"])
-		assert.Equal(t, apiPull.Head.Ref, gtCtx["head_ref"])
-		assert.Equal(t, actionRunJob.JobID, gtCtx["job"])
-		assert.Equal(t, actionRun.Ref, gtCtx["ref"])
-		assert.Equal(t, (git.RefName(actionRun.Ref)).ShortName(), gtCtx["ref_name"])
-		assert.Equal(t, false, gtCtx["ref_protected"])
-		assert.Equal(t, string((git.RefName(actionRun.Ref)).RefType()), gtCtx["ref_type"])
-		assert.Equal(t, actionRun.Repo.OwnerName+"/"+actionRun.Repo.Name, gtCtx["repository"])
-		assert.Equal(t, actionRun.Repo.OwnerName, gtCtx["repository_owner"])
-		assert.Equal(t, actionRun.Repo.HTMLURL(), gtCtx["repositoryUrl"])
-		assert.Equal(t, strconv.FormatInt(actionRunJob.RunID, 10), gtCtx["run_id"])
-		assert.Equal(t, strconv.FormatInt(actionRun.Index, 10), gtCtx["run_number"])
-		assert.Equal(t, strconv.FormatInt(actionRunJob.Attempt, 10), gtCtx["run_attempt"])
-		assert.Equal(t, "Actions", gtCtx["secret_source"])
-		assert.Equal(t, setting.AppURL, gtCtx["server_url"])
-		assert.Equal(t, actionRun.CommitSHA, gtCtx["sha"])
-		assert.Equal(t, actionRun.WorkflowID, gtCtx["workflow"])
-		assert.Equal(t, setting.Actions.DefaultActionsURL.URL(), gtCtx["gitea_default_actions_url"])
-		token, _ := gtCtx["token"].(string)
-		assert.Equal(t, actionTask.TokenLastEight, token[len(token)-8:])
+		assertTaskContext(t, gtCtx, actionTask, actionRunJob, actionRun, apiPull)
 	})
 }
 
@@ -612,38 +598,13 @@ jobs:
 		actionRun := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: actionRunJob.RunID})
 		assert.NoError(t, actionRun.LoadAttributes(t.Context()))
 
-		assert.Equal(t, user2.Name, gtCtx["actor"])
-		assert.Equal(t, setting.AppURL+"v1", gtCtx["api_url"])
-		assert.Equal(t, apiPull.Base.Ref, gtCtx["base_ref"])
-		runEvent := map[string]any{}
-		assert.NoError(t, json.Unmarshal([]byte(actionRun.EventPayload), &runEvent))
-		assert.True(t, reflect.DeepEqual(gtCtx["event"], runEvent))
-		assert.Equal(t, actionRun.TriggerEvent, gtCtx["event_name"])
-		assert.Equal(t, apiPull.Head.Ref, gtCtx["head_ref"])
-		assert.Equal(t, actionRunJob.JobID, gtCtx["job"])
-		assert.Equal(t, actionRun.Ref, gtCtx["ref"])
-		assert.Equal(t, (git.RefName(actionRun.Ref)).ShortName(), gtCtx["ref_name"])
-		assert.Equal(t, false, gtCtx["ref_protected"])
-		assert.Equal(t, string((git.RefName(actionRun.Ref)).RefType()), gtCtx["ref_type"])
-		assert.Equal(t, actionRun.Repo.OwnerName+"/"+actionRun.Repo.Name, gtCtx["repository"])
-		assert.Equal(t, actionRun.Repo.OwnerName, gtCtx["repository_owner"])
-		assert.Equal(t, actionRun.Repo.HTMLURL(), gtCtx["repositoryUrl"])
-		assert.Equal(t, strconv.FormatInt(actionRunJob.RunID, 10), gtCtx["run_id"])
-		assert.Equal(t, strconv.FormatInt(actionRun.Index, 10), gtCtx["run_number"])
-		assert.Equal(t, strconv.FormatInt(actionRunJob.Attempt, 10), gtCtx["run_attempt"])
-		assert.Equal(t, "Actions", gtCtx["secret_source"])
-		assert.Equal(t, setting.AppURL, gtCtx["server_url"])
-		assert.Equal(t, actionRun.CommitSHA, gtCtx["sha"])
-		assert.Equal(t, actionRun.WorkflowID, gtCtx["workflow"])
-		assert.Equal(t, setting.Actions.DefaultActionsURL.URL(), gtCtx["gitea_default_actions_url"])
-		token, _ := gtCtx["token"].(string)
-		assert.Equal(t, actionTask.TokenLastEight, token[len(token)-8:])
+		assertTaskContext(t, gtCtx, actionTask, actionRunJob, actionRun, apiPull)
 
 		// verify CleanupEphemeralRunners does not remove this runner
 		err = actions_service.CleanupEphemeralRunners(t.Context())
 		assert.NoError(t, err)
 
-		out, err := runner.task(t, &runner_module.TaskIn{TasksVersion: 0})
+		out, err := runner.task(t, &runner_module.TaskIn{Queue: 0})
 		assert.NoError(t, err)
 		assert.Nil(t, out.Task)
 
@@ -658,11 +619,11 @@ jobs:
 
 		// The ephemeral runner removed itself when its task finished, so it can no
 		// longer be placed and every later call is refused.
-		out, err = runner.task(t, &runner_module.TaskIn{TasksVersion: 0})
+		out, err = runner.task(t, &runner_module.TaskIn{Queue: 0})
 		assert.Error(t, err)
 		assert.Nil(t, out)
 
-		out, err = runner.task(t, &runner_module.TaskIn{TasksVersion: 0})
+		out, err = runner.task(t, &runner_module.TaskIn{Queue: 0})
 		assert.Error(t, err)
 		assert.Nil(t, out)
 
@@ -906,4 +867,41 @@ func TestLegacyRunsInCronTasks(t *testing.T) {
 			assert.Equal(t, actions_model.ArtifactStatusExpired, gotArtifact.Status)
 		})
 	})
+}
+
+// assertTaskContext checks every value a runner is given about its job. The
+// context is a struct on the wire, so a field that stops being sent is a compile
+// error here rather than a nil a runner reads as an empty string.
+func assertTaskContext(t *testing.T, c runner_module.Context, task *actions_model.ActionTask, job *actions_model.ActionRunJob, run *actions_model.ActionRun, pull api.PullRequest) {
+	t.Helper()
+
+	runEvent, event := map[string]any{}, map[string]any{}
+	require.NoError(t, json.Unmarshal([]byte(run.EventPayload), &runEvent))
+	require.NoError(t, json.Unmarshal(c.Event, &event))
+	assert.True(t, reflect.DeepEqual(event, runEvent))
+
+	assert.Equal(t, run.TriggerUser.Name, c.Actor)
+	assert.Equal(t, setting.AppURL+"v1", c.APIURL)
+	assert.Equal(t, pull.Base.Ref, c.BaseRef)
+	assert.Equal(t, pull.Head.Ref, c.HeadRef)
+	assert.Equal(t, run.TriggerEvent, c.EventName)
+	assert.Equal(t, job.JobID, c.Job)
+	assert.Equal(t, run.Ref, c.Ref)
+	assert.Equal(t, (git.RefName(run.Ref)).ShortName(), c.RefName)
+	assert.Equal(t, string((git.RefName(run.Ref)).RefType()), c.RefType)
+	assert.Equal(t, run.Repo.OwnerName+"/"+run.Repo.Name, c.Repository)
+	assert.Equal(t, run.Repo.OwnerName, c.RepositoryOwner)
+	assert.Equal(t, strconv.FormatInt(job.RunID, 10), c.RunID)
+	assert.Equal(t, strconv.FormatInt(run.Index, 10), c.RunNumber)
+	assert.Equal(t, strconv.FormatInt(job.Attempt, 10), c.RunAttempt)
+	assert.Equal(t, setting.AppURL, c.ServerURL)
+	assert.Equal(t, run.CommitSHA, c.Sha)
+	assert.Equal(t, task.TokenLastEight, c.Token[len(c.Token)-8:])
+	assert.NotEmpty(t, c.RuntimeToken)
+
+	// A runner composes an action's clone URL as <ActionsURL>/<owner>/<repo>.
+	// Receive nothing here and it composes "https://" + "" + "/actions/checkout",
+	// which fails as `http: no Host in request URL` — a job dead before its first
+	// step, reading as a broken runner rather than an absent field.
+	assert.Equal(t, setting.Actions.DefaultActionsURL.URL(), c.ActionsURL)
 }

@@ -24,11 +24,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Regression for https://gitea.com/gitea/runner/issues/950: a runner that
-// finalizes a task with no log output sends UpdateLog{Rows:[], NoMore:true}.
-// The previous short-circuit on len(Rows)==0 skipped TransferLogs, leaving
-// an orphan dbfs_data row. Verify the row is now archived and removed.
-func TestActionsLogFinalizeWithoutRows(t *testing.T) {
+// A runner that finalizes a task having printed nothing seals its log with no
+// lines at all. A short-circuit on len(lines)==0 skipped TransferLogs and left
+// an orphan dbfs_data row behind; this holds the row archived and removed.
+func TestActionsLogFinalizeWithoutLines(t *testing.T) {
 	onGitRun(t, func(t *testing.T, _ *url.URL) {
 		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 		session := loginUser(t, user2.Name)
@@ -56,17 +55,17 @@ jobs:
 
 		task := runner.fetchTask(t)
 
-		out, err := runner.logs(t, &runner_module.LogsIn{
-			TaskID: task.ID,
-			Index:  0,
-			Rows:   nil,
-			NoMore: true,
+		out, err := runner.appendLog(t, &runner_module.LogIn{
+			Task:  task.ID,
+			Index: 0,
+			Lines: nil,
+			Last:  true,
 		})
 		require.NoError(t, err)
 		assert.EqualValues(t, 0, out.Ack)
 
 		freshTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.ID})
-		require.True(t, freshTask.LogInStorage, "log_in_storage must flip after empty NoMore=true")
+		require.True(t, freshTask.LogInStorage, "log_in_storage must flip when an empty log is sealed")
 
 		_, err = storage.Actions.Stat(freshTask.LogFilename)
 		assert.NoError(t, err, "archived log must exist in storage")
@@ -74,17 +73,17 @@ jobs:
 		_, err = dbfs.Open(t.Context(), actions_module.DBFSPrefix+freshTask.LogFilename)
 		assert.ErrorIs(t, err, os.ErrNotExist, "DBFS row must be cleaned up after TransferLogs")
 
-		// The runner re-sends its final UpdateLog when the response was lost.
-		// A sealed log must ack the re-send and still reject new appended rows.
+		// The runner re-sends its final append when the reply was lost. A sealed
+		// log must ack the re-send and still refuse new lines.
 		t.Run("re-sent finalize is idempotent", func(t *testing.T) {
-			out, err := runner.logs(t, &runner_module.LogsIn{TaskID: task.ID, Index: 0, Rows: nil, NoMore: true})
+			out, err := runner.appendLog(t, &runner_module.LogIn{Task: task.ID, Index: 0, Lines: nil, Last: true})
 			require.NoError(t, err)
 			assert.EqualValues(t, 0, out.Ack)
 
-			_, err = runner.logs(t, &runner_module.LogsIn{
-				TaskID: task.ID, Index: 0, Rows: []runner_module.Row{{Content: "late"}}, NoMore: true,
+			_, err = runner.appendLog(t, &runner_module.LogIn{
+				Task: task.ID, Index: 0, Lines: []runner_module.Line{{Content: "late"}}, Last: true,
 			})
-			require.Error(t, err, "appending rows past the seal must be rejected")
+			require.Error(t, err, "appending past the seal must be refused")
 		})
 	})
 }

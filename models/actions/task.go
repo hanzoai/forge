@@ -775,13 +775,15 @@ func FindOldTasksToExpire(ctx context.Context, olderThan timeutil.TimeStamp, lim
 		Find(&tasks)
 }
 
-// stamp keeps an unset time unset: a runner that has not started a step sends
-// the zero time, and storing that as an epoch second would date the step to 1970.
-func stamp(t time.Time) timeutil.TimeStamp {
-	if t.IsZero() {
+// stamp converts an instant the runner reported — unix nanoseconds, 0 for unset
+// — to the second-resolution stamp the database column holds. Unset stays unset:
+// a runner that has not started a step sends 0, and storing that as an epoch
+// second would date the step to 1970.
+func stamp(nanos int64) timeutil.TimeStamp {
+	if nanos == 0 {
 		return 0
 	}
-	return timeutil.TimeStamp(t.Unix())
+	return timeutil.TimeStamp(nanos / int64(time.Second))
 }
 
 func logFileName(repoFullName string, taskID int64) string {

@@ -70,7 +70,7 @@ jobs:
 
 		// fetch and exec job1
 		job1Task := runner.fetchTask(t)
-		assert.Equal(t, "1", job1Task.Context["run_attempt"])
+		assert.Equal(t, "1", job1Task.Context.RunAttempt)
 		_, job1, run := getTaskAndJobAndRunByTaskID(t, job1Task.ID)
 		runner.execTask(t, job1Task, &mockTaskOutcome{
 			result: runner_module.Success,
@@ -91,7 +91,7 @@ jobs:
 		sessionAdmin.MakeRequest(t, req, http.StatusOK) // triggered by admin user
 		// fetch and exec job1
 		job1TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job1TaskR1.Context["run_attempt"])
+		assert.Equal(t, "2", job1TaskR1.Context.RunAttempt)
 		_, job1R1, _ := getTaskAndJobAndRunByTaskID(t, job1TaskR1.ID)
 		assert.Equal(t, job1.AttemptJobID, job1R1.AttemptJobID)
 		runner.execTask(t, job1TaskR1, &mockTaskOutcome{
@@ -99,7 +99,7 @@ jobs:
 		})
 		// fetch and exec job2
 		job2TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job2TaskR1.Context["run_attempt"])
+		assert.Equal(t, "2", job2TaskR1.Context.RunAttempt)
 		_, job2R1, _ := getTaskAndJobAndRunByTaskID(t, job2TaskR1.ID)
 		assert.Equal(t, job2.AttemptJobID, job2R1.AttemptJobID)
 		runner.execTask(t, job2TaskR1, &mockTaskOutcome{
@@ -114,13 +114,13 @@ jobs:
 		// job2 needs job1, so rerunning job1 will also rerun job2
 		// fetch and exec job1
 		job1TaskR2 := runner.fetchTask(t)
-		assert.Equal(t, "3", job1TaskR2.Context["run_attempt"])
+		assert.Equal(t, "3", job1TaskR2.Context.RunAttempt)
 		runner.execTask(t, job1TaskR2, &mockTaskOutcome{
 			result: runner_module.Success,
 		})
 		// fetch and exec job2
 		job2TaskR2 := runner.fetchTask(t)
-		assert.Equal(t, "3", job2TaskR2.Context["run_attempt"])
+		assert.Equal(t, "3", job2TaskR2.Context.RunAttempt)
 		runner.execTask(t, job2TaskR2, &mockTaskOutcome{
 			result: runner_module.Success,
 		})
@@ -133,7 +133,7 @@ jobs:
 		// only job2 will rerun
 		// fetch and exec job2
 		job2TaskR3 := runner.fetchTask(t)
-		assert.Equal(t, "4", job2TaskR3.Context["run_attempt"])
+		assert.Equal(t, "4", job2TaskR3.Context.RunAttempt)
 		runner.execTask(t, job2TaskR3, &mockTaskOutcome{
 			result: runner_module.Success,
 		})
@@ -182,12 +182,12 @@ jobs:
 			session.MakeRequest(t, req, http.StatusOK)
 			// fetch and exec job1
 			job1TaskR4 := runner.fetchTask(t)
-			assert.Equal(t, "5", job1TaskR4.Context["run_attempt"])
+			assert.Equal(t, "5", job1TaskR4.Context.RunAttempt)
 			runner.execTask(t, job1TaskR4, &mockTaskOutcome{
 				result: runner_module.Success,
 			})
 			job2TaskR4 := runner.fetchTask(t)
-			assert.Equal(t, "5", job2TaskR4.Context["run_attempt"])
+			assert.Equal(t, "5", job2TaskR4.Context.RunAttempt)
 			runner.execTask(t, job2TaskR4, &mockTaskOutcome{
 				result: runner_module.Success,
 			})
@@ -394,7 +394,7 @@ jobs:
 
 		// fetch job1 rerun task
 		job1TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job1TaskR1.Context["run_attempt"])
+		assert.Equal(t, "2", job1TaskR1.Context.RunAttempt)
 		rerunJob1Task, rerunJob1, rerunRun := getTaskAndJobAndRunByTaskID(t, job1TaskR1.ID)
 		assert.Equal(t, legacyRun.ID, rerunRun.ID)
 		assert.Equal(t, rerunJob1.RunAttemptID, rerunRun.LatestAttemptID)
@@ -402,7 +402,7 @@ jobs:
 
 		// fetch job2 rerun task
 		job2TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job2TaskR1.Context["run_attempt"])
+		assert.Equal(t, "2", job2TaskR1.Context.RunAttempt)
 		rerunJob2Task, rerunJob2, _ := getTaskAndJobAndRunByTaskID(t, job2TaskR1.ID)
 		runner.execTask(t, job2TaskR1, &mockTaskOutcome{result: runner_module.Success})
 		runner.fetchNoTask(t)
