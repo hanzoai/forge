@@ -137,7 +137,14 @@ func credential(working bool) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
 			ctx := req.Context()
-			r, err := actions_model.GetRunnerByUUID(ctx, req.Header.Get(uuidHeader))
+			uuid, token := req.Header.Get(uuidHeader), req.Header.Get(tokenHeader)
+			if uuid == "" || token == "" {
+				// Refused before the database is asked anything: a caller with no
+				// credential at all should not cost a query.
+				answerFault(resp, unknownRunner())
+				return
+			}
+			r, err := actions_model.GetRunnerByUUID(ctx, uuid)
 			if err != nil {
 				if errors.Is(err, util.ErrNotExist) {
 					answerFault(resp, unknownRunner())
@@ -146,7 +153,7 @@ func credential(working bool) func(http.Handler) http.Handler {
 				}
 				return
 			}
-			hashed := auth_model.HashToken(req.Header.Get(tokenHeader), r.TokenSalt)
+			hashed := auth_model.HashToken(token, r.TokenSalt)
 			if subtle.ConstantTimeCompare([]byte(r.TokenHash), []byte(hashed)) != 1 {
 				answerFault(resp, unknownRunner())
 				return
