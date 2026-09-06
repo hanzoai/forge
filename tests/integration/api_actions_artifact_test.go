@@ -592,7 +592,7 @@ func testActionRunAttemptArtifactV3(t *testing.T, repo *repo_model.Repository, s
 	task1 := runner.fetchTask(t)
 	_, job1, run := getTaskAndJobAndRunByTaskID(t, task1.ID)
 	require.NotZero(t, job1.RunAttemptID)
-	taskToken1, _ := task1.Context["git_runtime_token"].(string)
+	taskToken1 := task1.Context.RuntimeToken
 	require.NotEmpty(t, taskToken1)
 	uploadTestArtifactFile(t, run.ID, taskToken1, "artifact-attempt-1", "attempt-1.txt", strings.Repeat("A", 32))
 	uploadTestArtifactFile(t, run.ID, taskToken1, "artifact-shared", "shared.txt", strings.Repeat("C", 32))
@@ -608,7 +608,7 @@ func testActionRunAttemptArtifactV3(t *testing.T, repo *repo_model.Repository, s
 	_, job2, _ := getTaskAndJobAndRunByTaskID(t, task2.ID)
 	require.NotZero(t, job2.RunAttemptID)
 	assert.NotEqual(t, job1.RunAttemptID, job2.RunAttemptID)
-	taskToken2, _ := task2.Context["git_runtime_token"].(string)
+	taskToken2 := task2.Context.RuntimeToken
 	require.NotEmpty(t, taskToken2)
 	uploadTestArtifactFile(t, run.ID, taskToken2, "artifact-attempt-2", "attempt-2.txt", strings.Repeat("B", 32))
 	uploadTestArtifactFile(t, run.ID, taskToken2, "artifact-shared", "shared.txt", strings.Repeat("D", 32))

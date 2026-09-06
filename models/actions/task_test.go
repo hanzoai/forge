@@ -156,7 +156,7 @@ func TestTaskCancellingFinalizesToCancelled(t *testing.T) {
 		updatedTask, err := UpdateTaskByState(t.Context(), task.RunnerID, runner_module.State{
 			ID:      task.ID,
 			Result:  result,
-			Stopped: time.Now(),
+			Stopped: time.Now().UnixNano(),
 		})
 		require.NoError(t, err)
 		assert.Equal(t, StatusCancelled, updatedTask.Status)
@@ -612,7 +612,7 @@ func droppedState(taskID int64) runner_module.State {
 	return runner_module.State{
 		ID:      taskID,
 		Result:  runner_module.Failure,
-		Stopped: time.Now(),
+		Stopped: time.Now().UnixNano(),
 		Steps: []runner_module.Step{
 			{ID: 0, Result: runner_module.Cancelled},
 			{ID: 1, Result: runner_module.Cancelled},
@@ -655,8 +655,8 @@ func TestUpdateTaskByStateKeepsGenuineFailure(t *testing.T) {
 	state.Steps[0] = runner_module.Step{
 		ID:      0,
 		Result:  runner_module.Failure,
-		Started: time.Now(),
-		Stopped: time.Now(),
+		Started: time.Now().UnixNano(),
+		Stopped: time.Now().UnixNano(),
 	}
 
 	updated, err := UpdateTaskByState(t.Context(), task.RunnerID, state)

@@ -97,9 +97,9 @@ func (r *mockRunner) state(t *testing.T, in *runner_module.StateIn) (*runner_mod
 	return runnerCall[runner_module.StateIn, runner_module.StateOut](t, r, "state", in)
 }
 
-// logs appends console output.
-func (r *mockRunner) logs(t *testing.T, in *runner_module.LogsIn) (*runner_module.LogsOut, error) {
-	return runnerCall[runner_module.LogsIn, runner_module.LogsOut](t, r, "logs", in)
+// appendLog adds console output.
+func (r *mockRunner) appendLog(t *testing.T, in *runner_module.LogIn) (*runner_module.LogOut, error) {
+	return runnerCall[runner_module.LogIn, runner_module.LogOut](t, r, "log", in)
 }
 
 func (r *mockRunner) fetchTask(t *testing.T, timeout ...time.Duration) *runner_module.Task {
@@ -136,42 +136,67 @@ func (r *mockRunner) tryFetchTask(t *testing.T, timeout ...time.Duration) *runne
 // fetchTaskOnce asks for work once with the given queue version and returns the
 // task, if any, along with the version the forge answered with. This is the
 // production path: a runner always sends the version it last saw.
-func (r *mockRunner) fetchTaskOnce(t *testing.T, tasksVersion int64) (*runner_module.Task, int64) {
-	out, err := r.task(t, &runner_module.TaskIn{TasksVersion: tasksVersion})
+func (r *mockRunner) fetchTaskOnce(t *testing.T, queue int64) (*runner_module.Task, int64) {
+	out, err := r.task(t, &runner_module.TaskIn{Queue: queue})
 	require.NoError(t, err)
-	return out.Task, out.TasksVersion
+	return out.Task, out.Queue
 }
 
 type mockTaskOutcome struct {
-	result  runner_module.Result
-	outputs map[string]string
-	logRows []runner_module.Row
+	result   runner_module.Result
+	outputs  map[string]string
+	logLines []runner_module.Line
 }
 
 func (r *mockRunner) execTask(t *testing.T, task *runner_module.Task, outcome *mockTaskOutcome) {
-	for idx, lr := range outcome.logRows {
-		out, err := r.logs(t, &runner_module.LogsIn{
-			TaskID: task.ID,
-			Index:  int64(idx),
-			Rows:   []runner_module.Row{lr},
-			NoMore: idx == len(outcome.logRows)-1,
+	for idx, line := range outcome.logLines {
+		out, err := r.appendLog(t, &runner_module.LogIn{
+			Task:  task.ID,
+			Index: int64(idx),
+			Lines: []runner_module.Line{line},
+			Last:  idx == len(outcome.logLines)-1,
 		})
 		assert.NoError(t, err)
 		assert.EqualValues(t, idx+1, out.Ack)
 	}
-	sentOutputKeys := make([]string, 0, len(outcome.outputs))
+	stored := make([]string, 0, len(outcome.outputs))
 	for outputKey, outputValue := range outcome.outputs {
 		out, err := r.state(t, &runner_module.StateIn{
 			State:   runner_module.State{ID: task.ID, Result: runner_module.Pending},
-			Outputs: map[string]string{outputKey: outputValue},
+			Outputs: []runner_module.Pair{{Name: outputKey, Value: outputValue}},
 		})
 		assert.NoError(t, err)
-		sentOutputKeys = append(sentOutputKeys, outputKey)
-		assert.ElementsMatch(t, sentOutputKeys, out.SentOutputs)
+		stored = append(stored, outputKey)
+		assert.ElementsMatch(t, stored, out.Stored)
 	}
 	out, err := r.state(t, &runner_module.StateIn{
-		State: runner_module.State{ID: task.ID, Result: outcome.result, Stopped: time.Now()},
+		State: runner_module.State{ID: task.ID, Result: outcome.result, Stopped: time.Now().UnixNano()},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, outcome.result, out.State.Result)
+}
+
+// valueOf reads one named value out of the ordered list the wire carries.
+func valueOf(pairs []runner_module.Pair, name string) string {
+	for _, p := range pairs {
+		if p.Name == name {
+			return p.Value
+		}
+	}
+	return ""
+}
+
+// needOf reads what one job this task depends on produced.
+func needOf(needs []runner_module.Need, job string) runner_module.Need {
+	for _, need := range needs {
+		if need.Job == job {
+			return need
+		}
+	}
+	return runner_module.Need{}
+}
+
+// needOutput reads one output of one job this task depends on.
+func needOutput(needs []runner_module.Need, job, name string) string {
+	return valueOf(needOf(needs, job).Outputs, name)
 }
