@@ -16,7 +16,6 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	db_model "github.com/hanzoai/git/models/db"
@@ -25,6 +24,7 @@ import (
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/models/webhook"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/commitstatus"
 	"github.com/hanzoai/git/modules/git"
 	"github.com/hanzoai/git/modules/gitrepo"
@@ -1050,7 +1050,7 @@ jobs:
 		// 4. Execute a single Job
 		task := runner.fetchTask(t)
 		outcome := &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		}
 		runner.execTask(t, task, outcome)
 
@@ -1085,7 +1085,7 @@ jobs:
 		// 6. Execute a single Job
 		task = runner.fetchTask(t)
 		outcome = &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_FAILURE,
+			result: runner_module.Failure,
 		}
 		runner.execTask(t, task, outcome)
 
@@ -1413,7 +1413,7 @@ jobs:
 	for _, runner := range runners {
 		task := runner.fetchTask(t)
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 	}
 
@@ -1583,7 +1583,7 @@ jobs:
 		for _, runner := range runners {
 			task := runner.fetchTask(t)
 			runner.execTask(t, task, &mockTaskOutcome{
-				result: runnerv1.Result_RESULT_SUCCESS,
+				result: runner_module.Success,
 			})
 		}
 	}
@@ -1667,8 +1667,8 @@ jobs:
 
 	task1 := runners[0].fetchTask(t)
 	task2 := runners[1].fetchTask(t)
-	_, job1, _ := getTaskAndJobAndRunByTaskID(t, task1.Id)
-	_, job2, _ := getTaskAndJobAndRunByTaskID(t, task2.Id)
+	_, job1, _ := getTaskAndJobAndRunByTaskID(t, task1.ID)
+	_, job2, _ := getTaskAndJobAndRunByTaskID(t, task2.ID)
 	require.NotEqual(t, job1.RunID, job2.RunID)
 
 	initialRunEventsLen := len(webhookData.payloads)
@@ -1765,13 +1765,13 @@ jobs:
 	// 4. Execute two Jobs
 	task := runner.fetchTask(t)
 	outcome := &mockTaskOutcome{
-		result: runnerv1.Result_RESULT_SUCCESS,
+		result: runner_module.Success,
 	}
 	runner.execTask(t, task, outcome)
 
 	task = runner.fetchTask(t)
 	outcome = &mockTaskOutcome{
-		result: runnerv1.Result_RESULT_FAILURE,
+		result: runner_module.Failure,
 	}
 	runner.execTask(t, task, outcome)
 

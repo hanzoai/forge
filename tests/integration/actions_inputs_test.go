@@ -72,7 +72,7 @@ jobs:
 		lRunner.fetchNoTask(t)
 
 		task := wRunner.fetchTask(t)
-		_, _, run := getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run := getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "Build APP on windows", run.Title)
 	})
 }

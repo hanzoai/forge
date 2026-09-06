@@ -28,10 +28,10 @@ const (
 	MaxJobSummaryAggregateSize = 1024 * 1024 // 1 MiB
 )
 
-// RunnerCapabilities returns the value advertised in the X-Gitea-Actions-Capabilities header.
-// When more capabilities are added, return them comma-separated so runners can split on ", ".
-func RunnerCapabilities() string {
-	return JobSummaryCapability
+// RunnerCapabilities is what this forge understands, answered to a runner when
+// it declares itself.
+func RunnerCapabilities() []string {
+	return []string{JobSummaryCapability}
 }
 
 type ActionRunJobSummary struct {
