@@ -104,7 +104,6 @@ require (
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
 	golang.org/x/text v0.40.0
-	google.golang.org/protobuf v1.36.11
 	gopkg.in/ini.v1 v1.67.3
 	mvdan.cc/xurls/v2 v2.6.0
 	strk.kbt.io/projects/go/libravatar v0.0.0-20260301104140-add494e31dab
@@ -170,6 +169,7 @@ require (
 	go.uber.org/mock v0.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/exp v0.0.0-20260529124908-c761662dc8c9 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
 
