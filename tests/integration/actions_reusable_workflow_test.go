@@ -214,7 +214,7 @@ jobs:
 				if assert.Len(t, r1Job1Task.Secrets, 3) {
 					assert.Contains(t, r1Job1Task.Secrets, "GIT_TOKEN")
 					assert.Contains(t, r1Job1Task.Secrets, "GITHUB_TOKEN")
-					assert.Equal(t, "secRET-t0Ken", r1Job1Task.Secrets["PARENT_TOKEN"])
+					assert.Equal(t, "secRET-t0Ken", valueOf(r1Job1Task.Secrets, "PARENT_TOKEN"))
 				}
 				customRunner.fetchNoTask(t)
 				defaultRunner.execTask(t, r1Job1Task, &mockTaskOutcome{
@@ -234,7 +234,7 @@ jobs:
 				r1Job2AttemptJobID = r1Job2.AttemptJobID
 				if assert.Len(t, r1Job2Task.Needs, 1) {
 					assert.Contains(t, r1Job2Task.Needs, "reusable1_job1")
-					assert.Equal(t, runner_module.Success, r1Job2Task.Needs["reusable1_job1"].Result)
+					assert.Equal(t, runner_module.Success, needOf(r1Job2Task.Needs, "reusable1_job1").Result)
 				}
 				customRunner.execTask(t, r1Job2Task, &mockTaskOutcome{
 					result: runner_module.Success,
@@ -274,9 +274,9 @@ jobs:
 				assert.Equal(t, "caller_job3", callerJob3.JobID)
 				if assert.Len(t, callerJob3Task.Needs, 1) {
 					assert.Contains(t, callerJob3Task.Needs, "caller_job2")
-					assert.Equal(t, runner_module.Success, callerJob3Task.Needs["caller_job2"].Result)
-					if assert.Len(t, callerJob3Task.Needs["caller_job2"].Outputs, 1) {
-						assert.Equal(t, "r1j2_out_data", callerJob3Task.Needs["caller_job2"].Outputs["r1_out"])
+					assert.Equal(t, runner_module.Success, needOf(callerJob3Task.Needs, "caller_job2").Result)
+					if assert.Len(t, needOf(callerJob3Task.Needs, "caller_job2").Outputs, 1) {
+						assert.Equal(t, "r1j2_out_data", needOutput(callerJob3Task.Needs, "caller_job2", "r1_out"))
 					}
 				}
 				defaultRunner.execTask(t, callerJob3Task, &mockTaskOutcome{
@@ -344,9 +344,9 @@ jobs:
 				assert.Equal(t, "caller_job3", callerJob3.JobID)
 				if assert.Len(t, callerJob3Task.Needs, 1) {
 					assert.Contains(t, callerJob3Task.Needs, "caller_job2")
-					assert.Equal(t, runner_module.Success, callerJob3Task.Needs["caller_job2"].Result)
-					if assert.Len(t, callerJob3Task.Needs["caller_job2"].Outputs, 1) {
-						assert.Equal(t, "r1j2_out_data_updated", callerJob3Task.Needs["caller_job2"].Outputs["r1_out"])
+					assert.Equal(t, runner_module.Success, needOf(callerJob3Task.Needs, "caller_job2").Result)
+					if assert.Len(t, needOf(callerJob3Task.Needs, "caller_job2").Outputs, 1) {
+						assert.Equal(t, "r1j2_out_data_updated", needOutput(callerJob3Task.Needs, "caller_job2", "r1_out"))
 					}
 				}
 				defaultRunner.execTask(t, callerJob3Task, &mockTaskOutcome{
@@ -775,7 +775,7 @@ func createRepoWorkflowFile(t *testing.T, u *user_model.User, token string, repo
 }
 
 func getWorkflowCallPayloadFromTask(t *testing.T, runnerTask *runner_module.Task) *api.WorkflowCallPayload {
-	eventJSON, err := json.Marshal(runnerTask.Context["event"])
+	eventJSON, err := json.Marshal(runnerTask.Context.Event)
 	assert.NoError(t, err)
 	var payload api.WorkflowCallPayload
 	assert.NoError(t, json.Unmarshal(eventJSON, &payload))

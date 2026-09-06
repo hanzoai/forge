@@ -59,6 +59,9 @@ import (
 	"github.com/hanzoai/git/services/task"
 	"github.com/hanzoai/git/services/uinotification"
 	"github.com/hanzoai/git/services/webhook"
+
+	"github.com/zap-proto/fiber/v3/middleware/adaptor"
+	"github.com/zap-proto/zip"
 )
 
 func mustInit(fn func() error) {
@@ -188,12 +191,12 @@ func NormalRoutes() *web.Router {
 	r.AfterRouting(common.MaintenanceModeHandler())
 
 	// The whole top-level URL namespace is allocated here and nowhere else:
-	// "/" is the browser, "/v1" is every machine surface, "/v2" is the OCI spec
-	// and "/twirp" is what third-party artifact JavaScript insists on (see the
-	// actions mounts below). chi routes the most specific mount first, so a
-	// "/v1/…" route registered on the web router below would be swallowed by the
-	// "/v1" mount — /v1/sync and /v1/healthz therefore live here, not in
-	// routers/web.
+	// "/" is the browser, "/v1" is every machine surface, "/v2" is the OCI spec,
+	// "/.well-known/zip/op/" is ZAP's call plane and "/twirp" is what
+	// third-party artifact JavaScript insists on (see the actions mounts below).
+	// chi routes the most specific mount first, so a "/v1/…" route registered on
+	// the web router below would be swallowed by the "/v1" mount — /v1/sync and
+	// /v1/healthz therefore live here, not in routers/web.
 	r.Mount("/", web_routers.Routes())
 	r.Mount("/v1", apiv1.Routes())
 	r.Mount(private_module.RoutePrefix, private.Routes())
@@ -215,11 +218,22 @@ func NormalRoutes() *web.Router {
 	}
 
 	if setting.Actions.Enabled {
-		// The runner protocol: five typed operations, JSON in and JSON out, where
-		// the address is the operation. It sits beside the "/v1" mount rather than
-		// inside it because a runner carries its own credential and must not meet
-		// the session and API-token middleware.
-		r.Mount("/v1/runner", actions_router.RunnerRoutes())
+		// The runner protocol: five typed zip operations, addressed as
+		// POST /v1/runner/<name> over HTTP and as post_runner_<name> on ZAP's own
+		// call plane. Both faces are the same app on the same listener, so this
+		// needs no second port and no change at the edge.
+		//
+		// Registered with Post rather than Mount because Mount is chi's
+		// prefix-stripping form: the operations declare absolute paths, and an app
+		// that receives "/register" where it declared "/v1/runner/register"
+		// answers nothing. Post reaches chi's Method, which leaves URL.Path whole.
+		//
+		// It sits beside the "/v1" mount rather than inside it because a runner
+		// carries its own credential and must not meet the session and API-token
+		// middleware.
+		runnerOps := adaptor.FiberApp(actions_router.RunnerOps().Fiber())
+		r.Post(actions_router.RunnerRouteBase+"/*", runnerOps)
+		r.Post(zip.CallPath+"*", runnerOps)
 
 		// Artifact upload and download for actions/upload-artifact@v3 and its
 		// download counterpart. The runner hands a job this whole base as

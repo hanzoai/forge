@@ -53,34 +53,34 @@ jobs:
 			outcome: []*mockTaskOutcome{
 				{
 					result: runner_module.Success,
-					logRows: []runner_module.Row{
+					logLines: []runner_module.Line{
 						{
-							Time:    now.Add(1 * time.Second),
+							Time:    now.Add(1 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    now.Add(2 * time.Second),
+							Time:    now.Add(2 * time.Second).UnixNano(),
 							Content: "job1 zstd enabled",
 						},
 						{
-							Time:    now.Add(3 * time.Second),
+							Time:    now.Add(3 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
 				},
 				{
 					result: runner_module.Success,
-					logRows: []runner_module.Row{
+					logLines: []runner_module.Line{
 						{
-							Time:    now.Add(1 * time.Second),
+							Time:    now.Add(1 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    now.Add(2 * time.Second),
+							Time:    now.Add(2 * time.Second).UnixNano(),
 							Content: "job2 zstd enabled",
 						},
 						{
-							Time:    now.Add(3 * time.Second),
+							Time:    now.Add(3 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
@@ -108,34 +108,34 @@ jobs:
 			outcome: []*mockTaskOutcome{
 				{
 					result: runner_module.Success,
-					logRows: []runner_module.Row{
+					logLines: []runner_module.Line{
 						{
-							Time:    now.Add(4 * time.Second),
+							Time:    now.Add(4 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    now.Add(5 * time.Second),
+							Time:    now.Add(5 * time.Second).UnixNano(),
 							Content: "job1 zstd disabled",
 						},
 						{
-							Time:    now.Add(6 * time.Second),
+							Time:    now.Add(6 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
 				},
 				{
 					result: runner_module.Success,
-					logRows: []runner_module.Row{
+					logLines: []runner_module.Line{
 						{
-							Time:    now.Add(4 * time.Second),
+							Time:    now.Add(4 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    now.Add(5 * time.Second),
+							Time:    now.Add(5 * time.Second).UnixNano(),
 							Content: "job2 zstd disabled",
 						},
 						{
-							Time:    now.Add(6 * time.Second),
+							Time:    now.Add(6 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
@@ -189,11 +189,11 @@ jobs:
 						AddTokenAuth(token)
 					resp := MakeRequest(t, req, http.StatusOK)
 					logTextLines := strings.Split(strings.TrimSpace(resp.Body.String()), "\n")
-					assert.Len(t, logTextLines, len(outcome.logRows))
-					for idx, lr := range outcome.logRows {
+					assert.Len(t, logTextLines, len(outcome.logLines))
+					for idx, lr := range outcome.logLines {
 						assert.Equal(
 							t,
-							fmt.Sprintf("%s %s", lr.Time.Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
+							fmt.Sprintf("%s %s", time.Unix(0, lr.Time).UTC().Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
 							logTextLines[idx],
 						)
 					}
@@ -203,11 +203,11 @@ jobs:
 						AddTokenAuth(token)
 					resp = MakeRequest(t, req, http.StatusOK)
 					logTextLines = strings.Split(strings.TrimSpace(resp.Body.String()), "\n")
-					assert.Len(t, logTextLines, len(outcome.logRows))
-					for idx, lr := range outcome.logRows {
+					assert.Len(t, logTextLines, len(outcome.logLines))
+					for idx, lr := range outcome.logLines {
 						assert.Equal(
 							t,
-							fmt.Sprintf("%s %s", lr.Time.Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
+							fmt.Sprintf("%s %s", time.Unix(0, lr.Time).UTC().Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
 							logTextLines[idx],
 						)
 					}
@@ -244,9 +244,9 @@ jobs:
 			_, job1, _ := getTaskAndJobAndRunByTaskID(t, job1Task1.ID)
 			runner.execTask(t, job1Task1, &mockTaskOutcome{
 				result: runner_module.Success,
-				logRows: []runner_module.Row{
+				logLines: []runner_module.Line{
 					{
-						Time:    now.Add(1 * time.Second),
+						Time:    now.Add(1 * time.Second).UnixNano(),
 						Content: "job1 first run",
 					},
 				},
@@ -255,9 +255,9 @@ jobs:
 			_, job2, run := getTaskAndJobAndRunByTaskID(t, job2Task1.ID)
 			runner.execTask(t, job2Task1, &mockTaskOutcome{
 				result: runner_module.Success,
-				logRows: []runner_module.Row{
+				logLines: []runner_module.Line{
 					{
-						Time:    now.Add(1 * time.Second),
+						Time:    now.Add(1 * time.Second).UnixNano(),
 						Content: "job2 first run",
 					},
 				},
@@ -280,9 +280,9 @@ jobs:
 			job2TaskRerun := runner.fetchTask(t)
 			runner.execTask(t, job2TaskRerun, &mockTaskOutcome{
 				result: runner_module.Success,
-				logRows: []runner_module.Row{
+				logLines: []runner_module.Line{
 					{
-						Time:    now.Add(1 * time.Second),
+						Time:    now.Add(1 * time.Second).UnixNano(),
 						Content: "job2 rerun",
 					},
 				},

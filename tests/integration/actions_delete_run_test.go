@@ -54,51 +54,51 @@ jobs:
 		outcomes: map[string]*mockTaskOutcome{
 			"job1": {
 				result: runner_module.Success,
-				logRows: []runner_module.Row{
+				logLines: []runner_module.Line{
 					{
-						Time:    now.Add(4 * time.Second),
+						Time:    now.Add(4 * time.Second).UnixNano(),
 						Content: "  \U0001F433  docker create image",
 					},
 					{
-						Time:    now.Add(5 * time.Second),
+						Time:    now.Add(5 * time.Second).UnixNano(),
 						Content: "job1",
 					},
 					{
-						Time:    now.Add(6 * time.Second),
+						Time:    now.Add(6 * time.Second).UnixNano(),
 						Content: "\U0001F3C1  Job succeeded",
 					},
 				},
 			},
 			"job2": {
 				result: runner_module.Success,
-				logRows: []runner_module.Row{
+				logLines: []runner_module.Line{
 					{
-						Time:    now.Add(4 * time.Second),
+						Time:    now.Add(4 * time.Second).UnixNano(),
 						Content: "  \U0001F433  docker create image",
 					},
 					{
-						Time:    now.Add(5 * time.Second),
+						Time:    now.Add(5 * time.Second).UnixNano(),
 						Content: "job2",
 					},
 					{
-						Time:    now.Add(6 * time.Second),
+						Time:    now.Add(6 * time.Second).UnixNano(),
 						Content: "\U0001F3C1  Job succeeded",
 					},
 				},
 			},
 			"job3": {
 				result: runner_module.Success,
-				logRows: []runner_module.Row{
+				logLines: []runner_module.Line{
 					{
-						Time:    now.Add(4 * time.Second),
+						Time:    now.Add(4 * time.Second).UnixNano(),
 						Content: "  \U0001F433  docker create image",
 					},
 					{
-						Time:    now.Add(5 * time.Second),
+						Time:    now.Add(5 * time.Second).UnixNano(),
 						Content: "job3",
 					},
 					{
-						Time:    now.Add(6 * time.Second),
+						Time:    now.Add(6 * time.Second).UnixNano(),
 						Content: "\U0001F3C1  Job succeeded",
 					},
 				},
@@ -129,7 +129,7 @@ jobs:
 			outcome := testCase.outcomes[jobName]
 			assert.NotNil(t, outcome)
 			runner.execTask(t, task, outcome)
-			runIndex, _ := task.Context["run_number"].(string)
+			runIndex := task.Context.RunNumber
 			parsedRunIndex, err := strconv.ParseInt(runIndex, 10, 64)
 			assert.NoError(t, err)
 			run := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{RepoID: apiRepo.ID, Index: parsedRunIndex})
