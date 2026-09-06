@@ -1936,7 +1936,7 @@ jobs:
 		_, err := doAPICreatePullRequest(apiCtx, "user2", repoName, repo.DefaultBranch, "update-dir1")(t)
 		assert.NoError(t, err)
 		pr1Task := runner.fetchTask(t)
-		_, _, pr1Run := getTaskAndJobAndRunByTaskID(t, pr1Task.Id)
+		_, _, pr1Run := getTaskAndJobAndRunByTaskID(t, pr1Task.ID)
 		assert.Equal(t, webhook_module.HookEventPullRequest, pr1Run.Event)
 
 		// create a PR to modify "dir2/dir2.txt" then update main branch and rebase, the workflow will not be triggered

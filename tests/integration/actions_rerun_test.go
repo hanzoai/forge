@@ -12,7 +12,6 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/db"
@@ -20,6 +19,7 @@ import (
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/actions/jobparser"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/setting"
 	api "github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/test"
@@ -70,19 +70,19 @@ jobs:
 
 		// fetch and exec job1
 		job1Task := runner.fetchTask(t)
-		assert.Equal(t, "1", job1Task.Context.GetFields()["run_attempt"].GetStringValue())
-		_, job1, run := getTaskAndJobAndRunByTaskID(t, job1Task.Id)
+		assert.Equal(t, "1", job1Task.Context["run_attempt"])
+		_, job1, run := getTaskAndJobAndRunByTaskID(t, job1Task.ID)
 		runner.execTask(t, job1Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		// RERUN-FAILURE: the run is not done
 		req := NewRequest(t, "POST", fmt.Sprintf("/%s/%s/actions/runs/%d/rerun", user2.Name, repo.Name, run.ID))
 		session.MakeRequest(t, req, http.StatusBadRequest)
 		// fetch and exec job2
 		job2Task := runner.fetchTask(t)
-		_, job2, _ := getTaskAndJobAndRunByTaskID(t, job2Task.Id)
+		_, job2, _ := getTaskAndJobAndRunByTaskID(t, job2Task.ID)
 		runner.execTask(t, job2Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		assert.EqualValues(t, 1, getRunLatestAttemptNum(t, run.ID))
 
@@ -91,19 +91,19 @@ jobs:
 		sessionAdmin.MakeRequest(t, req, http.StatusOK) // triggered by admin user
 		// fetch and exec job1
 		job1TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job1TaskR1.Context.GetFields()["run_attempt"].GetStringValue())
-		_, job1R1, _ := getTaskAndJobAndRunByTaskID(t, job1TaskR1.Id)
+		assert.Equal(t, "2", job1TaskR1.Context["run_attempt"])
+		_, job1R1, _ := getTaskAndJobAndRunByTaskID(t, job1TaskR1.ID)
 		assert.Equal(t, job1.AttemptJobID, job1R1.AttemptJobID)
 		runner.execTask(t, job1TaskR1, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		// fetch and exec job2
 		job2TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job2TaskR1.Context.GetFields()["run_attempt"].GetStringValue())
-		_, job2R1, _ := getTaskAndJobAndRunByTaskID(t, job2TaskR1.Id)
+		assert.Equal(t, "2", job2TaskR1.Context["run_attempt"])
+		_, job2R1, _ := getTaskAndJobAndRunByTaskID(t, job2TaskR1.ID)
 		assert.Equal(t, job2.AttemptJobID, job2R1.AttemptJobID)
 		runner.execTask(t, job2TaskR1, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		assert.EqualValues(t, 2, getRunLatestAttemptNum(t, run.ID))
 
@@ -114,15 +114,15 @@ jobs:
 		// job2 needs job1, so rerunning job1 will also rerun job2
 		// fetch and exec job1
 		job1TaskR2 := runner.fetchTask(t)
-		assert.Equal(t, "3", job1TaskR2.Context.GetFields()["run_attempt"].GetStringValue())
+		assert.Equal(t, "3", job1TaskR2.Context["run_attempt"])
 		runner.execTask(t, job1TaskR2, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		// fetch and exec job2
 		job2TaskR2 := runner.fetchTask(t)
-		assert.Equal(t, "3", job2TaskR2.Context.GetFields()["run_attempt"].GetStringValue())
+		assert.Equal(t, "3", job2TaskR2.Context["run_attempt"])
 		runner.execTask(t, job2TaskR2, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		assert.EqualValues(t, 3, getRunLatestAttemptNum(t, run.ID))
 
@@ -133,9 +133,9 @@ jobs:
 		// only job2 will rerun
 		// fetch and exec job2
 		job2TaskR3 := runner.fetchTask(t)
-		assert.Equal(t, "4", job2TaskR3.Context.GetFields()["run_attempt"].GetStringValue())
+		assert.Equal(t, "4", job2TaskR3.Context["run_attempt"])
 		runner.execTask(t, job2TaskR3, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		runner.fetchNoTask(t)
 		assert.EqualValues(t, 4, getRunLatestAttemptNum(t, run.ID))
@@ -182,14 +182,14 @@ jobs:
 			session.MakeRequest(t, req, http.StatusOK)
 			// fetch and exec job1
 			job1TaskR4 := runner.fetchTask(t)
-			assert.Equal(t, "5", job1TaskR4.Context.GetFields()["run_attempt"].GetStringValue())
+			assert.Equal(t, "5", job1TaskR4.Context["run_attempt"])
 			runner.execTask(t, job1TaskR4, &mockTaskOutcome{
-				result: runnerv1.Result_RESULT_SUCCESS,
+				result: runner_module.Success,
 			})
 			job2TaskR4 := runner.fetchTask(t)
-			assert.Equal(t, "5", job2TaskR4.Context.GetFields()["run_attempt"].GetStringValue())
+			assert.Equal(t, "5", job2TaskR4.Context["run_attempt"])
 			runner.execTask(t, job2TaskR4, &mockTaskOutcome{
-				result: runnerv1.Result_RESULT_SUCCESS,
+				result: runner_module.Success,
 			})
 			assert.EqualValues(t, 5, getRunLatestAttemptNum(t, run.ID))
 		})
@@ -394,17 +394,17 @@ jobs:
 
 		// fetch job1 rerun task
 		job1TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job1TaskR1.Context.GetFields()["run_attempt"].GetStringValue())
-		rerunJob1Task, rerunJob1, rerunRun := getTaskAndJobAndRunByTaskID(t, job1TaskR1.Id)
+		assert.Equal(t, "2", job1TaskR1.Context["run_attempt"])
+		rerunJob1Task, rerunJob1, rerunRun := getTaskAndJobAndRunByTaskID(t, job1TaskR1.ID)
 		assert.Equal(t, legacyRun.ID, rerunRun.ID)
 		assert.Equal(t, rerunJob1.RunAttemptID, rerunRun.LatestAttemptID)
-		runner.execTask(t, job1TaskR1, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+		runner.execTask(t, job1TaskR1, &mockTaskOutcome{result: runner_module.Success})
 
 		// fetch job2 rerun task
 		job2TaskR1 := runner.fetchTask(t)
-		assert.Equal(t, "2", job2TaskR1.Context.GetFields()["run_attempt"].GetStringValue())
-		rerunJob2Task, rerunJob2, _ := getTaskAndJobAndRunByTaskID(t, job2TaskR1.Id)
-		runner.execTask(t, job2TaskR1, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+		assert.Equal(t, "2", job2TaskR1.Context["run_attempt"])
+		rerunJob2Task, rerunJob2, _ := getTaskAndJobAndRunByTaskID(t, job2TaskR1.ID)
+		runner.execTask(t, job2TaskR1, &mockTaskOutcome{result: runner_module.Success})
 		runner.fetchNoTask(t)
 
 		// query the 2 attempts

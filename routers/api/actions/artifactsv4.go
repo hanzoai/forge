@@ -120,6 +120,11 @@ import (
 	"github.com/hanzoai/builder"
 )
 
+// ArtifactV4RouteBase is where actions/upload-artifact@v4 and its download
+// counterpart address a forge, and it cannot be moved: @actions/artifact v2
+// reads ACTIONS_RESULTS_URL and keeps only its origin, then appends this path
+// itself. The whole string after the host is theirs, spelled here exactly as
+// their JavaScript spells it.
 const ArtifactV4RouteBase = "/twirp/github.actions.results.api.v1.ArtifactService"
 
 type artifactV4Routes struct {

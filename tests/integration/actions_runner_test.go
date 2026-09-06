@@ -5,81 +5,75 @@
 package integration
 
 import (
-	"context"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 	"time"
 
-	pingv1 "github.com/hanzo-git/actions-proto-go/ping/v1"
-	"github.com/hanzo-git/actions-proto-go/ping/v1/pingv1connect"
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
-	"github.com/hanzo-git/actions-proto-go/runner/v1/runnerv1connect"
 	auth_model "github.com/hanzoai/git/models/auth"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/setting"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// mockRunner speaks the runner protocol the way a real runner does: one POST per
+// operation under /v1/runner, carrying JSON in and JSON out, with its uuid and
+// token in headers once it has registered.
 type mockRunner struct {
-	client *mockRunnerClient
-}
-
-type mockRunnerClient struct {
-	pingServiceClient   pingv1connect.PingServiceClient
-	runnerServiceClient runnerv1connect.RunnerServiceClient
+	uuid  string
+	token string
 }
 
 func newMockRunner() *mockRunner {
-	client := newMockRunnerClient("", "")
-	return &mockRunner{client: client}
+	return &mockRunner{}
 }
 
-func newMockRunnerClient(uuid, token string) *mockRunnerClient {
-	baseURL := setting.AppURL + "api/actions"
+// runnerCall invokes one operation and decodes the reply. A non-2xx answer comes
+// back as an error carrying the fault body, which is the whole error contract.
+func runnerCall[In, Out any](t *testing.T, r *mockRunner, opName string, in *In) (*Out, error) {
+	t.Helper()
+	body, err := json.Marshal(in)
+	require.NoError(t, err)
 
-	opt := connect.WithInterceptors(connect.UnaryInterceptorFunc(func(next connect.UnaryFunc) connect.UnaryFunc {
-		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			if uuid != "" {
-				req.Header().Set("x-runner-uuid", uuid)
-			}
-			if token != "" {
-				req.Header().Set("x-runner-token", token)
-			}
-			return next(ctx, req)
-		}
-	}))
-
-	client := &mockRunnerClient{
-		pingServiceClient:   pingv1connect.NewPingServiceClient(http.DefaultClient, baseURL, opt),
-		runnerServiceClient: runnerv1connect.NewRunnerServiceClient(http.DefaultClient, baseURL, opt),
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, setting.AppURL+"v1/runner/"+opName, bytes.NewReader(body))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+	if r.uuid != "" {
+		req.Header.Set("x-runner-uuid", r.uuid)
+		req.Header.Set("x-runner-token", r.token)
 	}
 
-	return client
-}
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+	payload, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("%s: %s: %s", opName, resp.Status, bytes.TrimSpace(payload))
+	}
 
-func (r *mockRunner) doPing(t *testing.T) {
-	resp, err := r.client.pingServiceClient.Ping(t.Context(), connect.NewRequest(&pingv1.PingRequest{
-		Data: "mock-runner",
-	}))
-	assert.NoError(t, err)
-	assert.Equal(t, "Hello, mock-runner!", resp.Msg.Data)
+	out := new(Out)
+	require.NoError(t, json.Unmarshal(payload, out))
+	return out, nil
 }
 
 func (r *mockRunner) doRegister(t *testing.T, name, token string, labels []string, ephemeral bool) {
-	r.doPing(t)
-	resp, err := r.client.runnerServiceClient.Register(t.Context(), connect.NewRequest(&runnerv1.RegisterRequest{
+	out, err := runnerCall[runner_module.RegisterIn, runner_module.RegisterOut](t, r, "register", &runner_module.RegisterIn{
 		Name:      name,
 		Token:     token,
 		Version:   "mock-runner-version",
 		Labels:    labels,
 		Ephemeral: ephemeral,
-	}))
+	})
 	assert.NoError(t, err)
-	r.client = newMockRunnerClient(resp.Msg.Runner.Uuid, resp.Msg.Runner.Token)
+	if out != nil {
+		r.uuid, r.token = out.Runner.UUID, out.Runner.Token
+	}
 }
 
 func (r *mockRunner) registerAsRepoRunner(t *testing.T, ownerName, repoName, runnerName string, labels []string, ephemeral bool) {
@@ -93,7 +87,22 @@ func (r *mockRunner) registerAsRepoRunner(t *testing.T, ownerName, repoName, run
 	r.doRegister(t, runnerName, registrationToken.Token, labels, ephemeral)
 }
 
-func (r *mockRunner) fetchTask(t *testing.T, timeout ...time.Duration) *runnerv1.Task {
+// task asks for work.
+func (r *mockRunner) task(t *testing.T, in *runner_module.TaskIn) (*runner_module.TaskOut, error) {
+	return runnerCall[runner_module.TaskIn, runner_module.TaskOut](t, r, "task", in)
+}
+
+// state reports task progress.
+func (r *mockRunner) state(t *testing.T, in *runner_module.StateIn) (*runner_module.StateOut, error) {
+	return runnerCall[runner_module.StateIn, runner_module.StateOut](t, r, "state", in)
+}
+
+// logs appends console output.
+func (r *mockRunner) logs(t *testing.T, in *runner_module.LogsIn) (*runner_module.LogsOut, error) {
+	return runnerCall[runner_module.LogsIn, runner_module.LogsOut](t, r, "logs", in)
+}
+
+func (r *mockRunner) fetchTask(t *testing.T, timeout ...time.Duration) *runner_module.Task {
 	task := r.tryFetchTask(t, timeout...)
 	require.NotNil(t, task, "failed to fetch a task")
 	return task
@@ -106,13 +115,13 @@ func (r *mockRunner) fetchNoTask(t *testing.T, timeout ...time.Duration) {
 
 const defaultFetchTaskTimeout = 1 * time.Second
 
-func (r *mockRunner) tryFetchTask(t *testing.T, timeout ...time.Duration) *runnerv1.Task {
+func (r *mockRunner) tryFetchTask(t *testing.T, timeout ...time.Duration) *runner_module.Task {
 	fetchTimeout := defaultFetchTaskTimeout
 	if len(timeout) > 0 {
 		fetchTimeout = timeout[0]
 	}
 	ddl := time.Now().Add(fetchTimeout)
-	var task *runnerv1.Task
+	var task *runner_module.Task
 	for time.Now().Before(ddl) {
 		task, _ = r.fetchTaskOnce(t, 0)
 		if task != nil {
@@ -124,54 +133,45 @@ func (r *mockRunner) tryFetchTask(t *testing.T, timeout ...time.Duration) *runne
 	return task
 }
 
-// fetchTaskOnce performs a single FetchTask request with the given TasksVersion
-// and returns the task (if any) and the TasksVersion from the response.
-// Used to verify the production path where the runner sends the current version.
-func (r *mockRunner) fetchTaskOnce(t *testing.T, tasksVersion int64) (*runnerv1.Task, int64) {
-	resp, err := r.client.runnerServiceClient.FetchTask(t.Context(), connect.NewRequest(&runnerv1.FetchTaskRequest{
-		TasksVersion: tasksVersion,
-	}))
+// fetchTaskOnce asks for work once with the given queue version and returns the
+// task, if any, along with the version the forge answered with. This is the
+// production path: a runner always sends the version it last saw.
+func (r *mockRunner) fetchTaskOnce(t *testing.T, tasksVersion int64) (*runner_module.Task, int64) {
+	out, err := r.task(t, &runner_module.TaskIn{TasksVersion: tasksVersion})
 	require.NoError(t, err)
-	return resp.Msg.Task, resp.Msg.TasksVersion
+	return out.Task, out.TasksVersion
 }
 
 type mockTaskOutcome struct {
-	result  runnerv1.Result
+	result  runner_module.Result
 	outputs map[string]string
-	logRows []*runnerv1.LogRow
+	logRows []runner_module.Row
 }
 
-func (r *mockRunner) execTask(t *testing.T, task *runnerv1.Task, outcome *mockTaskOutcome) {
+func (r *mockRunner) execTask(t *testing.T, task *runner_module.Task, outcome *mockTaskOutcome) {
 	for idx, lr := range outcome.logRows {
-		resp, err := r.client.runnerServiceClient.UpdateLog(t.Context(), connect.NewRequest(&runnerv1.UpdateLogRequest{
-			TaskId: task.Id,
+		out, err := r.logs(t, &runner_module.LogsIn{
+			TaskID: task.ID,
 			Index:  int64(idx),
-			Rows:   []*runnerv1.LogRow{lr},
+			Rows:   []runner_module.Row{lr},
 			NoMore: idx == len(outcome.logRows)-1,
-		}))
+		})
 		assert.NoError(t, err)
-		assert.EqualValues(t, idx+1, resp.Msg.AckIndex)
+		assert.EqualValues(t, idx+1, out.Ack)
 	}
 	sentOutputKeys := make([]string, 0, len(outcome.outputs))
 	for outputKey, outputValue := range outcome.outputs {
-		resp, err := r.client.runnerServiceClient.UpdateTask(t.Context(), connect.NewRequest(&runnerv1.UpdateTaskRequest{
-			State: &runnerv1.TaskState{
-				Id:     task.Id,
-				Result: runnerv1.Result_RESULT_UNSPECIFIED,
-			},
+		out, err := r.state(t, &runner_module.StateIn{
+			State:   runner_module.State{ID: task.ID, Result: runner_module.Pending},
 			Outputs: map[string]string{outputKey: outputValue},
-		}))
+		})
 		assert.NoError(t, err)
 		sentOutputKeys = append(sentOutputKeys, outputKey)
-		assert.ElementsMatch(t, sentOutputKeys, resp.Msg.SentOutputs)
+		assert.ElementsMatch(t, sentOutputKeys, out.SentOutputs)
 	}
-	resp, err := r.client.runnerServiceClient.UpdateTask(t.Context(), connect.NewRequest(&runnerv1.UpdateTaskRequest{
-		State: &runnerv1.TaskState{
-			Id:        task.Id,
-			Result:    outcome.result,
-			StoppedAt: timestamppb.Now(),
-		},
-	}))
+	out, err := r.state(t, &runner_module.StateIn{
+		State: runner_module.State{ID: task.ID, Result: outcome.result, Stopped: time.Now()},
+	})
 	assert.NoError(t, err)
-	assert.Equal(t, outcome.result, resp.Msg.State.Result)
+	assert.Equal(t, outcome.result, out.State.Result)
 }

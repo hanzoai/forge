@@ -12,16 +12,15 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/routers/web/repo/actions"
 
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestActionsDeleteRun(t *testing.T) {
@@ -54,52 +53,52 @@ jobs:
 `,
 		outcomes: map[string]*mockTaskOutcome{
 			"job1": {
-				result: runnerv1.Result_RESULT_SUCCESS,
-				logRows: []*runnerv1.LogRow{
+				result: runner_module.Success,
+				logRows: []runner_module.Row{
 					{
-						Time:    timestamppb.New(now.Add(4 * time.Second)),
+						Time:    now.Add(4 * time.Second),
 						Content: "  \U0001F433  docker create image",
 					},
 					{
-						Time:    timestamppb.New(now.Add(5 * time.Second)),
+						Time:    now.Add(5 * time.Second),
 						Content: "job1",
 					},
 					{
-						Time:    timestamppb.New(now.Add(6 * time.Second)),
+						Time:    now.Add(6 * time.Second),
 						Content: "\U0001F3C1  Job succeeded",
 					},
 				},
 			},
 			"job2": {
-				result: runnerv1.Result_RESULT_SUCCESS,
-				logRows: []*runnerv1.LogRow{
+				result: runner_module.Success,
+				logRows: []runner_module.Row{
 					{
-						Time:    timestamppb.New(now.Add(4 * time.Second)),
+						Time:    now.Add(4 * time.Second),
 						Content: "  \U0001F433  docker create image",
 					},
 					{
-						Time:    timestamppb.New(now.Add(5 * time.Second)),
+						Time:    now.Add(5 * time.Second),
 						Content: "job2",
 					},
 					{
-						Time:    timestamppb.New(now.Add(6 * time.Second)),
+						Time:    now.Add(6 * time.Second),
 						Content: "\U0001F3C1  Job succeeded",
 					},
 				},
 			},
 			"job3": {
-				result: runnerv1.Result_RESULT_SUCCESS,
-				logRows: []*runnerv1.LogRow{
+				result: runner_module.Success,
+				logRows: []runner_module.Row{
 					{
-						Time:    timestamppb.New(now.Add(4 * time.Second)),
+						Time:    now.Add(4 * time.Second),
 						Content: "  \U0001F433  docker create image",
 					},
 					{
-						Time:    timestamppb.New(now.Add(5 * time.Second)),
+						Time:    now.Add(5 * time.Second),
 						Content: "job3",
 					},
 					{
-						Time:    timestamppb.New(now.Add(6 * time.Second)),
+						Time:    now.Add(6 * time.Second),
 						Content: "\U0001F3C1  Job succeeded",
 					},
 				},
@@ -126,11 +125,11 @@ jobs:
 		var runID int64
 		for i := 0; i < len(testCase.outcomes); i++ {
 			task := runner.fetchTask(t)
-			jobName := getTaskJobNameByTaskID(t, token, user2.Name, apiRepo.Name, task.Id)
+			jobName := getTaskJobNameByTaskID(t, token, user2.Name, apiRepo.Name, task.ID)
 			outcome := testCase.outcomes[jobName]
 			assert.NotNil(t, outcome)
 			runner.execTask(t, task, outcome)
-			runIndex := task.Context.GetFields()["run_number"].GetStringValue()
+			runIndex, _ := task.Context["run_number"].(string)
 			parsedRunIndex, err := strconv.ParseInt(runIndex, 10, 64)
 			assert.NoError(t, err)
 			run := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{RepoID: apiRepo.ID, Index: parsedRunIndex})

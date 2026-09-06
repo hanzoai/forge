@@ -6,8 +6,7 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 ## What it is
 
 - **Base:** Gitea **1.26.4** (upstream `go-gitea/gitea`; see `CHANGELOG.md` top
-  entry). Module path forked to `github.com/hanzoai/git`; the Actions proto is
-  `github.com/hanzo-git/actions-proto-go`. The daemon is **`gitd`**
+  entry). Module path forked to `github.com/hanzoai/git`. The daemon is **`gitd`**
   (`/app/git/gitd`, wrapper `/usr/local/bin/gitd`); upstream's CLI subcommands
   are intact under the new name (`gitd admin auth …`, `gitd migrate`).
 
@@ -24,8 +23,32 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   notably the `oauth-sync` init container in `hanzoai/universe` — must be
   updated in the SAME change that bumps the image tag.
 - **`[actions]` intact:** `services/actions`, `models/actions`,
-  `routers/api/actions/runner` — full act_runner registration + job API. Enabled
-  via `GIT__actions__ENABLED=true`.
+  `routers/api/actions` — full runner registration + job API. Enabled via
+  `GIT__actions__ENABLED=true`.
+- **The runner protocol is ours, and it is five typed ops under `/v1/runner`:**
+  `register`, `declare`, `task`, `state`, `logs` — a POST each, JSON in and JSON
+  out, where the address IS the operation. No protobuf, no Connect-RPC, no
+  `/api/` prefix. The messages live in `modules/actions/runner`, a NESTED MODULE
+  (`github.com/hanzoai/git/modules/actions/runner`) with an empty `require`
+  block. That nesting is the point: `hanzoai/git-runner` imports the very types
+  the handlers declare, so there is one definition of the protocol, and it does
+  NOT inherit this module's dependency graph. Requiring the whole forge instead
+  was tried and breaks the runner outright — the forge pins
+  `go.yaml.in/yaml/v4` forward with a `replace` that a dependent does not
+  inherit, and `actionlint` then fails to compile. Changing the protocol means
+  changing both sides; the forge builds it from the working tree via a
+  `replace`, so protocol and handlers land in one commit.
+- **Artifacts are third-party JavaScript and the paths are not ours.**
+  `actions/upload-artifact@v3` concatenates `_apis/pipelines/…` onto whatever
+  the runner set as `ACTIONS_RUNTIME_URL`, so that base IS ours and it now sits
+  at `/v1/artifact/`. The v4 protocol is different: `@actions/artifact` v2 reads
+  `ACTIONS_RESULTS_URL` and keeps only `new URL(…).origin`, then appends
+  `twirp/github.actions.results.api.v1.ArtifactService/…` itself — so
+  `ArtifactV4RouteBase` cannot be moved anywhere, and it stays at the root.
+  That same library throws `GHESNotSupportedError` for any host that is not
+  `github.com`, `*.ghe.com` or `*.localhost`, so on `git.hanzo.ai` every
+  `upload-artifact@v4+` / `download-artifact@v4+` step fails before it opens a
+  connection: the v4 endpoints answer nobody today.
 - **Identity = hanzo.id OIDC only.** No fork-baked issuer; binding is a standard
   Gitea OAuth2 auth source (goth `openidConnect`) pointed at
   `https://hanzo.id/.well-known/openid-configuration`. Org membership is driven by

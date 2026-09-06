@@ -11,15 +11,13 @@ import (
 	"sync"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/models/db"
 	secret_model "github.com/hanzoai/git/models/secret"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
-
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -39,7 +37,7 @@ func taskPickLimiter() chan struct{} {
 // runners poll at once. When the concurrency limit is reached it returns
 // throttled=true without touching the DB, so the caller can let the runner
 // retry on its next poll instead of advancing its tasks version.
-func TryPickTask(ctx context.Context, runner *actions_model.ActionRunner) (task *runnerv1.Task, ok, throttled bool, err error) {
+func TryPickTask(ctx context.Context, runner *actions_model.ActionRunner) (task *runner_module.Task, ok, throttled bool, err error) {
 	sem := taskPickLimiter()
 	select {
 	case sem <- struct{}{}:
@@ -62,9 +60,9 @@ func releaseTaskForRunnerCleanup(t *actions_model.ActionTask) {
 	}
 }
 
-func PickTask(ctx context.Context, runner *actions_model.ActionRunner) (*runnerv1.Task, bool, error) {
+func PickTask(ctx context.Context, runner *actions_model.ActionRunner) (*runner_module.Task, bool, error) {
 	var (
-		task       *runnerv1.Task
+		task       *runner_module.Task
 		job        *actions_model.ActionRunJob
 		actionTask *actions_model.ActionTask
 	)
@@ -131,7 +129,7 @@ func PickTask(ctx context.Context, runner *actions_model.ActionRunner) (*runnerv
 
 // buildRunnerTask assembles the runner-facing task payload for an already-claimed
 // task. All operations are read-only; on error the caller releases the claim.
-func buildRunnerTask(ctx context.Context, t *actions_model.ActionTask) (*runnerv1.Task, *actions_model.ActionRunJob, error) {
+func buildRunnerTask(ctx context.Context, t *actions_model.ActionTask) (*runner_module.Task, *actions_model.ActionRunJob, error) {
 	if err := t.LoadAttributes(ctx); err != nil {
 		return nil, nil, fmt.Errorf("task LoadAttributes: %w", err)
 	}
@@ -157,17 +155,17 @@ func buildRunnerTask(ctx context.Context, t *actions_model.ActionTask) (*runnerv
 		return nil, nil, fmt.Errorf("generateTaskContext: %w", err)
 	}
 
-	return &runnerv1.Task{
-		Id:              t.ID,
-		WorkflowPayload: t.Job.WorkflowPayload,
-		Context:         taskContext,
-		Secrets:         secrets,
-		Vars:            vars,
-		Needs:           needs,
+	return &runner_module.Task{
+		ID:       t.ID,
+		Workflow: t.Job.WorkflowPayload,
+		Context:  taskContext,
+		Secrets:  secrets,
+		Vars:     vars,
+		Needs:    needs,
 	}, job, nil
 }
 
-func generateTaskContext(ctx context.Context, t *actions_model.ActionTask) (*structpb.Struct, error) {
+func generateTaskContext(ctx context.Context, t *actions_model.ActionTask) (map[string]any, error) {
 	gitRuntimeToken, err := CreateAuthorizationToken(t.ID, t.Job.RunID, t.JobID)
 	if err != nil {
 		return nil, err
@@ -177,19 +175,19 @@ func generateTaskContext(ctx context.Context, t *actions_model.ActionTask) (*str
 	gitCtx["token"] = t.Token
 	gitCtx["git_runtime_token"] = gitRuntimeToken
 
-	return structpb.NewStruct(gitCtx)
+	return gitCtx, nil
 }
 
-func findTaskNeeds(ctx context.Context, taskJob *actions_model.ActionRunJob) (map[string]*runnerv1.TaskNeed, error) {
+func findTaskNeeds(ctx context.Context, taskJob *actions_model.ActionRunJob) (map[string]runner_module.Need, error) {
 	taskNeeds, err := FindTaskNeeds(ctx, taskJob)
 	if err != nil {
 		return nil, err
 	}
-	ret := make(map[string]*runnerv1.TaskNeed, len(taskNeeds))
+	ret := make(map[string]runner_module.Need, len(taskNeeds))
 	for jobID, taskNeed := range taskNeeds {
-		ret[jobID] = &runnerv1.TaskNeed{
+		ret[jobID] = runner_module.Need{
 			Outputs: taskNeed.Outputs,
-			Result:  runnerv1.Result(taskNeed.Result),
+			Result:  taskNeed.Result.AsResult(),
 		}
 	}
 	return ret, nil

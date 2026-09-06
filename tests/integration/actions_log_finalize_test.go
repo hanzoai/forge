@@ -10,7 +10,6 @@ import (
 	"os"
 	"testing"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/dbfs"
@@ -18,9 +17,9 @@ import (
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	actions_module "github.com/hanzoai/git/modules/actions"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/storage"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -57,16 +56,16 @@ jobs:
 
 		task := runner.fetchTask(t)
 
-		resp, err := runner.client.runnerServiceClient.UpdateLog(t.Context(), connect.NewRequest(&runnerv1.UpdateLogRequest{
-			TaskId: task.Id,
+		out, err := runner.logs(t, &runner_module.LogsIn{
+			TaskID: task.ID,
 			Index:  0,
 			Rows:   nil,
 			NoMore: true,
-		}))
+		})
 		require.NoError(t, err)
-		assert.EqualValues(t, 0, resp.Msg.AckIndex)
+		assert.EqualValues(t, 0, out.Ack)
 
-		freshTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.Id})
+		freshTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.ID})
 		require.True(t, freshTask.LogInStorage, "log_in_storage must flip after empty NoMore=true")
 
 		_, err = storage.Actions.Stat(freshTask.LogFilename)
@@ -78,14 +77,13 @@ jobs:
 		// The runner re-sends its final UpdateLog when the response was lost.
 		// A sealed log must ack the re-send and still reject new appended rows.
 		t.Run("re-sent finalize is idempotent", func(t *testing.T) {
-			finalize := &runnerv1.UpdateLogRequest{TaskId: task.Id, Index: 0, Rows: nil, NoMore: true}
-			resp, err := runner.client.runnerServiceClient.UpdateLog(t.Context(), connect.NewRequest(finalize))
+			out, err := runner.logs(t, &runner_module.LogsIn{TaskID: task.ID, Index: 0, Rows: nil, NoMore: true})
 			require.NoError(t, err)
-			assert.EqualValues(t, 0, resp.Msg.AckIndex)
+			assert.EqualValues(t, 0, out.Ack)
 
-			_, err = runner.client.runnerServiceClient.UpdateLog(t.Context(), connect.NewRequest(&runnerv1.UpdateLogRequest{
-				TaskId: task.Id, Index: 0, Rows: []*runnerv1.LogRow{{Content: "late"}}, NoMore: true,
-			}))
+			_, err = runner.logs(t, &runner_module.LogsIn{
+				TaskID: task.ID, Index: 0, Rows: []runner_module.Row{{Content: "late"}}, NoMore: true,
+			})
 			require.Error(t, err, "appending rows past the seal must be rejected")
 		})
 	})
