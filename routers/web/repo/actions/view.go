@@ -837,7 +837,7 @@ func convertToViewModel(ctx context.Context, locale translation.Locale, cursors 
 				logLines = append(logLines, &ViewStepLogLine{
 					Index:     cursor.Cursor + int64(i) + 1, // start at 1
 					Message:   row.Content,
-					Timestamp: float64(row.Time.AsTime().UnixNano()) / float64(time.Second),
+					Timestamp: float64(row.Time.UnixNano()) / float64(time.Second),
 				})
 			}
 		}

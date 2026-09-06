@@ -4,7 +4,6 @@ go 1.26.5
 
 require (
 	codeberg.org/gusted/mcaptcha v0.0.0-20220723083913-4f3072e1d570
-	connectrpc.com/connect v1.20.0
 	gitea.dev/sdk v1.2.0
 	github.com/42wim/httpsig v1.2.4
 	github.com/42wim/sshsig v0.0.0-20260317195500-b9f38cf0d432
@@ -52,9 +51,9 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/sessions v1.4.0
-	github.com/hanzo-git/actions-proto-go v0.6.1
 	github.com/hanzoai/act v1.0.0
 	github.com/hanzoai/authz v1.10.29
+	github.com/hanzoai/git/modules/actions/runner v0.0.0
 	github.com/hanzoai/sqlite v0.3.2
 	github.com/hanzoai/tasks v1.52.0
 	github.com/hanzokv/go/v9 v9.22.0
@@ -330,6 +329,11 @@ ignore (
 // When doing "go get -u ./...", Golang will try to update all dependencies
 // But not all latest versions of dependencies are compatible with other packages or our codebase, so we need to pin some dependencies to specific versions
 // Need to regularly maintain this list to try to update them to latest versions, especially the TODO ones
+
+// The runner protocol lives in this repository, one directory down, and is
+// built from the working tree rather than the proxy so a change to it and to
+// its handlers lands in one commit.
+replace github.com/hanzoai/git/modules/actions/runner => ./modules/actions/runner
 
 replace go.yaml.in/yaml/v4 => go.yaml.in/yaml/v4 v4.0.0-rc.3 // rc.4 changes block scalar serialization, wait for stable release
 
