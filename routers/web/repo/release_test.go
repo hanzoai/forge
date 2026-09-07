@@ -199,3 +199,49 @@ func TestCalReleaseNumCommitsBehind(t *testing.T) {
 		assert.Equal(t, expectedComputation[r.TagName], actual, "wrong computed fields for %s: %#v", r.TagName, r)
 	}
 }
+
+// TestUpstreamReleases: a mirror caches git objects, not release assets. Copying
+// them would duplicate gigabytes we already have a canonical copy of, into a
+// cache that can only be older than the source — and showing an empty page is
+// worse than either, because it says a project has no releases when it has four.
+func TestUpstreamReleases(t *testing.T) {
+	for _, c := range []struct {
+		name string
+		repo repo_model.Repository
+		want string
+	}{
+		{
+			name: "mirror of github points at the source",
+			repo: repo_model.Repository{IsMirror: true, OriginalURL: "https://github.com/hanzoai/s3.git"},
+			want: "https://github.com/hanzoai/s3/releases",
+		},
+		{
+			name: "no .git suffix to strip",
+			repo: repo_model.Repository{IsMirror: true, OriginalURL: "https://github.com/hanzoai/s3"},
+			want: "https://github.com/hanzoai/s3/releases",
+		},
+		{
+			// Ours: the releases here ARE the canonical ones.
+			name: "not a mirror keeps its own page",
+			repo: repo_model.Repository{IsMirror: false, OriginalURL: "https://github.com/hanzoai/s3.git"},
+			want: "",
+		},
+		{
+			// An ssh or file upstream is not something a browser can be sent to.
+			name: "non-http upstream is not linkable",
+			repo: repo_model.Repository{IsMirror: true, OriginalURL: "git@github.com:hanzoai/s3.git"},
+			want: "",
+		},
+		{
+			name: "no upstream recorded",
+			repo: repo_model.Repository{IsMirror: true},
+			want: "",
+		},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			if got := upstreamReleases(&c.repo); got != c.want {
+				t.Errorf("upstreamReleases() = %q, want %q", got, c.want)
+			}
+		})
+	}
+}
