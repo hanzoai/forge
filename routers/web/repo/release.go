@@ -155,6 +155,24 @@ func getReleaseInfos(ctx *context.Context, opts *repo_model.FindReleasesOptions)
 }
 
 // Releases render releases list page
+// upstreamReleases is where a mirror's releases actually live.
+//
+// A pull mirror caches git objects, not release assets: syncing them would copy
+// gigabytes we already have a canonical copy of, and serve them from a cache that
+// can only be older than the source. Empty is worse than either — the page says
+// this project has no releases when it has four. So point at the upstream and
+// store nothing. Returns "" when there is nothing to point at.
+func upstreamReleases(repo *repo_model.Repository) string {
+	if !repo.IsMirror {
+		return ""
+	}
+	u := repo.SanitizedOriginalURL()
+	if !strings.HasPrefix(u, "http://") && !strings.HasPrefix(u, "https://") {
+		return ""
+	}
+	return strings.TrimSuffix(u, ".git") + "/releases"
+}
+
 func Releases(ctx *context.Context) {
 	ctx.Data["PageIsReleaseList"] = true
 	ctx.Data["Title"] = ctx.Tr("repo.release.releases")
@@ -192,6 +210,13 @@ func Releases(ctx *context.Context) {
 	ctx.Data["Releases"] = releases
 
 	numReleases := ctx.Data["NumReleases"].(int64)
+	// Nothing mirrored here, and a canonical copy one hop away.
+	if numReleases == 0 && len(releases) == 0 {
+		if up := upstreamReleases(ctx.Repo.Repository); up != "" {
+			ctx.Redirect(up, http.StatusFound)
+			return
+		}
+	}
 	pager := context.NewPagination(numReleases, listOptions.PageSize, listOptions.Page, 5)
 	pager.AddParamFromRequest(ctx.Req)
 	ctx.Data["Page"] = pager
