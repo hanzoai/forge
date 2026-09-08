@@ -29,13 +29,16 @@ func registerUpdateMirrorTask() {
 		PushLimit int
 	}
 
+	// PullLimit 0 skips pull mirrors: they refresh on read (GetInfoRefs) and on a
+	// push event, never on a timer. PushLimit stays — a push mirror's cron pass
+	// retries a delivery that already had its trigger.
 	RegisterTaskFatal("update_mirrors", &UpdateMirrorTaskConfig{
 		BaseConfig: BaseConfig{
 			Enabled:    true,
 			RunAtStart: false,
 			Schedule:   "@every 10m",
 		},
-		PullLimit: 50,
+		PullLimit: 0,
 		PushLimit: 50,
 	}, func(ctx context.Context, _ *user_model.User, cfg Config) error {
 		umtc := cfg.(*UpdateMirrorTaskConfig)

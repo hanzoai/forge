@@ -5,31 +5,49 @@ hanzo-theme-meta-info {
 
 :root {
   --is-dark-theme: false;
-  --color-primary: #4183c4;
-  --color-primary-contrast: #ffffff;
-  --color-primary-dark-1: #3876b3;
-  --color-primary-dark-2: #31699f;
-  --color-primary-dark-3: #2b5c8b;
-  --color-primary-dark-4: #254f77;
-  --color-primary-dark-5: #193450;
-  --color-primary-dark-6: #0c1a28;
-  --color-primary-dark-7: #04080c;
-  --color-primary-light-1: #548fca;
-  --color-primary-light-2: #679cd0;
-  --color-primary-light-3: #7aa8d6;
-  --color-primary-light-4: #8db5dc;
-  --color-primary-light-5: #b3cde7;
-  --color-primary-light-6: #d9e6f3;
-  --color-primary-light-7: #f4f8fb;
-  --color-primary-alpha-10: #4183c419;
-  --color-primary-alpha-20: #4183c433;
-  --color-primary-alpha-30: #4183c44b;
-  --color-primary-alpha-40: #4183c466;
-  --color-primary-alpha-50: #4183c480;
-  --color-primary-alpha-60: #4183c499;
-  --color-primary-alpha-70: #4183c4b3;
-  --color-primary-alpha-80: #4183c4cc;
-  --color-primary-alpha-90: #4183c4e1;
+
+  /* Hanzo estate tokens (design/tokens/colors.css, @hanzo/tokens) — light,
+     the .light half: the alphas restated as black. Gitea's own --color-* below
+     are aliased onto these, so the estate is the single source of the palette. */
+  --background: #f7f7f7;
+  --card: #ffffff;
+  --muted: #ededed;
+  --secondary: #e4e4e4;
+  --foreground: #0a0a0a;
+  --primary: #0a0a0a;
+  --muted-foreground: #525252;
+  --border: rgb(0 0 0 / 0.1);
+  --border-strong: rgb(0 0 0 / 0.16);
+  --ring: rgb(0 0 0 / 0.5);
+
+  /* primary = ink action on paper; a zero-chroma ramp. dark-N descend toward
+     pure ink, light-N ascend toward paper — the upstream ramp's luminance
+     direction, so every consumer keeps its relative contrast. */
+  --color-primary: var(--primary);
+  --color-primary-contrast: #fafafa;
+  --color-primary-dark-1: #0d0d0d;
+  --color-primary-dark-2: #1a1a1a;
+  --color-primary-dark-3: #262626;
+  --color-primary-dark-4: #333333;
+  --color-primary-dark-5: #4d4d4d;
+  --color-primary-dark-6: #808080;
+  --color-primary-dark-7: #b3b3b3;
+  --color-primary-light-1: #333333;
+  --color-primary-light-2: #4d4d4d;
+  --color-primary-light-3: #666666;
+  --color-primary-light-4: #999999;
+  --color-primary-light-5: #cccccc;
+  --color-primary-light-6: #e6e6e6;
+  --color-primary-light-7: #f2f2f2;
+  --color-primary-alpha-10: rgb(0 0 0 / 0.1);
+  --color-primary-alpha-20: rgb(0 0 0 / 0.2);
+  --color-primary-alpha-30: rgb(0 0 0 / 0.3);
+  --color-primary-alpha-40: rgb(0 0 0 / 0.4);
+  --color-primary-alpha-50: rgb(0 0 0 / 0.5);
+  --color-primary-alpha-60: rgb(0 0 0 / 0.6);
+  --color-primary-alpha-70: rgb(0 0 0 / 0.7);
+  --color-primary-alpha-80: rgb(0 0 0 / 0.8);
+  --color-primary-alpha-90: rgb(0 0 0 / 0.9);
   --color-primary-hover: var(--color-primary-dark-1);
   --color-primary-active: var(--color-primary-dark-2);
   --color-secondary: #d0d7de;
@@ -205,13 +223,13 @@ hanzo-theme-meta-info {
   --color-orange-badge: #f2711c;
   --color-orange-badge-bg: #f2711c1a;
   --color-orange-badge-hover-bg: #f2711c4d;
-  --color-git: #f05133;
+  --color-git: var(--foreground);
   --color-logo: #000000;
   /* target-based colors */
-  --color-body: #ffffff;
-  --color-box-header: #f1f3f5;
-  --color-box-body: #ffffff;
-  --color-box-body-highlight: #ecf5fd;
+  --color-body: var(--background);
+  --color-box-header: var(--muted);
+  --color-box-body: var(--card);
+  --color-box-body-highlight: var(--muted);
   --color-text-dark: #01050a;
   --color-text: #181c21;
   --color-text-light: #30363b;
@@ -221,24 +239,24 @@ hanzo-theme-meta-info {
   --color-footer: var(--color-nav-bg);
   --color-timeline: #d0d7de;
   --color-input-text: var(--color-text-dark);
-  --color-input-background: #fff;
+  --color-input-background: var(--card);
   --color-input-toggle-background: #d0d7de;
   --color-input-border: var(--color-secondary-dark-1);
   --color-light: #00001706;
   --color-light-border: #0000171d;
   --color-hover: #00001708;
-  --color-hover-opaque: #f1f3f5; /* TODO: color-mix(in srgb, var(--color-body), var(--color-hover)); */
+  --color-hover-opaque: var(--muted); /* TODO: color-mix(in srgb, var(--color-body), var(--color-hover)); */
   --color-active: #00001714;
-  --color-menu: #f8f9fb;
-  --color-card: #f8f9fb;
+  --color-menu: var(--card);
+  --color-card: var(--card);
   --color-markup-table-row: #0030600a;
   --color-markup-code-block: #00306010;
   --color-markup-code-inline: #00306012;
-  --color-button: #f8f9fb;
-  --color-code-bg: #fafdff;
+  --color-button: var(--card);
+  --color-code-bg: var(--background);
   --color-shadow: #00001726;
   --color-shadow-opaque: #c7ced5;
-  --color-secondary-bg: #f2f5f8;
+  --color-secondary-bg: var(--secondary);
   --color-expand-button: #cfe8fa;
   --color-placeholder-text: var(--color-text-light-3);
   --color-editor-line-highlight: var(--color-secondary-alpha-30);
@@ -250,10 +268,10 @@ hanzo-theme-meta-info {
   --color-reaction-active-bg: var(--color-primary-light-6);
   --color-tooltip-text: #fbfdff;
   --color-tooltip-bg: #000017f0;
-  --color-nav-bg: #f6f7fa;
+  --color-nav-bg: var(--card);
   --color-nav-hover-bg: var(--color-secondary-light-1);
   --color-nav-text: var(--color-text);
-  --color-secondary-nav-bg: #f9fafb;
+  --color-secondary-nav-bg: var(--background);
   --color-label-text: var(--color-text);
   --color-label-bg: #949da64b;
   --color-label-hover-bg: #949da6a0;
@@ -312,34 +330,3 @@ hanzo-theme-meta-info {
   color-scheme: light;
 }
 
-/* ---------------------------------------------------------------------------
-   Hanzo estate alignment (light) — black action-on-white, zero-chroma primary
-   ramp; semantic colors untouched. Mirrors the dark theme's appended block. */
-:root {
-  --color-primary: #000000;
-  --color-primary-contrast: #ffffff;
-  --color-primary-dark-1: #0d0d0d;
-  --color-primary-dark-2: #1a1a1a;
-  --color-primary-dark-3: #262626;
-  --color-primary-dark-4: #333333;
-  --color-primary-dark-5: #4d4d4d;
-  --color-primary-dark-6: #808080;
-  --color-primary-dark-7: #b3b3b3;
-  --color-primary-light-1: #333333;
-  --color-primary-light-2: #4d4d4d;
-  --color-primary-light-3: #666666;
-  --color-primary-light-4: #999999;
-  --color-primary-light-5: #cccccc;
-  --color-primary-light-6: #e6e6e6;
-  --color-primary-light-7: #f2f2f2;
-  --color-primary-alpha-10: #00000019;
-  --color-primary-alpha-20: #00000033;
-  --color-primary-alpha-30: #0000004b;
-  --color-primary-alpha-40: #00000066;
-  --color-primary-alpha-50: #00000080;
-  --color-primary-alpha-60: #00000099;
-  --color-primary-alpha-70: #000000b3;
-  --color-primary-alpha-80: #000000cc;
-  --color-primary-alpha-90: #000000e6;
-  --color-git: #000000;
-}

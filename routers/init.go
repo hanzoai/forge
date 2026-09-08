@@ -57,6 +57,9 @@ import (
 	"github.com/hanzoai/git/services/task"
 	"github.com/hanzoai/git/services/uinotification"
 	"github.com/hanzoai/git/services/webhook"
+
+	"github.com/zap-proto/fiber/v3/middleware/adaptor"
+	"github.com/zap-proto/zip"
 )
 
 func mustInit(fn func() error) {
@@ -173,6 +176,9 @@ func InitWebInstalled(ctx context.Context) {
 	cron.Init(ctx)
 }
 
+// artifactRouteBase is what the runner passes to a job as ACTIONS_RUNTIME_URL.
+const artifactRouteBase = "/v1/artifact"
+
 // NormalRoutes represents non install routes
 func NormalRoutes() *web.Router {
 	r := web.NewRouter()
@@ -181,7 +187,9 @@ func NormalRoutes() *web.Router {
 	r.AfterRouting(common.MaintenanceModeHandler())
 
 	// The whole top-level URL namespace is allocated here and nowhere else:
-	// "/" is the browser, "/v1" is every machine surface, "/v2" is the OCI spec.
+	// "/" is the browser, "/v1" is every machine surface, "/v2" is the OCI spec,
+	// "/.well-known/zip/op/" is ZAP's call plane and "/twirp" is what
+	// third-party artifact JavaScript insists on (see the actions mounts below).
 	// chi routes the most specific mount first, so a "/v1/…" route registered on
 	// the web router below would be swallowed by the "/v1" mount — /v1/sync and
 	// /v1/healthz therefore live here, not in routers/web.
@@ -206,20 +214,32 @@ func NormalRoutes() *web.Router {
 	}
 
 	if setting.Actions.Enabled {
-		// "/api/actions*" is the act_runner wire protocol, not our API: the runner
-		// hardcodes this prefix client-side (and builds ACTIONS_RUNTIME_URL from
-		// "/api/actions_pipeline" itself), so it is as fixed as "/v2" above until
-		// the runner is changed in lockstep.
-		prefix := "/api/actions"
-		r.Mount(prefix, actions_router.Routes(prefix))
+		// The runner protocol: five typed zip operations, addressed as
+		// POST /v1/runner/<name> over HTTP and as post_runner_<name> on ZAP's own
+		// call plane. Both faces are the same app on the same listener, so this
+		// needs no second port and no change at the edge.
+		//
+		// Registered with Post rather than Mount because Mount is chi's
+		// prefix-stripping form: the operations declare absolute paths, and an app
+		// that receives "/register" where it declared "/v1/runner/register"
+		// answers nothing. Post reaches chi's Method, which leaves URL.Path whole.
+		//
+		// It sits beside the "/v1" mount rather than inside it because a runner
+		// carries its own credential and must not meet the session and API-token
+		// middleware.
+		runnerOps := adaptor.FiberApp(actions_router.RunnerOps().Fiber())
+		r.Post(actions_router.RunnerRouteBase+"/*", runnerOps)
+		r.Post(zip.CallPath+"*", runnerOps)
 
-		// TODO: Pipeline api used for runner internal communication with gitea server. but only artifact is used for now.
-		// In Github, it uses ACTIONS_RUNTIME_URL=https://pipelines.actions.githubusercontent.com/fLgcSHkPGySXeIFrg8W8OBSfeg3b5Fls1A1CwX566g8PayEGlg/
-		// TODO: this prefix should be generated with a token string with runner ?
-		prefix = "/api/actions_pipeline"
-		r.Mount(prefix, actions_router.ArtifactsRoutes(prefix))
-		prefix = actions_router.ArtifactV4RouteBase
-		r.Mount(prefix, actions_router.ArtifactsV4Routes(prefix))
+		// Artifact upload and download for actions/upload-artifact@v3 and its
+		// download counterpart. The runner hands a job this whole base as
+		// ACTIONS_RUNTIME_URL and their JavaScript concatenates
+		// "_apis/pipelines/…" onto it, so the base is ours to place and the suffix
+		// is theirs.
+		r.Mount(artifactRouteBase, actions_router.ArtifactsRoutes(artifactRouteBase))
+		// The v4 artifact protocol keeps the root: @actions/artifact v2 reduces
+		// ACTIONS_RESULTS_URL to its origin, so this path is not ours to place.
+		r.Mount(actions_router.ArtifactV4RouteBase, actions_router.ArtifactsV4Routes(actions_router.ArtifactV4RouteBase))
 	}
 
 	r.NotFound(func(w http.ResponseWriter, req *http.Request) {

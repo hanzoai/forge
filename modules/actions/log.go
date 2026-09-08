@@ -13,13 +13,11 @@ import (
 	"strings"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	"github.com/hanzoai/git/models/dbfs"
+	"github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/storage"
 	"github.com/hanzoai/git/modules/zstd"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -33,7 +31,7 @@ const (
 // WriteLogs appends logs to DBFS file for temporary storage.
 // It doesn't respect the file format in the filename like ".zst", since it's difficult to reopen a closed compressed file and append new content.
 // Why doesn't it store logs in object storage directly? Because it's not efficient to append content to object storage.
-func WriteLogs(ctx context.Context, filename string, offset int64, rows []*runnerv1.LogRow) ([]int, error) {
+func WriteLogs(ctx context.Context, filename string, offset int64, lines []runner.Line) ([]int, error) {
 	flag, openFileFor := os.O_WRONLY, "write-only"
 	if offset == 0 {
 		// Only allow to create file if offset is 0 (the first write), see #25560.
@@ -63,9 +61,9 @@ func WriteLogs(ctx context.Context, filename string, offset int64, rows []*runne
 
 	writer := bufio.NewWriterSize(f, defaultBufSize)
 
-	ns := make([]int, 0, len(rows))
-	for _, row := range rows {
-		n, err := writer.WriteString(FormatLog(row.Time.AsTime(), row.Content) + "\n")
+	ns := make([]int, 0, len(lines))
+	for _, line := range lines {
+		n, err := writer.WriteString(FormatLog(time.Unix(0, line.Time), line.Content) + "\n")
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +76,7 @@ func WriteLogs(ctx context.Context, filename string, offset int64, rows []*runne
 	return ns, nil
 }
 
-func ReadLogs(ctx context.Context, inStorage bool, filename string, offset, limit int64) ([]*runnerv1.LogRow, error) {
+func ReadLogs(ctx context.Context, inStorage bool, filename string, offset, limit int64) ([]runner.Line, error) {
 	f, err := OpenLogs(ctx, inStorage, filename)
 	if err != nil {
 		return nil, err
@@ -93,23 +91,20 @@ func ReadLogs(ctx context.Context, inStorage bool, filename string, offset, limi
 	maxLineSize := len(timeFormat) + MaxLineSize + 1
 	scanner.Buffer(make([]byte, maxLineSize), maxLineSize)
 
-	var rows []*runnerv1.LogRow
-	for scanner.Scan() && (int64(len(rows)) < limit || limit < 0) {
+	var lines []runner.Line
+	for scanner.Scan() && (int64(len(lines)) < limit || limit < 0) {
 		t, c, err := ParseLog(scanner.Text())
 		if err != nil {
 			return nil, fmt.Errorf("parse log %q: %w", scanner.Text(), err)
 		}
-		rows = append(rows, &runnerv1.LogRow{
-			Time:    timestamppb.New(t),
-			Content: c,
-		})
+		lines = append(lines, runner.Line{Time: t.UnixNano(), Content: c})
 	}
 
 	if err := scanner.Err(); err != nil {
 		return nil, fmt.Errorf("ReadLogs scan: %w", err)
 	}
 
-	return rows, nil
+	return lines, nil
 }
 
 const (
