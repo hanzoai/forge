@@ -4,3 +4,112 @@ Copyright (c) 2026 Hanzo AI, Inc.
 This product includes software from Gitea (https://github.com/go-gitea/gitea), licensed under MIT:
 
     Copyright (c) 2016 The Gitea Authors
+
+Forked from go-gitea/gitea and synced through Gitea 1.26.4 (2026-06-21), the
+newest release in CHANGELOG.md. GitHub records this repository's parent as
+go-gitea/gitea, and the upstream history is present in full — the history root
+is Gogs' first commit (475e3471b4, 2014-02-11, Joe Chen) and the top ten
+authors by commit count are all upstream maintainers. The rebrand begins at
+61fc4c7183 (2026-07-15).
+
+Gitea is itself a fork of Gogs, and both copyrights are retained in LICENSE:
+
+    Copyright (c) 2015 The Gogs Authors
+
+Upstream Gitea ships no NOTICE file. MIT has no NOTICE mechanism; it requires
+the copyright notice and permission text to be retained, which LICENSE and the
+per-file headers do.
+
+FILE HEADERS
+
+Commit edb3cec504 added "Copyright 2026 Hanzo AI, Inc." above the existing
+notices in 2978 files. Upstream's lines were retained, not replaced — MIT
+requires it, and the attribution is true. Nothing named "The Git Authors" was
+introduced: Git is a different project under a different licence, and putting
+its name on this code would attribute it to people with no connection to it.
+
+THIRD-PARTY SOURCE IN THIS TREE
+
+Beyond Gitea and Gogs, this repository carries third-party source that upstream
+had already brought in, plus middleware vendored here. Every file retains its
+original copyright header.
+
+  Apache-2.0 — Macaron / Martini / Beego middleware. Commit 5faa667de3 vendored
+  four packages that had been external modules at gitea.com/go-chi (Gitea's own
+  forks of Macaron middleware, themselves descended from Martini and Beego).
+  Vendoring makes this repository their redistributor:
+
+      modules/binding          Copyright 2014 Martini Authors
+                               Copyright 2014 The Macaron Authors
+                               Copyright 2020 The Gitea Authors
+      modules/captcha          Copyright 2013 Beego Authors
+      modules/cache/chi        Copyright 2014 The Macaron Authors
+      modules/session/chi
+
+  MIT — LFS Test Server. modules/lfs derives from GitHub's LFS test server and
+  keeps its own licence file at modules/lfs/LICENSE:
+
+      Copyright (c) GitHub, Inc. and LFS Test Server contributors
+
+  MIT — individual upstream authors, credited in the files they wrote:
+
+      Copyright 2018 Jonas Franz — the migration framework, 16 files:
+          modules/migration/    comment.go downloader.go issue.go label.go
+                                milestone.go options.go pullrequest.go repo.go
+                                uploader.go
+          services/migrations/  error.go github.go github_test.go
+                                git_uploader.go git_uploader_test.go
+                                main_test.go migrate.go
+
+      Copyright 2015 Kenneth Shaw — emoji, 3 files:
+          modules/emoji/emoji.go, modules/emoji/emoji_test.go,
+          build/generate-emoji.go
+
+      Copyright 2019 Yusuke Inuzuka — 2 files derived from goldmark
+      extensions, each saying so in its own header:
+          modules/markup/common/footnote.go
+          modules/markup/common/linkify.go
+
+BUNDLED DATA
+
+These are data corpora shipped for users to pick from, not code this product
+executes:
+
+  options/gitignore  270 templates generated from github/gitignore
+                     (build/generate-gitignores.go fetches
+                     https://api.github.com/repos/github/gitignore/tarball).
+  options/license    28 licence texts, synced from GitHub's licence corpus by
+                     upstream commit 42032fdecf (2017). These are the licence
+                     texts themselves.
+  modules/emoji      generated from rhysd/gemoji at commit 537ff2d7
+                     (build/generate-emoji.go).
+
+DEPENDENCY LICENCES
+
+Go dependency licence texts are collected into assets/go-licenses.json
+(1.2 MB) by build/generate-go-licenses.go and shipped with the binary;
+`make go-licenses` regenerates it. JavaScript dependency licences are collected
+at bundle time by rolldown-license-plugin. Neither is hand-maintained, so
+neither is duplicated here.
+
+DEVIATIONS
+
+  - Module path renamed from code.gitea.io/gitea to github.com/hanzoai/git
+    (cb8b07b268); the product is named "Git" and served as Hanzo Git.
+  - Environment variables renamed GITEA_* -> GIT_* (962ab4f3bd).
+  - User-facing Gitea branding, identifiers and the mascot removed
+    (a655ad2b7f, 534814599f, d24e7ffd2b, cec850b847). Load-bearing upstream
+    strings were kept where renaming them would change behaviour.
+  - Forward-only: the .gitea directory, the gitea webhook type and the gitea_
+    runtime keys were dropped (d47cdeb0fa).
+  - Zero gitea.com dependencies (8c66b01570). The four go-chi middleware
+    packages were vendored (5faa667de3, see above); the DingTalk webhook
+    payload is defined in-tree instead of gitea.com/lunny/dingtalk_webhook
+    (74133ba158).
+  - Queue rewritten onto ZapDB as the durable backend; levelqueue, goleveldb
+    and the nosql manager are gone (ab39c2f308, 973f62a6e4, 6ea26f854d), and
+    ZapDB is reached through luxfi/database so the backend stays swappable
+    (52cc17de28).
+  - Routing: chi is the mux only; the route context is ours (f32cca4324,
+    935f99f513).
+  - Authentication is Hanzo IAM native.
