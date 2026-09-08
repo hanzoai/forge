@@ -828,16 +828,16 @@ func convertToViewModel(ctx context.Context, locale translation.Locale, cursors 
 		if validCursor {
 			length := step.LogLength - cursor.Cursor
 			offset := task.LogIndexes[index]
-			logRows, err := actions.ReadLogs(ctx, task.LogInStorage, task.LogFilename, offset, length)
+			read, err := actions.ReadLogs(ctx, task.LogInStorage, task.LogFilename, offset, length)
 			if err != nil {
 				return nil, nil, fmt.Errorf("actions.ReadLogs: %w", err)
 			}
 
-			for i, row := range logRows {
+			for i, line := range read {
 				logLines = append(logLines, &ViewStepLogLine{
 					Index:     cursor.Cursor + int64(i) + 1, // start at 1
-					Message:   row.Content,
-					Timestamp: float64(row.Time.AsTime().UnixNano()) / float64(time.Second),
+					Message:   line.Content,
+					Timestamp: float64(line.Time) / float64(time.Second),
 				})
 			}
 		}

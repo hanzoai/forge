@@ -8,10 +8,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	"github.com/hanzoai/git/models/db"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/shared/types"
@@ -124,19 +122,25 @@ func (r *ActionRunner) BelongsToOwnerType() types.OwnerType {
 	return types.OwnerTypeSystemGlobal
 }
 
-// if the logic here changed, you should also modify FindRunnerOptions.ToCond
-func (r *ActionRunner) Status() runnerv1.RunnerStatus {
+// How recently a runner has spoken, in three words. The names are the ones the
+// templates and the API already print, so this is the value itself rather than
+// an enum something else has to spell out.
+const (
+	RunnerOffline = "offline"
+	RunnerIdle    = "idle"
+	RunnerActive  = "active"
+)
+
+// StatusName reports whether the runner is offline, idle or running work.
+// If the logic here changes, so must FindRunnerOptions.ToCond.
+func (r *ActionRunner) StatusName() string {
 	if time.Since(r.LastOnline.AsTime()) > RunnerOfflineTime {
-		return runnerv1.RunnerStatus_RUNNER_STATUS_OFFLINE
+		return RunnerOffline
 	}
 	if time.Since(r.LastActive.AsTime()) > RunnerIdleTime {
-		return runnerv1.RunnerStatus_RUNNER_STATUS_IDLE
+		return RunnerIdle
 	}
-	return runnerv1.RunnerStatus_RUNNER_STATUS_ACTIVE
-}
-
-func (r *ActionRunner) StatusName() string {
-	return strings.ToLower(strings.TrimPrefix(r.Status().String(), "RUNNER_STATUS_"))
+	return RunnerActive
 }
 
 func (r *ActionRunner) StatusLocaleName(lang translation.Locale) string {
@@ -144,11 +148,7 @@ func (r *ActionRunner) StatusLocaleName(lang translation.Locale) string {
 }
 
 func (r *ActionRunner) IsOnline() bool {
-	status := r.Status()
-	if status == runnerv1.RunnerStatus_RUNNER_STATUS_IDLE || status == runnerv1.RunnerStatus_RUNNER_STATUS_ACTIVE {
-		return true
-	}
-	return false
+	return r.StatusName() != RunnerOffline
 }
 
 // EditableInContext checks if the runner is editable by the "context" owner/repo

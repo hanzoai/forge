@@ -68,6 +68,9 @@ func mainTest(m *testing.M, testOptsArg ...*TestOptions) int {
 	setting.SSH.BuiltinServerUser = "builtinuser"
 	setting.SSH.Port = 3000
 	setting.SSH.Domain = "try.gitea.io"
+	// Under a real HOME the authorized_keys rewrite would replace the user's own
+	// keys with the fixtures'; keep it inside the test tree.
+	setting.SSH.RootPath = filepath.Join(tempWorkPath, "ssh")
 	setting.Database.Type = "sqlite3"
 	setting.Repository.DefaultBranch = "master" // many test code still assume that default branch is called "master"
 	setting.GravatarSource = "https://secure.gravatar.com/avatar/"

@@ -7,7 +7,7 @@ package actions
 import (
 	"testing"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -15,17 +15,17 @@ import (
 func TestStatusAsResult(t *testing.T) {
 	cases := []struct {
 		status Status
-		want   runnerv1.Result
+		want   runner_module.Result
 	}{
-		{StatusUnknown, runnerv1.Result_RESULT_UNSPECIFIED},
-		{StatusWaiting, runnerv1.Result_RESULT_UNSPECIFIED},
-		{StatusRunning, runnerv1.Result_RESULT_UNSPECIFIED},
-		{StatusBlocked, runnerv1.Result_RESULT_UNSPECIFIED},
-		{StatusSuccess, runnerv1.Result_RESULT_SUCCESS},
-		{StatusFailure, runnerv1.Result_RESULT_FAILURE},
-		{StatusCancelled, runnerv1.Result_RESULT_CANCELLED},
-		{StatusCancelling, runnerv1.Result_RESULT_CANCELLED},
-		{StatusSkipped, runnerv1.Result_RESULT_SKIPPED},
+		{StatusUnknown, runner_module.Pending},
+		{StatusWaiting, runner_module.Pending},
+		{StatusRunning, runner_module.Pending},
+		{StatusBlocked, runner_module.Pending},
+		{StatusSuccess, runner_module.Success},
+		{StatusFailure, runner_module.Failure},
+		{StatusCancelled, runner_module.Cancelled},
+		{StatusCancelling, runner_module.Cancelled},
+		{StatusSkipped, runner_module.Skipped},
 	}
 
 	for _, tt := range cases {
@@ -35,14 +35,14 @@ func TestStatusAsResult(t *testing.T) {
 
 func TestStatusFromResult(t *testing.T) {
 	cases := []struct {
-		result runnerv1.Result
+		result runner_module.Result
 		want   Status
 	}{
-		{runnerv1.Result_RESULT_UNSPECIFIED, StatusUnknown},
-		{runnerv1.Result_RESULT_SUCCESS, StatusSuccess},
-		{runnerv1.Result_RESULT_FAILURE, StatusFailure},
-		{runnerv1.Result_RESULT_CANCELLED, StatusCancelled},
-		{runnerv1.Result_RESULT_SKIPPED, StatusSkipped},
+		{runner_module.Pending, StatusUnknown},
+		{runner_module.Success, StatusSuccess},
+		{runner_module.Failure, StatusFailure},
+		{runner_module.Cancelled, StatusCancelled},
+		{runner_module.Skipped, StatusSkipped},
 	}
 
 	for _, tt := range cases {

@@ -15,7 +15,6 @@ import (
 	"strconv"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	asymkey_model "github.com/hanzoai/git/models/asymkey"
 	"github.com/hanzoai/git/models/auth"
@@ -725,7 +724,6 @@ func ToActionArtifact(repo *repo_model.Repository, art *actions_model.ActionArti
 }
 
 func ToActionRunner(ctx context.Context, runner *actions_model.ActionRunner) *api.ActionRunner {
-	status := runner.Status()
 	apiStatus := "offline"
 	if runner.IsOnline() {
 		apiStatus = "online"
@@ -742,7 +740,7 @@ func ToActionRunner(ctx context.Context, runner *actions_model.ActionRunner) *ap
 		ID:        runner.ID,
 		Name:      runner.Name,
 		Status:    apiStatus,
-		Busy:      status == runnerv1.RunnerStatus_RUNNER_STATUS_ACTIVE,
+		Busy:      runner.StatusName() == actions_model.RunnerActive,
 		Disabled:  runner.IsDisabled,
 		Ephemeral: runner.Ephemeral,
 		Labels:    labels,

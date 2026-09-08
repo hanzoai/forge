@@ -8,7 +8,7 @@ package actions
 //
 // 1. Upload artifact
 // 1.1. Post upload url
-// Post: /api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts?api-version=6.0-preview
+// Post: /v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts?api-version=6.0-preview
 // Request:
 // {
 //  "Type": "actions_storage",
@@ -16,11 +16,11 @@ package actions
 // }
 // Response:
 // {
-// 	"fileContainerResourceUrl":"/api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/upload"
+// 	"fileContainerResourceUrl":"/v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/upload"
 // }
 // it acquires an upload url for artifact upload
 // 1.2. Upload artifact
-// PUT: /api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/upload?itemPath=artifact%2Ffilename
+// PUT: /v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/upload?itemPath=artifact%2Ffilename
 // it upload chunk with headers:
 //    x-tfs-filelength: 1024 					// total file length
 //    content-length: 1024 						// chunk length
@@ -28,36 +28,36 @@ package actions
 //    content-range: bytes 0-1023/1024 // chunk range
 // we save all chunks to one storage directory after md5sum check
 // 1.3. Confirm upload
-// PATCH: /api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/upload?itemPath=artifact%2Ffilename
+// PATCH: /v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/upload?itemPath=artifact%2Ffilename
 // it confirm upload and merge all chunks to one file, save this file to storage
 //
 // 2. Download artifact
 // 2.1 list artifacts
-// GET: /api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts?api-version=6.0-preview
+// GET: /v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts?api-version=6.0-preview
 // Response:
 // {
 // 	"count": 1,
 // 	"value": [
 // 		{
 // 			"name": "artifact",
-// 			"fileContainerResourceUrl": "/api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/path"
+// 			"fileContainerResourceUrl": "/v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/path"
 // 		}
 // 	]
 // }
 // 2.2 download artifact
-// GET: /api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/path?api-version=6.0-preview
+// GET: /v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/path?api-version=6.0-preview
 // Response:
 // {
 //   "value": [
 // 			{
-// 	 			"contentLocation": "/api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/download",
+// 	 			"contentLocation": "/v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/download",
 // 				"path": "artifact/filename",
 // 				"itemType": "file"
 // 			}
 //   ]
 // }
 // 2.3 download artifact file
-// GET: /api/actions_pipeline/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/download?itemPath=artifact%2Ffilename
+// GET: /v1/artifact/_apis/pipelines/workflows/{run_id}/artifacts/{artifact_id}/download?itemPath=artifact%2Ffilename
 // Response:
 // download file
 //

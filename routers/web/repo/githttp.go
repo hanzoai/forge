@@ -32,6 +32,7 @@ import (
 	"github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/util"
 	"github.com/hanzoai/git/services/context"
+	mirror_service "github.com/hanzoai/git/services/mirror"
 	repo_service "github.com/hanzoai/git/services/repository"
 
 	"github.com/go-chi/cors"
@@ -458,6 +459,17 @@ func GetInfoRefs(ctx *context.Context) {
 	if h == nil {
 		return
 	}
+	// A mirror caches an upstream that is canonical, so the read is what refreshes
+	// it: a fetch that begins here is current by construction, and a repo nobody
+	// reads costs nothing. A cron sweep instead made staleness a function of the
+	// clock, and a cache that contradicts its upstream still answers 200.
+	// Upstream down serves the cached copy — that is what the cache is for.
+	if h.repo != nil && h.repo.IsMirror && h.serviceType == ServiceTypeUploadPack {
+		if !mirror_service.SyncPullMirror(ctx, h.repo.ID) {
+			log.Warn("mirror %s: upstream sync failed, serving the cached copy", h.repo.FullName())
+		}
+	}
+
 	setHeaderNoCache(ctx)
 	if h.serviceType == "" {
 		// it's said that some legacy git clients will send requests to "/info/refs" without "service" parameter,

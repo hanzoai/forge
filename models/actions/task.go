@@ -12,20 +12,19 @@ import (
 	"strings"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unit"
 	"github.com/hanzoai/git/modules/actions/jobparser"
+	"github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/globallock"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"
 
-	lru "github.com/hashicorp/golang-lru/v2"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"github.com/hanzoai/builder"
+	lru "github.com/hashicorp/golang-lru/v2"
 )
 
 // ActionTask represents a distribution of job
@@ -574,15 +573,15 @@ func getRunIDByTaskID(ctx context.Context, taskID int64) (runID int64, _ error) 
 // UpdateTaskByState updates the task by the state.
 // It will always update the task if the state is not final, even there is no change.
 // So it will update ActionTask.Updated to avoid the task being judged as a zombie task.
-func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.TaskState) (*ActionTask, error) {
-	stepStates := map[int64]*runnerv1.StepState{}
+func UpdateTaskByState(ctx context.Context, runnerID int64, state runner.State) (*ActionTask, error) {
+	reported := make(map[int64]runner.Step, len(state.Steps))
 	for _, v := range state.Steps {
-		stepStates[v.Id] = v
+		reported[v.ID] = v
 	}
 
 	// Only one request can update the task because the final state needs to be calculated with all job states.
 	// Otherwise, concurrent requests with transaction will make the SQL read stale job state and result in wrong final state.
-	taskID := state.Id
+	taskID := state.ID
 	runID, err := getRunIDByTaskID(ctx, taskID)
 	if err != nil {
 		return nil, err
@@ -602,15 +601,15 @@ func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.Task
 			return nil
 		}
 
-		// state.Result is not unspecified means the task is finished
-		if state.Result != runnerv1.Result_RESULT_UNSPECIFIED {
+		// A result at all means the task is finished.
+		if state.Result != runner.Pending {
 			if task.Status == StatusCancelling {
 				// The runner may report SUCCESS/FAILURE for the cleanup phase; preserve user intent.
 				task.Status = StatusCancelled
 			} else {
 				task.Status = StatusFromResult(state.Result)
 			}
-			task.Stopped = timeutil.TimeStamp(state.StoppedAt.AsTime().Unix())
+			task.Stopped = stamp(state.Stopped)
 			if err := UpdateTask(ctx, task, "status", "stopped"); err != nil {
 				return err
 			}
@@ -633,15 +632,15 @@ func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.Task
 		task.Steps = steps
 
 		for _, step := range steps {
-			var result runnerv1.Result
-			if v, ok := stepStates[step.Index]; ok {
+			var result runner.Result
+			if v, ok := reported[step.Index]; ok {
 				result = v.Result
 				step.LogIndex = v.LogIndex
 				step.LogLength = v.LogLength
-				step.Started = convertTimestamp(v.StartedAt)
-				step.Stopped = convertTimestamp(v.StoppedAt)
+				step.Started = stamp(v.Started)
+				step.Stopped = stamp(v.Stopped)
 			}
-			if result != runnerv1.Result_RESULT_UNSPECIFIED {
+			if result != runner.Pending {
 				step.Status = StatusFromResult(result)
 			} else if step.Started != 0 {
 				step.Status = StatusRunning
@@ -651,7 +650,7 @@ func UpdateTaskByState(ctx context.Context, runnerID int64, state *runnerv1.Task
 			}
 		}
 
-		if state.Result != runnerv1.Result_RESULT_UNSPECIFIED {
+		if state.Result != runner.Pending {
 			// A runner stopped before it started a step reports the task failed. Its
 			// job ran nothing, so it goes back to the queue instead of ending red.
 			requeued := false
@@ -776,11 +775,15 @@ func FindOldTasksToExpire(ctx context.Context, olderThan timeutil.TimeStamp, lim
 		Find(&tasks)
 }
 
-func convertTimestamp(timestamp *timestamppb.Timestamp) timeutil.TimeStamp {
-	if timestamp.GetSeconds() == 0 && timestamp.GetNanos() == 0 {
-		return timeutil.TimeStamp(0)
+// stamp converts an instant the runner reported — unix nanoseconds, 0 for unset
+// — to the second-resolution stamp the database column holds. Unset stays unset:
+// a runner that has not started a step sends 0, and storing that as an epoch
+// second would date the step to 1970.
+func stamp(nanos int64) timeutil.TimeStamp {
+	if nanos == 0 {
+		return 0
 	}
-	return timeutil.TimeStamp(timestamp.AsTime().Unix())
+	return timeutil.TimeStamp(nanos / int64(time.Second))
 }
 
 func logFileName(repoFullName string, taskID int64) string {

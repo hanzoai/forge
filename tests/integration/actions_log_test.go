@@ -12,18 +12,17 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/storage"
 	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestDownloadTaskLogs(t *testing.T) {
@@ -53,35 +52,35 @@ jobs:
 `,
 			outcome: []*mockTaskOutcome{
 				{
-					result: runnerv1.Result_RESULT_SUCCESS,
-					logRows: []*runnerv1.LogRow{
+					result: runner_module.Success,
+					logLines: []runner_module.Line{
 						{
-							Time:    timestamppb.New(now.Add(1 * time.Second)),
+							Time:    now.Add(1 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    timestamppb.New(now.Add(2 * time.Second)),
+							Time:    now.Add(2 * time.Second).UnixNano(),
 							Content: "job1 zstd enabled",
 						},
 						{
-							Time:    timestamppb.New(now.Add(3 * time.Second)),
+							Time:    now.Add(3 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
 				},
 				{
-					result: runnerv1.Result_RESULT_SUCCESS,
-					logRows: []*runnerv1.LogRow{
+					result: runner_module.Success,
+					logLines: []runner_module.Line{
 						{
-							Time:    timestamppb.New(now.Add(1 * time.Second)),
+							Time:    now.Add(1 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    timestamppb.New(now.Add(2 * time.Second)),
+							Time:    now.Add(2 * time.Second).UnixNano(),
 							Content: "job2 zstd enabled",
 						},
 						{
-							Time:    timestamppb.New(now.Add(3 * time.Second)),
+							Time:    now.Add(3 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
@@ -108,35 +107,35 @@ jobs:
 `,
 			outcome: []*mockTaskOutcome{
 				{
-					result: runnerv1.Result_RESULT_SUCCESS,
-					logRows: []*runnerv1.LogRow{
+					result: runner_module.Success,
+					logLines: []runner_module.Line{
 						{
-							Time:    timestamppb.New(now.Add(4 * time.Second)),
+							Time:    now.Add(4 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    timestamppb.New(now.Add(5 * time.Second)),
+							Time:    now.Add(5 * time.Second).UnixNano(),
 							Content: "job1 zstd disabled",
 						},
 						{
-							Time:    timestamppb.New(now.Add(6 * time.Second)),
+							Time:    now.Add(6 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
 				},
 				{
-					result: runnerv1.Result_RESULT_SUCCESS,
-					logRows: []*runnerv1.LogRow{
+					result: runner_module.Success,
+					logLines: []runner_module.Line{
 						{
-							Time:    timestamppb.New(now.Add(4 * time.Second)),
+							Time:    now.Add(4 * time.Second).UnixNano(),
 							Content: "  \U0001F433  docker create image",
 						},
 						{
-							Time:    timestamppb.New(now.Add(5 * time.Second)),
+							Time:    now.Add(5 * time.Second).UnixNano(),
 							Content: "job2 zstd disabled",
 						},
 						{
-							Time:    timestamppb.New(now.Add(6 * time.Second)),
+							Time:    now.Add(6 * time.Second).UnixNano(),
 							Content: "\U0001F3C1  Job succeeded",
 						},
 					},
@@ -176,25 +175,25 @@ jobs:
 					runner.execTask(t, task, outcome)
 
 					// check whether the log file exists
-					logFileName := fmt.Sprintf("%s/%02x/%d.log", repo.FullName(), task.Id%256, task.Id)
+					logFileName := fmt.Sprintf("%s/%02x/%d.log", repo.FullName(), task.ID%256, task.ID)
 					if setting.Actions.LogCompression.IsZstd() {
 						logFileName += ".zst"
 					}
 					_, err := storage.Actions.Stat(logFileName)
 					assert.NoError(t, err)
 
-					_, job, run := getTaskAndJobAndRunByTaskID(t, task.Id)
+					_, job, run := getTaskAndJobAndRunByTaskID(t, task.ID)
 
 					// download task logs and check content
 					req := NewRequest(t, "GET", fmt.Sprintf("/%s/%s/actions/runs/%d/jobs/%d/logs", user2.Name, repo.Name, run.ID, job.ID)).
 						AddTokenAuth(token)
 					resp := MakeRequest(t, req, http.StatusOK)
 					logTextLines := strings.Split(strings.TrimSpace(resp.Body.String()), "\n")
-					assert.Len(t, logTextLines, len(outcome.logRows))
-					for idx, lr := range outcome.logRows {
+					assert.Len(t, logTextLines, len(outcome.logLines))
+					for idx, lr := range outcome.logLines {
 						assert.Equal(
 							t,
-							fmt.Sprintf("%s %s", lr.Time.AsTime().Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
+							fmt.Sprintf("%s %s", time.Unix(0, lr.Time).UTC().Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
 							logTextLines[idx],
 						)
 					}
@@ -204,11 +203,11 @@ jobs:
 						AddTokenAuth(token)
 					resp = MakeRequest(t, req, http.StatusOK)
 					logTextLines = strings.Split(strings.TrimSpace(resp.Body.String()), "\n")
-					assert.Len(t, logTextLines, len(outcome.logRows))
-					for idx, lr := range outcome.logRows {
+					assert.Len(t, logTextLines, len(outcome.logLines))
+					for idx, lr := range outcome.logLines {
 						assert.Equal(
 							t,
-							fmt.Sprintf("%s %s", lr.Time.AsTime().Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
+							fmt.Sprintf("%s %s", time.Unix(0, lr.Time).UTC().Format("2006-01-02T15:04:05.0000000Z07:00"), lr.Content),
 							logTextLines[idx],
 						)
 					}
@@ -242,23 +241,23 @@ jobs:
 
 			// first run
 			job1Task1 := runner.fetchTask(t)
-			_, job1, _ := getTaskAndJobAndRunByTaskID(t, job1Task1.Id)
+			_, job1, _ := getTaskAndJobAndRunByTaskID(t, job1Task1.ID)
 			runner.execTask(t, job1Task1, &mockTaskOutcome{
-				result: runnerv1.Result_RESULT_SUCCESS,
-				logRows: []*runnerv1.LogRow{
+				result: runner_module.Success,
+				logLines: []runner_module.Line{
 					{
-						Time:    timestamppb.New(now.Add(1 * time.Second)),
+						Time:    now.Add(1 * time.Second).UnixNano(),
 						Content: "job1 first run",
 					},
 				},
 			})
 			job2Task1 := runner.fetchTask(t)
-			_, job2, run := getTaskAndJobAndRunByTaskID(t, job2Task1.Id)
+			_, job2, run := getTaskAndJobAndRunByTaskID(t, job2Task1.ID)
 			runner.execTask(t, job2Task1, &mockTaskOutcome{
-				result: runnerv1.Result_RESULT_SUCCESS,
-				logRows: []*runnerv1.LogRow{
+				result: runner_module.Success,
+				logLines: []runner_module.Line{
 					{
-						Time:    timestamppb.New(now.Add(1 * time.Second)),
+						Time:    now.Add(1 * time.Second).UnixNano(),
 						Content: "job2 first run",
 					},
 				},
@@ -280,10 +279,10 @@ jobs:
 			session.MakeRequest(t, req, http.StatusOK)
 			job2TaskRerun := runner.fetchTask(t)
 			runner.execTask(t, job2TaskRerun, &mockTaskOutcome{
-				result: runnerv1.Result_RESULT_SUCCESS,
-				logRows: []*runnerv1.LogRow{
+				result: runner_module.Success,
+				logLines: []runner_module.Line{
 					{
-						Time:    timestamppb.New(now.Add(1 * time.Second)),
+						Time:    now.Add(1 * time.Second).UnixNano(),
 						Content: "job2 rerun",
 					},
 				},
