@@ -13,13 +13,13 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	repo_model "github.com/hanzoai/git/models/repo"
 	unit_model "github.com/hanzoai/git/models/unit"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/commitstatus"
 	"github.com/hanzoai/git/modules/queue"
 	api "github.com/hanzoai/git/modules/structs"
@@ -110,10 +110,10 @@ func TestActionsScopedWorkflows(t *testing.T) {
 
 			// runs in the CONSUMER's context and reaches a terminal state
 			task := runner.fetchTask(t)
-			_, taskJob, taskRun := getTaskAndJobAndRunByTaskID(t, task.Id)
+			_, taskJob, taskRun := getTaskAndJobAndRunByTaskID(t, task.ID)
 			assert.Equal(t, consumer.ID, taskJob.RepoID)
 			assert.Equal(t, run.ID, taskRun.ID)
-			runner.execTask(t, task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, task, &mockTaskOutcome{result: runner_module.Success})
 			run = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: run.ID})
 			assert.Equal(t, actions_model.StatusSuccess, run.Status)
 
@@ -122,10 +122,10 @@ func TestActionsScopedWorkflows(t *testing.T) {
 			user2Session.MakeRequest(t, rerunReq, http.StatusOK)
 			unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunAttempt{RunID: run.ID, Attempt: 2})
 			task2 := runner.fetchTask(t)
-			_, taskJob2, taskRun2 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+			_, taskJob2, taskRun2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 			assert.Equal(t, consumer.ID, taskJob2.RepoID)
 			assert.True(t, taskRun2.IsScopedRun, "the rerun is still a scoped run")
-			runner.execTask(t, task2, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, task2, &mockTaskOutcome{result: runner_module.Success})
 			run = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: run.ID})
 			assert.Equal(t, actions_model.StatusSuccess, run.Status)
 		})
@@ -304,7 +304,7 @@ jobs:
 
 				// the required scoped run succeeds ->  merge allowed
 				task := runner.fetchTask(t)
-				runner.execTask(t, task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+				runner.execTask(t, task, &mockTaskOutcome{result: runner_module.Success})
 				assert.NoError(t, queue.GetManager().FlushAll(t.Context(), 5*time.Second))
 				user2Session.MakeRequest(t, mergeReq(), http.StatusOK)
 			})
@@ -339,7 +339,7 @@ jobs:
 
 				// the required scoped run succeeds ->  merge allowed
 				task := runner.fetchTask(t)
-				runner.execTask(t, task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+				runner.execTask(t, task, &mockTaskOutcome{result: runner_module.Success})
 				assert.NoError(t, queue.GetManager().FlushAll(t.Context(), 5*time.Second))
 				user2Session.MakeRequest(t, mergeReq(), http.StatusOK)
 			})

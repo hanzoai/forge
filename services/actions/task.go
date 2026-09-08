@@ -8,18 +8,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
+	"strings"
 	"sync"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/models/db"
 	secret_model "github.com/hanzoai/git/models/secret"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/graceful"
+	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
-
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -39,7 +40,7 @@ func taskPickLimiter() chan struct{} {
 // runners poll at once. When the concurrency limit is reached it returns
 // throttled=true without touching the DB, so the caller can let the runner
 // retry on its next poll instead of advancing its tasks version.
-func TryPickTask(ctx context.Context, runner *actions_model.ActionRunner) (task *runnerv1.Task, ok, throttled bool, err error) {
+func TryPickTask(ctx context.Context, runner *actions_model.ActionRunner) (task *runner_module.Task, ok, throttled bool, err error) {
 	sem := taskPickLimiter()
 	select {
 	case sem <- struct{}{}:
@@ -62,9 +63,9 @@ func releaseTaskForRunnerCleanup(t *actions_model.ActionTask) {
 	}
 }
 
-func PickTask(ctx context.Context, runner *actions_model.ActionRunner) (*runnerv1.Task, bool, error) {
+func PickTask(ctx context.Context, runner *actions_model.ActionRunner) (*runner_module.Task, bool, error) {
 	var (
-		task       *runnerv1.Task
+		task       *runner_module.Task
 		job        *actions_model.ActionRunJob
 		actionTask *actions_model.ActionTask
 	)
@@ -131,7 +132,7 @@ func PickTask(ctx context.Context, runner *actions_model.ActionRunner) (*runnerv
 
 // buildRunnerTask assembles the runner-facing task payload for an already-claimed
 // task. All operations are read-only; on error the caller releases the claim.
-func buildRunnerTask(ctx context.Context, t *actions_model.ActionTask) (*runnerv1.Task, *actions_model.ActionRunJob, error) {
+func buildRunnerTask(ctx context.Context, t *actions_model.ActionTask) (*runner_module.Task, *actions_model.ActionRunJob, error) {
 	if err := t.LoadAttributes(ctx); err != nil {
 		return nil, nil, fmt.Errorf("task LoadAttributes: %w", err)
 	}
@@ -157,40 +158,90 @@ func buildRunnerTask(ctx context.Context, t *actions_model.ActionTask) (*runnerv
 		return nil, nil, fmt.Errorf("generateTaskContext: %w", err)
 	}
 
-	return &runnerv1.Task{
-		Id:              t.ID,
-		WorkflowPayload: t.Job.WorkflowPayload,
-		Context:         taskContext,
-		Secrets:         secrets,
-		Vars:            vars,
-		Needs:           needs,
+	return &runner_module.Task{
+		ID:       t.ID,
+		Workflow: t.Job.WorkflowPayload,
+		Context:  taskContext,
+		Secrets:  pairs(secrets),
+		Vars:     pairs(vars),
+		Needs:    needs,
 	}, job, nil
 }
 
-func generateTaskContext(ctx context.Context, t *actions_model.ActionTask) (*structpb.Struct, error) {
-	gitRuntimeToken, err := CreateAuthorizationToken(t.ID, t.Job.RunID, t.JobID)
-	if err != nil {
-		return nil, err
+// pairs orders a set of named values so it can cross the plane. Sorted by name,
+// because a map iterates in a different order every time and a payload that
+// reshuffles per request is one nothing can be compared against.
+func pairs(m map[string]string) []runner_module.Pair {
+	if len(m) == 0 {
+		return nil
 	}
-
-	gitCtx := GenerateGitContext(ctx, t.Job.Run, nil, t.Job)
-	gitCtx["token"] = t.Token
-	gitCtx["git_runtime_token"] = gitRuntimeToken
-
-	return structpb.NewStruct(gitCtx)
+	out := make([]runner_module.Pair, 0, len(m))
+	for k, v := range m {
+		out = append(out, runner_module.Pair{Name: k, Value: v})
+	}
+	slices.SortFunc(out, func(a, b runner_module.Pair) int { return strings.Compare(a.Name, b.Name) })
+	return out
 }
 
-func findTaskNeeds(ctx context.Context, taskJob *actions_model.ActionRunJob) (map[string]*runnerv1.TaskNeed, error) {
+// generateTaskContext projects the forge's own expression context onto the
+// runner-facing one. It is the ONE place the two vocabularies meet: the map
+// stays because the forge evaluates workflow expressions against it, and the
+// struct is what crosses, so a name can drift in exactly one function instead
+// of between two repositories.
+func generateTaskContext(ctx context.Context, t *actions_model.ActionTask) (runner_module.Context, error) {
+	runtimeToken, err := CreateAuthorizationToken(t.ID, t.Job.RunID, t.JobID)
+	if err != nil {
+		return runner_module.Context{}, err
+	}
+
+	g := GenerateGitContext(ctx, t.Job.Run, nil, t.Job)
+	event, err := json.Marshal(g["event"])
+	if err != nil {
+		return runner_module.Context{}, fmt.Errorf("encode event: %w", err)
+	}
+
+	return runner_module.Context{
+		Event:           event,
+		EventName:       g.Text("event_name"),
+		Job:             g.Text("job"),
+		RunID:           g.Text("run_id"),
+		RunNumber:       g.Text("run_number"),
+		RunAttempt:      g.Text("run_attempt"),
+		Actor:           g.Text("actor"),
+		Repository:      g.Text("repository"),
+		RepositoryOwner: g.Text("repository_owner"),
+		Ref:             g.Text("ref"),
+		RefName:         g.Text("ref_name"),
+		RefType:         g.Text("ref_type"),
+		HeadRef:         g.Text("head_ref"),
+		BaseRef:         g.Text("base_ref"),
+		Sha:             g.Text("sha"),
+		ServerURL:       g.Text("server_url"),
+		APIURL:          g.Text("api_url"),
+		RetentionDays:   g.Text("retention_days"),
+		Token:           t.Token,
+		RuntimeToken:    runtimeToken,
+		// Read from the setting rather than from the context map: it is a fact
+		// about this forge, not about this run. A runner that receives nothing
+		// here composes "https://" + "" + "/actions/checkout" and every job dies
+		// before its first step, so it is worth one direct read.
+		ActionsURL: setting.Actions.DefaultActionsURL.URL(),
+	}, nil
+}
+
+func findTaskNeeds(ctx context.Context, taskJob *actions_model.ActionRunJob) ([]runner_module.Need, error) {
 	taskNeeds, err := FindTaskNeeds(ctx, taskJob)
 	if err != nil {
 		return nil, err
 	}
-	ret := make(map[string]*runnerv1.TaskNeed, len(taskNeeds))
+	needs := make([]runner_module.Need, 0, len(taskNeeds))
 	for jobID, taskNeed := range taskNeeds {
-		ret[jobID] = &runnerv1.TaskNeed{
-			Outputs: taskNeed.Outputs,
-			Result:  runnerv1.Result(taskNeed.Result),
-		}
+		needs = append(needs, runner_module.Need{
+			Job:     jobID,
+			Result:  taskNeed.Result.AsResult(),
+			Outputs: pairs(taskNeed.Outputs),
+		})
 	}
-	return ret, nil
+	slices.SortFunc(needs, func(a, b runner_module.Need) int { return strings.Compare(a.Job, b.Job) })
+	return needs, nil
 }

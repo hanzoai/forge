@@ -7,23 +7,27 @@ package actions
 import (
 	"slices"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
+	"github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/translation"
 )
 
 // Status represents the status of ActionRun, ActionRunJob, ActionTask, or ActionTaskStep
 type Status int
 
+// A Status covers more ground than a runner Result: the four states after
+// StatusSkipped describe a job the forge is still holding, which a runner never
+// reports. AsResult and StatusFromResult are the whole crossing, so nothing here
+// has to keep step with a number on the wire.
 const (
-	StatusUnknown    Status = iota // 0, consistent with runnerv1.Result_RESULT_UNSPECIFIED
-	StatusSuccess                  // 1, consistent with runnerv1.Result_RESULT_SUCCESS
-	StatusFailure                  // 2, consistent with runnerv1.Result_RESULT_FAILURE
-	StatusCancelled                // 3, consistent with runnerv1.Result_RESULT_CANCELLED
-	StatusSkipped                  // 4, consistent with runnerv1.Result_RESULT_SKIPPED
-	StatusWaiting                  // 5, isn't a runnerv1.Result
-	StatusRunning                  // 6, isn't a runnerv1.Result
-	StatusBlocked                  // 7, isn't a runnerv1.Result
-	StatusCancelling               // 8, isn't a runnerv1.Result
+	StatusUnknown Status = iota
+	StatusSuccess
+	StatusFailure
+	StatusCancelled
+	StatusSkipped
+	StatusWaiting
+	StatusRunning
+	StatusBlocked
+	StatusCancelling
 )
 
 var statusNames = map[Status]string{
@@ -99,30 +103,32 @@ func (s Status) In(statuses ...Status) bool {
 	return slices.Contains(statuses, s)
 }
 
-func (s Status) AsResult() runnerv1.Result {
+// AsResult reports how a runner should read this status. A job the forge is
+// still cancelling has already been decided, so it crosses as cancelled.
+func (s Status) AsResult() runner.Result {
 	switch s {
 	case StatusSuccess:
-		return runnerv1.Result_RESULT_SUCCESS
+		return runner.Success
 	case StatusFailure:
-		return runnerv1.Result_RESULT_FAILURE
+		return runner.Failure
 	case StatusCancelled, StatusCancelling:
-		return runnerv1.Result_RESULT_CANCELLED
+		return runner.Cancelled
 	case StatusSkipped:
-		return runnerv1.Result_RESULT_SKIPPED
+		return runner.Skipped
 	default:
-		return runnerv1.Result_RESULT_UNSPECIFIED
+		return runner.Pending
 	}
 }
 
-func StatusFromResult(r runnerv1.Result) Status {
+func StatusFromResult(r runner.Result) Status {
 	switch r {
-	case runnerv1.Result_RESULT_SUCCESS:
+	case runner.Success:
 		return StatusSuccess
-	case runnerv1.Result_RESULT_FAILURE:
+	case runner.Failure:
 		return StatusFailure
-	case runnerv1.Result_RESULT_CANCELLED:
+	case runner.Cancelled:
 		return StatusCancelled
-	case runnerv1.Result_RESULT_SKIPPED:
+	case runner.Skipped:
 		return StatusSkipped
 	default:
 		return StatusUnknown

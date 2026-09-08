@@ -12,6 +12,7 @@ import (
 	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/setting"
 	api "github.com/hanzoai/git/modules/structs"
@@ -320,29 +321,74 @@ func TestFindTaskNeeds(t *testing.T) {
 	assert.Len(t, ret["job1"].Outputs, 2)
 	assert.Equal(t, "abc", ret["job1"].Outputs["output_a"])
 	assert.Equal(t, "bbb", ret["job1"].Outputs["output_b"])
+
+	// What the runner is sent: the same needs, ordered, with the map's key
+	// promoted to a field so the set can cross the plane.
+	needs, err := findTaskNeeds(t.Context(), job)
+	require.NoError(t, err)
+	require.Len(t, needs, 1)
+	assert.Equal(t, "job1", needs[0].Job)
+	assert.Equal(t, []runner_module.Pair{{Name: "output_a", Value: "abc"}, {Name: "output_b", Value: "bbb"}}, needs[0].Outputs)
 }
 
-func TestGitContextCarriesTheActionsURLUnderBothNames(t *testing.T) {
-	// A runner composes an action's clone URL as <default_actions_url>/<owner>/<repo>.
-	// Find neither name and it composes "https://" + "" + "/actions/checkout", which
-	// fails as `http: no Host in request URL` — a missing field that reads as a broken
-	// runner. act_runner reads the gitea_ spelling; ours reads git_. Both must resolve.
+func TestTaskContextCarriesTheActionsURL(t *testing.T) {
+	// A runner composes an action's clone URL as <ActionsURL>/<owner>/<repo>.
+	// Receive nothing here and it composes "https://" + "" + "/actions/checkout",
+	// which fails as `http: no Host in request URL` — a missing field that reads
+	// as a broken runner.
 	assert.NoError(t, unittest.PrepareTestDatabase())
 
-	run := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: 791})
-	require.NoError(t, run.LoadAttributes(t.Context()))
+	task := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: 51})
+	require.NoError(t, task.LoadAttributes(t.Context()))
 
-	gitCtx := GenerateGitContext(t.Context(), run, nil, nil)
+	c, err := generateTaskContext(t.Context(), task)
+	require.NoError(t, err)
+
 	want := setting.Actions.DefaultActionsURL.URL()
 	require.NotEmpty(t, want, "the setting itself must resolve to a URL")
+	assert.Equal(t, want, c.ActionsURL)
 
-	for _, name := range []string{"gitea_default_actions_url", "git_default_actions_url"} {
-		got, ok := gitCtx[name]
-		require.Truef(t, ok, "context is missing %q; a runner reading it gets an empty host", name)
-		assert.Equalf(t, want, got, "%q must carry the resolved URL", name)
+	u, err := url.Parse(c.ActionsURL)
+	require.NoError(t, err)
+	assert.NotEmpty(t, u.Host, "no host — this is the https:/// failure")
+}
 
-		u, err := url.Parse(got.(string))
-		require.NoErrorf(t, err, "%q must parse as a URL", name)
-		assert.NotEmptyf(t, u.Host, "%q has no host — this is the https:/// failure", name)
-	}
+// The runner reads the context as a struct, so what the forge computes and what
+// it sends have to be joined somewhere. This is that join, and it is the one
+// place a name can go missing.
+func TestTaskContextIsProjectedWhole(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+
+	task := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: 51})
+	require.NoError(t, task.LoadAttributes(t.Context()))
+
+	c, err := generateTaskContext(t.Context(), task)
+	require.NoError(t, err)
+
+	g := GenerateGitContext(t.Context(), task.Job.Run, nil, task.Job)
+	assert.Equal(t, g["actor"], c.Actor)
+	assert.Equal(t, g["api_url"], c.APIURL)
+	assert.Equal(t, g["event_name"], c.EventName)
+	assert.Equal(t, g["job"], c.Job)
+	assert.Equal(t, g["ref"], c.Ref)
+	assert.Equal(t, g["ref_name"], c.RefName)
+	assert.Equal(t, g["ref_type"], c.RefType)
+	assert.Equal(t, g["repository"], c.Repository)
+	assert.Equal(t, g["repository_owner"], c.RepositoryOwner)
+	assert.Equal(t, g["run_id"], c.RunID)
+	assert.Equal(t, g["run_number"], c.RunNumber)
+	assert.Equal(t, g["run_attempt"], c.RunAttempt)
+	assert.Equal(t, g["server_url"], c.ServerURL)
+	assert.Equal(t, g["sha"], c.Sha)
+
+	// The event crosses as opaque JSON rather than as a value with a shape,
+	// because its shape belongs to the event.
+	event := map[string]any{}
+	require.NoError(t, json.Unmarshal(c.Event, &event))
+	assert.Equal(t, g["event"], event)
+
+	// Two credentials, and they are not the same secret.
+	assert.Equal(t, task.Token, c.Token)
+	assert.NotEmpty(t, c.RuntimeToken)
+	assert.NotEqual(t, c.Token, c.RuntimeToken)
 }

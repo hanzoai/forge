@@ -19,12 +19,12 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/storage"
@@ -892,25 +892,25 @@ func testActionRunAttemptArtifactV4(t *testing.T, repo *repo_model.Repository, s
 
 	// first run
 	task1 := runner.fetchTask(t)
-	_, job1, run := getTaskAndJobAndRunByTaskID(t, task1.Id)
+	_, job1, run := getTaskAndJobAndRunByTaskID(t, task1.ID)
 	require.NotZero(t, job1.RunAttemptID)
-	taskToken1 := task1.Context.GetFields()["gitea_runtime_token"].GetStringValue()
+	taskToken1 := task1.Context.RuntimeToken
 	require.NotEmpty(t, taskToken1)
 	uploadTestArtifactFileV4(t, run.ID, job1.ID, taskToken1, "artifact-attempt-1", strings.Repeat("A", 32))
 	uploadTestArtifactFileV4(t, run.ID, job1.ID, taskToken1, "artifact-shared", strings.Repeat("C", 32))
 	attempt1Names := listArtifactNamesForRunV4(t, run.ID, job1.ID, taskToken1)
 	assert.ElementsMatch(t, []string{"artifact-attempt-1", "artifact-shared"}, attempt1Names)
 
-	runner.execTask(t, task1, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+	runner.execTask(t, task1, &mockTaskOutcome{result: runner_module.Success})
 
 	// rerun
 	req = NewRequest(t, "POST", fmt.Sprintf("/%s/%s/actions/runs/%d/rerun", repo.OwnerName, repo.Name, run.ID))
 	session.MakeRequest(t, req, http.StatusOK)
 	task2 := runner.fetchTask(t)
-	_, job2, _ := getTaskAndJobAndRunByTaskID(t, task2.Id)
+	_, job2, _ := getTaskAndJobAndRunByTaskID(t, task2.ID)
 	require.NotZero(t, job2.RunAttemptID)
 	assert.NotEqual(t, job1.RunAttemptID, job2.RunAttemptID)
-	taskToken2 := task2.Context.GetFields()["gitea_runtime_token"].GetStringValue()
+	taskToken2 := task2.Context.RuntimeToken
 	require.NotEmpty(t, taskToken2)
 	uploadTestArtifactFileV4(t, run.ID, job2.ID, taskToken2, "artifact-attempt-2", strings.Repeat("B", 32))
 	uploadTestArtifactFileV4(t, run.ID, job2.ID, taskToken2, "artifact-shared", strings.Repeat("D", 32))

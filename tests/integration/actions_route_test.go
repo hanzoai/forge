@@ -10,12 +10,12 @@ import (
 	"net/url"
 	"testing"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/setting"
 	actions_web "github.com/hanzoai/git/routers/web/repo/actions"
 
@@ -60,9 +60,9 @@ jobs:
 	createWorkflowFile(t, user2Token, user2.Name, repo2.Name, workflowTreePath, opts)
 
 	task1 := runner1.fetchTask(t)
-	_, job1, run1 := getTaskAndJobAndRunByTaskID(t, task1.Id)
+	_, job1, run1 := getTaskAndJobAndRunByTaskID(t, task1.ID)
 	task2 := runner2.fetchTask(t)
-	_, job2, run2 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+	_, job2, run2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 
 	require.NoError(t, actions_model.UpsertActionRunJobSummary(t.Context(), repo1.ID, run1.ID, job1.RunAttemptID, job1.ID, 0, "text/markdown", []byte("### Hello summary\n\nFrom first step.\n")))
 	require.NoError(t, actions_model.UpsertActionRunJobSummary(t.Context(), repo1.ID, run1.ID, job1.RunAttemptID, job1.ID, 1, "text/markdown", []byte("From second step.\n")))
@@ -132,10 +132,10 @@ jobs:
 
 	// make the tasks complete, then test rerun
 	runner1.execTask(t, task1, &mockTaskOutcome{
-		result: runnerv1.Result_RESULT_SUCCESS,
+		result: runner_module.Success,
 	})
 	runner2.execTask(t, task2, &mockTaskOutcome{
-		result: runnerv1.Result_RESULT_SUCCESS,
+		result: runner_module.Success,
 	})
 	req = NewRequest(t, "POST", fmt.Sprintf("/%s/%s/actions/runs/%d/rerun", user2.Name, repo1.Name, run2.ID))
 	user2Session.MakeRequest(t, req, http.StatusNotFound)

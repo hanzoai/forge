@@ -12,12 +12,12 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/gitrepo"
 	"github.com/hanzoai/git/modules/json"
 	api "github.com/hanzoai/git/modules/structs"
@@ -189,18 +189,18 @@ jobs:
 
 			t.Run("First run", func(t *testing.T) {
 				callerJob1Task := defaultRunner.fetchTask(t) // for caller_job1
-				_, callerJob1, _ := getTaskAndJobAndRunByTaskID(t, callerJob1Task.Id)
+				_, callerJob1, _ := getTaskAndJobAndRunByTaskID(t, callerJob1Task.ID)
 				assert.Equal(t, "caller_job1", callerJob1.JobID)
 				defaultRunner.fetchNoTask(t)
 				defaultRunner.execTask(t, callerJob1Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"prepared": "prepared_data",
 					},
 				})
 
 				r1Job1Task := defaultRunner.fetchTask(t) // for reusable1_job1
-				_, r1Job1, _ := getTaskAndJobAndRunByTaskID(t, r1Job1Task.Id)
+				_, r1Job1, _ := getTaskAndJobAndRunByTaskID(t, r1Job1Task.ID)
 				assert.Equal(t, "reusable1_job1", r1Job1.JobID)
 				assert.Equal(t, callerJob2ID, r1Job1.ParentJobID)
 				payload := getWorkflowCallPayloadFromTask(t, r1Job1Task)
@@ -214,11 +214,11 @@ jobs:
 				if assert.Len(t, r1Job1Task.Secrets, 3) {
 					assert.Contains(t, r1Job1Task.Secrets, "GIT_TOKEN")
 					assert.Contains(t, r1Job1Task.Secrets, "GITHUB_TOKEN")
-					assert.Equal(t, "secRET-t0Ken", r1Job1Task.Secrets["PARENT_TOKEN"])
+					assert.Equal(t, "secRET-t0Ken", valueOf(r1Job1Task.Secrets, "PARENT_TOKEN"))
 				}
 				customRunner.fetchNoTask(t)
 				defaultRunner.execTask(t, r1Job1Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				})
 
 				// reusable1_job3 (a nested caller) needs reusable1_job2, so it stays Blocked until r1j2 succeeds.
@@ -228,16 +228,16 @@ jobs:
 				assert.Equal(t, 0, unittest.GetCount(t, &actions_model.ActionRunJob{RunID: runID, JobID: "reusable2_job1"}))
 
 				r1Job2Task := customRunner.fetchTask(t) // for reusable1_job2
-				_, r1Job2, _ := getTaskAndJobAndRunByTaskID(t, r1Job2Task.Id)
+				_, r1Job2, _ := getTaskAndJobAndRunByTaskID(t, r1Job2Task.ID)
 				assert.Equal(t, "reusable1_job2", r1Job2.JobID)
 				r1Job2ID = r1Job2.ID
 				r1Job2AttemptJobID = r1Job2.AttemptJobID
 				if assert.Len(t, r1Job2Task.Needs, 1) {
 					assert.Contains(t, r1Job2Task.Needs, "reusable1_job1")
-					assert.Equal(t, runnerv1.Result_RESULT_SUCCESS, r1Job2Task.Needs["reusable1_job1"].Result)
+					assert.Equal(t, runner_module.Success, needOf(r1Job2Task.Needs, "reusable1_job1").Result)
 				}
 				customRunner.execTask(t, r1Job2Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"r1j2_out": "r1j2_out_data",
 					},
@@ -255,7 +255,7 @@ jobs:
 				r2Job1AttemptJobID = r2Job1.AttemptJobID
 
 				r2Job1Task := defaultRunner.fetchTask(t) // for reusable2_job1
-				_, fetchedR2Job1, _ := getTaskAndJobAndRunByTaskID(t, r2Job1Task.Id)
+				_, fetchedR2Job1, _ := getTaskAndJobAndRunByTaskID(t, r2Job1Task.ID)
 				assert.Equal(t, "reusable2_job1", fetchedR2Job1.JobID)
 				assert.Equal(t, r1Job3ID, fetchedR2Job1.ParentJobID)
 				r2Job1Payload := getWorkflowCallPayloadFromTask(t, r2Job1Task)
@@ -263,24 +263,24 @@ jobs:
 					assert.Equal(t, "from_caller_job2", r2Job1Payload.Inputs["msg"])
 				}
 				defaultRunner.execTask(t, r2Job1Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				})
 
 				callerJob2 := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: callerJob2ID})
 				assert.Equal(t, actions_model.StatusSuccess, callerJob2.Status)
 
 				callerJob3Task := defaultRunner.fetchTask(t) // for caller_job3
-				_, callerJob3, _ := getTaskAndJobAndRunByTaskID(t, callerJob3Task.Id)
+				_, callerJob3, _ := getTaskAndJobAndRunByTaskID(t, callerJob3Task.ID)
 				assert.Equal(t, "caller_job3", callerJob3.JobID)
 				if assert.Len(t, callerJob3Task.Needs, 1) {
 					assert.Contains(t, callerJob3Task.Needs, "caller_job2")
-					assert.Equal(t, runnerv1.Result_RESULT_SUCCESS, callerJob3Task.Needs["caller_job2"].Result)
-					if assert.Len(t, callerJob3Task.Needs["caller_job2"].Outputs, 1) {
-						assert.Equal(t, "r1j2_out_data", callerJob3Task.Needs["caller_job2"].Outputs["r1_out"])
+					assert.Equal(t, runner_module.Success, needOf(callerJob3Task.Needs, "caller_job2").Result)
+					if assert.Len(t, needOf(callerJob3Task.Needs, "caller_job2").Outputs, 1) {
+						assert.Equal(t, "r1j2_out_data", needOutput(callerJob3Task.Needs, "caller_job2", "r1_out"))
 					}
 				}
 				defaultRunner.execTask(t, callerJob3Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				})
 				callerRun := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: runID})
 				assert.Equal(t, actions_model.StatusSuccess, callerRun.Status)
@@ -308,7 +308,7 @@ jobs:
 
 				defaultRunner.fetchNoTask(t)
 				r1Job2Task := customRunner.fetchTask(t)
-				_, r1Job2, _ := getTaskAndJobAndRunByTaskID(t, r1Job2Task.Id)
+				_, r1Job2, _ := getTaskAndJobAndRunByTaskID(t, r1Job2Task.ID)
 				assert.Equal(t, "reusable1_job2", r1Job2.JobID)
 				assert.Equal(t, callerJob2.ID, r1Job2.ParentJobID)
 				assert.Equal(t, r1Job2AttemptJobID, r1Job2.AttemptJobID)
@@ -316,7 +316,7 @@ jobs:
 				run = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: runID})
 				assert.Equal(t, actions_model.StatusRunning, run.Status)
 				customRunner.execTask(t, r1Job2Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"r1j2_out": "r1j2_out_data_updated",
 					},
@@ -330,27 +330,27 @@ jobs:
 				assert.Equal(t, r1Job3Attempt2.ID, r2Job1Attempt2.ParentJobID)
 
 				r2Job1Task := defaultRunner.fetchTask(t)
-				_, fetchedR2Job1, _ := getTaskAndJobAndRunByTaskID(t, r2Job1Task.Id)
+				_, fetchedR2Job1, _ := getTaskAndJobAndRunByTaskID(t, r2Job1Task.ID)
 				assert.Equal(t, "reusable2_job1", fetchedR2Job1.JobID)
 				defaultRunner.execTask(t, r2Job1Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				})
 
 				callerJob2 = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: callerJob2.ID})
 				assert.Equal(t, actions_model.StatusSuccess, callerJob2.Status)
 
 				callerJob3Task := defaultRunner.fetchTask(t)
-				_, callerJob3, _ = getTaskAndJobAndRunByTaskID(t, callerJob3Task.Id)
+				_, callerJob3, _ = getTaskAndJobAndRunByTaskID(t, callerJob3Task.ID)
 				assert.Equal(t, "caller_job3", callerJob3.JobID)
 				if assert.Len(t, callerJob3Task.Needs, 1) {
 					assert.Contains(t, callerJob3Task.Needs, "caller_job2")
-					assert.Equal(t, runnerv1.Result_RESULT_SUCCESS, callerJob3Task.Needs["caller_job2"].Result)
-					if assert.Len(t, callerJob3Task.Needs["caller_job2"].Outputs, 1) {
-						assert.Equal(t, "r1j2_out_data_updated", callerJob3Task.Needs["caller_job2"].Outputs["r1_out"])
+					assert.Equal(t, runner_module.Success, needOf(callerJob3Task.Needs, "caller_job2").Result)
+					if assert.Len(t, needOf(callerJob3Task.Needs, "caller_job2").Outputs, 1) {
+						assert.Equal(t, "r1j2_out_data_updated", needOutput(callerJob3Task.Needs, "caller_job2", "r1_out"))
 					}
 				}
 				defaultRunner.execTask(t, callerJob3Task, &mockTaskOutcome{
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				})
 				attempt2 = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunAttempt{RunID: runID, Attempt: 2})
 				assert.Equal(t, actions_model.StatusSuccess, attempt2.Status)
@@ -415,7 +415,7 @@ jobs:
 			assert.Equal(t, actions_model.StatusWaiting, crossJob.Status)
 
 			libJobTask := runner.fetchTask(t)
-			_, fetchedLibJob, _ := getTaskAndJobAndRunByTaskID(t, libJobTask.Id)
+			_, fetchedLibJob, _ := getTaskAndJobAndRunByTaskID(t, libJobTask.ID)
 			assert.Equal(t, "lib_job", fetchedLibJob.JobID)
 			assert.Equal(t, crossJob.ID, fetchedLibJob.ParentJobID)
 			assert.Equal(t, consumerRepo.ID, fetchedLibJob.RepoID)
@@ -425,7 +425,7 @@ jobs:
 			}
 			crossJob = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: crossJob.ID})
 			assert.Equal(t, actions_model.StatusRunning, crossJob.Status)
-			runner.execTask(t, libJobTask, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, libJobTask, &mockTaskOutcome{result: runner_module.Success})
 
 			crossJob = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: crossJob.ID})
 			assert.Equal(t, actions_model.StatusSuccess, crossJob.Status)
@@ -644,7 +644,7 @@ jobs:
 			user2Session.MakeRequest(t, req, http.StatusOK)
 
 			task := runner.fetchTask(t)
-			_, taskJob, taskRun := getTaskAndJobAndRunByTaskID(t, task.Id)
+			_, taskJob, taskRun := getTaskAndJobAndRunByTaskID(t, task.ID)
 			assert.Equal(t, "callee", taskJob.JobID)
 			assert.Equal(t, forkRun.ID, taskRun.ID)
 
@@ -656,7 +656,7 @@ jobs:
 				assert.NotEqual(t, "MUST-NOT-LEAK", value, "secret %q leaked the base repo's secret value into a fork PR task", name)
 			}
 
-			runner.execTask(t, task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, task, &mockTaskOutcome{result: runner_module.Success})
 		})
 
 		t.Run("Caller alternates expanding across attempts", func(t *testing.T) {
@@ -713,18 +713,18 @@ jobs:
 
 			// attempt 1: gate Success -> caller expands -> inner runs
 			gate1Task := runner.fetchTask(t)
-			_, gate1, _ := getTaskAndJobAndRunByTaskID(t, gate1Task.Id)
+			_, gate1, _ := getTaskAndJobAndRunByTaskID(t, gate1Task.ID)
 			assert.Equal(t, "gate", gate1.JobID)
-			runner.execTask(t, gate1Task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, gate1Task, &mockTaskOutcome{result: runner_module.Success})
 
 			inner1Task := runner.fetchTask(t)
-			_, inner1, _ := getTaskAndJobAndRunByTaskID(t, inner1Task.Id)
+			_, inner1, _ := getTaskAndJobAndRunByTaskID(t, inner1Task.ID)
 			assert.Equal(t, "inner", inner1.JobID)
 			innerAttemptJobID := inner1.AttemptJobID
 			callerAttempt1 := jobInLatest("caller")
 			assert.True(t, callerAttempt1.IsExpanded)
 			assert.Equal(t, callerAttempt1.ID, inner1.ParentJobID)
-			runner.execTask(t, inner1Task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, inner1Task, &mockTaskOutcome{result: runner_module.Success})
 
 			run = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: runID})
 			assert.Equal(t, actions_model.StatusSuccess, run.Status)
@@ -735,9 +735,9 @@ jobs:
 			user2Session.MakeRequest(t, req, http.StatusOK)
 
 			gate2Task := runner.fetchTask(t)
-			_, gate2, _ := getTaskAndJobAndRunByTaskID(t, gate2Task.Id)
+			_, gate2, _ := getTaskAndJobAndRunByTaskID(t, gate2Task.ID)
 			assert.Equal(t, "gate", gate2.JobID)
-			runner.execTask(t, gate2Task, &mockTaskOutcome{result: runnerv1.Result_RESULT_FAILURE})
+			runner.execTask(t, gate2Task, &mockTaskOutcome{result: runner_module.Failure})
 
 			runner.fetchNoTask(t) // no inner because caller did not expand
 			attempt2 := latestAttempt()
@@ -753,13 +753,13 @@ jobs:
 			user2Session.MakeRequest(t, req, http.StatusOK)
 
 			gate3Task := runner.fetchTask(t)
-			runner.execTask(t, gate3Task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, gate3Task, &mockTaskOutcome{result: runner_module.Success})
 
 			inner3Task := runner.fetchTask(t)
-			_, inner3, _ := getTaskAndJobAndRunByTaskID(t, inner3Task.Id)
+			_, inner3, _ := getTaskAndJobAndRunByTaskID(t, inner3Task.ID)
 			assert.Equal(t, "inner", inner3.JobID)
 			assert.Equal(t, innerAttemptJobID, inner3.AttemptJobID)
-			runner.execTask(t, inner3Task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, inner3Task, &mockTaskOutcome{result: runner_module.Success})
 
 			run = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: runID})
 			assert.Equal(t, actions_model.StatusSuccess, run.Status)
@@ -774,8 +774,8 @@ func createRepoWorkflowFile(t *testing.T, u *user_model.User, token string, repo
 	createWorkflowFile(t, token, repo.OwnerName, repo.Name, treePath, opts)
 }
 
-func getWorkflowCallPayloadFromTask(t *testing.T, runnerTask *runnerv1.Task) *api.WorkflowCallPayload {
-	eventJSON, err := runnerTask.GetContext().Fields["event"].GetStructValue().MarshalJSON()
+func getWorkflowCallPayloadFromTask(t *testing.T, runnerTask *runner_module.Task) *api.WorkflowCallPayload {
+	eventJSON, err := json.Marshal(runnerTask.Context.Event)
 	assert.NoError(t, err)
 	var payload api.WorkflowCallPayload
 	assert.NoError(t, json.Unmarshal(eventJSON, &payload))

@@ -6,8 +6,7 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 ## What it is
 
 - **Base:** Gitea **1.26.4** (upstream `go-gitea/gitea`; see `CHANGELOG.md` top
-  entry). Module path forked to `github.com/hanzoai/git`; the Actions proto is
-  `github.com/hanzo-git/actions-proto-go`. The daemon is **`gitd`**
+  entry). Module path forked to `github.com/hanzoai/git`. The daemon is **`gitd`**
   (`/app/git/gitd`, wrapper `/usr/local/bin/gitd`); upstream's CLI subcommands
   are intact under the new name (`gitd admin auth …`, `gitd migrate`).
 
@@ -24,8 +23,56 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   notably the `oauth-sync` init container in `hanzoai/universe` — must be
   updated in the SAME change that bumps the image tag.
 - **`[actions]` intact:** `services/actions`, `models/actions`,
-  `routers/api/actions/runner` — full act_runner registration + job API. Enabled
-  via `GIT__actions__ENABLED=true`.
+  `routers/api/actions` — full runner registration + job API. Enabled via
+  `GIT__actions__ENABLED=true`.
+- **The runner protocol is ours: five typed zip operations at `/v1/runner`** —
+  `register`, `declare`, `task`, `state`, `log`, declared once with `zip.Post`
+  and answered on two faces: `POST /v1/runner/<name>` for a runner over HTTP, and
+  `post_runner_<name>` on ZAP's own call plane at `/.well-known/zip/op/`. Both
+  are the same app on the forge's one listener — `routers/init.go` hangs it on
+  two chi routes with `adaptor.FiberApp`, registered with `Post` and never
+  `Mount`, because Mount strips the prefix and the operations declare absolute
+  paths. It is spoken only between this forge and `hanzoai/git-runner`, so it is
+  written to suit us: no protobuf, no generated code, no service name in the path.
+  Two rules govern every value on it, and a test in `routers/api/actions` holds
+  both: no `map`, which the ZAP layout refuses outright, and no `time.Time`,
+  which it accepts and then silently blanks because every field of one is
+  unexported. Named values cross as `[]Pair`; instants as int64 unix nanoseconds.
+  `routers/api/actions/runner.go` holds the handlers; the messages live in
+  `modules/actions/runner`, a NESTED MODULE
+  (`github.com/hanzoai/git/modules/actions/runner`) with an empty `require`
+  block. That nesting is the point: the runner imports the very types the
+  handlers declare, so there is one definition of the protocol and it does NOT
+  inherit this module's dependency graph. Requiring the whole forge instead
+  breaks the runner outright — the forge pins `go.yaml.in/yaml/v4` forward with
+  a `replace`, a dependent does not inherit a `replace`, and `actionlint` then
+  fails to compile.
+- **A runner's job context is a struct, and that is the point.** As a map the
+  two sides could disagree in silence, and did: the forge wrote
+  `git_runtime_token` while the runner read `gitea_runtime_token` and quietly
+  fell back to the task token. `runner.Context` names the twenty-one values the
+  forge computes AND the runner reads, so a missing one is a compile error.
+  `GenerateGitContext` keeps its map — the forge evaluates workflow expressions
+  against it — and `generateTaskContext` is the ONE place the two vocabularies
+  meet.
+- **The forge and the runner share that wire, so they are deployed together.**
+  The forge serves one runner protocol and the runner speaks one; nothing
+  negotiates a version and there is no shim, deliberately. So a protocol change
+  lands in both repos or in neither, and a rollout goes forge first, runner
+  fleet second: in the gap a runner's operations fail, it backs off, jobs queue
+  here, and the queue drains once the fleet is rolled. The other order points
+  runners at a forge that does not yet answer them.
+- **Artifacts are third-party JavaScript and the paths are not ours.**
+  `actions/upload-artifact@v3` concatenates `_apis/pipelines/…` onto whatever
+  the runner set as `ACTIONS_RUNTIME_URL`, so that base IS ours and it sits at
+  `/v1/artifact/`. The v4 protocol is different: `@actions/artifact` v2 reads
+  `ACTIONS_RESULTS_URL` and keeps only `new URL(…).origin`, then appends
+  `twirp/github.actions.results.api.v1.ArtifactService/…` itself — so
+  `ArtifactV4RouteBase` cannot be moved anywhere, and it stays at the root.
+  That same library throws `GHESNotSupportedError` for any host that is not
+  `github.com`, `*.ghe.com` or `*.localhost`, so on `git.hanzo.ai` every
+  `upload-artifact@v4+` / `download-artifact@v4+` step fails before it opens a
+  connection: the v4 endpoints answer nobody today.
 - **Identity = hanzo.id OIDC only.** No fork-baked issuer; binding is a standard
   Gitea OAuth2 auth source (goth `openidConnect`) pointed at
   `https://hanzo.id/.well-known/openid-configuration`. Org membership is driven by
@@ -90,6 +137,37 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   `[global_lock] SERVICE_TYPE = kv`. `modules/nosql.getKVOptions` hand-parses the
   URI, so the scheme family is this repo's to define — it never reaches the
   client's own parser.
+
+## The URL namespace
+
+`routers.NormalRoutes` (`routers/init.go`) allocates the whole top level, and it
+is the only place that may: chi matches the most specific mount first, so a
+`/v1/…` route declared inside `routers/web` would be swallowed by the `/v1`
+mount. Five prefixes:
+
+- **`/` — the browser.** Every page a person sees (`routers/web`), plus
+  `/-/fetch-redirect`, the delegate that lets a `fetch` response redirect to a
+  URL carrying a hash.
+- **`/v1` — every machine surface.** The REST API is mounted here whole
+  (`routers/api/v1`). Beside that mount, not inside it, sit the endpoints that
+  arrive with their own credential and so must not meet the session and
+  API-token middleware: `/v1/internal` (the daemon calling itself from a git
+  hook or the SSH command, holding the internal token), `/v1/sync` (HMAC-SHA256
+  over the payload), `/v1/healthz` (no auth and no database, so a probe stays a
+  probe), `/v1/packages`, `/v1/runner` and `/v1/artifact`.
+- **`/.well-known/zip/op/` — ZAP's call plane**, the second face of the same five
+  runner operations. It is a top-level path because that is where zip addresses
+  an operation by name, and it rides the forge's existing listener.
+- **`/v2` — the OCI distribution spec.** The registry API fixes this at the root
+  of the host, so a sub-path deploy has to map it there in the proxy. Not ours to
+  place.
+- **`/twirp/github.actions.results.api.v1.ArtifactService`** — the v4 artifact
+  protocol, also not ours to place, and answering nobody. See artifacts above.
+
+**Nothing lives under `/api`.** The only thing that ever did was the runner
+control plane, which is now `/v1/runner`. The host is `api.*` where an API
+surface deserves its own name; the path carries `/v1/` and never a second
+`/api/` segment as well.
 
 ## Upstream naming: what stays, and why
 
@@ -159,10 +237,14 @@ Operator-managed in `hanzoai/universe` (DOKS `hanzo-k8s`, namespace `hanzo`):
 - `infra/k8s/git/` — the App's non-App supporting resources (Hanzo CD's project is
   `hanzo.ai/App`-only): `gitea-data` PVC, `hanzo-git-oauth` ConfigMap, the
   `git.hanzo.ai` Ingress, and `git-secrets-kms.yaml` (gitea-secrets from KMS).
-- `infra/k8s/git-runner/` — the act_runner DinD pool (upstream
-  `gitea/act_runner:0.6.1-dind`) that runs Actions jobs; maps `hanzo-build-linux-amd64`.
-- Push-to-deploy: a Gitea push webhook → cloud `/v1/git/webhook` → the `/v1/runner`
-  build core. Architecture: `universe/docs/architecture/paas-in-cloud.md` §9.
+- `infra/k8s/git-runner/` — the DinD pool that runs Actions jobs
+  (`statefulset.yaml`, image `oci.hanzo.ai/hanzoai/git-runner`); maps
+  `hanzo-build-linux-amd64`. It rolls in the same change as this image, one
+  after the other, because of the shared wire above.
+- Push-to-deploy: a push webhook → cloud `/v1/git/webhook` → cloud's own
+  `/v1/runner` build core — which is a different service on a different host that
+  happens to share the path, not the runner surface described above.
+  Architecture: `universe/docs/architecture/paas-in-cloud.md` §9.
 
 The migration (fork becomes THE git server, replacing the raw upstream-image deploy
 and the cloud embedded git seam as the host) is STAGED — the coordinator flips it.

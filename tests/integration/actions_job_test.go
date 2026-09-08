@@ -14,13 +14,13 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/db"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/git"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/setting"
@@ -28,7 +28,6 @@ import (
 	"github.com/hanzoai/git/modules/timeutil"
 	actions_service "github.com/hanzoai/git/services/actions"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -60,10 +59,10 @@ jobs:
 `,
 			outcomes: map[string]*mockTaskOutcome{
 				"job1": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				},
 				"job2": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				},
 			},
 			expectedStatuses: map[string]string{
@@ -91,7 +90,7 @@ jobs:
 `,
 			outcomes: map[string]*mockTaskOutcome{
 				"job1": {
-					result: runnerv1.Result_RESULT_FAILURE,
+					result: runner_module.Failure,
 				},
 			},
 			expectedStatuses: map[string]string{
@@ -120,10 +119,10 @@ jobs:
 `,
 			outcomes: map[string]*mockTaskOutcome{
 				"job1": {
-					result: runnerv1.Result_RESULT_FAILURE,
+					result: runner_module.Failure,
 				},
 				"job2": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 				},
 			},
 			expectedStatuses: map[string]string{
@@ -150,7 +149,7 @@ jobs:
 				// fetch and execute task
 				for i := 0; i < len(tc.outcomes); i++ {
 					task := runner.fetchTask(t)
-					jobName := getTaskJobNameByTaskID(t, token, user2.Name, apiRepo.Name, task.Id)
+					jobName := getTaskJobNameByTaskID(t, token, user2.Name, apiRepo.Name, task.ID)
 					outcome := tc.outcomes[jobName]
 					assert.NotNil(t, outcome)
 					runner.execTask(t, task, outcome)
@@ -173,12 +172,20 @@ jobs:
 	})
 }
 
+// wantNeed is what one entry of a task's needs should say. It keeps outputs as a
+// map because this is test data a human reads, while the wire carries an ordered
+// list.
+type wantNeed struct {
+	Result  runner_module.Result
+	Outputs map[string]string
+}
+
 func TestJobNeedsMatrix(t *testing.T) {
 	testCases := []struct {
 		treePath          string
 		fileContent       string
 		outcomes          map[string]*mockTaskOutcome
-		expectedTaskNeeds map[string]*runnerv1.TaskNeed // jobID => TaskNeed
+		expectedTaskNeeds map[string]wantNeed // jobID => what that need should say
 	}{
 		{
 			treePath: ".hanzo/workflows/jobs-outputs-with-matrix.yml",
@@ -211,7 +218,7 @@ jobs:
 `,
 			outcomes: map[string]*mockTaskOutcome{
 				"job1 (1)": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"output_1": "1",
 						"output_2": "",
@@ -219,7 +226,7 @@ jobs:
 					},
 				},
 				"job1 (2)": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"output_1": "",
 						"output_2": "2",
@@ -227,7 +234,7 @@ jobs:
 					},
 				},
 				"job1 (3)": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"output_1": "",
 						"output_2": "",
@@ -235,9 +242,9 @@ jobs:
 					},
 				},
 			},
-			expectedTaskNeeds: map[string]*runnerv1.TaskNeed{
+			expectedTaskNeeds: map[string]wantNeed{
 				"job1": {
-					Result: runnerv1.Result_RESULT_SUCCESS,
+					Result: runner_module.Success,
 					Outputs: map[string]string{
 						"output_1": "1",
 						"output_2": "2",
@@ -278,7 +285,7 @@ jobs:
 `,
 			outcomes: map[string]*mockTaskOutcome{
 				"job1 (1)": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"output_1": "1",
 						"output_2": "",
@@ -286,7 +293,7 @@ jobs:
 					},
 				},
 				"job1 (2)": {
-					result: runnerv1.Result_RESULT_FAILURE,
+					result: runner_module.Failure,
 					outputs: map[string]string{
 						"output_1": "",
 						"output_2": "",
@@ -294,7 +301,7 @@ jobs:
 					},
 				},
 				"job1 (3)": {
-					result: runnerv1.Result_RESULT_SUCCESS,
+					result: runner_module.Success,
 					outputs: map[string]string{
 						"output_1": "",
 						"output_2": "",
@@ -302,9 +309,9 @@ jobs:
 					},
 				},
 			},
-			expectedTaskNeeds: map[string]*runnerv1.TaskNeed{
+			expectedTaskNeeds: map[string]wantNeed{
 				"job1": {
-					Result: runnerv1.Result_RESULT_FAILURE,
+					Result: runner_module.Failure,
 					Outputs: map[string]string{
 						"output_1": "1",
 						"output_2": "",
@@ -330,21 +337,24 @@ jobs:
 
 				for i := 0; i < len(tc.outcomes); i++ {
 					task := runner.fetchTask(t)
-					jobName := getTaskJobNameByTaskID(t, token, user2.Name, apiRepo.Name, task.Id)
+					jobName := getTaskJobNameByTaskID(t, token, user2.Name, apiRepo.Name, task.ID)
 					outcome := tc.outcomes[jobName]
 					assert.NotNil(t, outcome)
 					runner.execTask(t, task, outcome)
 				}
 
 				task := runner.fetchTask(t)
-				actualTaskNeeds := task.Needs
-				assert.Len(t, actualTaskNeeds, len(tc.expectedTaskNeeds))
-				for jobID, tn := range tc.expectedTaskNeeds {
-					actualNeed := actualTaskNeeds[jobID]
-					assert.Equal(t, tn.Result, actualNeed.Result)
-					assert.Len(t, actualNeed.Outputs, len(tn.Outputs))
-					for outputKey, outputValue := range tn.Outputs {
-						assert.Equal(t, outputValue, actualNeed.Outputs[outputKey])
+				assert.Len(t, task.Needs, len(tc.expectedTaskNeeds))
+				byJob := make(map[string]runner_module.Need, len(task.Needs))
+				for _, need := range task.Needs {
+					byJob[need.Job] = need
+				}
+				for jobID, want := range tc.expectedTaskNeeds {
+					got := byJob[jobID]
+					assert.Equal(t, want.Result, got.Result)
+					assert.Len(t, got.Outputs, len(want.Outputs))
+					for _, out := range got.Outputs {
+						assert.Equal(t, want.Outputs[out.Name], out.Value)
 					}
 				}
 			})
@@ -369,7 +379,7 @@ func TestRunnerDisableEnable(t *testing.T) {
 			req := newRunnerUpdateRequest(t, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), true).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusOK)
 
-			testData.runner.execTask(t, task1, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			testData.runner.execTask(t, task1, &mockTaskOutcome{result: runner_module.Success})
 			testData.runner.fetchNoTask(t, 2*time.Second)
 
 			req = newRunnerUpdateRequest(t, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), false).AddTokenAuth(token)
@@ -377,14 +387,14 @@ func TestRunnerDisableEnable(t *testing.T) {
 
 			task2 := testData.runner.fetchTask(t, 5*time.Second)
 			require.NotNil(t, task2)
-			testData.runner.execTask(t, task2, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			testData.runner.execTask(t, task2, &mockTaskOutcome{result: runner_module.Success})
 		})
 
 		t.Run("TasksVersionPath", func(t *testing.T) {
 			testData := prepareRunnerDisableEnableTest(t, user2, token, "actions-runner-version-path", "mock-runner-version-path", "runner-version-path")
 
 			var firstVersion int64
-			var task1 *runnerv1.Task
+			var task1 *runner_module.Task
 			ddl := time.Now().Add(5 * time.Second)
 			for time.Now().Before(ddl) {
 				task1, firstVersion = testData.runner.fetchTaskOnce(t, 0)
@@ -403,7 +413,7 @@ func TestRunnerDisableEnable(t *testing.T) {
 			req := newRunnerUpdateRequest(t, fmt.Sprintf("/v1/repos/%s/%s/actions/runners/%d", user2.Name, testData.repo.Name, testData.runnerID), true).AddTokenAuth(token)
 			MakeRequest(t, req, http.StatusOK)
 
-			testData.runner.execTask(t, task1, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			testData.runner.execTask(t, task1, &mockTaskOutcome{result: runner_module.Success})
 
 			// Fetch with the version we had before disable. Server has bumped version on disable,
 			// so we enter PickTask with a re-loaded runner (disabled) and get no task.
@@ -415,7 +425,7 @@ func TestRunnerDisableEnable(t *testing.T) {
 
 			task2 := testData.runner.fetchTask(t, 5*time.Second)
 			require.NotNil(t, task2, "after re-enable runner should receive tasks again")
-			testData.runner.execTask(t, task2, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			testData.runner.execTask(t, task2, &mockTaskOutcome{result: runner_module.Success})
 		})
 	})
 }
@@ -515,38 +525,13 @@ jobs:
 		apiPull, err := doAPICreatePullRequest(user2APICtx, baseRepo.OwnerName, baseRepo.Name, baseRepo.DefaultBranch, "user2/patch-1")(t)
 		assert.NoError(t, err)
 		task := runner.fetchTask(t)
-		gtCtx := task.Context.GetFields()
-		actionTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.Id})
+		gtCtx := task.Context
+		actionTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.ID})
 		actionRunJob := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: actionTask.JobID})
 		actionRun := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: actionRunJob.RunID})
 		assert.NoError(t, actionRun.LoadAttributes(t.Context()))
 
-		assert.Equal(t, user2.Name, gtCtx["actor"].GetStringValue())
-		assert.Equal(t, setting.AppURL+"v1", gtCtx["api_url"].GetStringValue())
-		assert.Equal(t, apiPull.Base.Ref, gtCtx["base_ref"].GetStringValue())
-		runEvent := map[string]any{}
-		assert.NoError(t, json.Unmarshal([]byte(actionRun.EventPayload), &runEvent))
-		assert.True(t, reflect.DeepEqual(gtCtx["event"].GetStructValue().AsMap(), runEvent))
-		assert.Equal(t, actionRun.TriggerEvent, gtCtx["event_name"].GetStringValue())
-		assert.Equal(t, apiPull.Head.Ref, gtCtx["head_ref"].GetStringValue())
-		assert.Equal(t, actionRunJob.JobID, gtCtx["job"].GetStringValue())
-		assert.Equal(t, actionRun.Ref, gtCtx["ref"].GetStringValue())
-		assert.Equal(t, (git.RefName(actionRun.Ref)).ShortName(), gtCtx["ref_name"].GetStringValue())
-		assert.False(t, gtCtx["ref_protected"].GetBoolValue())
-		assert.Equal(t, string((git.RefName(actionRun.Ref)).RefType()), gtCtx["ref_type"].GetStringValue())
-		assert.Equal(t, actionRun.Repo.OwnerName+"/"+actionRun.Repo.Name, gtCtx["repository"].GetStringValue())
-		assert.Equal(t, actionRun.Repo.OwnerName, gtCtx["repository_owner"].GetStringValue())
-		assert.Equal(t, actionRun.Repo.HTMLURL(), gtCtx["repositoryUrl"].GetStringValue())
-		assert.Equal(t, strconv.FormatInt(actionRunJob.RunID, 10), gtCtx["run_id"].GetStringValue())
-		assert.Equal(t, strconv.FormatInt(actionRun.Index, 10), gtCtx["run_number"].GetStringValue())
-		assert.Equal(t, strconv.FormatInt(actionRunJob.Attempt, 10), gtCtx["run_attempt"].GetStringValue())
-		assert.Equal(t, "Actions", gtCtx["secret_source"].GetStringValue())
-		assert.Equal(t, setting.AppURL, gtCtx["server_url"].GetStringValue())
-		assert.Equal(t, actionRun.CommitSHA, gtCtx["sha"].GetStringValue())
-		assert.Equal(t, actionRun.WorkflowID, gtCtx["workflow"].GetStringValue())
-		assert.Equal(t, setting.Actions.DefaultActionsURL.URL(), gtCtx["gitea_default_actions_url"].GetStringValue())
-		token := gtCtx["token"].GetStringValue()
-		assert.Equal(t, actionTask.TokenLastEight, token[len(token)-8:])
+		assertTaskContext(t, gtCtx, actionTask, actionRunJob, actionRun, apiPull)
 	})
 }
 
@@ -607,72 +592,40 @@ jobs:
 		apiPull, err := doAPICreatePullRequest(user2APICtx, baseRepo.OwnerName, baseRepo.Name, baseRepo.DefaultBranch, "user2/patch-1")(t)
 		assert.NoError(t, err)
 		task := runner.fetchTask(t)
-		gtCtx := task.Context.GetFields()
-		actionTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.Id})
+		gtCtx := task.Context
+		actionTask := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: task.ID})
 		actionRunJob := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRunJob{ID: actionTask.JobID})
 		actionRun := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: actionRunJob.RunID})
 		assert.NoError(t, actionRun.LoadAttributes(t.Context()))
 
-		assert.Equal(t, user2.Name, gtCtx["actor"].GetStringValue())
-		assert.Equal(t, setting.AppURL+"v1", gtCtx["api_url"].GetStringValue())
-		assert.Equal(t, apiPull.Base.Ref, gtCtx["base_ref"].GetStringValue())
-		runEvent := map[string]any{}
-		assert.NoError(t, json.Unmarshal([]byte(actionRun.EventPayload), &runEvent))
-		assert.True(t, reflect.DeepEqual(gtCtx["event"].GetStructValue().AsMap(), runEvent))
-		assert.Equal(t, actionRun.TriggerEvent, gtCtx["event_name"].GetStringValue())
-		assert.Equal(t, apiPull.Head.Ref, gtCtx["head_ref"].GetStringValue())
-		assert.Equal(t, actionRunJob.JobID, gtCtx["job"].GetStringValue())
-		assert.Equal(t, actionRun.Ref, gtCtx["ref"].GetStringValue())
-		assert.Equal(t, (git.RefName(actionRun.Ref)).ShortName(), gtCtx["ref_name"].GetStringValue())
-		assert.False(t, gtCtx["ref_protected"].GetBoolValue())
-		assert.Equal(t, string((git.RefName(actionRun.Ref)).RefType()), gtCtx["ref_type"].GetStringValue())
-		assert.Equal(t, actionRun.Repo.OwnerName+"/"+actionRun.Repo.Name, gtCtx["repository"].GetStringValue())
-		assert.Equal(t, actionRun.Repo.OwnerName, gtCtx["repository_owner"].GetStringValue())
-		assert.Equal(t, actionRun.Repo.HTMLURL(), gtCtx["repositoryUrl"].GetStringValue())
-		assert.Equal(t, strconv.FormatInt(actionRunJob.RunID, 10), gtCtx["run_id"].GetStringValue())
-		assert.Equal(t, strconv.FormatInt(actionRun.Index, 10), gtCtx["run_number"].GetStringValue())
-		assert.Equal(t, strconv.FormatInt(actionRunJob.Attempt, 10), gtCtx["run_attempt"].GetStringValue())
-		assert.Equal(t, "Actions", gtCtx["secret_source"].GetStringValue())
-		assert.Equal(t, setting.AppURL, gtCtx["server_url"].GetStringValue())
-		assert.Equal(t, actionRun.CommitSHA, gtCtx["sha"].GetStringValue())
-		assert.Equal(t, actionRun.WorkflowID, gtCtx["workflow"].GetStringValue())
-		assert.Equal(t, setting.Actions.DefaultActionsURL.URL(), gtCtx["gitea_default_actions_url"].GetStringValue())
-		token := gtCtx["token"].GetStringValue()
-		assert.Equal(t, actionTask.TokenLastEight, token[len(token)-8:])
+		assertTaskContext(t, gtCtx, actionTask, actionRunJob, actionRun, apiPull)
 
 		// verify CleanupEphemeralRunners does not remove this runner
 		err = actions_service.CleanupEphemeralRunners(t.Context())
 		assert.NoError(t, err)
 
-		resp, err := runner.client.runnerServiceClient.FetchTask(t.Context(), connect.NewRequest(&runnerv1.FetchTaskRequest{
-			TasksVersion: 0,
-		}))
+		out, err := runner.task(t, &runner_module.TaskIn{Queue: 0})
 		assert.NoError(t, err)
-		assert.Nil(t, resp.Msg.Task)
+		assert.Nil(t, out.Task)
 
 		// verify CleanupEphemeralRunners does not remove this runner
 		err = actions_service.CleanupEphemeralRunners(t.Context())
 		assert.NoError(t, err)
 
-		_, err = runner.client.runnerServiceClient.UpdateTask(t.Context(), connect.NewRequest(&runnerv1.UpdateTaskRequest{
-			State: &runnerv1.TaskState{
-				Id:     actionTask.ID,
-				Result: runnerv1.Result_RESULT_SUCCESS,
-			},
-		}))
+		_, err = runner.state(t, &runner_module.StateIn{
+			State: runner_module.State{ID: actionTask.ID, Result: runner_module.Success},
+		})
 		assert.NoError(t, err)
 
-		resp, err = runner.client.runnerServiceClient.FetchTask(t.Context(), connect.NewRequest(&runnerv1.FetchTaskRequest{
-			TasksVersion: 0,
-		}))
+		// The ephemeral runner removed itself when its task finished, so it can no
+		// longer be placed and every later call is refused.
+		out, err = runner.task(t, &runner_module.TaskIn{Queue: 0})
 		assert.Error(t, err)
-		assert.Nil(t, resp)
+		assert.Nil(t, out)
 
-		resp, err = runner.client.runnerServiceClient.FetchTask(t.Context(), connect.NewRequest(&runnerv1.FetchTaskRequest{
-			TasksVersion: 0,
-		}))
+		out, err = runner.task(t, &runner_module.TaskIn{Queue: 0})
 		assert.Error(t, err)
-		assert.Nil(t, resp)
+		assert.Nil(t, out)
 
 		// create a runner that picks a job and get force cancelled
 		runnerToBeRemoved := newMockRunner()
@@ -680,7 +633,7 @@ jobs:
 
 		taskToStopAPIObj := runnerToBeRemoved.fetchTask(t)
 
-		taskToStop := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: taskToStopAPIObj.Id})
+		taskToStop := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionTask{ID: taskToStopAPIObj.ID})
 
 		// verify CleanupEphemeralRunners does not remove the custom crafted runner
 		err = actions_service.CleanupEphemeralRunners(t.Context())
@@ -914,4 +867,41 @@ func TestLegacyRunsInCronTasks(t *testing.T) {
 			assert.Equal(t, actions_model.ArtifactStatusExpired, gotArtifact.Status)
 		})
 	})
+}
+
+// assertTaskContext checks every value a runner is given about its job. The
+// context is a struct on the wire, so a field that stops being sent is a compile
+// error here rather than a nil a runner reads as an empty string.
+func assertTaskContext(t *testing.T, c runner_module.Context, task *actions_model.ActionTask, job *actions_model.ActionRunJob, run *actions_model.ActionRun, pull api.PullRequest) {
+	t.Helper()
+
+	runEvent, event := map[string]any{}, map[string]any{}
+	require.NoError(t, json.Unmarshal([]byte(run.EventPayload), &runEvent))
+	require.NoError(t, json.Unmarshal(c.Event, &event))
+	assert.True(t, reflect.DeepEqual(event, runEvent))
+
+	assert.Equal(t, run.TriggerUser.Name, c.Actor)
+	assert.Equal(t, setting.AppURL+"v1", c.APIURL)
+	assert.Equal(t, pull.Base.Ref, c.BaseRef)
+	assert.Equal(t, pull.Head.Ref, c.HeadRef)
+	assert.Equal(t, run.TriggerEvent, c.EventName)
+	assert.Equal(t, job.JobID, c.Job)
+	assert.Equal(t, run.Ref, c.Ref)
+	assert.Equal(t, (git.RefName(run.Ref)).ShortName(), c.RefName)
+	assert.Equal(t, string((git.RefName(run.Ref)).RefType()), c.RefType)
+	assert.Equal(t, run.Repo.OwnerName+"/"+run.Repo.Name, c.Repository)
+	assert.Equal(t, run.Repo.OwnerName, c.RepositoryOwner)
+	assert.Equal(t, strconv.FormatInt(job.RunID, 10), c.RunID)
+	assert.Equal(t, strconv.FormatInt(run.Index, 10), c.RunNumber)
+	assert.Equal(t, strconv.FormatInt(job.Attempt, 10), c.RunAttempt)
+	assert.Equal(t, setting.AppURL, c.ServerURL)
+	assert.Equal(t, run.CommitSHA, c.Sha)
+	assert.Equal(t, task.TokenLastEight, c.Token[len(c.Token)-8:])
+	assert.NotEmpty(t, c.RuntimeToken)
+
+	// A runner composes an action's clone URL as <ActionsURL>/<owner>/<repo>.
+	// Receive nothing here and it composes "https://" + "" + "/actions/checkout",
+	// which fails as `http: no Host in request URL` — a job dead before its first
+	// step, reading as a broken runner rather than an absent field.
+	assert.Equal(t, setting.Actions.DefaultActionsURL.URL(), c.ActionsURL)
 }

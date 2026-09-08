@@ -9,17 +9,16 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/actions/jobparser"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/test"
 	"github.com/hanzoai/git/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestMakeTaskStepDisplayName(t *testing.T) {
@@ -144,7 +143,7 @@ func TestTaskCancellingFinalizesToCancelled(t *testing.T) {
 		return task, job
 	}
 
-	testResult := func(t *testing.T, result runnerv1.Result) {
+	testResult := func(t *testing.T, result runner_module.Result) {
 		t.Helper()
 		require.NoError(t, unittest.PrepareTestDatabase())
 
@@ -154,10 +153,10 @@ func TestTaskCancellingFinalizesToCancelled(t *testing.T) {
 		taskAfterStop := unittest.AssertExistsAndLoadBean(t, &ActionTask{ID: task.ID})
 		assert.Equal(t, StatusCancelling, taskAfterStop.Status)
 
-		updatedTask, err := UpdateTaskByState(t.Context(), task.RunnerID, &runnerv1.TaskState{
-			Id:        task.ID,
-			Result:    result,
-			StoppedAt: timestamppb.Now(),
+		updatedTask, err := UpdateTaskByState(t.Context(), task.RunnerID, runner_module.State{
+			ID:      task.ID,
+			Result:  result,
+			Stopped: time.Now().UnixNano(),
 		})
 		require.NoError(t, err)
 		assert.Equal(t, StatusCancelled, updatedTask.Status)
@@ -170,11 +169,11 @@ func TestTaskCancellingFinalizesToCancelled(t *testing.T) {
 	}
 
 	t.Run("runner reports success", func(t *testing.T) {
-		testResult(t, runnerv1.Result_RESULT_SUCCESS)
+		testResult(t, runner_module.Success)
 	})
 
 	t.Run("runner reports failure", func(t *testing.T) {
-		testResult(t, runnerv1.Result_RESULT_FAILURE)
+		testResult(t, runner_module.Failure)
 	})
 }
 
@@ -609,14 +608,14 @@ func newDroppedTask(t *testing.T, name string, runIndex, drops int64) (*ActionTa
 
 // droppedState is what act_runner sends when it is stopped before the first
 // step: the task failed, and every step is cancelled without ever having started.
-func droppedState(taskID int64) *runnerv1.TaskState {
-	return &runnerv1.TaskState{
-		Id:        taskID,
-		Result:    runnerv1.Result_RESULT_FAILURE,
-		StoppedAt: timestamppb.Now(),
-		Steps: []*runnerv1.StepState{
-			{Id: 0, Result: runnerv1.Result_RESULT_CANCELLED},
-			{Id: 1, Result: runnerv1.Result_RESULT_CANCELLED},
+func droppedState(taskID int64) runner_module.State {
+	return runner_module.State{
+		ID:      taskID,
+		Result:  runner_module.Failure,
+		Stopped: time.Now().UnixNano(),
+		Steps: []runner_module.Step{
+			{ID: 0, Result: runner_module.Cancelled},
+			{ID: 1, Result: runner_module.Cancelled},
 		},
 	}
 }
@@ -653,11 +652,11 @@ func TestUpdateTaskByStateKeepsGenuineFailure(t *testing.T) {
 	task, job := newDroppedTask(t, "step-exited-nonzero", 9921, 0)
 
 	state := droppedState(task.ID)
-	state.Steps[0] = &runnerv1.StepState{
-		Id:        0,
-		Result:    runnerv1.Result_RESULT_FAILURE,
-		StartedAt: timestamppb.Now(),
-		StoppedAt: timestamppb.Now(),
+	state.Steps[0] = runner_module.Step{
+		ID:      0,
+		Result:  runner_module.Failure,
+		Started: time.Now().UnixNano(),
+		Stopped: time.Now().UnixNano(),
 	}
 
 	updated, err := UpdateTaskByState(t.Context(), task.RunnerID, state)

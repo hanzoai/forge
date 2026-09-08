@@ -12,13 +12,13 @@ import (
 	"testing"
 	"time"
 
-	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	actions_model "github.com/hanzoai/git/models/actions"
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/db"
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	runner_module "github.com/hanzoai/git/modules/actions/runner"
 	"github.com/hanzoai/git/modules/setting"
 	api "github.com/hanzoai/git/modules/structs"
 	"github.com/hanzoai/git/modules/timeutil"
@@ -99,12 +99,12 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf1TreePath, opts1)
 		// fetch and exec workflow1
 		task := runner.fetchTask(t)
-		_, _, run := getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run := getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-1.yml", run.WorkflowID)
 		runner.fetchNoTask(t)
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// push workflow2
@@ -112,7 +112,7 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf2TreePath, opts2)
 		// fetch workflow2
 		task = runner.fetchTask(t)
-		_, _, run = getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run = getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-2.yml", run.WorkflowID)
 
@@ -123,17 +123,17 @@ jobs:
 
 		// exec workflow2
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// fetch and exec workflow3
 		task = runner.fetchTask(t)
-		_, _, run = getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run = getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-3.yml", run.WorkflowID)
 		runner.fetchNoTask(t)
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 	})
 }
@@ -204,12 +204,12 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf1TreePath, opts1)
 		// fetch and exec workflow1
 		task := runner.fetchTask(t)
-		_, _, run := getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run := getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-1.yml", run.WorkflowID)
 		runner.fetchNoTask(t)
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// push workflow2
@@ -217,7 +217,7 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf2TreePath, opts2)
 		// fetch workflow2
 		task = runner.fetchTask(t)
-		_, _, run = getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run = getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-2.yml", run.WorkflowID)
 
@@ -228,17 +228,17 @@ jobs:
 
 		// exec workflow2
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// fetch and exec workflow3
 		task = runner.fetchTask(t)
-		_, _, run = getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run = getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-3.yml", run.WorkflowID)
 		runner.fetchNoTask(t)
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 	})
 }
@@ -321,12 +321,12 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf1TreePath, opts1)
 		// fetch and exec workflow1
 		task := runner.fetchTask(t)
-		_, _, run := getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run := getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-1.yml", run.WorkflowID)
 		runner.fetchNoTask(t)
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// push workflow2
@@ -334,7 +334,7 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf2TreePath, opts2)
 		// fetch workflow2
 		task = runner.fetchTask(t)
-		_, _, run = getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run = getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-2.yml", run.WorkflowID)
 
@@ -345,17 +345,17 @@ jobs:
 
 		// exec workflow2
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// fetch and exec workflow3
 		task = runner.fetchTask(t)
-		_, _, run = getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, _, run = getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "workflow-main-abc123-user2", getRunConcurrencyGroup(t, run))
 		assert.Equal(t, "concurrent-workflow-3.yml", run.WorkflowID)
 		runner.fetchNoTask(t)
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 	})
 }
@@ -415,7 +415,7 @@ jobs:
 		})(t)
 		doAPICreatePullRequest(user2APICtx, baseRepo.OwnerName, baseRepo.Name, baseRepo.DefaultBranch, "bugfix/aaa")(t)
 		pr1Task1 := runner.fetchTask(t)
-		_, _, pr1Run1 := getTaskAndJobAndRunByTaskID(t, pr1Task1.Id)
+		_, _, pr1Run1 := getTaskAndJobAndRunByTaskID(t, pr1Task1.ID)
 		assert.Equal(t, "pull-request-test", getRunConcurrencyGroup(t, pr1Run1))
 		assert.True(t, getRunConcurrencyCancel(t, pr1Run1))
 		assert.Equal(t, actions_model.StatusRunning, pr1Run1.Status)
@@ -460,7 +460,7 @@ jobs:
 		user2Session.MakeRequest(t, req, http.StatusOK)
 		// fetch the task and the previous task has been cancelled
 		pr2Task1 := runner.fetchTask(t)
-		_, _, pr2Run1 = getTaskAndJobAndRunByTaskID(t, pr2Task1.Id)
+		_, _, pr2Run1 = getTaskAndJobAndRunByTaskID(t, pr2Task1.ID)
 		assert.Equal(t, "pull-request-test", getRunConcurrencyGroup(t, pr2Run1))
 		assert.True(t, getRunConcurrencyCancel(t, pr2Run1))
 		assert.Equal(t, actions_model.StatusRunning, pr2Run1.Status)
@@ -491,7 +491,7 @@ jobs:
 		// cannot fetch the task: approval still required (user4 has no merged PR) and cancel-in-progress is false
 		runner.fetchNoTask(t)
 		runner.execTask(t, pr2Task1, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		pr2Run1 = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: pr2Run1.ID})
 		assert.Equal(t, actions_model.StatusSuccess, pr2Run1.Status)
@@ -501,7 +501,7 @@ jobs:
 		user2Session.MakeRequest(t, req, http.StatusOK)
 		// fetch the task
 		pr3Task1 := runner.fetchTask(t)
-		_, _, pr3Run1 := getTaskAndJobAndRunByTaskID(t, pr3Task1.Id)
+		_, _, pr3Run1 := getTaskAndJobAndRunByTaskID(t, pr3Task1.ID)
 		assert.Equal(t, "pull-request-test", getRunConcurrencyGroup(t, pr3Run1))
 		assert.False(t, getRunConcurrencyCancel(t, pr3Run1))
 		assert.Equal(t, actions_model.StatusRunning, pr3Run1.Status)
@@ -591,13 +591,13 @@ jobs:
 
 		// fetch wf1-job1
 		wf1Job1Task := runner1.fetchTask(t)
-		_, wf1Job1ActionJob, _ := getTaskAndJobAndRunByTaskID(t, wf1Job1Task.Id)
+		_, wf1Job1ActionJob, _ := getTaskAndJobAndRunByTaskID(t, wf1Job1Task.ID)
 		assert.Equal(t, "job-main-v1.23.0", wf1Job1ActionJob.ConcurrencyGroup)
 		assert.Equal(t, actions_model.StatusRunning, wf1Job1ActionJob.Status)
 		// fetch and exec wf2-job1
 		wf2Job1Task := runner2.fetchTask(t)
 		runner2.execTask(t, wf2Job1Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 			outputs: map[string]string{
 				"version": "v1.23.0",
 			},
@@ -606,11 +606,11 @@ jobs:
 		runner1.fetchNoTask(t)
 		// exec wf1-job1
 		runner1.execTask(t, wf1Job1Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		// fetch wf2-job2
 		wf2Job2Task := runner1.fetchTask(t)
-		_, wf2Job2ActionJob, wf2Run := getTaskAndJobAndRunByTaskID(t, wf2Job2Task.Id)
+		_, wf2Job2ActionJob, wf2Run := getTaskAndJobAndRunByTaskID(t, wf2Job2Task.ID)
 		assert.Equal(t, "job-main-v1.23.0", wf2Job2ActionJob.ConcurrencyGroup)
 		assert.Equal(t, actions_model.StatusRunning, wf2Job2ActionJob.Status)
 		// push workflow3 to trigger wf3-job1
@@ -618,11 +618,11 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf3TreePath, opts3)
 		// fetch wf3-job1
 		wf3Job1Task := runner1.fetchTask(t)
-		_, wf3Job1ActionJob, _ := getTaskAndJobAndRunByTaskID(t, wf3Job1Task.Id)
+		_, wf3Job1ActionJob, _ := getTaskAndJobAndRunByTaskID(t, wf3Job1Task.ID)
 		assert.Equal(t, "job-main-v1.23.0", wf3Job1ActionJob.ConcurrencyGroup)
 		assert.Equal(t, actions_model.StatusRunning, wf3Job1ActionJob.Status)
 		// wf2-job2 has been cancelled
-		_, wf2Job2ActionJob, _ = getTaskAndJobAndRunByTaskID(t, wf2Job2Task.Id)
+		_, wf2Job2ActionJob, _ = getTaskAndJobAndRunByTaskID(t, wf2Job2Task.ID)
 		assert.Equal(t, actions_model.StatusCancelled, wf2Job2ActionJob.Status)
 
 		// rerun wf2
@@ -633,10 +633,10 @@ jobs:
 		runner1.fetchNoTask(t)
 		// (rerun1) fetch and exec wf2-job1
 		wf2Job1Rerun1Task := runner2.fetchTask(t)
-		_, _, wf2Rerun1Run := getTaskAndJobAndRunByTaskID(t, wf2Job1Rerun1Task.Id)
+		_, _, wf2Rerun1Run := getTaskAndJobAndRunByTaskID(t, wf2Job1Rerun1Task.ID)
 		assert.Equal(t, wf2Rerun1Run.ID, wf2Run.ID)
 		runner2.execTask(t, wf2Job1Rerun1Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 			outputs: map[string]string{
 				"version": "v1.24.0",
 			},
@@ -644,9 +644,9 @@ jobs:
 		// (rerun1) fetch and exec wf2-job2
 		wf2Job2Rerun1Task := runner1.fetchTask(t)
 		runner1.execTask(t, wf2Job2Rerun1Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
-		_, wf2Job2Rerun1Job, _ := getTaskAndJobAndRunByTaskID(t, wf2Job2Rerun1Task.Id)
+		_, wf2Job2Rerun1Job, _ := getTaskAndJobAndRunByTaskID(t, wf2Job2Rerun1Task.ID)
 		assert.Equal(t, "job-main-v1.24.0", wf2Job2Rerun1Job.ConcurrencyGroup)
 
 		// rerun wf2-job2
@@ -656,9 +656,9 @@ jobs:
 		// (rerun2) fetch and exec wf2-job2
 		wf2Job2Rerun2Task := runner1.fetchTask(t)
 		runner1.execTask(t, wf2Job2Rerun2Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
-		_, wf2Job2Rerun2Job, _ := getTaskAndJobAndRunByTaskID(t, wf2Job2Rerun2Task.Id)
+		_, wf2Job2Rerun2Job, _ := getTaskAndJobAndRunByTaskID(t, wf2Job2Rerun2Task.ID)
 		assert.Equal(t, "job-main-v1.24.0", wf2Job2Rerun2Job.ConcurrencyGroup)
 	})
 }
@@ -724,33 +724,33 @@ jobs:
 		job1LinuxTask := linuxRunner.fetchTask(t)
 		windowsRunner.fetchNoTask(t)
 		linuxRunner.fetchNoTask(t)
-		_, job1WinJob, _ := getTaskAndJobAndRunByTaskID(t, job1WinTask.Id)
+		_, job1WinJob, _ := getTaskAndJobAndRunByTaskID(t, job1WinTask.ID)
 		assert.Equal(t, "wf1-job (windows)", job1WinJob.Name)
 		assert.Equal(t, "job-os-windows", job1WinJob.ConcurrencyGroup)
-		_, job1LinuxJob, _ := getTaskAndJobAndRunByTaskID(t, job1LinuxTask.Id)
+		_, job1LinuxJob, _ := getTaskAndJobAndRunByTaskID(t, job1LinuxTask.ID)
 		assert.Equal(t, "wf1-job (linux)", job1LinuxJob.Name)
 		assert.Equal(t, "job-os-linux", job1LinuxJob.ConcurrencyGroup)
 
 		opts2 := getWorkflowCreateFileOptions(user2, repo.DefaultBranch, "create "+wf2TreePath, wf2FileContent)
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf2TreePath, opts2)
 		job2DarwinTask := darwinRunner.fetchTask(t)
-		_, job2DarwinJob, _ := getTaskAndJobAndRunByTaskID(t, job2DarwinTask.Id)
+		_, job2DarwinJob, _ := getTaskAndJobAndRunByTaskID(t, job2DarwinTask.ID)
 		assert.Equal(t, "wf2-job (darwin)", job2DarwinJob.Name)
 		assert.Equal(t, "job-os-darwin", job2DarwinJob.ConcurrencyGroup)
 
 		windowsRunner.execTask(t, job1WinTask, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 		linuxRunner.execTask(t, job1LinuxTask, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		job2WinTask := windowsRunner.fetchTask(t)
 		job2LinuxTask := linuxRunner.fetchTask(t)
-		_, job2WinJob, _ := getTaskAndJobAndRunByTaskID(t, job2WinTask.Id)
+		_, job2WinJob, _ := getTaskAndJobAndRunByTaskID(t, job2WinTask.ID)
 		assert.Equal(t, "wf2-job (windows)", job2WinJob.Name)
 		assert.Equal(t, "job-os-windows", job2WinJob.ConcurrencyGroup)
-		_, job2LinuxJob, _ := getTaskAndJobAndRunByTaskID(t, job2LinuxTask.Id)
+		_, job2LinuxJob, _ := getTaskAndJobAndRunByTaskID(t, job2LinuxTask.ID)
 		assert.Equal(t, "wf2-job (linux)", job2LinuxJob.Name)
 		assert.Equal(t, "job-os-linux", job2LinuxJob.ConcurrencyGroup)
 	})
@@ -810,7 +810,7 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task1 := runner.fetchTask(t)
-		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.Id)
+		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.ID)
 		assert.Equal(t, "workflow-dispatch-v1.21", getRunConcurrencyGroup(t, run1))
 
 		// run the workflow with appVersion=v1.22 and cancel=false
@@ -820,7 +820,7 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task2 := runner.fetchTask(t)
-		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run2))
 
 		// run the workflow with appVersion=v1.22 and cancel=false again
@@ -839,9 +839,9 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task4 := runner.fetchTask(t)
-		_, _, run4 := getTaskAndJobAndRunByTaskID(t, task4.Id)
+		_, _, run4 := getTaskAndJobAndRunByTaskID(t, task4.ID)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run4))
-		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, actions_model.StatusCancelled, run2.Status)
 	})
 }
@@ -900,7 +900,7 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task1 := runner.fetchTask(t)
-		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.Id)
+		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.ID)
 		assert.Equal(t, "workflow-dispatch-v1.21", getRunConcurrencyGroup(t, run1))
 
 		req = NewRequestWithValues(t, "POST", urlStr, map[string]string{
@@ -909,7 +909,7 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task2 := runner.fetchTask(t)
-		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run2))
 
 		// run the workflow with appVersion=v1.22 and cancel=false again
@@ -933,14 +933,14 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task4 := runner.fetchTask(t)
-		_, _, run4 := getTaskAndJobAndRunByTaskID(t, task4.Id)
+		_, _, run4 := getTaskAndJobAndRunByTaskID(t, task4.ID)
 		assert.Equal(t, actions_model.StatusRunning, run4.Status)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run4))
-		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, actions_model.StatusCancelled, run2.Status)
 
 		runner.execTask(t, task4, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// rerun cancel true scenario
@@ -952,14 +952,14 @@ jobs:
 		_ = session.MakeRequest(t, req, http.StatusOK)
 
 		task5 := runner.fetchTask(t)
-		_, _, run4_1 := getTaskAndJobAndRunByTaskID(t, task5.Id)
+		_, _, run4_1 := getTaskAndJobAndRunByTaskID(t, task5.ID)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run4_1))
 		assert.Equal(t, run4.ID, run4_1.ID)
-		_, _, run2_1 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2_1 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, actions_model.StatusCancelled, run2_1.Status)
 
 		runner.execTask(t, task5, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_CANCELLED,
+			result: runner_module.Cancelled,
 		})
 
 		// rerun cancel false scenario
@@ -974,7 +974,7 @@ jobs:
 		_ = session.MakeRequest(t, req, http.StatusOK)
 
 		task6 := runner.fetchTask(t)
-		_, _, run3_2 := getTaskAndJobAndRunByTaskID(t, task6.Id)
+		_, _, run3_2 := getTaskAndJobAndRunByTaskID(t, task6.ID)
 		assert.Equal(t, run3.ID, run3_2.ID)
 		assert.Equal(t, actions_model.StatusRunning, run3_2.Status)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run3))
@@ -1038,7 +1038,7 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task1 := runner.fetchTask(t)
-		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.Id)
+		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.ID)
 		assert.Equal(t, "workflow-dispatch-v1.21", getRunConcurrencyGroup(t, run1))
 
 		req = NewRequestWithValues(t, "POST", urlStr, map[string]string{
@@ -1047,7 +1047,7 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task2 := runner.fetchTask(t)
-		_, job2, run2 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, job2, run2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run2))
 
 		// run the workflow with appVersion=v1.22 and cancel=false again
@@ -1071,14 +1071,14 @@ jobs:
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 		task4 := runner.fetchTask(t)
-		_, job4, run4 := getTaskAndJobAndRunByTaskID(t, task4.Id)
+		_, job4, run4 := getTaskAndJobAndRunByTaskID(t, task4.ID)
 		assert.Equal(t, actions_model.StatusRunning, run4.Status)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run4))
-		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, actions_model.StatusCancelled, run2.Status)
 
 		runner.execTask(t, task4, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// rerun cancel true scenario
@@ -1091,14 +1091,14 @@ jobs:
 		_ = session.MakeRequest(t, req, http.StatusOK)
 
 		task5 := runner.fetchTask(t)
-		_, _, run4_1 := getTaskAndJobAndRunByTaskID(t, task5.Id)
+		_, _, run4_1 := getTaskAndJobAndRunByTaskID(t, task5.ID)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run4_1))
 		assert.Equal(t, run4.ID, run4_1.ID)
-		_, _, run2_1 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2_1 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, actions_model.StatusCancelled, run2_1.Status)
 
 		runner.execTask(t, task5, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_CANCELLED,
+			result: runner_module.Cancelled,
 		})
 
 		// rerun cancel false scenario
@@ -1115,7 +1115,7 @@ jobs:
 		_ = session.MakeRequest(t, req, http.StatusOK)
 
 		task6 := runner.fetchTask(t)
-		_, _, run3 = getTaskAndJobAndRunByTaskID(t, task6.Id)
+		_, _, run3 = getTaskAndJobAndRunByTaskID(t, task6.ID)
 		assert.Equal(t, "workflow-dispatch-v1.22", getRunConcurrencyGroup(t, run3))
 
 		run2_2 = unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: run2_2.ID})
@@ -1158,7 +1158,7 @@ jobs:
 
 		// fetch the task triggered by push
 		task1 := runner.fetchTask(t)
-		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.Id)
+		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.ID)
 		assert.Equal(t, "schedule-concurrency", getRunConcurrencyGroup(t, run1))
 		assert.True(t, getRunConcurrencyCancel(t, run1))
 		assert.Equal(t, string(webhook_module.HookEventPush), run1.TriggerEvent)
@@ -1171,12 +1171,12 @@ jobs:
 		assert.NoError(t, actions_service.StartScheduleTasks(t.Context()))
 		runner.fetchNoTask(t) // cannot fetch because task1 is not completed
 		runner.execTask(t, task1, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
-		_, _, run1 = getTaskAndJobAndRunByTaskID(t, task1.Id)
+		_, _, run1 = getTaskAndJobAndRunByTaskID(t, task1.ID)
 		assert.Equal(t, actions_model.StatusSuccess, run1.Status)
 		task2 := runner.fetchTask(t)
-		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, "schedule-concurrency", getRunConcurrencyGroup(t, run2))
 		assert.False(t, getRunConcurrencyCancel(t, run2))
 		assert.Equal(t, string(webhook_module.HookEventSchedule), run2.TriggerEvent)
@@ -1215,7 +1215,7 @@ jobs:
 		})(t)
 
 		task4 := runner.fetchTask(t)
-		_, _, run4 := getTaskAndJobAndRunByTaskID(t, task4.Id)
+		_, _, run4 := getTaskAndJobAndRunByTaskID(t, task4.ID)
 		assert.Equal(t, "schedule-concurrency", getRunConcurrencyGroup(t, run4))
 		assert.True(t, getRunConcurrencyCancel(t, run4))
 		assert.Equal(t, string(webhook_module.HookEventPush), run4.TriggerEvent)
@@ -1327,12 +1327,12 @@ jobs:
 		// fetch wf1-job1 and wf1-job2
 		w1j1Task := runner1.fetchTask(t)
 		w1j2Task := runner2.fetchTask(t)
-		_, w1j1Job, w1Run := getTaskAndJobAndRunByTaskID(t, w1j1Task.Id)
+		_, w1j1Job, w1Run := getTaskAndJobAndRunByTaskID(t, w1j1Task.ID)
 		assert.Equal(t, "job-group-1", w1j1Job.ConcurrencyGroup)
 		assert.Equal(t, "workflow-group-1", getRunConcurrencyGroup(t, w1Run))
 		assert.Equal(t, "concurrent-workflow-1.yml", w1Run.WorkflowID)
 		assert.Equal(t, actions_model.StatusRunning, w1j1Job.Status)
-		_, w1j2Job, _ := getTaskAndJobAndRunByTaskID(t, w1j2Task.Id)
+		_, w1j2Job, _ := getTaskAndJobAndRunByTaskID(t, w1j2Task.ID)
 		assert.Equal(t, "job-group-2", w1j2Job.ConcurrencyGroup)
 		assert.Equal(t, actions_model.StatusRunning, w1j2Job.Status)
 
@@ -1362,25 +1362,25 @@ jobs:
 
 		// exec wf1-job1
 		runner1.execTask(t, w1j1Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// fetch wf3-job1
 		assert.Equal(t, actions_model.StatusBlocked, w3j1Job.Status)
 		w3j1Task := runner1.fetchTask(t)
-		_, w3j1Job, w3Run = getTaskAndJobAndRunByTaskID(t, w3j1Task.Id)
+		_, w3j1Job, w3Run = getTaskAndJobAndRunByTaskID(t, w3j1Task.ID)
 		assert.Equal(t, "job-group-1", w3j1Job.ConcurrencyGroup)
 		assert.Equal(t, "workflow-group-2", getRunConcurrencyGroup(t, w3Run))
 		assert.Equal(t, "concurrent-workflow-3.yml", w3Run.WorkflowID)
 
 		// exec wf1-job2
 		runner2.execTask(t, w1j2Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// fetch wf2-job2
 		w2j2Task := runner2.fetchTask(t)
-		_, w2j2Job, w2Run := getTaskAndJobAndRunByTaskID(t, w2j2Task.Id)
+		_, w2j2Job, w2Run := getTaskAndJobAndRunByTaskID(t, w2j2Task.ID)
 		assert.Equal(t, "job-group-2", w2j2Job.ConcurrencyGroup)
 		assert.Equal(t, "workflow-group-1", getRunConcurrencyGroup(t, w2Run))
 		assert.Equal(t, "concurrent-workflow-2.yml", w2Run.WorkflowID)
@@ -1394,7 +1394,7 @@ jobs:
 
 		// exec wf3-job1
 		runner1.execTask(t, w3j1Task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// fetch wf4-job1
@@ -1403,11 +1403,11 @@ jobs:
 		runner1.fetchNoTask(t)
 		runner2.fetchNoTask(t)
 
-		_, w2j2Job, w2Run = getTaskAndJobAndRunByTaskID(t, w2j2Task.Id)
+		_, w2j2Job, w2Run = getTaskAndJobAndRunByTaskID(t, w2j2Task.ID)
 		// wf2-job2 is cancelled because wf4-job1's cancel-in-progress is true
 		assert.Equal(t, actions_model.StatusCancelled, w2j2Job.Status)
 		assert.Equal(t, actions_model.StatusCancelled, w2Run.Status)
-		_, w4j1Job, w4Run := getTaskAndJobAndRunByTaskID(t, w4j1Task.Id)
+		_, w4j1Job, w4Run := getTaskAndJobAndRunByTaskID(t, w4j1Task.ID)
 		assert.Equal(t, "job-group-2", w4j1Job.ConcurrencyGroup)
 		assert.Equal(t, "workflow-group-2", getRunConcurrencyGroup(t, w4Run))
 		assert.Equal(t, "concurrent-workflow-4.yml", w4Run.WorkflowID)
@@ -1446,7 +1446,7 @@ jobs:
 
 		// fetch and check the first task
 		task1 := runner.fetchTask(t)
-		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.Id)
+		_, _, run1 := getTaskAndJobAndRunByTaskID(t, task1.ID)
 		assert.Equal(t, "cancel-run-group", getRunConcurrencyGroup(t, run1))
 		assert.False(t, getRunConcurrencyCancel(t, run1))
 		assert.Equal(t, actions_model.StatusRunning, run1.Status)
@@ -1484,7 +1484,7 @@ jobs:
 
 		// fetch and check the second task
 		task2 := runner.fetchTask(t)
-		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, "cancel-run-group", getRunConcurrencyGroup(t, run2))
 		assert.False(t, getRunConcurrencyCancel(t, run2))
 		assert.Equal(t, actions_model.StatusRunning, run2.Status)
@@ -1544,7 +1544,7 @@ jobs:
 
 		// fetch wf1-job1
 		w1j1Task := runner.fetchTask(t)
-		_, _, run1 := getTaskAndJobAndRunByTaskID(t, w1j1Task.Id)
+		_, _, run1 := getTaskAndJobAndRunByTaskID(t, w1j1Task.ID)
 		assert.Equal(t, "test-group", getRunConcurrencyGroup(t, run1))
 		assert.Equal(t, actions_model.StatusRunning, run1.Status)
 		// query wf1-job2 from db and check its status
@@ -1566,7 +1566,7 @@ jobs:
 		assert.Equal(t, actions_model.StatusBlocked, run2.Status)
 
 		// complete wf1-job1
-		runner.execTask(t, w1j1Task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+		runner.execTask(t, w1j1Task, &mockTaskOutcome{result: runner_module.Success})
 
 		// mock time
 		fakeNow := now.Add(setting.Actions.AbandonedJobTimeout)
@@ -1585,7 +1585,7 @@ jobs:
 
 		// fetch wf2-job1 and check
 		w2j1Task := runner.fetchTask(t)
-		_, w2j1Job, run2 := getTaskAndJobAndRunByTaskID(t, w2j1Task.Id)
+		_, w2j1Job, run2 := getTaskAndJobAndRunByTaskID(t, w2j1Task.ID)
 		assert.Equal(t, "test-group", getRunConcurrencyGroup(t, run2))
 		assert.Equal(t, "wf2-job1", w2j1Job.JobID)
 		assert.Equal(t, actions_model.StatusRunning, run2.Status)
@@ -1655,7 +1655,7 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf1TreePath, opts1)
 		// fetch run1
 		task := runner.fetchTask(t)
-		_, job1, run1 := getTaskAndJobAndRunByTaskID(t, task.Id)
+		_, job1, run1 := getTaskAndJobAndRunByTaskID(t, task.ID)
 		assert.Equal(t, "test-group", job1.ConcurrencyGroup)
 		assert.Equal(t, actions_model.StatusRunning, run1.Status)
 
@@ -1670,12 +1670,12 @@ jobs:
 
 		// exec run1
 		runner.execTask(t, task, &mockTaskOutcome{
-			result: runnerv1.Result_RESULT_SUCCESS,
+			result: runner_module.Success,
 		})
 
 		// fetch run2
 		task2 := runner.fetchTask(t)
-		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.Id)
+		_, _, run2 = getTaskAndJobAndRunByTaskID(t, task2.ID)
 		assert.Equal(t, actions_model.StatusRunning, run2.Status)
 
 		// push workflow3
@@ -1683,7 +1683,7 @@ jobs:
 		createWorkflowFile(t, token, user2.Name, repo.Name, wf3TreePath, opts3)
 		// fetch run3
 		task3 := runner.fetchTask(t)
-		_, job3, run3 := getTaskAndJobAndRunByTaskID(t, task3.Id)
+		_, job3, run3 := getTaskAndJobAndRunByTaskID(t, task3.ID)
 		assert.Equal(t, "test-group", job3.ConcurrencyGroup)
 		assert.Equal(t, actions_model.StatusRunning, run3.Status)
 
@@ -1824,7 +1824,7 @@ jobs:
 		// Both jobs run successfully on the registered runner.
 		for range 2 {
 			task := runner.fetchTask(t)
-			runner.execTask(t, task, &mockTaskOutcome{result: runnerv1.Result_RESULT_SUCCESS})
+			runner.execTask(t, task, &mockTaskOutcome{result: runner_module.Success})
 		}
 		finalRun := unittest.AssertExistsAndLoadBean(t, &actions_model.ActionRun{ID: legacyRun.ID})
 		assert.Equal(t, actions_model.StatusSuccess, finalRun.Status)
