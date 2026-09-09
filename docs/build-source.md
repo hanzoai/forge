@@ -1,6 +1,6 @@
 # Prepare build environment
 
-Complete the steps in [build-setup.md](build-setup.md) to prepare your environment for building Gitea from source.
+Complete the steps in [build-setup.md](build-setup.md) to prepare your environment for building Hanzo Forge from source.
 
 ## Choose a branch
 
@@ -17,7 +17,7 @@ git fetch origin pull/123456/head:pr-123456
 
 # Build
 
-Various [make tasks](https://github.com/go-gitea/gitea/blob/main/Makefile)
+Various [make tasks](../Makefile)
 are provided to keep the build process as simple as possible.
 
 Depending on requirements, the following build tags can be included.
@@ -42,8 +42,8 @@ GOOS=windows TAGS="bindata gogit" make build
 
 ## Changing default paths
 
-Gitea will search for a number of things from the _`CustomPath`_.
-By default, this is the `custom/` directory in the current working directory when running Gitea.
+Hanzo Forge will search for a number of things from the _`CustomPath`_.
+By default, this is the `custom/` directory in the current working directory when running it.
 It will also look for its configuration file _`CustomConf`_ in `$(CustomPath)/conf/app.ini`,
 and will use the current working directory as the relative base path _`AppWorkPath`_.
 
@@ -53,19 +53,19 @@ For packagers who need to use paths like `/etc/gitea/app.ini`,
 they should define these values at build time for `make build` by environment variable like
 `LDFLAGS='-X "module.Var1=Value1" -X "module.Var2=Value2"' TAGS="bindata" make build`.
 
-- _`CustomConf`_: `-X "code.gitea.io/gitea/modules/setting.CustomConf=/etc/gitea/app.ini"`
-- _`AppWorkPath`_: `-X "code.gitea.io/gitea/modules/setting.AppWorkPath=/var/lib/gitea"`
-- _`CustomPath`_: `-X "code.gitea.io/gitea/modules/setting.CustomPath=/var/lib/gitea/custom"`
-- Default PID file location: `-X "code.gitea.io/gitea/cmd.PIDFile=/run/gitea.pid"`
+- _`CustomConf`_: `-X "github.com/hanzoai/git/modules/setting.CustomConf=/etc/gitea/app.ini"`
+- _`AppWorkPath`_: `-X "github.com/hanzoai/git/modules/setting.AppWorkPath=/var/lib/gitea"`
+- _`CustomPath`_: `-X "github.com/hanzoai/git/modules/setting.CustomPath=/var/lib/gitea/custom"`
+- Default PID file location: `-X "github.com/hanzoai/git/cmd.PIDFile=/run/gitd.pid"`
 
 Add as many of the strings with their preceding `-X` to the `LDFLAGS` variable and run `make build`
 with the appropriate `TAGS` as above.
 
-Running `gitea help` will allow you to review what the computed settings will be for your `gitea`.
+Running `gitd help` will allow you to review what the computed settings will be for your build.
 
 ## Cross Build
 
-Gitea use's Golang's toolchain variables for cross-building.
+Hanzo Forge use's Golang's toolchain variables for cross-building.
 
 For example, to cross build for Linux ARM64:
 
@@ -77,7 +77,7 @@ GOOS=linux GOARCH=arm64 TAGS="bindata" make build
 
 Shell completion can be generated directly from binary with:
 ```sh
-gitea completion <shell>
+gitd completion <shell>
 ```
 
 Supported values for `<shell>` are `bash`, `fish`, `pwsh` and `zsh`.
@@ -85,7 +85,7 @@ Details on how to load the completion for your shell can be found in the complet
 
 ## Source Maps
 
-By default, gitea generates reduced source maps for frontend files to conserve space. This can be controlled with the `ENABLE_SOURCEMAP` environment variable:
+By default, Hanzo Forge generates reduced source maps for frontend files to conserve space. This can be controlled with the `ENABLE_SOURCEMAP` environment variable:
 
 - `ENABLE_SOURCEMAP=true` generates all source maps, the default for development builds
 - `ENABLE_SOURCEMAP=reduced` generates limited source maps, the default for production builds

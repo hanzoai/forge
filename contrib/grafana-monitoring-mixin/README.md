@@ -1,6 +1,6 @@
-# Gitea Mixin
+# Hanzo Forge Mixin
 
-Gitea Mixin is a set of configurable Grafana dashboards based on the metrics exported by the Gitea built-in metrics endpoint.
+Hanzo Forge Mixin is a set of configurable Grafana dashboards based on the metrics exported by the built-in metrics endpoint.
 
 ## Generate config files
 

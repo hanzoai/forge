@@ -1,4 +1,4 @@
-# Hanzo Git
+# Hanzo Forge
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT "License: MIT")
 
@@ -7,7 +7,7 @@ GitHub Actions 的 CI/CD，并通过 hanzo.id OIDC 原生集成 IAM。服务位�
 [git.hanzo.ai](https://git.hanzo.ai)。
 
 本项目是 [Gitea](https://gitea.com)（MIT）的白牌分支。上游版权与许可完整保留于
-[LICENSE](LICENSE)；身份验证改接 Hanzo IAM 而非本地账号，产品品牌为 Hanzo Git。
+[LICENSE](LICENSE)；身份验证改接 Hanzo IAM 而非本地账号，产品品牌为 Hanzo Forge。
 
 ## 构建与部署
 

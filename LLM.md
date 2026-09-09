@@ -1,4 +1,4 @@
-# Hanzo Git — `github.com/hanzoai/git`
+# Hanzo Forge — `github.com/hanzoai/git`
 
 The rebranded **Gitea fork** that serves `git.hanzo.ai`: IAM-native code hosting
 for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
@@ -6,7 +6,8 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 ## What it is
 
 - **Base:** Gitea **1.26.4** (upstream `go-gitea/gitea`; see `CHANGELOG.md` top
-  entry). Module path forked to `github.com/hanzoai/git`. The daemon is **`gitd`**
+  entry). Module path is `github.com/hanzoai/git` — the GitHub repo rename to
+  `hanzoai/forge` did not change it. The daemon is **`gitd`**
   (`/app/git/gitd`, wrapper `/usr/local/bin/gitd`); upstream's CLI subcommands
   are intact under the new name (`gitd admin auth …`, `gitd migrate`).
 
@@ -74,7 +75,7 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   `upload-artifact@v4+` / `download-artifact@v4+` step fails before it opens a
   connection: the v4 endpoints answer nobody today.
 - **Identity = hanzo.id OIDC only.** No fork-baked issuer; binding is a standard
-  Gitea OAuth2 auth source (goth `openidConnect`) pointed at
+  OAuth2 auth source (goth `openidConnect`) pointed at
   `https://hanzo.id/.well-known/openid-configuration`. Org membership is driven by
   the IAM `owner` claim (`--group-claim-name owner --group-team-map …
   --group-team-map-removal`), reconciled declaratively by the deploy's `oauth-sync`
@@ -172,7 +173,7 @@ surface deserves its own name; the path carries `/v1/` and never a second
 ## Upstream naming: what stays, and why
 
 The rendered UI, locale strings, CLI help, log/error text, outbound User-Agents
-and our own `X-*` headers are Hanzo Git. What is left is left on purpose — it is
+and our own `X-*` headers are Hanzo Forge. What is left is left on purpose — it is
 either legally required or an addressing value where a rename silently points at
 a different resource. Do NOT sed these:
 
