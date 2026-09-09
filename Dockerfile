@@ -49,6 +49,11 @@ WORKDIR ${GOPATH}/src/hanzo-git
 # before you touch go.mod.
 ENV GOPRIVATE=github.com/hanzoai/*
 COPY go.mod go.sum ./
+# The root module replaces github.com/hanzoai/git/modules/actions/runner with
+# ./modules/actions/runner, so `go mod download` reads that directory's go.mod
+# and fails without it. It is copied here, ahead of the source tree, to keep
+# the dependency layer cached independently of every other file.
+COPY modules/actions/runner/go.mod modules/actions/runner/
 RUN --mount=type=secret,id=gh_token \
     if [ -s /run/secrets/gh_token ]; then \
       export GIT_CONFIG_COUNT=1 \
