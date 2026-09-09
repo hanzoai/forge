@@ -27,7 +27,7 @@ const (
 	EnvKeyID         = "GIT_KEY_ID" // public key ID
 	EnvDeployKeyID   = "GIT_DEPLOY_KEY_ID"
 	EnvPRID          = "GIT_PR_ID"
-	EnvPRIndex       = "GIT_PR_INDEX" // not used by Gitea at the moment, it is for custom git hooks
+	EnvPRIndex       = "GIT_PR_INDEX" // not used by the forge at the moment, it is for custom git hooks
 	EnvPushTrigger   = "GIT_PUSH_TRIGGER"
 	EnvIsInternal    = "GIT_INTERNAL_PUSH"
 	EnvAppURL        = "GIT_ROOT_URL"
@@ -87,7 +87,7 @@ func FullPushingEnvironment(author, committer *user_model.User, repo *repo_model
 		"GIT_COMMITTER_EMAIL="+committerSig.Email,
 		EnvPRID+"="+strconv.FormatInt(prID, 10),
 		EnvPRIndex+"="+strconv.FormatInt(prIndex, 10),
-		"SSH_ORIGINAL_COMMAND=gitea-internal",
+		"SSH_ORIGINAL_COMMAND=forge-internal",
 	)
 	environ = append(environ, DoerPushingEnvironment(committer, repo, isWiki)...)
 	return environ

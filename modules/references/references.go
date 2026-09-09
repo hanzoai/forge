@@ -38,7 +38,7 @@ var (
 	// e.g. org/repo#12345
 	crossReferenceIssueNumericPattern = regexp.MustCompile(`(?:\s|^|\(|\[)([0-9a-zA-Z-_\.]+/[0-9a-zA-Z-_\.]+[#!][0-9]+)(?:\s|$|\)|\]|[:;,.?!]\s|[:;,.?!]$)`)
 	// crossReferenceCommitPattern matches a string that references a commit in a different repository
-	// e.g. go-gitea/gitea@d8a994ef, go-gitea/gitea@d8a994ef243349f321568f9e36d5c3f444b99cae (7-40 characters)
+	// e.g. hanzoai/forge@d8a994ef, hanzoai/forge@d8a994ef243349f321568f9e36d5c3f444b99cae (7-40 characters)
 	crossReferenceCommitPattern = regexp.MustCompile(`(?:\s|^|\(|\[)([0-9a-zA-Z-_\.]+)/([0-9a-zA-Z-_\.]+)@([0-9a-f]{7,64})(?:\s|$|\)|\]|[:;,.?!]\s|[:;,.?!]$)`)
 	// spaceTrimmedPattern let's find the trailing space
 	spaceTrimmedPattern = regexp.MustCompile(`(?:.*[0-9a-zA-Z-_])\s`)
@@ -48,9 +48,9 @@ var (
 	issueCloseKeywordsPat, issueReopenKeywordsPat *regexp.Regexp
 	issueKeywordsOnce                             sync.Once
 
-	giteaHostInit         sync.Once
-	giteaHost             string
-	giteaIssuePullPattern *regexp.Regexp
+	forgeHostInit         sync.Once
+	forgeHost             string
+	forgeIssuePullPattern *regexp.Regexp
 
 	actionStrings = []string{
 		"none",
@@ -172,26 +172,26 @@ func doNewKeywords(closeKeywords, reopenKeywords []string) {
 
 // getGitHostName returns a normalized string with the local host name, with no scheme or port information
 func getGitHostName() string {
-	giteaHostInit.Do(func() {
+	forgeHostInit.Do(func() {
 		if uapp, err := url.Parse(setting.AppURL); err == nil {
-			giteaHost = strings.ToLower(uapp.Host)
-			giteaIssuePullPattern = regexp.MustCompile(
+			forgeHost = strings.ToLower(uapp.Host)
+			forgeIssuePullPattern = regexp.MustCompile(
 				`(\s|^|\(|\[)` +
 					regexp.QuoteMeta(strings.TrimSpace(setting.AppURL)) +
 					`([0-9a-zA-Z-_\.]+/[0-9a-zA-Z-_\.]+)/` +
 					`((?:issues)|(?:pulls))/([0-9]+)(?:\s|$|\)|\]|[:;,.?!]\s|[:;,.?!]$)`)
 		} else {
-			giteaHost = ""
-			giteaIssuePullPattern = nil
+			forgeHost = ""
+			forgeIssuePullPattern = nil
 		}
 	})
-	return giteaHost
+	return forgeHost
 }
 
 // getGitIssuePullPattern
 func getGitIssuePullPattern() *regexp.Regexp {
 	getGitHostName()
-	return giteaIssuePullPattern
+	return forgeIssuePullPattern
 }
 
 // FindAllMentionsMarkdown matches mention patterns in given content and
@@ -257,8 +257,8 @@ func convertFullHTMLReferencesToShortRefs(re *regexp.Regexp, contentBytes *[]byt
 	//
 	// We want to transform something like:
 	//
-	// this is a https://ourgitea.com/git/owner/repo/issues/123456789, foo
-	// https://ourgitea.com/git/owner/repo/pulls/123456789
+	// this is a https://ourforge.example/git/owner/repo/issues/123456789, foo
+	// https://ourforge.example/git/owner/repo/pulls/123456789
 	//
 	// Into something like:
 	//
@@ -267,7 +267,7 @@ func convertFullHTMLReferencesToShortRefs(re *regexp.Regexp, contentBytes *[]byt
 
 	pos := 0
 	for {
-		// re looks for something like: (\s|^|\(|\[)https://ourgitea.com/git/(owner/repo)/(issues)/(123456789)(?:\s|$|\)|\]|[:;,.?!]\s|[:;,.?!]$)
+		// re looks for something like: (\s|^|\(|\[)https://ourforge.example/git/(owner/repo)/(issues)/(123456789)(?:\s|$|\)|\]|[:;,.?!]\s|[:;,.?!]$)
 		match := re.FindSubmatchIndex((*contentBytes)[pos:])
 		if match == nil {
 			break
@@ -325,7 +325,7 @@ func FindAllIssueReferences(content string) []IssueReference {
 	if re := getGitIssuePullPattern(); re != nil {
 		convertFullHTMLReferencesToShortRefs(re, &contentBytes)
 	} else {
-		log.Debug("No GiteaIssuePullPattern pattern")
+		log.Debug("No ForgeIssuePullPattern pattern")
 	}
 	return rawToIssueReferenceList(findAllIssueReferencesBytes(contentBytes, []string{}, nil))
 }

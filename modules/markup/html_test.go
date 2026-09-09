@@ -66,7 +66,7 @@ func TestRender_Commits(t *testing.T) {
 	test(commitCompareWithHash, `<p><a href="`+commitCompareWithHash+`" rel="nofollow"><code>65f1bf27bc...65f1bf27bc (L2)</code></a></p>`)
 
 	test("commit "+sha, `<p>commit <a href="`+commitPath+`" rel="nofollow"><code>65f1bf27bc</code></a></p>`)
-	test("/home/gitea/"+sha, "<p>/home/gitea/"+sha+"</p>")
+	test("/home/forge/"+sha, "<p>/home/forge/"+sha+"</p>")
 	test("deadbeef", `<p>deadbeef</p>`)
 	test("d27ace93", `<p>d27ace93</p>`)
 	test(sha[:14]+".x", `<p>`+sha[:14]+`.x</p>`)
@@ -91,20 +91,20 @@ func TestRender_CrossReferences(t *testing.T) {
 		"test-owner/test-repo#12345",
 		`<p><a href="/test-owner/test-repo/issues/12345" class="ref-issue" rel="nofollow">test-owner/test-repo#12345</a></p>`)
 	test(
-		"go-gitea/gitea#12345",
-		`<p><a href="/go-gitea/gitea/issues/12345" class="ref-issue" rel="nofollow">go-gitea/gitea#12345</a></p>`)
+		"hanzoai/forge#12345",
+		`<p><a href="/hanzoai/forge/issues/12345" class="ref-issue" rel="nofollow">hanzoai/forge#12345</a></p>`)
 	test(
-		"/home/gitea/go-gitea/gitea#12345",
-		`<p>/home/gitea/go-gitea/gitea#12345</p>`)
+		"/home/forge/hanzoai/forge#12345",
+		`<p>/home/forge/hanzoai/forge#12345</p>`)
 	test(
-		markup.TestAppURL+"gogitea/gitea/issues/12345",
-		`<p><a href="`+markup.TestAppURL+`gogitea/gitea/issues/12345" class="ref-issue" rel="nofollow">gogitea/gitea#12345</a></p>`)
+		markup.TestAppURL+"hanzoai/forge/issues/12345",
+		`<p><a href="`+markup.TestAppURL+`hanzoai/forge/issues/12345" class="ref-issue" rel="nofollow">hanzoai/forge#12345</a></p>`)
 	test(
-		markup.TestAppURL+"go-gitea/gitea/issues/12345",
-		`<p><a href="`+markup.TestAppURL+`go-gitea/gitea/issues/12345" class="ref-issue" rel="nofollow">go-gitea/gitea#12345</a></p>`)
+		markup.TestAppURL+"hanzo-ai/forge/issues/12345",
+		`<p><a href="`+markup.TestAppURL+`hanzo-ai/forge/issues/12345" class="ref-issue" rel="nofollow">hanzo-ai/forge#12345</a></p>`)
 	test(
-		markup.TestAppURL+"gogitea/some-repo-name/issues/12345",
-		`<p><a href="`+markup.TestAppURL+`gogitea/some-repo-name/issues/12345" class="ref-issue" rel="nofollow">gogitea/some-repo-name#12345</a></p>`)
+		markup.TestAppURL+"hanzoai/some-repo-name/issues/12345",
+		`<p><a href="`+markup.TestAppURL+`hanzoai/some-repo-name/issues/12345" class="ref-issue" rel="nofollow">hanzoai/some-repo-name#12345</a></p>`)
 
 	inputURL := setting.AppURL + "a/b/commit/0123456789012345678901234567890123456789/foo.txt?a=b#L2-L3"
 	test(
@@ -170,8 +170,8 @@ func TestRender_links(t *testing.T) {
 		"http://142.42.1.1/",
 		`<p><a href="http://142.42.1.1/" rel="nofollow">http://142.42.1.1/</a></p>`)
 	test(
-		"https://github.com/go-gitea/gitea/?p=aaa/bbb.html#ccc-ddd",
-		`<p><a href="https://github.com/go-gitea/gitea/?p=aaa/bbb.html#ccc-ddd" rel="nofollow">https://github.com/go-gitea/gitea/?p=aaa/bbb.html#ccc-ddd</a></p>`)
+		"https://github.com/hanzoai/forge/?p=aaa/bbb.html#ccc-ddd",
+		`<p><a href="https://github.com/hanzoai/forge/?p=aaa/bbb.html#ccc-ddd" rel="nofollow">https://github.com/hanzoai/forge/?p=aaa/bbb.html#ccc-ddd</a></p>`)
 	test(
 		"https://en.wikipedia.org/wiki/URL_(disambiguation)",
 		`<p><a href="https://en.wikipedia.org/wiki/URL_(disambiguation)" rel="nofollow">https://en.wikipedia.org/wiki/URL_(disambiguation)</a></p>`)
@@ -182,11 +182,11 @@ func TestRender_links(t *testing.T) {
 		"https://stackoverflow.com/questions/2896191/what-is-go-used-fore",
 		`<p><a href="https://stackoverflow.com/questions/2896191/what-is-go-used-fore" rel="nofollow">https://stackoverflow.com/questions/2896191/what-is-go-used-fore</a></p>`)
 	test(
-		"https://username:password@gitea.com",
-		`<p><a href="https://username:password@gitea.com" rel="nofollow">https://username:password@gitea.com</a></p>`)
+		"https://username:password@forge.example",
+		`<p><a href="https://username:password@forge.example" rel="nofollow">https://username:password@forge.example</a></p>`)
 	test(
-		"ftp://gitea.com/file.txt",
-		`<p><a href="ftp://gitea.com/file.txt" rel="nofollow">ftp://gitea.com/file.txt</a></p>`)
+		"ftp://forge.example/file.txt",
+		`<p><a href="ftp://forge.example/file.txt" rel="nofollow">ftp://forge.example/file.txt</a></p>`)
 	test(
 		"magnet:?xt=urn:btih:5dee65101db281ac9c46344cd6b175cdcadabcde&dn=download",
 		`<p><a href="magnet:?xt=urn:btih:5dee65101db281ac9c46344cd6b175cdcadabcde&amp;dn=download" rel="nofollow">magnet:?xt=urn:btih:5dee65101db281ac9c46344cd6b175cdcadabcde&amp;dn=download</a></p>`)
@@ -223,8 +223,8 @@ func TestRender_links(t *testing.T) {
 		"www",
 		`<p>www</p>`)
 	test(
-		"ftps://gitea.com",
-		`<p>ftps://gitea.com</p>`)
+		"ftps://forge.example",
+		`<p>ftps://forge.example</p>`)
 
 	t.Run("LinkEllipsis", func(t *testing.T) {
 		input := util.EllipsisDisplayString("http://10.1.2.3", 12)
@@ -248,23 +248,23 @@ func TestRender_email(t *testing.T) {
 
 	// Text that should be turned into email link
 	test(
-		"info@gitea.com",
-		`<p><a href="mailto:info@gitea.com" rel="nofollow">info@gitea.com</a></p>`)
+		"info@forge.example",
+		`<p><a href="mailto:info@forge.example" rel="nofollow">info@forge.example</a></p>`)
 	test(
-		"(info@gitea.com)",
-		`<p>(<a href="mailto:info@gitea.com" rel="nofollow">info@gitea.com</a>)</p>`)
+		"(info@forge.example)",
+		`<p>(<a href="mailto:info@forge.example" rel="nofollow">info@forge.example</a>)</p>`)
 	test(
-		"[info@gitea.com]",
-		`<p>[<a href="mailto:info@gitea.com" rel="nofollow">info@gitea.com</a>]</p>`)
+		"[info@forge.example]",
+		`<p>[<a href="mailto:info@forge.example" rel="nofollow">info@forge.example</a>]</p>`)
 	test(
-		"info@gitea.com.",
-		`<p><a href="mailto:info@gitea.com" rel="nofollow">info@gitea.com</a>.</p>`)
+		"info@forge.example.",
+		`<p><a href="mailto:info@forge.example" rel="nofollow">info@forge.example</a>.</p>`)
 	test(
-		"firstname+lastname@gitea.com",
-		`<p><a href="mailto:firstname+lastname@gitea.com" rel="nofollow">firstname+lastname@gitea.com</a></p>`)
+		"firstname+lastname@forge.example",
+		`<p><a href="mailto:firstname+lastname@forge.example" rel="nofollow">firstname+lastname@forge.example</a></p>`)
 	test(
-		"send email to info@gitea.co.uk.",
-		`<p>send email to <a href="mailto:info@gitea.co.uk" rel="nofollow">info@gitea.co.uk</a>.</p>`)
+		"send email to info@forge.co.uk.",
+		`<p>send email to <a href="mailto:info@forge.co.uk" rel="nofollow">info@forge.co.uk</a>.</p>`)
 
 	test(
 		`j.doe@example.com,
@@ -282,24 +282,24 @@ func TestRender_email(t *testing.T) {
 	test("email@domain@domain.com", `<p>email@<a href="mailto:domain@domain.com" rel="nofollow">domain@domain.com</a></p>`)
 
 	// match GitHub behavior
-	test(`"info@gitea.com"`, `<p>&#34;<a href="mailto:info@gitea.com" rel="nofollow">info@gitea.com</a>&#34;</p>`)
+	test(`"info@forge.example"`, `<p>&#34;<a href="mailto:info@forge.example" rel="nofollow">info@forge.example</a>&#34;</p>`)
 
 	// Test that should *not* be turned into email links
 	test(
-		"/home/gitea/mailstore/info@gitea/com",
-		`<p>/home/gitea/mailstore/info@gitea/com</p>`)
+		"/home/forge/mailstore/info@forge/com",
+		`<p>/home/forge/mailstore/info@forge/com</p>`)
 	test(
-		"git@try.gitea.io:go-gitea/gitea.git",
-		`<p>git@try.gitea.io:go-gitea/gitea.git</p>`)
+		"git@try.forge.example:hanzoai/forge.git",
+		`<p>git@try.forge.example:hanzoai/forge.git</p>`)
 	test(
-		"https://foo:bar@gitea.io",
-		`<p><a href="https://foo:bar@gitea.io" rel="nofollow">https://foo:bar@gitea.io</a></p>`)
+		"https://foo:bar@forge.example",
+		`<p><a href="https://foo:bar@forge.example" rel="nofollow">https://foo:bar@forge.example</a></p>`)
 	test(
-		"gitea@3",
-		`<p>gitea@3</p>`)
+		"forge@3",
+		`<p>forge@3</p>`)
 	test(
-		"gitea@gmail.c",
-		`<p>gitea@gmail.c</p>`)
+		"forge@gmail.c",
+		`<p>forge@gmail.c</p>`)
 	test(
 		"email@domain..com",
 		`<p>email@domain..com</p>`)
@@ -495,7 +495,7 @@ func TestRender_ShortLinks(t *testing.T) {
 func Test_ParseClusterFuzz(t *testing.T) {
 	setting.AppURL = markup.TestAppURL
 
-	localMetas := map[string]string{"user": "go-gitea", "repo": "gitea"}
+	localMetas := map[string]string{"user": "hanzoai", "repo": "forge"}
 
 	data := "<A><maTH><tr><MN><bodY ÿ><temPlate></template><tH><tr></A><tH><d<bodY "
 
@@ -519,7 +519,7 @@ func TestPostProcess(t *testing.T) {
 
 	test := func(input, expected string) {
 		var res strings.Builder
-		err := markup.PostProcessDefault(markup.NewTestRenderContext(markup.TestAppURL, map[string]string{"user": "go-gitea", "repo": "gitea"}), strings.NewReader(input), &res)
+		err := markup.PostProcessDefault(markup.NewTestRenderContext(markup.TestAppURL, map[string]string{"user": "hanzoai", "repo": "forge"}), strings.NewReader(input), &res)
 		assert.NoError(t, err)
 		assert.Equal(t, strings.TrimSpace(expected), strings.TrimSpace(res.String()))
 	}
@@ -531,8 +531,8 @@ func TestPostProcess(t *testing.T) {
 
 	// But cross-referenced issue index should work.
 	test(
-		"go-gitea/gitea#12345",
-		`<a href="/go-gitea/gitea/issues/12345" class="ref-issue">go-gitea/gitea#12345</a>`)
+		"hanzoai/forge#12345",
+		`<a href="/hanzoai/forge/issues/12345" class="ref-issue">hanzoai/forge#12345</a>`)
 
 	// Test that other post-processing still works.
 	test(
@@ -559,8 +559,8 @@ func TestIssue16020(t *testing.T) {
 	setting.AppURL = markup.TestAppURL
 
 	localMetas := map[string]string{
-		"user": "go-gitea",
-		"repo": "gitea",
+		"user": "hanzoai",
+		"repo": "forge",
 	}
 
 	data := `<img src="data:image/png;base64,i//V"/>`

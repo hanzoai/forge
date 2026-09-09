@@ -265,7 +265,7 @@ func (r *Router) normalizeRequestPath(resp http.ResponseWriter, req *http.Reques
 		normalizedPath = buf.String()
 	}
 
-	// If the config tells Gitea to use a sub-url path directly without reverse proxy,
+	// If the config tells the forge to use a sub-url path directly without reverse proxy,
 	// then we need to remove the sub-url path from the request URL path.
 	// But "/v2" is special for OCI container registry, it should always be in the root of the site.
 	if setting.UseSubURLPath {

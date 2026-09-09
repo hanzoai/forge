@@ -53,7 +53,7 @@ func TestGenKeyPair(t *testing.T) {
 		})
 	}
 	t.Run("Generate unknown key type", func(t *testing.T) {
-		err := GenKeyPair(t.TempDir()+"gitea.badkey", "badkey", 0)
+		err := GenKeyPair(t.TempDir()+"forge.badkey", "badkey", 0)
 		require.Error(t, err)
 	})
 }

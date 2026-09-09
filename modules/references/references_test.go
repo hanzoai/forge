@@ -32,12 +32,12 @@ type testResult struct {
 
 func TestConvertFullHTMLReferencesToShortRefs(t *testing.T) {
 	re := regexp.MustCompile(`(\s|^|\(|\[)` +
-		regexp.QuoteMeta("https://ourgitea.com/git/") +
+		regexp.QuoteMeta("https://ourforge.example/git/") +
 		`([0-9a-zA-Z-_\.]+/[0-9a-zA-Z-_\.]+)/` +
 		`((?:issues)|(?:pulls))/([0-9]+)(?:\s|$|\)|\]|[:;,.?!]\s|[:;,.?!]$)`)
-	test := `this is a https://ourgitea.com/git/owner/repo/issues/123456789, foo
-https://ourgitea.com/git/owner/repo/pulls/123456789
-  And https://ourgitea.com/git/owner/repo/pulls/123
+	test := `this is a https://ourforge.example/git/owner/repo/issues/123456789, foo
+https://ourforge.example/git/owner/repo/pulls/123456789
+  And https://ourforge.example/git/owner/repo/pulls/123
 `
 	expect := `this is a owner/repo#123456789, foo
 owner/repo!123456789
@@ -107,7 +107,7 @@ func TestFindAllIssueReferences(t *testing.T) {
 			},
 		},
 		{
-			"This [four](http://gitea.com:3000/org3/repo4/issues/203) yes.",
+			"This [four](http://forge.example:3000/org3/repo4/issues/203) yes.",
 			[]testResult{
 				{203, "org3", "repo4", "203", false, XRefActionNone, nil, nil, ""},
 			},
@@ -117,24 +117,24 @@ func TestFindAllIssueReferences(t *testing.T) {
 			[]testResult{},
 		},
 		{
-			"This http://gitea.com:3000/user4/repo5/201 no, bad URL.",
+			"This http://forge.example:3000/user4/repo5/201 no, bad URL.",
 			[]testResult{},
 		},
 		{
-			"This http://gitea.com:3000/user4/repo5/pulls/202 yes.",
+			"This http://forge.example:3000/user4/repo5/pulls/202 yes.",
 			[]testResult{
 				{202, "user4", "repo5", "202", true, XRefActionNone, nil, nil, ""},
 			},
 		},
 		{
-			"This http://gitea.com:3000/user4/repo5/pulls/202 yes. http://gitea.com:3000/user4/repo5/pulls/203 no",
+			"This http://forge.example:3000/user4/repo5/pulls/202 yes. http://forge.example:3000/user4/repo5/pulls/203 no",
 			[]testResult{
 				{202, "user4", "repo5", "202", true, XRefActionNone, nil, nil, ""},
 				{203, "user4", "repo5", "203", true, XRefActionNone, nil, nil, ""},
 			},
 		},
 		{
-			"This http://GiTeA.COM:3000/user4/repo6/pulls/205 yes.",
+			"This http://FoRgE.EXAMPLE:3000/user4/repo6/pulls/205 yes.",
 			[]testResult{
 				{205, "user4", "repo6", "205", true, XRefActionNone, nil, nil, ""},
 			},
@@ -229,31 +229,31 @@ func TestFindAllIssueReferences(t *testing.T) {
 	testFixtures(t, fixtures, "default")
 
 	// Test closing/reopening keywords with URLs (issue #27549)
-	// Uses the same AppURL as testFixtures (https://gitea.com:3000/)
+	// Uses the same AppURL as testFixtures (https://forge.example:3000/)
 	urlFixtures := []testFixture{
 		{
-			"Closes [this issue](https://gitea.com:3000/user/repo/issues/123)",
+			"Closes [this issue](https://forge.example:3000/user/repo/issues/123)",
 			[]testResult{
 				{123, "user", "repo", "123", false, XRefActionCloses, nil, &RefSpan{Start: 0, End: 6}, ""},
 			},
 		},
 		{
-			"This fixes [#456](https://gitea.com:3000/org/project/issues/456)",
+			"This fixes [#456](https://forge.example:3000/org/project/issues/456)",
 			[]testResult{
 				{456, "org", "project", "456", false, XRefActionCloses, nil, &RefSpan{Start: 5, End: 10}, ""},
 			},
 		},
 		{
-			"Reopens [PR](https://gitea.com:3000/owner/repo/pulls/789)",
+			"Reopens [PR](https://forge.example:3000/owner/repo/pulls/789)",
 			[]testResult{
 				{789, "owner", "repo", "789", true, XRefActionReopens, nil, &RefSpan{Start: 0, End: 7}, ""},
 			},
 		},
 		{
-			"See [issue](https://gitea.com:3000/user/repo/issues/100) but closes [another](https://gitea.com:3000/user/repo/issues/200)",
+			"See [issue](https://forge.example:3000/user/repo/issues/100) but closes [another](https://forge.example:3000/user/repo/issues/200)",
 			[]testResult{
 				{100, "user", "repo", "100", false, XRefActionNone, nil, nil, ""},
-				{200, "user", "repo", "200", false, XRefActionCloses, nil, &RefSpan{Start: 61, End: 67}, ""},
+				{200, "user", "repo", "200", false, XRefActionCloses, nil, &RefSpan{Start: 65, End: 71}, ""},
 			},
 		},
 	}
@@ -262,16 +262,16 @@ func TestFindAllIssueReferences(t *testing.T) {
 
 	// Test bare URLs (not markdown links) with closing keywords
 	// These use FindAllIssueReferences (non-markdown) which converts full URLs to short refs first
-	setting.AppURL = "https://gitea.com:3000/"
+	setting.AppURL = "https://forge.example:3000/"
 	bareURLTests := []struct {
 		name     string
 		input    string
 		expected XRefAction
 	}{
-		{"Fixes bare URL", "Fixes https://gitea.com:3000/org/project/issues/456", XRefActionCloses},
-		{"Fixes with colon", "Fixes: https://gitea.com:3000/org/project/issues/456", XRefActionCloses},
-		{"Closes bare URL", "Closes https://gitea.com:3000/user/repo/issues/123", XRefActionCloses},
-		{"Closes with colon", "Closes: https://gitea.com:3000/user/repo/issues/123", XRefActionCloses},
+		{"Fixes bare URL", "Fixes https://forge.example:3000/org/project/issues/456", XRefActionCloses},
+		{"Fixes with colon", "Fixes: https://forge.example:3000/org/project/issues/456", XRefActionCloses},
+		{"Closes bare URL", "Closes https://forge.example:3000/user/repo/issues/123", XRefActionCloses},
+		{"Closes with colon", "Closes: https://forge.example:3000/user/repo/issues/123", XRefActionCloses},
 	}
 
 	for _, tt := range bareURLTests {
@@ -321,7 +321,7 @@ func TestFindAllIssueReferences(t *testing.T) {
 func testFixtures(t *testing.T, fixtures []testFixture, context string) {
 	// Save original value for other tests that may rely on it
 	prevURL := setting.AppURL
-	setting.AppURL = "https://gitea.com:3000/"
+	setting.AppURL = "https://forge.example:3000/"
 
 	for _, fixture := range fixtures {
 		expraw := make([]*rawReference, len(fixture.expected))
@@ -373,42 +373,42 @@ func TestFindRenderizableCommitCrossReference(t *testing.T) {
 			Expected: nil,
 		},
 		{
-			Input:    "go-gitea/gitea@test",
+			Input:    "hanzoai/forge@test",
 			Expected: nil,
 		},
 		{
-			Input:    "go-gitea/gitea@ab1234",
+			Input:    "hanzoai/forge@ab1234",
 			Expected: nil,
 		},
 		{
-			Input: "go-gitea/gitea@abcd1234",
+			Input: "hanzoai/forge@abcd1234",
 			Expected: &RenderizableReference{
-				Owner:       "go-gitea",
-				Name:        "gitea",
+				Owner:       "hanzoai",
+				Name:        "forge",
 				CommitSha:   "abcd1234",
-				RefLocation: &RefSpan{Start: 0, End: 23},
+				RefLocation: &RefSpan{Start: 0, End: 22},
 			},
 		},
 		{
-			Input: "go-gitea/gitea@abcd1234abcd1234abcd1234abcd1234abcd1234",
+			Input: "hanzoai/forge@abcd1234abcd1234abcd1234abcd1234abcd1234",
 			Expected: &RenderizableReference{
-				Owner:       "go-gitea",
-				Name:        "gitea",
+				Owner:       "hanzoai",
+				Name:        "forge",
 				CommitSha:   "abcd1234abcd1234abcd1234abcd1234abcd1234",
-				RefLocation: &RefSpan{Start: 0, End: 55},
+				RefLocation: &RefSpan{Start: 0, End: 54},
 			},
 		},
 		{
-			Input:    "go-gitea/gitea@abcd1234abcd1234abcd1234abcd1234abcd12341234512345123451234512345", // longer than 64 characters
+			Input:    "hanzoai/forge@abcd1234abcd1234abcd1234abcd1234abcd12341234512345123451234512345", // longer than 64 characters
 			Expected: nil,
 		},
 		{
-			Input: "test go-gitea/gitea@abcd1234 test",
+			Input: "test hanzoai/forge@abcd1234 test",
 			Expected: &RenderizableReference{
-				Owner:       "go-gitea",
-				Name:        "gitea",
+				Owner:       "hanzoai",
+				Name:        "forge",
 				CommitSha:   "abcd1234",
-				RefLocation: &RefSpan{Start: 5, End: 28},
+				RefLocation: &RefSpan{Start: 5, End: 27},
 			},
 		},
 	}
@@ -430,24 +430,24 @@ func TestRegExp_mentionPattern(t *testing.T) {
 		{"@xxx-DiN0-z-A..uru..s-xxx", "@xxx-DiN0-z-A..uru..s-xxx"},
 		{"   @lol   ", "@lol"},
 		{" @Te-st", "@Te-st"},
-		{"(@gitea)", "@gitea"},
-		{"[@gitea]", "@gitea"},
-		{"@gitea! this", "@gitea"},
-		{"@gitea? this", "@gitea"},
-		{"@gitea. this", "@gitea"},
-		{"@gitea, this", "@gitea"},
-		{"@gitea; this", "@gitea"},
-		{"@gitea!\nthis", "@gitea"},
-		{"\n@gitea?\nthis", "@gitea"},
-		{"\t@gitea.\nthis", "@gitea"},
-		{"@gitea,\nthis", "@gitea"},
-		{"@gitea;\nthis", "@gitea"},
-		{"@gitea!", "@gitea"},
-		{"@gitea?", "@gitea"},
-		{"@gitea.", "@gitea"},
-		{"@gitea,", "@gitea"},
-		{"@gitea;", "@gitea"},
-		{"@gitea/team1;", "@gitea/team1"},
+		{"(@forge)", "@forge"},
+		{"[@forge]", "@forge"},
+		{"@forge! this", "@forge"},
+		{"@forge? this", "@forge"},
+		{"@forge. this", "@forge"},
+		{"@forge, this", "@forge"},
+		{"@forge; this", "@forge"},
+		{"@forge!\nthis", "@forge"},
+		{"\n@forge?\nthis", "@forge"},
+		{"\t@forge.\nthis", "@forge"},
+		{"@forge,\nthis", "@forge"},
+		{"@forge;\nthis", "@forge"},
+		{"@forge!", "@forge"},
+		{"@forge?", "@forge"},
+		{"@forge.", "@forge"},
+		{"@forge,", "@forge"},
+		{"@forge;", "@forge"},
+		{"@forge/team1;", "@forge/team1"},
 		{"@user's idea", "@user"},
 	}
 	falseTestCases := []string{
@@ -457,14 +457,14 @@ func TestRegExp_mentionPattern(t *testing.T) {
 		"",
 		"ABC",
 		"@.ABC",
-		"/home/gitea/@gitea",
-		"\"@gitea\"",
-		"@@gitea",
-		"@gitea!this",
-		"@gitea?this",
-		"@gitea,this",
-		"@gitea;this",
-		"@gitea/team1/more",
+		"/home/forge/@forge",
+		"\"@forge\"",
+		"@@forge",
+		"@forge!this",
+		"@forge?this",
+		"@forge,this",
+		"@forge;this",
+		"@forge/team1/more",
 	}
 
 	for _, testCase := range trueTestCases {
@@ -532,7 +532,7 @@ func TestRegExp_issueAlphanumericPattern(t *testing.T) {
 		"ABC",
 		"GG-",
 		"rm-1",
-		"/home/gitea/ABC-1234",
+		"/home/forge/ABC-1234",
 		"MY-STRING-ABC-123",
 	}
 

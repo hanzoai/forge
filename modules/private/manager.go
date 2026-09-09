@@ -106,7 +106,7 @@ func RemoveLogger(ctx context.Context, logger, writer string) ResponseExtra {
 	return requestJSONClientMsg(req, "Removed")
 }
 
-// Processes return the current processes from this gitea instance
+// Processes return the current processes from this forge instance
 func Processes(ctx context.Context, out io.Writer, flat, noSystem, stacktraces, json bool, cancel string) ResponseExtra {
 	reqURL := internalURL(fmt.Sprintf("manager/processes?flat=%t&no-system=%t&stacktraces=%t&json=%t&cancel-pid=%s", flat, noSystem, stacktraces, json, url.QueryEscape(cancel)))
 

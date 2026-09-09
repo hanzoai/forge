@@ -90,8 +90,8 @@ func TestRender_IssueIndexPattern(t *testing.T) {
 	test("test!1234")
 	test("!1234test")
 	test(" test !1234test")
-	test("/home/gitea/#1234")
-	test("/home/gitea/!1234")
+	test("/home/forge/#1234")
+	test("/home/forge/!1234")
 
 	// should not render issue mention without leading space
 	test("test#54321 issue")
@@ -299,7 +299,7 @@ func TestRender_AutoLink(t *testing.T) {
 	test(tmp, "<a href=\""+tmp+"\" class=\"commit\"><code>d8a994ef24 (diff-2)</code></a>")
 
 	// render other commit URLs
-	tmp = "https://external-link.gitea.io/go-gitea/gitea/commit/d8a994ef243349f321568f9e36d5c3f444b99cae#diff-2"
+	tmp = "https://external-link.forge.example/hanzoai/forge/commit/d8a994ef243349f321568f9e36d5c3f444b99cae#diff-2"
 	test(tmp, "<a href=\""+tmp+"\">"+tmp+"</a>")
 }
 

@@ -17,10 +17,10 @@ import (
 
 func TestParseImageConfig(t *testing.T) {
 	description := "Image Description"
-	author := "Gitea"
+	author := "Forge"
 	license := "MIT"
-	projectURL := "https://gitea.com"
-	repositoryURL := "https://gitea.com/gitea"
+	projectURL := "https://forge.example"
+	repositoryURL := "https://forge.example/forge"
 	documentationURL := "https://docs.hanzo.ai"
 
 	// FIXME: JSON-KEY-CASE: the test case is not right, the config fields are capitalized in the spec

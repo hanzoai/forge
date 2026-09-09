@@ -4,7 +4,7 @@
 
 package gtprof
 
-// This is a Gitea-specific profiling package,
+// This is a forge-specific profiling package,
 // the name is chosen to distinguish it from the standard pprof tool and "GNU gprof"
 
 // LabelGracefulLifecycle is a label marking manager lifecycle phase

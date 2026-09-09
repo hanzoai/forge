@@ -136,7 +136,7 @@ func goldmarkDefaultParser() parser.Parser {
 	)
 }
 
-// SpecializedMarkdown sets up the Gitea specific markdown extensions
+// SpecializedMarkdown sets up the forge-specific markdown extensions
 func SpecializedMarkdown(ctx *markup.RenderContext) *GoldmarkRender {
 	// TODO: it could use a pool to cache the renderers to reuse them with different contexts
 	// at the moment it is fast enough (see the benchmarks)

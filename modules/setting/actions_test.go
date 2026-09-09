@@ -207,7 +207,7 @@ DEFAULT_ACTIONS_URL = self
 			name: "custom url",
 			iniStr: `
 [actions]
-DEFAULT_ACTIONS_URL = https://gitea.com
+DEFAULT_ACTIONS_URL = https://forge.example
 `,
 			wantErr: assert.NoError,
 			wantURL: "https://github.com",
@@ -216,7 +216,7 @@ DEFAULT_ACTIONS_URL = https://gitea.com
 			name: "custom urls",
 			iniStr: `
 [actions]
-DEFAULT_ACTIONS_URL = https://gitea.com,https://github.com
+DEFAULT_ACTIONS_URL = https://forge.example,https://github.com
 `,
 			wantErr: assert.NoError,
 			wantURL: "https://github.com",

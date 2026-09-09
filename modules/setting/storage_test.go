@@ -14,28 +14,28 @@ import (
 func Test_getStorageMultipleName(t *testing.T) {
 	iniStr := `
 [lfs]
-S3_BUCKET = gitea-lfs
+S3_BUCKET = forge-lfs
 
 [attachment]
-S3_BUCKET = gitea-attachment
+S3_BUCKET = forge-attachment
 
 [storage]
 STORAGE_TYPE = s3
-S3_BUCKET = gitea-storage
+S3_BUCKET = forge-storage
 `
 	cfg, err := NewConfigProviderFromData(iniStr)
 	assert.NoError(t, err)
 
 	assert.NoError(t, loadAttachmentFrom(cfg))
-	assert.Equal(t, "gitea-attachment", Attachment.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-attachment", Attachment.Storage.S3Config.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.S3Config.BasePath)
 
 	assert.NoError(t, loadLFSFrom(cfg))
-	assert.Equal(t, "gitea-lfs", LFS.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-lfs", LFS.Storage.S3Config.Bucket)
 	assert.Equal(t, "lfs/", LFS.Storage.S3Config.BasePath)
 
 	assert.NoError(t, loadAvatarsFrom(cfg))
-	assert.Equal(t, "gitea-storage", Avatar.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-storage", Avatar.Storage.S3Config.Bucket)
 	assert.Equal(t, "avatars/", Avatar.Storage.S3Config.BasePath)
 }
 
@@ -82,17 +82,17 @@ STORAGE_TYPE = lfs
 
 [storage.lfs]
 STORAGE_TYPE = s3
-S3_BUCKET = gitea-storage
+S3_BUCKET = forge-storage
 `
 	cfg, err := NewConfigProviderFromData(iniStr)
 	assert.NoError(t, err)
 
 	assert.NoError(t, loadAttachmentFrom(cfg))
-	assert.Equal(t, "gitea-storage", Attachment.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-storage", Attachment.Storage.S3Config.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.S3Config.BasePath)
 
 	assert.NoError(t, loadLFSFrom(cfg))
-	assert.Equal(t, "gitea-storage", LFS.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-storage", LFS.Storage.S3Config.Bucket)
 	assert.Equal(t, "lfs/", LFS.Storage.S3Config.BasePath)
 }
 

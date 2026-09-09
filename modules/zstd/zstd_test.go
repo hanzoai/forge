@@ -229,10 +229,10 @@ func TestSeekableWriterReader(t *testing.T) {
 // Random data is not suitable for testing compression,
 // so it collects code files from the project to get enough data.
 func prepareTestData(t *testing.T, size int) []byte {
-	// .../gitea/modules/zstd
+	// .../forge/modules/zstd
 	dir, err := os.Getwd()
 	require.NoError(t, err)
-	// .../gitea/
+	// .../forge/
 	dir = filepath.Join(dir, "../../")
 
 	textExt := []string{".go", ".tmpl", ".ts", ".yml", ".css"} // add more if not enough data collected

@@ -25,7 +25,7 @@ func (i *Indexer) Init(_ context.Context) (bool, error) {
 // Ping checks if the indexer is available
 func (i *Indexer) Ping(_ context.Context) error {
 	// No need to ping database to check if it is available.
-	// If the database goes down, Gitea will go down, so nobody will care if the indexer is available.
+	// If the database goes down, the forge will go down, so nobody will care if the indexer is available.
 	return nil
 }
 

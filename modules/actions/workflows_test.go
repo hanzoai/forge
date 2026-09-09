@@ -50,13 +50,13 @@ func TestIsWorkflow(t *testing.T) {
 			expected: true,
 		},
 		{
-			name:     "only gitea configured, github path rejected",
+			name:     "only forge configured, github path rejected",
 			dirs:     []string{".hanzo/workflows"},
 			path:     ".github/workflows/test.yml",
 			expected: false,
 		},
 		{
-			name:     "only github configured, gitea path rejected",
+			name:     "only github configured, forge path rejected",
 			dirs:     []string{".github/workflows"},
 			path:     ".hanzo/workflows/test.yml",
 			expected: false,

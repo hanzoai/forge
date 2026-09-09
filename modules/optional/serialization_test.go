@@ -21,7 +21,7 @@ type testSerializationStruct struct {
 	OptBool      optional.Option[bool] `json:"optional_bool,omitempty" yaml:"optional_bool,omitempty"`
 
 	// It causes an undefined behavior: should the "omitempty" tag only omit "null", or also the empty string?
-	// The behavior is inconsistent between json and v2 packages, and there is no such use case in Gitea.
+	// The behavior is inconsistent between json and v2 packages, and there is no such use case in the forge.
 	// If anyone really needs it, they can use json.MarshalKeepOptionalEmpty to revert the v1 behavior
 	OptString optional.Option[string] `json:"optional_string,omitempty" yaml:"optional_string,omitempty"`
 
@@ -57,7 +57,7 @@ func TestOptionalToJson(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			b, err := json.MarshalKeepOptionalEmpty(tc.obj)
 			assert.NoError(t, err)
-			assert.Equal(t, tc.want, string(b), "gitea json module returned unexpected")
+			assert.Equal(t, tc.want, string(b), "forge json module returned unexpected")
 
 			b, err = std_json.Marshal(tc.obj)
 			assert.NoError(t, err)
@@ -95,7 +95,7 @@ func TestOptionalFromJson(t *testing.T) {
 			var obj1 testSerializationStruct
 			err := json.Unmarshal([]byte(tc.data), &obj1)
 			assert.NoError(t, err)
-			assert.Equal(t, tc.want, obj1, "gitea json module returned unexpected")
+			assert.Equal(t, tc.want, obj1, "forge json module returned unexpected")
 
 			var obj2 testSerializationStruct
 			err = std_json.Unmarshal([]byte(tc.data), &obj2)

@@ -24,13 +24,13 @@ func TestParsePackage(t *testing.T) {
 	packageVersion := "1.0.1-pre"
 	packageTag := "latest"
 	packageAuthor := "KN4CK3R"
-	packageBin := "gitea"
+	packageBin := "forge"
 	packageDescription := "Test Description"
 	data := "H4sIAAAAAAAA/ytITM5OTE/VL4DQelnF+XkMVAYGBgZmJiYK2MRBwNDcSIHB2NTMwNDQzMwAqA7IMDUxA9LUdgg2UFpcklgEdAql5kD8ogCnhwio5lJQUMpLzE1VslJQcihOzi9I1S9JLS7RhSYIJR2QgrLUouLM/DyQGkM9Az1D3YIiqExKanFyUWZBCVQ2BKhVwQVJDKwosbQkI78IJO/tZ+LsbRykxFXLNdA+HwWjYBSMgpENACgAbtAACAAA"
 	integrity := "sha512-yA4FJsVhetynGfOC1jFf79BuS+jrHbm0fhh+aHzCQkOaOBXKf9oBnC4a6DnLLnEsHQDRLYd00cwj8sCXpC+wIg=="
 	repository := Repository{
 		Type:      "native",
-		URL:       "http://localhost:3000/gitea/test.git",
+		URL:       "http://localhost:3000/forge/test.git",
 		Directory: "packages/test-package",
 	}
 
@@ -256,7 +256,7 @@ func TestParsePackage(t *testing.T) {
 						Description: packageDescription,
 						Author:      User{Name: packageAuthor},
 						License:     "MIT",
-						Homepage:    "https://gitea.io/",
+						Homepage:    "https://forge.example/",
 						Readme:      packageDescription,
 						Dependencies: map[string]string{
 							"package": "1.2.0",
@@ -295,7 +295,7 @@ func TestParsePackage(t *testing.T) {
 		assert.Equal(t, packageAuthor, p.Metadata.Author)
 		assert.Equal(t, packageBin, p.Metadata.Bin["bin"])
 		assert.Equal(t, "MIT", string(p.Metadata.License))
-		assert.Equal(t, "https://gitea.io/", p.Metadata.ProjectURL)
+		assert.Equal(t, "https://forge.example/", p.Metadata.ProjectURL)
 		assert.Contains(t, p.Metadata.Dependencies, "package")
 		assert.Equal(t, "1.2.0", p.Metadata.Dependencies["package"])
 		assert.Equal(t, repository.Type, p.Metadata.Repository.Type)
@@ -336,7 +336,7 @@ func TestParsePackage(t *testing.T) {
 			"name": "dev-null",
 			"version": "0.1.1",
 			"bin": "./cli.js",
-			"repository": "https://gitea.io/gitea/test.git",
+			"repository": "https://forge.example/forge/test.git",
 			"dist": {
 				"integrity": "sha256-"
 			}
@@ -350,7 +350,7 @@ func TestParsePackage(t *testing.T) {
 }`
 		p, err := ParsePackage(strings.NewReader(packageJSON))
 		require.NoError(t, err)
-		require.Equal(t, "https://gitea.io/gitea/test.git", p.Metadata.Repository.URL)
+		require.Equal(t, "https://forge.example/forge/test.git", p.Metadata.Repository.URL)
 		// a string bin is named after the package
 		require.Equal(t, "./cli.js", p.Metadata.Bin["dev-null"])
 	})

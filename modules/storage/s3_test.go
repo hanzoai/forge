@@ -23,7 +23,7 @@ func TestS3Storage(t *testing.T) {
 			Endpoint:        endpoint,
 			AccessKeyID:     "123456",
 			SecretAccessKey: "12345678",
-			Bucket:          "gitea",
+			Bucket:          "forge",
 			Location:        "us-east-1",
 		},
 	}

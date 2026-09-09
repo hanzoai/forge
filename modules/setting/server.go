@@ -54,12 +54,12 @@ var (
 	// PublicURLDetection controls how to use the HTTP request headers to detect public URL
 	PublicURLDetection string
 
-	// AppSubURL represents the sub-url mounting point for gitea, parsed from "ROOT_URL"
+	// AppSubURL represents the sub-url mounting point for the forge, parsed from "ROOT_URL"
 	// It is either "" or starts with '/' and ends without '/', such as '/{sub-path}'.
 	// This value is empty if site does not have sub-url.
 	AppSubURL string
 
-	// UseSubURLPath makes Gitea handle requests with sub-path like "/sub-path/owner/repo/...",
+	// UseSubURLPath makes the forge handle requests with sub-path like "/sub-path/owner/repo/...",
 	// to make it easier to debug sub-path related problems without a reverse proxy.
 	UseSubURLPath bool
 
@@ -67,7 +67,7 @@ var (
 	// It maps to ini:"APP_DATA_PATH" in [server] and defaults to AppWorkPath + "/data"
 	AppDataPath string
 
-	// LocalURL is the url for locally running applications to contact Gitea. It always has a '/' suffix
+	// LocalURL is the url for locally running applications to contact the forge. It always has a '/' suffix
 	// It maps to ini:"LOCAL_ROOT_URL" in [server]
 	LocalURL string
 

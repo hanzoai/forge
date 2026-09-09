@@ -60,7 +60,7 @@ func (n *FootnoteLink) Dump(source []byte, level int) {
 }
 
 // KindFootnoteLink is a NodeKind of the FootnoteLink node.
-var KindFootnoteLink = ast.NewNodeKind("GiteaFootnoteLink")
+var KindFootnoteLink = ast.NewNodeKind("ForgeFootnoteLink")
 
 // Kind implements Node.Kind.
 func (n *FootnoteLink) Kind() ast.NodeKind {
@@ -92,7 +92,7 @@ func (n *FootnoteBackLink) Dump(source []byte, level int) {
 }
 
 // KindFootnoteBackLink is a NodeKind of the FootnoteBackLink node.
-var KindFootnoteBackLink = ast.NewNodeKind("GiteaFootnoteBackLink")
+var KindFootnoteBackLink = ast.NewNodeKind("ForgeFootnoteBackLink")
 
 // Kind implements Node.Kind.
 func (n *FootnoteBackLink) Kind() ast.NodeKind {
@@ -126,7 +126,7 @@ func (n *Footnote) Dump(source []byte, level int) {
 }
 
 // KindFootnote is a NodeKind of the Footnote node.
-var KindFootnote = ast.NewNodeKind("GiteaFootnote")
+var KindFootnote = ast.NewNodeKind("ForgeFootnote")
 
 // Kind implements Node.Kind.
 func (n *Footnote) Kind() ast.NodeKind {
@@ -157,7 +157,7 @@ func (n *FootnoteList) Dump(source []byte, level int) {
 }
 
 // KindFootnoteList is a NodeKind of the FootnoteList node.
-var KindFootnoteList = ast.NewNodeKind("GiteaFootnoteList")
+var KindFootnoteList = ast.NewNodeKind("ForgeFootnoteList")
 
 // Kind implements Node.Kind.
 func (n *FootnoteList) Kind() ast.NodeKind {
@@ -472,10 +472,10 @@ func (r *FootnoteHTMLRenderer) renderFootnoteList(w util.BufWriter, source []byt
 
 type footnoteExtension struct{}
 
-// FootnoteExtension represents the Gitea Footnote
+// FootnoteExtension represents the Forge footnote
 var FootnoteExtension = &footnoteExtension{}
 
-// Extend extends the markdown converter with the Gitea Footnote parser
+// Extend extends the markdown converter with the Forge footnote parser
 func (e *footnoteExtension) Extend(m goldmark.Markdown) {
 	m.Parser().AddOptions(
 		parser.WithBlockParsers(

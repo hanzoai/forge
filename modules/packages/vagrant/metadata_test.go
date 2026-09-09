@@ -17,10 +17,10 @@ import (
 )
 
 const (
-	author        = "gitea"
+	author        = "forge"
 	description   = "Package Description"
-	projectURL    = "https://gitea.io"
-	repositoryURL = "https://gitea.io/gitea/gitea"
+	projectURL    = "https://forge.example"
+	repositoryURL = "https://forge.example/forge/forge"
 )
 
 func TestParseMetadataFromBox(t *testing.T) {

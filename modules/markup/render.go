@@ -35,7 +35,7 @@ const (
 )
 
 var RenderBehaviorForTesting struct {
-	// Gitea will emit some additional attributes for various purposes, these attributes don't affect rendering.
+	// The forge will emit some additional attributes for various purposes, these attributes don't affect rendering.
 	// But there are too many hard-coded test cases, to avoid changing all of them again and again, we can disable emitting these internal attributes.
 	DisableAdditionalAttributes bool
 }

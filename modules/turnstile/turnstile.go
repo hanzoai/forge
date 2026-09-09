@@ -18,7 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/util"
 )
 
-// httpClient returns an HTTP client that honors Gitea's proxy configuration.
+// httpClient returns an HTTP client that honors the forge's proxy configuration.
 var httpClient = util.OnceValue[*http.Client]{
 	Func: func() *http.Client {
 		transport := http.DefaultTransport.(*http.Transport).Clone()

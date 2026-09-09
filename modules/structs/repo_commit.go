@@ -69,9 +69,9 @@ type Commit struct {
 	HTMLURL string `json:"html_url"`
 	// RepoCommit contains the commit information
 	RepoCommit *RepoCommit `json:"commit"`
-	// Author is the GitHub/Gitea user who authored the commit
+	// Author is the GitHub/Forge user who authored the commit
 	Author *User `json:"author"`
-	// Committer is the GitHub/Gitea user who committed the commit
+	// Committer is the GitHub/Forge user who committed the commit
 	Committer *User `json:"committer"`
 	// Parents contains the parent commit information
 	Parents []*CommitMeta `json:"parents"`

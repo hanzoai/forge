@@ -18,9 +18,9 @@ func TestParsePackage(t *testing.T) {
 	const (
 		description = "Package Description"
 		author      = "KN4CK3R"
-		homepage    = "https://gitea.io/"
+		homepage    = "https://forge.example/"
 		license     = "MIT"
-		payload     = "gitea test dummy payload" // a fake payload for test only
+		payload     = "forge test dummy payload" // a fake payload for test only
 	)
 	makeDefaultPackageMeta := func(name, version string) string {
 		return `{
@@ -100,13 +100,13 @@ func TestParsePackage(t *testing.T) {
          "version_req":"1.0"
       }
    ],
-   "homepage":"https://gitea.io/",
+   "homepage":"https://forge.example/",
    "license":"MIT"
 }`)
 		cp, err := ParsePackage(data)
 		assert.NoError(t, err)
 		assert.Equal(t, "test-pkg", cp.Name)
-		assert.Equal(t, "https://gitea.io/", cp.Metadata.ProjectURL)
+		assert.Equal(t, "https://forge.example/", cp.Metadata.ProjectURL)
 		assert.Equal(t, "dep-explicit", cp.Metadata.Dependencies[0].Name)
 		assert.Equal(t, "dep-renamed", *cp.Metadata.Dependencies[0].Package)
 	})

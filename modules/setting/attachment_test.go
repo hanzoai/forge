@@ -14,7 +14,7 @@ func Test_getStorageCustomType(t *testing.T) {
 	iniStr := `
 [attachment]
 STORAGE_TYPE = my_s3
-S3_BUCKET = gitea-attachment
+S3_BUCKET = forge-attachment
 
 [storage.my_s3]
 STORAGE_TYPE = s3
@@ -27,7 +27,7 @@ S3_ENDPOINT = my_s3:9000
 
 	assert.EqualValues(t, "s3", Attachment.Storage.Type)
 	assert.Equal(t, "my_s3:9000", Attachment.Storage.S3Config.Endpoint)
-	assert.Equal(t, "gitea-attachment", Attachment.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-attachment", Attachment.Storage.S3Config.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.S3Config.BasePath)
 }
 
@@ -37,7 +37,7 @@ func Test_getStorageTypeSectionOverridesStorageSection(t *testing.T) {
 STORAGE_TYPE = s3
 
 [storage.s3]
-S3_BUCKET = gitea-s3
+S3_BUCKET = forge-s3
 
 [storage]
 S3_BUCKET = gitea
@@ -48,7 +48,7 @@ S3_BUCKET = gitea
 	assert.NoError(t, loadAttachmentFrom(cfg))
 
 	assert.EqualValues(t, "s3", Attachment.Storage.Type)
-	assert.Equal(t, "gitea-s3", Attachment.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-s3", Attachment.Storage.S3Config.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.S3Config.BasePath)
 }
 
@@ -56,7 +56,7 @@ func Test_getStorageSpecificOverridesStorage(t *testing.T) {
 	iniStr := `
 [attachment]
 STORAGE_TYPE = s3
-S3_BUCKET = gitea-attachment
+S3_BUCKET = forge-attachment
 
 [storage.attachments]
 S3_BUCKET = gitea
@@ -70,7 +70,7 @@ STORAGE_TYPE = local
 	assert.NoError(t, loadAttachmentFrom(cfg))
 
 	assert.EqualValues(t, "s3", Attachment.Storage.Type)
-	assert.Equal(t, "gitea-attachment", Attachment.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge-attachment", Attachment.Storage.S3Config.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.S3Config.BasePath)
 }
 

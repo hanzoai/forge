@@ -39,7 +39,7 @@ type ServeHeaderOptions struct {
 }
 
 const (
-	// Disable JS execution on the same origin, since we serve the file from the same origin as Gitea server.
+	// Disable JS execution on the same origin, since we serve the file from the same origin as the forge server.
 	// This rule can be relaxed in the future as long as it is properly sandboxed.
 	// "style-src" is for SVG inline styles (from Display SVG files as images instead of text #14101)
 	serveHeaderCspDefault = "default-src 'none'; style-src 'unsafe-inline'; sandbox"
@@ -50,7 +50,7 @@ const (
 	// HINT: PDF-RENDER-SANDBOX: PDF won't render in sandboxed context
 	serveHeaderCspPdf = "default-src 'none'; style-src 'unsafe-inline'"
 
-	// For audios and videos, actually it doesn't really need CSP (just like Gitea <= 1.25)
+	// For audios and videos, actually it doesn't really need CSP (just like the forge <= 1.25)
 	serveHeaderCspAudioVideo = ""
 )
 

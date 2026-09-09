@@ -61,8 +61,8 @@ func TestDecodeEnvironmentKey(t *testing.T) {
 	assert.Equal(t, "KEY", key)
 	assert.False(t, file)
 
-	// with "__FILE" suffix, it doesn't support to write "[sec].FILE" to config (no such key FILE is used in Gitea)
-	// but it could be fixed in the future by adding a new suffix like "__VALUE" (no such key VALUE is used in Gitea either)
+	// with "__FILE" suffix, it doesn't support to write "[sec].FILE" to config (no such key FILE is used in the forge)
+	// but it could be fixed in the future by adding a new suffix like "__VALUE" (no such key VALUE is used in the forge either)
 	ok, section, key, file = decodeEnvironmentKey(prefix, suffix, "GIT__SEC__FILE")
 	assert.False(t, ok)
 	assert.Empty(t, section)

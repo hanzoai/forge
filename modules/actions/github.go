@@ -69,7 +69,7 @@ func IsDefaultBranchWorkflow(triggedEvent webhook_module.HookEventType) bool {
 	return false
 }
 
-// canGithubEventMatch check if the input Github event can match any Gitea event.
+// canGithubEventMatch check if the input Github event can match any forge event.
 func canGithubEventMatch(eventName string, triggedEvent webhook_module.HookEventType) bool {
 	switch eventName {
 	case GithubEventRegistryPackage:

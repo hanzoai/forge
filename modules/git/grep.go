@@ -50,10 +50,10 @@ func GrepSearch(ctx context.Context, repo *Repository, search string, opts GrepO
 	 The output is like this ( "^@" means \x00):
 
 	 HEAD:.air.toml
-	 6^@bin = "gitea"
+	 6^@bin = "forge"
 
 	 HEAD:.changelog.yml
-	 2^@repo: go-gitea/gitea
+	 2^@repo: hanzoai/forge
 	*/
 	var results []*GrepResult
 	cmd := gitcmd.NewCommand("grep", "--null", "--break", "--heading", "--line-number", "--full-name")

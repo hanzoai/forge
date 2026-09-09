@@ -6,7 +6,7 @@ package math
 
 import (
 	"github.com/hanzoai/git/modules/markup/internal"
-	giteaUtil "github.com/hanzoai/git/modules/util"
+	forgeUtil "github.com/hanzoai/git/modules/util"
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
@@ -30,7 +30,7 @@ type Extension struct {
 
 // NewExtension creates a new math extension with the provided options
 func NewExtension(renderInternal *internal.RenderInternal, opts ...Options) *Extension {
-	opt := giteaUtil.OptionalArg(opts)
+	opt := forgeUtil.OptionalArg(opts)
 	r := &Extension{
 		renderInternal: renderInternal,
 		options:        opt,

@@ -13,11 +13,11 @@ import (
 	"github.com/hanzoai/git/modules/log"
 )
 
-// OAuth2UsernameType is enum describing the way gitea generates its 'username' from oauth2 data
+// OAuth2UsernameType is enum describing the way the forge generates its 'username' from oauth2 data
 type OAuth2UsernameType string
 
 const (
-	OAuth2UsernameUserid            OAuth2UsernameType = "userid"             // use user id (sub) field as gitea's username
+	OAuth2UsernameUserid            OAuth2UsernameType = "userid"             // use user id (sub) field as the forge's username
 	OAuth2UsernameNickname          OAuth2UsernameType = "nickname"           // use nickname field
 	OAuth2UsernameEmail             OAuth2UsernameType = "email"              // use email field
 	OAuth2UsernamePreferredUsername OAuth2UsernameType = "preferred_username" // use preferred_username field

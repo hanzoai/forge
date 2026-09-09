@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	packageName    = "gitea.com/go-gitea/gitea"
+	packageName    = "forge.example/hanzoai/forge"
 	packageVersion = "v0.0.1"
 )
 
@@ -57,7 +57,7 @@ func TestParsePackage(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, packageName, p.Name)
 		assert.Equal(t, packageVersion, p.Version)
-		assert.Equal(t, "module gitea.com/go-gitea/gitea", p.GoMod)
+		assert.Equal(t, "module forge.example/hanzoai/forge", p.GoMod)
 	})
 
 	t.Run("InvalidVersion", func(t *testing.T) {

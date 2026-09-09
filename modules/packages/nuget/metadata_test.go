@@ -13,22 +13,22 @@ import (
 )
 
 const (
-	authors                  = "Gitea Authors"
+	authors                  = "Forge Authors"
 	copyright                = "Package Copyright"
 	dependencyID             = "System.Text.Json"
 	dependencyVersion        = "5.0.0"
 	developmentDependency    = true
 	description              = "Package Description"
-	iconURL                  = "https://gitea.io/favicon.png"
-	id                       = "System.Gitea"
+	iconURL                  = "https://forge.example/favicon.png"
+	id                       = "System.Forge"
 	language                 = "Package Language"
-	licenseURL               = "https://gitea.io/license"
+	licenseURL               = "https://forge.example/license"
 	minClientVersion         = "1.0.0.0"
 	owners                   = "Package Owners"
-	projectURL               = "https://gitea.io"
+	projectURL               = "https://forge.example"
 	readme                   = "Readme"
 	releaseNotes             = "Package Release Notes"
-	repositoryURL            = "https://gitea.io/gitea/gitea"
+	repositoryURL            = "https://forge.example/forge/forge"
 	requireLicenseAcceptance = true
 	tags                     = "tag_1 tag_2 tag_3"
 	targetFramework          = ".NETStandard2.1"

@@ -115,7 +115,7 @@ func (p *Renderer) Render(ctx *markup.RenderContext, input io.Reader, output io.
 
 	if p.IsInputFile {
 		// write to temp file
-		f, cleanup, err := setting.AppDataTempDir("git-repo-content").CreateTempFileRandom("gitea_input")
+		f, cleanup, err := setting.AppDataTempDir("git-repo-content").CreateTempFileRandom("forge_input")
 		if err != nil {
 			return fmt.Errorf("%s create temp file when rendering %s failed: %w", p.Name(), p.Command, err)
 		}

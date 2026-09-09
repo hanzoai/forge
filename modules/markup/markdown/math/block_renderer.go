@@ -8,7 +8,7 @@ import (
 	"html/template"
 
 	"github.com/hanzoai/git/modules/markup/internal"
-	giteaUtil "github.com/hanzoai/git/modules/util"
+	forgeUtil "github.com/hanzoai/git/modules/util"
 
 	gast "github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
@@ -52,11 +52,11 @@ func (r *BlockRenderer) writeLines(w util.BufWriter, source []byte, n gast.Node)
 func (r *BlockRenderer) renderBlock(w util.BufWriter, source []byte, node gast.Node, entering bool) (gast.WalkStatus, error) {
 	n := node.(*Block)
 	if entering {
-		codeHTML := giteaUtil.Iif[template.HTML](n.Inline, "", `<pre class="code-block is-loading">`) + `<code class="language-math display">`
+		codeHTML := forgeUtil.Iif[template.HTML](n.Inline, "", `<pre class="code-block is-loading">`) + `<code class="language-math display">`
 		_, _ = w.WriteString(string(r.renderInternal.ProtectSafeAttrs(codeHTML)))
 		r.writeLines(w, source, n)
 	} else {
-		_, _ = w.WriteString(`</code>` + giteaUtil.Iif(n.Inline, "", `</pre>`) + "\n")
+		_, _ = w.WriteString(`</code>` + forgeUtil.Iif(n.Inline, "", `</pre>`) + "\n")
 	}
 	return gast.WalkContinue, nil
 }

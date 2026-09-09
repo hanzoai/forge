@@ -20,12 +20,12 @@ import (
 )
 
 const (
-	packageName         = "gitea"
+	packageName         = "forge"
 	packageVersion      = "0:1.0.1-te~st"
 	packageArchitecture = "amd64"
 	packageAuthor       = "KN4CK3R"
 	description         = "Description with multiple lines."
-	projectURL          = "https://gitea.io"
+	projectURL          = "https://forge.example"
 )
 
 func TestParsePackage(t *testing.T) {
@@ -69,7 +69,7 @@ func TestParsePackage(t *testing.T) {
 			Mode: 0o600,
 			Size: 50,
 		})
-		tw.Write([]byte("Package: gitea\nVersion: 1.0.0\nArchitecture: amd64\n"))
+		tw.Write([]byte("Package: forge\nVersion: 1.0.0\nArchitecture: amd64\n"))
 		tw.Close()
 
 		cases := []struct {
@@ -116,7 +116,7 @@ func TestParsePackage(t *testing.T) {
 				p, err := ParsePackage(data)
 				assert.NotNil(t, p)
 				assert.NoError(t, err)
-				assert.Equal(t, "gitea", p.Name)
+				assert.Equal(t, "forge", p.Name)
 
 				t.Run("TrailingSlash", func(t *testing.T) {
 					data := createArchive(map[string][]byte{"control.tar" + c.Extension + "/": cbuf.Bytes()})
@@ -124,7 +124,7 @@ func TestParsePackage(t *testing.T) {
 					p, err := ParsePackage(data)
 					assert.NotNil(t, p)
 					assert.NoError(t, err)
-					assert.Equal(t, "gitea", p.Name)
+					assert.Equal(t, "forge", p.Name)
 				})
 			})
 		}
@@ -134,7 +134,7 @@ func TestParsePackage(t *testing.T) {
 func TestParseControlFile(t *testing.T) {
 	buildContent := func(name, version, architecture string) *bytes.Buffer {
 		var buf bytes.Buffer
-		buf.WriteString("Package: " + name + "\nVersion: " + version + "\nArchitecture: " + architecture + "\nMaintainer: " + packageAuthor + " <kn4ck3r@gitea.io>\nHomepage: " + projectURL + "\nDepends: a,\n b\nDescription: Description\n with multiple\n lines.")
+		buf.WriteString("Package: " + name + "\nVersion: " + version + "\nArchitecture: " + architecture + "\nMaintainer: " + packageAuthor + " <kn4ck3r@forge.example>\nHomepage: " + projectURL + "\nDepends: a,\n b\nDescription: Description\n with multiple\n lines.")
 		return &buf
 	}
 

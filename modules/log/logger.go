@@ -2,7 +2,7 @@
 // Copyright 2023 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// Package log provides logging capabilities for Gitea.
+// Package log provides logging capabilities for the forge.
 // Concepts:
 //
 // * Logger: a Logger provides logging functions and dispatches log events to all its writers

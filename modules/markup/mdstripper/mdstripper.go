@@ -25,8 +25,8 @@ import (
 )
 
 var (
-	giteaHostInit sync.Once
-	giteaHost     *url.URL
+	forgeHostInit sync.Once
+	forgeHost     *url.URL
 )
 
 type stripRenderer struct {
@@ -189,11 +189,11 @@ func StripMarkdownBytes(rawBytes []byte) ([]byte, []string) {
 
 // getGitHostName returns a normalized string with the local host name, with no scheme or port information
 func getGitHost() *url.URL {
-	giteaHostInit.Do(func() {
+	forgeHostInit.Do(func() {
 		var err error
-		if giteaHost, err = url.Parse(setting.AppURL); err != nil {
-			giteaHost = &url.URL{}
+		if forgeHost, err = url.Parse(setting.AppURL); err != nil {
+			forgeHost = &url.URL{}
 		}
 	})
-	return giteaHost
+	return forgeHost
 }

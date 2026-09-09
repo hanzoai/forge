@@ -280,7 +280,7 @@ func populateRepoIndexer(ctx context.Context) {
 	}
 
 	// start with the maximum existing repo ID and work backwards, so that we
-	// don't include repos that are created after gitea starts; such repos will
+	// don't include repos that are created after the forge starts; such repos will
 	// already be added to the indexer, and we don't need to add them again.
 	for maxRepoID > 0 {
 		select {
