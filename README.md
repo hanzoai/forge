@@ -1,10 +1,3 @@
-> **Retired — this is a stale copy of `hanzoai/git`.**
->
-> Every branch here is reachable from `hanzoai/git` — 12 refs, not one commit it lacks — and this copy has no push mirror, so anything committed here reached nothing.
->
-> It also declared `ghcr.io/hanzoai/git`, the tag `hanzoai/git` owns, so a push here
-> could have published over it. That declaration is removed.
-
 # Hanzo Forge
 
 [![](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT "License: MIT")
