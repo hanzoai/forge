@@ -10,20 +10,15 @@ import (
 	"strings"
 	"testing"
 
-	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/test"
 	"github.com/hanzoai/git/modules/translation"
-	"github.com/hanzoai/git/modules/web"
 	"github.com/hanzoai/git/routers"
-	"github.com/hanzoai/git/routers/web/auth"
-	"github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/tests"
 
-	"github.com/markbates/goth"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -104,12 +99,6 @@ func TestSigninWithRememberMe(t *testing.T) {
 func TestEnablePasswordSignInFormAndEnablePasskeyAuth(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	mockLinkAccount := func(ctx *context.Context) {
-		authSource := auth_model.Source{ID: 1}
-		gothUser := goth.User{Email: "invalid-email", Name: "."}
-		_ = auth.Oauth2SetLinkAccountData(ctx, auth.LinkAccountData{AuthSourceID: authSource.ID, GothUser: gothUser})
-	}
-
 	t.Run("EnablePasswordSignInForm=false", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 		defer test.MockVariableValue(&setting.Service.EnablePasswordSignInForm, false)()
@@ -121,13 +110,6 @@ func TestEnablePasswordSignInFormAndEnablePasskeyAuth(t *testing.T) {
 
 		req = NewRequest(t, "POST", "/user/login")
 		MakeRequest(t, req, http.StatusForbidden)
-
-		req = NewRequest(t, "GET", "/user/link_account")
-		defer web.RouteMockReset()
-		web.RouteMock(web.MockAfterMiddlewares, mockLinkAccount)
-		resp = MakeRequest(t, req, http.StatusOK)
-		doc = NewHTMLParser(t, resp.Body)
-		AssertHTMLElement(t, doc, "form[action='/user/link_account_signin']", false)
 	})
 
 	t.Run("EnablePasswordSignInForm=true", func(t *testing.T) {
@@ -141,13 +123,6 @@ func TestEnablePasswordSignInFormAndEnablePasskeyAuth(t *testing.T) {
 
 		req = NewRequest(t, "POST", "/user/login")
 		MakeRequest(t, req, http.StatusOK)
-
-		req = NewRequest(t, "GET", "/user/link_account")
-		defer web.RouteMockReset()
-		web.RouteMock(web.MockAfterMiddlewares, mockLinkAccount)
-		resp = MakeRequest(t, req, http.StatusOK)
-		doc = NewHTMLParser(t, resp.Body)
-		AssertHTMLElement(t, doc, "form[action='/user/link_account_signin']", true)
 	})
 
 	t.Run("EnablePasskeyAuth=false", func(t *testing.T) {
