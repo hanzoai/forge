@@ -456,7 +456,7 @@ $(GO_LICENSE_FILE): go.mod go.sum
 
 .PHONY: test-integration
 test-integration:
-	@# Use a compiled binary: testlogger forwards gitea logs to t.Log, so `go test -v`
+	@# Use a compiled binary: testlogger forwards server logs to t.Log, so `go test -v`
 	@# would flood output per passing test. testcache can't help these tests anyway —
 	@# they mutate the work directory, so cache inputs change between runs.
 	$(GO) test $(GOTEST_FLAGS) -tags '$(TAGS)' -c github.com/hanzoai/git/tests/integration -o ./test-integration-$(GIT_TEST_DATABASE).test

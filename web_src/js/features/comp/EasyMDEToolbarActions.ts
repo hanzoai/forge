@@ -101,7 +101,7 @@ export function easyMDEToolbarActions(easyMde: typeof EasyMDE, editor: ComboMark
       title: 'Side by Side',
     },
 
-    // gitea's custom actions
+    // our own custom actions
     'hanzo-checkbox-empty': {
       action(e) {
         const cm = e.codemirror;

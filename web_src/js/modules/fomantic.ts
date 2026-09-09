@@ -6,14 +6,14 @@ import {svg} from '../svg.ts';
 
 export const fomanticMobileScreen = window.matchMedia('only screen and (max-width: 767.98px)');
 
-export function initGiteaFomantic() {
+export function initFomantic() {
   // our extensions
   $.fn.fomanticExt = {};
   // By default, use "exact match" for full text search
   $.fn.dropdown.settings.fullTextSearch = 'exact';
   // Do not use "cursor: pointer" for dropdown labels
   $.fn.dropdown.settings.className.label += ' tw-cursor-default';
-  // Always use Gitea's SVG icons
+  // Always use our own SVG icons
   $.fn.dropdown.settings.templates.label = function(_value: any, text: any, preserveHTML: any, className: Record<string, string>) {
     const escape = $.fn.dropdown.settings.templates.escape;
     return escape(text, preserveHTML) + svg('octicon-x', 16, `${className.delete} icon`);

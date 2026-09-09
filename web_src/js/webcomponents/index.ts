@@ -7,7 +7,7 @@ function initPageThemeDarkLight() {
   // Set page's theme color preference as early as possible, to avoid flicker of wrong theme color during page load.
   const sync = () => document.documentElement.setAttribute('data-hanzo-theme-dark', String(isDarkTheme()));
   sync();
-  // Track system theme changes in case Gitea is using "auto" theme.
+  // Track system theme changes in case the site is using "auto" theme.
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
 }
 

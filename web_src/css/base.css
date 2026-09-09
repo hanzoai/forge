@@ -803,7 +803,7 @@ table th[data-sortt-desc] .svg {
   margin-left: 0.25rem;
 }
 
-/* for "image" emojis like ":git:"  ":gitea:" and ":github:" (see CUSTOM_EMOJIS config option) */
+/* for "image" emojis like ":git:", ":gitlab:" and ":github:" (see CUSTOM_EMOJIS config option) */
 .emoji img {
   border-width: 0 !important;
   margin: 0 !important;

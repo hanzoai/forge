@@ -754,7 +754,7 @@ $.api = $.fn.api = function(parameters) {
             ;
           },
           urlEncodedValue: function(value) {
-            // GITEA-PATCH: always encode the value.
+            // FORGE-PATCH: always encode the value.
             // Old code does "decodeURIComponent" first to guess whether the value is encoded, it is not right.
             return window.encodeURIComponent(value);
           },
@@ -1144,8 +1144,8 @@ $.api.settings = {
   },
 
   regExp  : {
-    required : /\{\$*[_A-Za-z0-9]+\}/g, // GITEA-PATCH: use "_A-Za-z" instead of "A-z" for variable name matching
-    optional : /\{\/\$*[_A-Za-z0-9]+\}/g, // GITEA-PATCH: use "_A-Za-z" instead of "A-z" for variable name matching
+    required : /\{\$*[_A-Za-z0-9]+\}/g, // FORGE-PATCH: use "_A-Za-z" instead of "A-z" for variable name matching
+    optional : /\{\/\$*[_A-Za-z0-9]+\}/g, // FORGE-PATCH: use "_A-Za-z" instead of "A-z" for variable name matching
   },
 
   className: {

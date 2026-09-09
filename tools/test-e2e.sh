@@ -2,7 +2,7 @@
 set -euo pipefail
 
 CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-docker}"
-CONTAINER_NAME="gitea-e2e-runner-$$"
+CONTAINER_NAME="forge-e2e-runner-$$"
 
 free_port() {
   node -e "const s=require('net').createServer();s.listen(0,'127.0.0.1',()=>{process.stdout.write(String(s.address().port));s.close()})"
@@ -106,7 +106,7 @@ trap cleanup EXIT
 
 if [ "$PLAYWRIGHT_MODE" = "container" ]; then
   PLAYWRIGHT_SERVER_PORT=$(free_port)
-  # --network=host: container needs host loopback to reach gitea.
+  # --network=host: container needs host loopback to reach the server.
   "$CONTAINER_RUNTIME" run --network=host --name "$CONTAINER_NAME" -d --rm --init --workdir /home/pwuser --user pwuser "$PLAYWRIGHT_IMAGE" /bin/sh -c "npx -y playwright@${PLAYWRIGHT_VERSION} run-server --port ${PLAYWRIGHT_SERVER_PORT} --host 0.0.0.0"
 
   if ! wait_for_container; then
@@ -150,8 +150,8 @@ EOF
 export GIT_WORK_DIR="$WORK_DIR"
 export GIT_TEST_E2E=true
 
-# Start Gitea server
-echo "Starting Gitea server on port $FREE_PORT (workdir: $WORK_DIR)..."
+# Start the server
+echo "Starting server on port $FREE_PORT (workdir: $WORK_DIR)..."
 if [ -n "${GIT_TEST_E2E_DEBUG:-}" ]; then
   "./$EXECUTABLE" web &
 else
@@ -165,12 +165,12 @@ MAX_WAIT=120
 ELAPSED=0
 while ! curl -sf --max-time 5 "$E2E_URL" > /dev/null 2>&1; do
   if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-    echo "error: Gitea server process exited unexpectedly. Server log:" >&2
+    echo "error: server process exited unexpectedly. Server log:" >&2
     cat "$WORK_DIR/server.log" 2>/dev/null >&2 || true
     exit 1
   fi
   if [ "$ELAPSED" -ge "$MAX_WAIT" ]; then
-    echo "error: Gitea server not reachable after ${MAX_WAIT}s. Server log:" >&2
+    echo "error: server not reachable after ${MAX_WAIT}s. Server log:" >&2
     cat "$WORK_DIR/server.log" 2>/dev/null >&2 || true
     exit 1
   fi
@@ -178,9 +178,9 @@ while ! curl -sf --max-time 5 "$E2E_URL" > /dev/null 2>&1; do
   ELAPSED=$((ELAPSED + 2))
 done
 
-echo "Gitea server is ready at $E2E_URL"
+echo "Server is ready at $E2E_URL"
 
-GIT_TEST_E2E_DOMAIN="e2e.gitea.com"
+GIT_TEST_E2E_DOMAIN="e2e.hanzo.ai"
 GIT_TEST_E2E_USER="e2e-admin"
 GIT_TEST_E2E_PASSWORD="password"
 GIT_TEST_E2E_EMAIL="$GIT_TEST_E2E_USER@$GIT_TEST_E2E_DOMAIN"

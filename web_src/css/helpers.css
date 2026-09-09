@@ -1,6 +1,6 @@
 /*
-Gitea's tailwind-style CSS helper classes have `gt-` prefix.
-Gitea's private styles use `g-` prefix.
+Tailwind-style CSS helper classes have `gt-` prefix.
+Private styles use `g-` prefix.
 */
 
 .gt-ellipsis {
