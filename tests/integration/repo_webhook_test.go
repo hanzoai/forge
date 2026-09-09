@@ -908,8 +908,8 @@ func Test_WebhookStatus(t *testing.T) {
 		provider := newMockWebhookProvider(func(r *http.Request) {
 			assert.Contains(t, r.Header["X-Github-Event-Type"], "status", "X-GitHub-Event-Type should contain status")
 			assert.Contains(t, r.Header["X-Github-Hook-Installation-Target-Type"], "repository", "X-GitHub-Hook-Installation-Target-Type should contain repository")
-			assert.Contains(t, r.Header["X-Gitea-Event-Type"], "status", "X-Gitea-Event-Type should contain status")
-			assert.Contains(t, r.Header["X-Gitea-Hook-Installation-Target-Type"], "repository", "X-Gitea-Hook-Installation-Target-Type should contain repository")
+			assert.Contains(t, r.Header["X-Git-Event-Type"], "status", "X-Git-Event-Type should contain status")
+			assert.Contains(t, r.Header["X-Git-Hook-Installation-Target-Type"], "repository", "X-Git-Hook-Installation-Target-Type should contain repository")
 			assert.Contains(t, r.Header["X-Gogs-Event-Type"], "status", "X-Gogs-Event-Type should contain status")
 			content, _ := io.ReadAll(r.Body)
 			var payload api.CommitStatusPayload
@@ -954,7 +954,7 @@ func Test_WebhookStatus_NoWrongTrigger(t *testing.T) {
 		var trigger string
 		provider := newMockWebhookProvider(func(r *http.Request) {
 			assert.NotContains(t, r.Header["X-Github-Event-Type"], "status", "X-GitHub-Event-Type should not contain status")
-			assert.NotContains(t, r.Header["X-Gitea-Event-Type"], "status", "X-Gitea-Event-Type should not contain status")
+			assert.NotContains(t, r.Header["X-Git-Event-Type"], "status", "X-Git-Event-Type should not contain status")
 			assert.NotContains(t, r.Header["X-Gogs-Event-Type"], "status", "X-Gogs-Event-Type should not contain status")
 			trigger = "push"
 		}, http.StatusOK)
@@ -980,7 +980,7 @@ func Test_WebhookWorkflowJob(t *testing.T) {
 		var triggeredEvent string
 		provider := newMockWebhookProvider(func(r *http.Request) {
 			assert.Contains(t, r.Header["X-Github-Event-Type"], "workflow_job", "X-GitHub-Event-Type should contain workflow_job")
-			assert.Contains(t, r.Header["X-Gitea-Event-Type"], "workflow_job", "X-Gitea-Event-Type should contain workflow_job")
+			assert.Contains(t, r.Header["X-Git-Event-Type"], "workflow_job", "X-Git-Event-Type should contain workflow_job")
 			assert.Contains(t, r.Header["X-Gogs-Event-Type"], "workflow_job", "X-Gogs-Event-Type should contain workflow_job")
 			content, _ := io.ReadAll(r.Body)
 			var payload api.WorkflowJobPayload
@@ -1163,7 +1163,7 @@ func Test_WebhookWorkflowRun(t *testing.T) {
 				webhookData := &workflowRunWebhook{}
 				provider := newMockWebhookProvider(func(r *http.Request) {
 					assert.Contains(t, r.Header["X-Github-Event-Type"], "workflow_run", "X-GitHub-Event-Type should contain workflow_run")
-					assert.Contains(t, r.Header["X-Gitea-Event-Type"], "workflow_run", "X-Gitea-Event-Type should contain workflow_run")
+					assert.Contains(t, r.Header["X-Git-Event-Type"], "workflow_run", "X-Git-Event-Type should contain workflow_run")
 					assert.Contains(t, r.Header["X-Gogs-Event-Type"], "workflow_run", "X-Gogs-Event-Type should contain workflow_run")
 					content, _ := io.ReadAll(r.Body)
 					var payload api.WorkflowRunPayload

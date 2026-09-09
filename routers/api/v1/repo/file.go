@@ -33,7 +33,7 @@ import (
 	files_service "github.com/hanzoai/git/services/repository/files"
 )
 
-const gitObjectTypeHeader = "X-Gitea-Object-Type"
+const gitObjectTypeHeader = "X-Git-Object-Type"
 
 // GetRawFile get a file by path on a repository
 func GetRawFile(ctx *context.APIContext) {
