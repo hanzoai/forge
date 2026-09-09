@@ -138,7 +138,7 @@ func buildCallerChain(t *testing.T, callerUses ...string) []*actions_model.Actio
 }
 
 func TestResolveUses(t *testing.T) {
-	defer test.MockVariableValue(&setting.AppURL, "https://gitea.example.com/sub/")()
+	defer test.MockVariableValue(&setting.AppURL, "https://forge.example.com/sub/")()
 	defer test.MockVariableValue(&setting.AppSubURL, "/sub")()
 	defer test.MockVariableValue(&setting.Actions.WorkflowDirs, []string{".hanzo/workflows", ".github/workflows"})()
 	defer test.MockVariableValue(&setting.Actions.ScopedWorkflowDirs, []string{".hanzo/scoped_workflows"})()
@@ -185,7 +185,7 @@ func TestResolveUses(t *testing.T) {
 
 	t.Run("LocalInstanceURL", func(t *testing.T) {
 		// An absolute URL on this instance (incl. AppSubURL) resolves to the equivalent cross-repo ref.
-		ref, err := ResolveUses(ctx, "https://gitea.example.com/sub/owner/repo/.hanzo/workflows/ci.yml@refs/heads/main")
+		ref, err := ResolveUses(ctx, "https://forge.example.com/sub/owner/repo/.hanzo/workflows/ci.yml@refs/heads/main")
 		require.NoError(t, err)
 		assert.Equal(t, jobparser.UsesRef{Kind: jobparser.UsesKindLocalCrossRepo, Owner: "owner", Repo: "repo", Path: ".hanzo/workflows/ci.yml", Ref: "refs/heads/main"}, *ref)
 	})
@@ -194,7 +194,7 @@ func TestResolveUses(t *testing.T) {
 		for _, in := range []string{
 			"owner/.hanzo/workflows/foo.yml",                                             // missing repo segment
 			"owner/repo/.hanzo/workflows/foo.yml",                                        // missing @ref
-			"https://gitea.example.com/sub/repo/.hanzo/workflows/ci.yml@refs/heads/main", // local absolute URL but missing owner
+			"https://forge.example.com/sub/repo/.hanzo/workflows/ci.yml@refs/heads/main", // local absolute URL but missing owner
 			"not a valid uses at all",
 		} {
 			_, err := ResolveUses(ctx, in)
@@ -203,7 +203,7 @@ func TestResolveUses(t *testing.T) {
 	})
 
 	t.Run("ForeignURL", func(t *testing.T) {
-		_, err := ResolveUses(ctx, "https://other.gitea-example.com/owner/repo/.hanzo/workflows/ci.yaml@v1")
+		_, err := ResolveUses(ctx, "https://other.forge-example.com/owner/repo/.hanzo/workflows/ci.yaml@v1")
 		assert.ErrorContains(t, err, "must point to this Hanzo Git instance")
 	})
 }

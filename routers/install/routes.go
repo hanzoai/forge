@@ -45,7 +45,7 @@ func Routes() *web.Router {
 func installNotFound(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
 	w.Header().Add("Refresh", "1; url="+setting.AppSubURL+"/")
-	// do not use 30x status, because the "post-install" page needs to use 404/200 to detect if Gitea has been installed.
+	// do not use 30x status, because the "post-install" page needs to use 404/200 to detect if the forge has been installed.
 	// the fetch API could follow 30x requests to the page with 200 status.
 	w.WriteHeader(http.StatusNotFound)
 	_, _ = fmt.Fprintf(w, `Not Found. <a href="%s">Go to default page</a>.`, html.EscapeString(setting.AppSubURL+"/"))

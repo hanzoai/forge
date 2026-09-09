@@ -16,7 +16,7 @@ import (
 
 func TestGenerateMessageID(t *testing.T) {
 	mailService := setting.Mailer{
-		From: "test@gitea.com",
+		From: "test@forge.example",
 	}
 
 	setting.MailService = &mailService
@@ -45,13 +45,13 @@ func TestToMessage(t *testing.T) {
 		setting.MailService = oldConf
 	}()
 	setting.MailService = &setting.Mailer{
-		From: "test@gitea.com",
+		From: "test@forge.example",
 	}
 
 	m1 := Message{
 		Info:            "info",
-		FromAddress:     "test@gitea.com",
-		FromDisplayName: "Test Gitea",
+		FromAddress:     "test@forge.example",
+		FromDisplayName: "Test Forge",
 		To:              "a@b.com",
 		Subject:         "Issue X Closed",
 		Body:            "Some Issue got closed by Y-Man",
@@ -70,7 +70,7 @@ func TestToMessage(t *testing.T) {
 	assertHeaders(t, map[string]string{
 		"Content-Type":             "multipart/alternative;",
 		"Date":                     "Mon, 01 Jan 0001 00:00:00 +0000",
-		"From":                     "\"Test Gitea\" <test@gitea.com>",
+		"From":                     "\"Test Forge\" <test@forge.example>",
 		"Message-ID":               "<autogen--6795364578871-69c000786adc60dc@localhost>",
 		"MIME-Version":             "1.0",
 		"Subject":                  "Issue X Closed",
@@ -90,7 +90,7 @@ func TestToMessage(t *testing.T) {
 	assertHeaders(t, map[string]string{
 		"Content-Type":             "multipart/alternative;",
 		"Date":                     "Mon, 01 Jan 0001 00:00:00 +0000",
-		"From":                     "\"Test Gitea\" <test@gitea.com>",
+		"From":                     "\"Test Forge\" <test@forge.example>",
 		"Message-ID":               "",
 		"MIME-Version":             "1.0",
 		"Subject":                  "Issue X Closed",

@@ -40,7 +40,7 @@ import (
 
 var _ base.Uploader = &GitLocalUploader{}
 
-// GitLocalUploader implements an Uploader to gitea sites
+// GitLocalUploader implements an Uploader to forge sites
 type GitLocalUploader struct {
 	doer           *user_model.User
 	repoOwner      string
@@ -57,7 +57,7 @@ type GitLocalUploader struct {
 	gitServiceType structs.GitServiceType
 }
 
-// NewGitLocalUploader creates a gitea Uploader via gitea API v1
+// NewGitLocalUploader creates a forge Uploader via the forge API v1
 func NewGitLocalUploader(_ context.Context, doer *user_model.User, repoOwner, repoName string) *GitLocalUploader {
 	return &GitLocalUploader{
 		doer:        doer,

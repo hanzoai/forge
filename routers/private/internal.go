@@ -64,13 +64,13 @@ func setRealIP(next http.Handler) http.Handler {
 }
 
 // Routes registers all internal APIs routes to web application.
-// These APIs will be invoked by internal commands for example `gitea serv` and etc.
+// These APIs will be invoked by internal commands for example `gitd serv` and etc.
 func Routes() *web.Router {
 	r := web.NewRouter()
 	r.AfterRouting(context.PrivateContexter())
 	r.AfterRouting(authInternal)
 	// Log the real ip address of the request from SSH is really helpful for diagnosing sometimes.
-	// Since internal API will be sent only from Gitea sub commands and it's under control (checked by InternalToken), we can trust the headers.
+	// Since internal API will be sent only from the forge's sub commands and it's under control (checked by InternalToken), we can trust the headers.
 	r.AfterRouting(setRealIP)
 
 	r.Get("/dummy", misc.DummyOK)

@@ -140,7 +140,7 @@ good job`, pl.RichMessage.HTML)
 		pl, err := tc.Package(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `Package created: <a href="http://localhost:3000/user1/-/packages/container/GiteaContainer/latest" rel="nofollow">GiteaContainer:latest</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
+		assert.Equal(t, `Package created: <a href="http://localhost:3000/user1/-/packages/container/ForgeContainer/latest" rel="nofollow">ForgeContainer:latest</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
 	})
 
 	t.Run("Wiki", func(t *testing.T) {

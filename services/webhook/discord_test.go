@@ -219,9 +219,9 @@ func TestDiscordPayload(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Len(t, pl.Embeds, 1)
-		assert.Equal(t, "Package created: GiteaContainer:latest", pl.Embeds[0].Title)
+		assert.Equal(t, "Package created: ForgeContainer:latest", pl.Embeds[0].Title)
 		assert.Empty(t, pl.Embeds[0].Description)
-		assert.Equal(t, "http://localhost:3000/user1/-/packages/container/GiteaContainer/latest", pl.Embeds[0].URL)
+		assert.Equal(t, "http://localhost:3000/user1/-/packages/container/ForgeContainer/latest", pl.Embeds[0].URL)
 		assert.Equal(t, p.Sender.UserName, pl.Embeds[0].Author.Name)
 		assert.Equal(t, setting.AppURL+p.Sender.UserName, pl.Embeds[0].Author.URL)
 		assert.Equal(t, p.Sender.AvatarURL, pl.Embeds[0].Author.IconURL)

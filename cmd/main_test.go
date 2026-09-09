@@ -39,8 +39,8 @@ func TestDefaultCommand(t *testing.T) {
 		assert.NoError(t, cmd.Run(t.Context(), args))
 		assert.True(t, called)
 	}
-	test(t, []string{"./gitea"}, "", true)
-	test(t, []string{"./gitea", "test"}, "", true)
-	test(t, []string{"./gitea", "other"}, "other", false)
-	test(t, []string{"./gitea", "test", "extra"}, "extra", false)
+	test(t, []string{"./gitd"}, "", true)
+	test(t, []string{"./gitd", "test"}, "", true)
+	test(t, []string{"./gitd", "other"}, "other", false)
+	test(t, []string{"./gitd", "test", "extra"}, "extra", false)
 }

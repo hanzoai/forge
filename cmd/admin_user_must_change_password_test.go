@@ -19,9 +19,9 @@ func TestMustChangePassword(t *testing.T) {
 	defer func() {
 		require.NoError(t, db.TruncateBeans(t.Context(), &user_model.User{}))
 	}()
-	err := microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuser", "--email", "testuser@gitea.local", "--random-password"})
+	err := microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuser", "--email", "testuser@forge.local", "--random-password"})
 	require.NoError(t, err)
-	err = microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuserexclude", "--email", "testuserexclude@gitea.local", "--random-password"})
+	err = microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuserexclude", "--email", "testuserexclude@forge.local", "--random-password"})
 	require.NoError(t, err)
 	// Reset password change flag
 	err = microcmdUserMustChangePassword().Run(t.Context(), []string{"change-test", "--all", "--unset"})

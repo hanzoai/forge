@@ -34,7 +34,7 @@ func TestAdminUserDeleteAccessToken(t *testing.T) {
 	setup := func(t *testing.T, username, tokenName string) {
 		t.Helper()
 		require.NoError(t, microcmdUserCreate().Run(t.Context(),
-			[]string{"create", "--username", username, "--email", username + "@gitea.local", "--random-password"}))
+			[]string{"create", "--username", username, "--email", username + "@forge.local", "--random-password"}))
 		require.NoError(t, newUserGenerateAccessTokenCommand().Run(t.Context(),
 			[]string{"generate-access-token", "--username", username, "--token-name", tokenName, "--scopes", "read:user"}))
 	}
@@ -83,7 +83,7 @@ func TestAdminUserDeleteAccessTokenFailure(t *testing.T) {
 		require.NoError(t, db.TruncateBeans(t.Context(), &auth_model.AccessToken{}))
 	}()
 	require.NoError(t, microcmdUserCreate().Run(t.Context(),
-		[]string{"create", "--username", "tokenuser", "--email", "tokenuser@gitea.local", "--random-password"}))
+		[]string{"create", "--username", "tokenuser", "--email", "tokenuser@forge.local", "--random-password"}))
 
 	for _, tc := range []struct {
 		name, expectedErr string

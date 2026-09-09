@@ -320,7 +320,6 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 
 	validation.AddBindingRules()
 
-
 	oauth2Enabled := func(ctx *context.Context) {
 		if !setting.OAuth2.Enabled {
 			ctx.HTTPError(http.StatusForbidden)
@@ -534,7 +533,6 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 	// serves none of them: there is nothing to check a password against and no
 	// second factor of our own to demand.
 	m.Any("/user/events", routing.MarkLongPolling(), events.Events)
-
 
 	m.Group("/user/settings", func() {
 		m.Get("", user_setting.Profile)
@@ -1635,7 +1633,7 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 	// pattern: "/{username}/{reponame}/{lfs-paths}": git-lfs support, see also addOwnerRepoGitHTTPRouters
 	common.AddOwnerRepoGitLFSRoutes(m, lfsServerEnabled, webAuth.AllowBasic, repo.CorsHandler(), optSignInFromAnyOrigin)
 
-	// Some users want to use "web-based git client" to access Gitea's repositories,
+	// Some users want to use "web-based git client" to access the forge's repositories,
 	// so the CORS handler and OPTIONS method are used.
 	// pattern: "/{username}/{reponame}/{git-paths}": git http support
 	addOwnerRepoGitHTTPRouters(m, repo.HTTPGitEnabledHandler, webAuth.AllowBasic, webAuth.AllowOAuth2, repo.CorsHandler(), optSignInFromAnyOrigin, context.UserAssignmentWeb())

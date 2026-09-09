@@ -70,7 +70,7 @@ func QueueSet(ctx *context.Context) {
 }
 
 func QueueRemoveAllItems(ctx *context.Context) {
-	// Gitea's queue doesn't have transaction support
+	// The forge's queue doesn't have transaction support
 	// So in rare cases, the queue could be corrupted/out-of-sync
 	// Site admin could remove all items from the queue to make it work again
 	qid := ctx.PathParamInt64("qid")

@@ -133,7 +133,7 @@ func APIUnauthorizedError(ctx *context.Context) {
 	requireSignIn := owner != nil && owner.Visibility != structs.VisibleTypePublic
 	requireSignIn = requireSignIn || setting.Service.RequireSignInViewStrict
 	if requireSignIn {
-		// support apple container like: container registry login <gitea-host> -u
+		// support apple container like: container registry login <forge-host> -u
 		ctx.Resp.Header().Add("WWW-Authenticate", `Basic realm="Hanzo Git Container Registry"`)
 	}
 	apiErrorDefined(ctx, errUnauthorized)

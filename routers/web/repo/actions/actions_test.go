@@ -185,7 +185,7 @@ func Test_loadIsRefDeleted(t *testing.T) {
 }
 
 func TestPrepareWorkflowBadgeTemplate(t *testing.T) {
-	defer test.MockVariableValue(&setting.AppURL, "https://gitea.example.com/")()
+	defer test.MockVariableValue(&setting.AppURL, "https://forge.example.com/")()
 
 	t.Run("no workflow selected", func(t *testing.T) {
 		ctx := newWorkflowBadgeTestContext(t)
@@ -201,8 +201,8 @@ func TestPrepareWorkflowBadgeTemplate(t *testing.T) {
 		prepareWorkflowBadgeTemplate(ctx, "build/test workflow.yml", `CI [prod]\build "fast" <ok>`)
 
 		assert.Equal(t, workflowBadge{
-			BadgeURL:    "https://gitea.example.com/user1/repo1/actions/workflows/build/test%20workflow.yml/badge.svg?branch=release%2F1.0+%26+hotfix",
-			WorkflowURL: "https://gitea.example.com/user1/repo1/actions?workflow=build%2Ftest+workflow.yml",
+			BadgeURL:    "https://forge.example.com/user1/repo1/actions/workflows/build/test%20workflow.yml/badge.svg?branch=release%2F1.0+%26+hotfix",
+			WorkflowURL: "https://forge.example.com/user1/repo1/actions?workflow=build%2Ftest+workflow.yml",
 			DisplayName: `CI [prod]\build "fast" <ok>`,
 		}, ctx.Data["WorkflowBadge"])
 	})
@@ -211,7 +211,7 @@ func TestPrepareWorkflowBadgeTemplate(t *testing.T) {
 func newWorkflowBadgeTestContext(t *testing.T) *web_context.Context {
 	t.Helper()
 
-	req := httptest.NewRequest(http.MethodGet, "https://gitea.example.com/user1/repo1/actions", nil)
+	req := httptest.NewRequest(http.MethodGet, "https://forge.example.com/user1/repo1/actions", nil)
 	resp := httptest.NewRecorder()
 	ctx := web_context.NewWebContext(web_context.NewBaseContextForTest(resp, req), nil, nil)
 	ctx.Repo.Repository = &repo_model.Repository{

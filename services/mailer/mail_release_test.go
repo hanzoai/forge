@@ -27,11 +27,11 @@ func TestMailNewReleaseFiltersUnauthorizedWatchers(t *testing.T) {
 	defer test.MockVariableValue(&setting.AppURL)()
 
 	setting.MailService = &setting.Mailer{
-		From:      "Gitea",
+		From:      "Hanzo Forge",
 		FromEmail: "noreply@example.com",
 	}
 	setting.Domain = "example.com"
-	setting.AppName = "Gitea"
+	setting.AppName = "Hanzo Forge"
 	setting.AppURL = "https://example.com/"
 	defer mockMailTemplates(string(tplNewReleaseMail), "{{.Subject}}", "<p>{{.Release.TagName}}</p>")()
 

@@ -64,7 +64,7 @@ func rewriteAllPublicKeys(ctx context.Context) error {
 			return err
 		}
 		if isExist {
-			bakPath := fmt.Sprintf("%s_%d.gitea_bak", fPath, time.Now().Unix())
+			bakPath := fmt.Sprintf("%s_%d.forge_bak", fPath, time.Now().Unix())
 			if err = util.CopyFile(fPath, bakPath); err != nil {
 				return err
 			}

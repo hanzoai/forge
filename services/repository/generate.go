@@ -255,7 +255,7 @@ func generateRepoCommit(ctx context.Context, repo, templateRepo, generateRepo *r
 
 // GenerateGitContent generates git content from a template repository
 func GenerateGitContent(ctx context.Context, templateRepo, generateRepo *repo_model.Repository) (err error) {
-	tmpDir, cleanup, err := setting.AppDataTempDir("git-repo-content").MkdirTempRandom("gitea-" + generateRepo.Name)
+	tmpDir, cleanup, err := setting.AppDataTempDir("git-repo-content").MkdirTempRandom("repos-" + generateRepo.Name)
 	if err != nil {
 		return fmt.Errorf("failed to create temp dir for repository %s: %w", generateRepo.FullName(), err)
 	}

@@ -40,13 +40,13 @@ func TestRenderHelperMention(t *testing.T) {
 	req, err := http.NewRequest(http.MethodGet, "/", nil)
 	assert.NoError(t, err)
 	base := git_context.NewBaseContextForTest(httptest.NewRecorder(), req)
-	giteaCtx := git_context.NewWebContext(base, &contexttest.MockRender{}, nil)
+	webCtx := git_context.NewWebContext(base, &contexttest.MockRender{}, nil)
 
-	assert.True(t, FormalRenderHelperFuncs().IsUsernameMentionable(giteaCtx, userPublic))
-	assert.False(t, FormalRenderHelperFuncs().IsUsernameMentionable(giteaCtx, userPrivate))
+	assert.True(t, FormalRenderHelperFuncs().IsUsernameMentionable(webCtx, userPublic))
+	assert.False(t, FormalRenderHelperFuncs().IsUsernameMentionable(webCtx, userPrivate))
 
-	giteaCtx.Doer, err = user.GetUserByName(t.Context(), userPrivate)
+	webCtx.Doer, err = user.GetUserByName(t.Context(), userPrivate)
 	assert.NoError(t, err)
-	assert.True(t, FormalRenderHelperFuncs().IsUsernameMentionable(giteaCtx, userPublic))
-	assert.True(t, FormalRenderHelperFuncs().IsUsernameMentionable(giteaCtx, userPrivate))
+	assert.True(t, FormalRenderHelperFuncs().IsUsernameMentionable(webCtx, userPublic))
+	assert.True(t, FormalRenderHelperFuncs().IsUsernameMentionable(webCtx, userPrivate))
 }

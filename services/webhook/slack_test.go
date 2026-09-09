@@ -123,7 +123,7 @@ func TestSlackPayload(t *testing.T) {
 		pl, err := sc.Package(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, "Package created: <http://localhost:3000/user1/-/packages/container/GiteaContainer/latest|GiteaContainer:latest> by <https://try.gitea.io/user1|user1>", pl.Text)
+		assert.Equal(t, "Package created: <http://localhost:3000/user1/-/packages/container/ForgeContainer/latest|ForgeContainer:latest> by <https://try.gitea.io/user1|user1>", pl.Text)
 	})
 
 	t.Run("Wiki", func(t *testing.T) {
@@ -198,13 +198,13 @@ func TestIsValidSlackChannel(t *testing.T) {
 		channelName string
 		expected    bool
 	}{
-		{"gitea", true},
-		{"#gitea", true},
+		{"forge", true},
+		{"#forge", true},
 		{"  ", false},
 		{"#", false},
 		{" #", false},
-		{"gitea   ", false},
-		{"  gitea", false},
+		{"forge   ", false},
+		{"  forge", false},
 	}
 
 	for _, v := range tt {

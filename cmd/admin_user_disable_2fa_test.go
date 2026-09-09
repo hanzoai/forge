@@ -27,7 +27,7 @@ func TestDisableTwoFactorCommand(t *testing.T) {
 	}()
 
 	t.Run("disable TOTP and WebAuthn", func(t *testing.T) {
-		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "tfuser", "--email", "tfuser@gitea.local", "--random-password"}))
+		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "tfuser", "--email", "tfuser@forge.local", "--random-password"}))
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{LowerName: "tfuser"})
 
 		// Enroll TOTP.
@@ -54,7 +54,7 @@ func TestDisableTwoFactorCommand(t *testing.T) {
 	})
 
 	t.Run("disable by id", func(t *testing.T) {
-		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "iduser", "--email", "iduser@gitea.local", "--random-password"}))
+		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "iduser", "--email", "iduser@forge.local", "--random-password"}))
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{LowerName: "iduser"})
 
 		tf := &auth_model.TwoFactor{UID: user.ID}
@@ -69,12 +69,12 @@ func TestDisableTwoFactorCommand(t *testing.T) {
 	})
 
 	t.Run("no enrollment is a no-op", func(t *testing.T) {
-		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "plainuser", "--email", "plainuser@gitea.local", "--random-password"}))
+		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "plainuser", "--email", "plainuser@forge.local", "--random-password"}))
 		require.NoError(t, microcmdUserDisableTwoFactor().Run(ctx, []string{"disable-2fa", "--username", "plainuser"}))
 	})
 
 	t.Run("id and username must match when both given", func(t *testing.T) {
-		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "matchuser", "--email", "matchuser@gitea.local", "--random-password"}))
+		require.NoError(t, microcmdUserCreate().Run(ctx, []string{"create", "--username", "matchuser", "--email", "matchuser@forge.local", "--random-password"}))
 		user := unittest.AssertExistsAndLoadBean(t, &user_model.User{LowerName: "matchuser"})
 		id := strconv.FormatInt(user.ID, 10)
 

@@ -50,7 +50,7 @@ func testWebhookPrepare(t *testing.T) {
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 	hook := &webhook_model.Webhook{
 		RepoID:      repo.ID,
-		URL:         "http://localhost/gitea-webhook-test-prepare_webhooks",
+		URL:         "http://localhost/forge-webhook-test-prepare_webhooks",
 		ContentType: webhook_model.ContentTypeJSON,
 		Events:      `{"push_only":true}`,
 		IsActive:    true,
@@ -68,7 +68,7 @@ func testWebhookPrepareBranchFilterMatch(t *testing.T) {
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 2})
 	hook := &webhook_model.Webhook{
 		RepoID:      repo.ID,
-		URL:         "http://localhost/gitea-webhook-test-branch_filter_match",
+		URL:         "http://localhost/forge-webhook-test-branch_filter_match",
 		ContentType: webhook_model.ContentTypeJSON,
 		Events:      `{"push_only":true,"branch_filter":"{master,feature*}"}`,
 		IsActive:    true,
@@ -87,7 +87,7 @@ func testWebhookPrepareBranchFilterNoMatch(t *testing.T) {
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 2})
 	hook := &webhook_model.Webhook{
 		RepoID:      repo.ID,
-		URL:         "http://localhost/gitea-webhook-test-branch_filter_no_match",
+		URL:         "http://localhost/forge-webhook-test-branch_filter_no_match",
 		ContentType: webhook_model.ContentTypeJSON,
 		Events:      `{"push_only":true,"branch_filter":"{master,feature*}"}`,
 		IsActive:    true,
@@ -139,7 +139,7 @@ func testPrepareTestWebhookIgnoresGates(t *testing.T) {
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 	hook := &webhook_model.Webhook{
 		RepoID:      repo.ID,
-		URL:         "http://localhost/gitea-webhook-test-prepare_test_webhook",
+		URL:         "http://localhost/forge-webhook-test-prepare_test_webhook",
 		ContentType: webhook_model.ContentTypeJSON,
 		IsActive:    true,
 		HookEvent: &webhook_module.HookEvent{

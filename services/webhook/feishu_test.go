@@ -122,7 +122,7 @@ func TestFeishuPayload(t *testing.T) {
 		pl, err := fc.Package(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, "Package created: GiteaContainer:latest by user1", pl.Content.Text)
+		assert.Equal(t, "Package created: ForgeContainer:latest by user1", pl.Content.Text)
 	})
 
 	t.Run("Wiki", func(t *testing.T) {

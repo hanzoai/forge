@@ -64,7 +64,7 @@ func renderCommentMarkdown(ctx *context.Context, act *activities_model.Action, c
 	return rendered
 }
 
-// feedActionsToFeedItems convert gitea's Action feed to feeds Item
+// feedActionsToFeedItems convert the forge's Action feed to feeds Item
 func feedActionsToFeedItems(ctx *context.Context, actions activities_model.ActionList) (items []*feeds.Item, err error) {
 	renderUtils := templates.NewRenderUtils(ctx)
 	for _, act := range actions {
@@ -274,7 +274,7 @@ func GetFeedType(name string, req *http.Request) (showFeed bool, feedType string
 	return false, ""
 }
 
-// feedActionsToFeedItems convert gitea's Repo's Releases to feeds Item
+// feedActionsToFeedItems convert the forge's Repo's Releases to feeds Item
 func releasesToFeedItems(ctx *context.Context, releases []*repo_model.Release) (items []*feeds.Item, err error) {
 	for _, rel := range releases {
 		err := rel.LoadAttributes(ctx)

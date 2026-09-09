@@ -683,7 +683,7 @@ func (g *GitlabDownloader) GetPullRequests(ctx context.Context, page, perPage in
 			awardPage++
 		}
 
-		// Generate new PR Numbers by the known Issue Numbers, because they share the same number space in Gitea, but they are independent in Gitlab
+		// Generate new PR Numbers by the known Issue Numbers, because they share the same number space in the forge, but they are independent in Gitlab
 		newPRNumber := g.iidResolver.generatePullRequestNumber(pr.IID)
 
 		allPRs = append(allPRs, &base.PullRequest{

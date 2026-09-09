@@ -135,10 +135,10 @@ const (
 
 // CheckPullMergeable check if the pull mergeable based on all conditions (branch protection, merge options, ...)
 // mergeStyle tailors the "require signed commits" prechecks:
-//   - fast-forward-only: no Gitea commit is produced, so Gitea's merge-signing check is skipped;
+//   - fast-forward-only: no forge commit is produced, so the merge-signing check is skipped;
 //     only the user's head commits are verified.
-//   - merge: both the head commits must be verified and Gitea must sign the merge commit.
-//   - rebase, rebase-merge, squash: Gitea rewrites the commits and signs each, so only Gitea's
+//   - merge: both the head commits must be verified and the forge must sign the merge commit.
+//   - rebase, rebase-merge, squash: the forge rewrites the commits and signs each, so only its
 //     signing ability is checked.
 func CheckPullMergeable(stdCtx context.Context, doer *user_model.User, perm *access_model.Permission, pr *issues_model.PullRequest, mergeCheckType MergeCheckType, mergeStyle repo_model.MergeStyle, forceMerge bool) error {
 	return db.WithTx(stdCtx, func(ctx context.Context) error {
@@ -236,9 +236,9 @@ func CheckPullMergeable(stdCtx context.Context, doer *user_model.User, perm *acc
 //   - fast-forward-only and merge keep the user's commits on the base branch, so
 //     those commits must all be verified, or the pre-receive hook will reject the
 //     push with a generic error.
-//   - fast-forward-only creates no Gitea commit, so Gitea's signing key is not used.
-//   - merge, rebase, rebase-merge and squash produce a Gitea-signed commit, so
-//     Gitea must be configured to sign it.
+//   - fast-forward-only creates no forge commit, so the forge's signing key is not used.
+//   - merge, rebase, rebase-merge and squash produce a forge-signed commit, so
+//     the forge must be configured to sign it.
 func checkSigningRequirements(ctx context.Context, pr *issues_model.PullRequest, doer *user_model.User, mergeStyle repo_model.MergeStyle) error {
 	pb, err := git_model.GetFirstMatchProtectedBranchRule(ctx, pr.BaseRepoID, pr.BaseBranch)
 	if err != nil {
