@@ -6,10 +6,14 @@
 # injected via the GIT__<section>__<KEY> env contract. No deploy: here — the App
 # CR pins a semver tag, bumped by a reviewed universe change, not auto-rolled.
 #
-# No platforms: — the default is amd64 and arm64, which is what this Dockerfile
-# already builds: the frontend stage pins $BUILDPLATFORM and the Go stages take
-# the target, so each architecture compiles natively on the node that serves it.
-# A single-arch image here strands the forge on one half of the fleet.
+# No platforms: yet, and that publishes amd64 alone — hanzoai/ci reads
+# `.platforms // ["linux/amd64"]` on BOTH lanes, so 1.26.57 is a two-arch index
+# only because it was built by hand. The Dockerfile is ready: the frontend stage
+# pins $BUILDPLATFORM and the Go stages take the target. Getting both needs
+# `platforms:` here plus `mode: delegate` in cicd.yml, and two things stop that
+# lane today — the live cloud revision decodes runnerBuildReq.Platforms and drops
+# it, and the delegate POST carries no args, so GIT_VERSION below would vanish
+# and the daemon would report 0.0.0+unknown.
 #
 # GIT_VERSION reaches the Makefile as the VERSION file. The build context is an
 # export rather than a clone, so without this arg the daemon reports
