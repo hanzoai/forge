@@ -40,8 +40,8 @@ func TestPackageNpm(t *testing.T) {
 	packageDescription := "Test Description"
 	packageBinName := "cli"
 	packageBinPath := "./cli.sh"
-	repoType := "gitea"
-	repoURL := "http://localhost:3000/gitea/test.git"
+	repoType := "forge"
+	repoURL := "http://localhost:3000/forge/test.git"
 	repoDirectory := "package-subdir"
 
 	data := "H4sIAAAAAAAA/ytITM5OTE/VL4DQelnF+XkMVAYGBgZmJiYK2MRBwNDcSIHB2NTMwNDQzMwAqA7IMDUxA9LUdgg2UFpcklgEdAql5kD8ogCnhwio5lJQUMpLzE1VslJQcihOzi9I1S9JLS7RhSYIJR2QgrLUouLM/DyQGkM9Az1D3YIiqExKanFyUWZBCVQ2BKhVwQVJDKwosbQkI78IJO/tZ+LsbRykxFXLNdA+HwWjYBSMgpENACgAbtAACAAA"
@@ -278,7 +278,7 @@ func TestPackageNpm(t *testing.T) {
 		}{
 			{"", 0, 0, 1, 1},
 			{"", 0, 10, 1, 1},
-			{"gitea", 0, 10, 0, 0},
+			{"forge", 0, 10, 0, 0},
 			{"test", 0, 10, 1, 1},
 			{"test", 1, 10, 1, 0},
 		}

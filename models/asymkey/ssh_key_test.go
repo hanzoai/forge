@@ -135,7 +135,7 @@ AAAAC3NzaC1lZDI1NTE5AAAAICV0MGX/W9IvLA4FXpIuUcdDcbj5KX4syHgsTy7soVgf
 		{"---- NOT A REAL KEY ----"},
 		{"bad\nkey"},
 		{"\t\t:)\t\r\n"},
-		{"\r\ntest \r\ngitea\r\n\r\n"},
+		{"\r\ntest \r\nforge\r\n\r\n"},
 	} {
 		_, err := CheckPublicKeyString(invalidKeys.content)
 		assert.Error(t, err)

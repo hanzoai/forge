@@ -19,7 +19,7 @@ import (
 )
 
 var testLicenseContent = `
-Copyright (c) 2024 Gitea
+Copyright (c) 2024 Hanzo AI, Inc.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -52,7 +52,7 @@ func TestAPIRepoLicense(t *testing.T) {
 		resp = session.MakeRequest(t, req, http.StatusOK)
 		assert.NotEmpty(t, test.RedirectURL(resp))
 
-		// let gitea update repo license
+		// let the forge update repo license
 		time.Sleep(time.Second)
 		checkRepoLicense(t, "user2", "repo1", []string{"BSD-2-Clause"})
 
@@ -64,7 +64,7 @@ func TestAPIRepoLicense(t *testing.T) {
 		}).AddTokenAuth(token)
 		session.MakeRequest(t, req, http.StatusOK)
 
-		// let gitea update repo license
+		// let the forge update repo license
 		time.Sleep(time.Second)
 		checkRepoLicense(t, "user2", "repo1", []string{"MIT"})
 	})

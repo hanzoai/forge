@@ -45,7 +45,7 @@ func TestNewWebHookLink(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	require.NoError(t, db_model.Insert(t.Context(), &webhook.Webhook{
 		RepoID:      1,
-		URL:         "http://localhost/gitea-test-webhook-link",
+		URL:         "http://localhost/forge-test-webhook-link",
 		ContentType: webhook.ContentTypeJSON,
 		Events:      `{}`,
 		IsActive:    true,
@@ -885,8 +885,8 @@ func Test_WebhookPackage(t *testing.T) {
 
 		// 2. trigger the webhook
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeAll)
-		url := fmt.Sprintf("/v1/packages/%s/generic/%s/%s", "org3", "gitea", "v1.24.0")
-		req := NewRequestWithBody(t, "PUT", url+"/gitea", strings.NewReader("This is a dummy file")).
+		url := fmt.Sprintf("/v1/packages/%s/generic/%s/%s", "org3", "forge", "v1.24.0")
+		req := NewRequestWithBody(t, "PUT", url+"/forge", strings.NewReader("This is a dummy file")).
 			AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusCreated)
 
@@ -894,7 +894,7 @@ func Test_WebhookPackage(t *testing.T) {
 		assert.Equal(t, "package", triggeredEvent)
 		assert.Len(t, payloads, 1)
 		assert.EqualValues(t, "created", payloads[0].Action)
-		assert.Equal(t, "gitea", payloads[0].Package.Name)
+		assert.Equal(t, "forge", payloads[0].Package.Name)
 		assert.Equal(t, "generic", payloads[0].Package.Type)
 		assert.Equal(t, "org3", payloads[0].Organization.UserName)
 		assert.Equal(t, "v1.24.0", payloads[0].Package.Version)

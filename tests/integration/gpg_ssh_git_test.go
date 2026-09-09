@@ -44,8 +44,8 @@ func TestGPGGit(t *testing.T) {
 	require.NoError(t, err, "importTestingKey")
 
 	defer test.MockVariableValue(&setting.Repository.Signing.SigningKey, rootKeyPair.PrimaryKey.KeyIdShortString())()
-	defer test.MockVariableValue(&setting.Repository.Signing.SigningName, "gitea")()
-	defer test.MockVariableValue(&setting.Repository.Signing.SigningEmail, "gitea@fake.local")()
+	defer test.MockVariableValue(&setting.Repository.Signing.SigningName, "forge")()
+	defer test.MockVariableValue(&setting.Repository.Signing.SigningEmail, "forge@fake.local")()
 	defer test.MockVariableValue(&setting.Repository.Signing.InitialCommit, []string{"never"})()
 	defer test.MockVariableValue(&setting.Repository.Signing.CRUDActions, []string{"never"})()
 
@@ -70,8 +70,8 @@ func TestSSHGit(t *testing.T) {
 	require.NoError(t, err, "os.WriteFile id_ed25519")
 
 	defer test.MockVariableValue(&setting.Repository.Signing.SigningKey, tmpDir+"/id_ed25519.pub")()
-	defer test.MockVariableValue(&setting.Repository.Signing.SigningName, "gitea")()
-	defer test.MockVariableValue(&setting.Repository.Signing.SigningEmail, "gitea@fake.local")()
+	defer test.MockVariableValue(&setting.Repository.Signing.SigningName, "forge")()
+	defer test.MockVariableValue(&setting.Repository.Signing.SigningEmail, "forge@fake.local")()
 	defer test.MockVariableValue(&setting.Repository.Signing.SigningFormat, "ssh")()
 	defer test.MockVariableValue(&setting.Repository.Signing.InitialCommit, []string{"never"})()
 	defer test.MockVariableValue(&setting.Repository.Signing.CRUDActions, []string{"never"})()
@@ -139,13 +139,13 @@ func testGitSigning(t *testing.T) {
 				t, testCtx, user, "master", "always", "signed-always.txt", func(t *testing.T, response api.FileResponse) {
 					require.NotNil(t, response.Verification, "no verification provided with response! %v", response)
 					require.True(t, response.Verification.Verified)
-					assert.Equal(t, "gitea@fake.local", response.Verification.Signer.Email)
+					assert.Equal(t, "forge@fake.local", response.Verification.Signer.Email)
 				}))
 			t.Run("CreateCRUDFile-ParentSigned-always", crudActionCreateFile(
 				t, testCtx, user, "parentsigned", "parentsigned-always", "signed-parent2.txt", func(t *testing.T, response api.FileResponse) {
 					require.NotNil(t, response.Verification, "no verification provided with response! %v", response)
 					require.True(t, response.Verification.Verified)
-					assert.Equal(t, "gitea@fake.local", response.Verification.Signer.Email)
+					assert.Equal(t, "forge@fake.local", response.Verification.Signer.Email)
 				}))
 		})
 
@@ -157,7 +157,7 @@ func testGitSigning(t *testing.T) {
 				t, testCtx, user, "always", "always-parentsigned", "signed-always-parentsigned.txt", func(t *testing.T, response api.FileResponse) {
 					require.NotNil(t, response.Verification, "no verification provided with response! %v", response)
 					require.True(t, response.Verification.Verified)
-					assert.Equal(t, "gitea@fake.local", response.Verification.Signer.Email)
+					assert.Equal(t, "forge@fake.local", response.Verification.Signer.Email)
 				}))
 		})
 
@@ -170,7 +170,7 @@ func testGitSigning(t *testing.T) {
 				require.NotNil(t, branch.Commit, "no commit provided with branch! %v", branch)
 				require.NotNil(t, branch.Commit.Verification, "no verification provided with branch commit! %v", branch.Commit)
 				require.True(t, branch.Commit.Verification.Verified)
-				assert.Equal(t, "gitea@fake.local", branch.Commit.Verification.Signer.Email)
+				assert.Equal(t, "forge@fake.local", branch.Commit.Verification.Signer.Email)
 			}))
 		})
 
@@ -193,7 +193,7 @@ func testGitSigning(t *testing.T) {
 			t.Run("CreateCRUDFile-ParentSigned", crudActionCreateFile(
 				t, testCtx, user, "master", "parentsigned", "signed-parent.txt", func(t *testing.T, response api.FileResponse) {
 					require.True(t, response.Verification.Verified)
-					assert.Equal(t, "gitea@fake.local", response.Verification.Signer.Email)
+					assert.Equal(t, "forge@fake.local", response.Verification.Signer.Email)
 				}))
 		})
 
@@ -205,7 +205,7 @@ func testGitSigning(t *testing.T) {
 			t.Run("CreateCRUDFile-Always", crudActionCreateFile(
 				t, testCtx, user, "master", "always", "signed-always.txt", func(t *testing.T, response api.FileResponse) {
 					require.True(t, response.Verification.Verified)
-					assert.Equal(t, "gitea@fake.local", response.Verification.Signer.Email)
+					assert.Equal(t, "forge@fake.local", response.Verification.Signer.Email)
 				}))
 		})
 

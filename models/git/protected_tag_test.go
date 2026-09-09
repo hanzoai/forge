@@ -73,22 +73,22 @@ func TestIsUserAllowedToControlTag(t *testing.T) {
 			allowed: true,
 		},
 		{
-			name:    "gitea",
+			name:    "forge",
 			userid:  1,
 			allowed: true,
 		},
 		{
-			name:    "gitea",
+			name:    "forge",
 			userid:  3,
 			allowed: false,
 		},
 		{
-			name:    "test-gitea",
+			name:    "test-forge",
 			userid:  1,
 			allowed: true,
 		},
 		{
-			name:    "test-gitea",
+			name:    "test-forge",
 			userid:  3,
 			allowed: false,
 		},
@@ -122,7 +122,7 @@ func TestIsUserAllowedToControlTag(t *testing.T) {
 	t.Run("Glob", func(t *testing.T) {
 		protectedTags := []*git_model.ProtectedTag{
 			{
-				NamePattern:      `*gitea`,
+				NamePattern:      `*forge`,
 				AllowlistUserIDs: []int64{1},
 			},
 			{
@@ -144,7 +144,7 @@ func TestIsUserAllowedToControlTag(t *testing.T) {
 	t.Run("Regex", func(t *testing.T) {
 		protectedTags := []*git_model.ProtectedTag{
 			{
-				NamePattern:      `/gitea\z/`,
+				NamePattern:      `/forge\z/`,
 				AllowlistUserIDs: []int64{1},
 			},
 			{

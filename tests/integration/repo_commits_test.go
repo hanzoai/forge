@@ -61,7 +61,7 @@ func TestRepoCommits(t *testing.T) {
 	})
 
 	t.Run("CommitListNonExistingCommiter", func(t *testing.T) {
-		// check the commit list for a repository with no gitea user
+		// check the commit list for a repository whose commit author has no account here
 		// * commit 985f0301dba5e7b34be866819cd15ad3d8f508ee (branch2)
 		// * Author: 6543 <6543@obermui.de>
 		req := NewRequest(t, "GET", "/user2/repo1/commits/branch/branch2")

@@ -52,7 +52,7 @@ func SyncDirs(srcPath, destPath string) error {
 		return err
 	}
 	if strings.HasPrefix(destPathAbs+string(filepath.Separator), devDataPathAbs+string(filepath.Separator)) {
-		return errors.New("destination path should not be inside Gitea data directory, otherwise your data for dev mode will be removed")
+		return errors.New("destination path should not be inside the data directory, otherwise your data for dev mode will be removed")
 	}
 
 	err = os.MkdirAll(destPath, os.ModePerm)

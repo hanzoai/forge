@@ -20,7 +20,7 @@ func TestAPIUpdateUser(t *testing.T) {
 	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteUser)
 
 	req := NewRequestWithJSON(t, "PATCH", "/v1/user/settings", map[string]string{
-		"website": "https://gitea.com",
+		"website": "https://example.com",
 	}).AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusOK)
 }

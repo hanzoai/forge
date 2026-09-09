@@ -42,7 +42,7 @@ func testAPIOrgCreateRename(t *testing.T) {
 		UserName:    "user1_org",
 		FullName:    "User1's organization",
 		Description: "This organization created by user1",
-		Website:     "https://try.gitea.io",
+		Website:     "https://example.com",
 		Location:    "Shanghai",
 		Visibility:  "limited",
 	}

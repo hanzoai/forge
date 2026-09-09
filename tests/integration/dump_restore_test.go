@@ -30,7 +30,7 @@ import (
 
 func TestDumpRestore(t *testing.T) {
 	onGitRun(t, func(t *testing.T, u *url.URL) {
-		// Gitea SDK (go-sdk) need to parse the AppVer from server response, so we must set it to a valid version string.
+		// The SDK needs to parse the AppVer from the server response, so we must set it to a valid version string.
 		defer test.MockVariableValue(&setting.AppVer, "1.16.0")()
 		defer test.MockVariableValue(&setting.Migrations.AllowLocalNetworks, true)()
 		assert.NoError(t, migrations.Init())
@@ -44,7 +44,7 @@ func TestDumpRestore(t *testing.T) {
 		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteIssue, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeReadMisc)
 
 		//
-		// Phase 1: dump repo1 from the Gitea instance to the filesystem
+		// Phase 1: dump repo1 from the instance to the filesystem
 		//
 
 		ctx := t.Context()
@@ -71,7 +71,7 @@ func TestDumpRestore(t *testing.T) {
 		}
 
 		//
-		// Phase 2: restore from the filesystem to the Gitea instance in restoredrepo
+		// Phase 2: restore from the filesystem to the instance in restoredrepo
 		//
 
 		newreponame := "restored"
@@ -83,7 +83,7 @@ func TestDumpRestore(t *testing.T) {
 		newrepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{Name: newreponame})
 
 		//
-		// Phase 3: dump restored from the Gitea instance to the filesystem
+		// Phase 3: dump restored from the instance to the filesystem
 		//
 		opts.RepoName = newreponame
 		opts.CloneAddr = newrepo.CloneLinkGeneral(t.Context()).HTTPS

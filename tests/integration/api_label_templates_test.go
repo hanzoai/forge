@@ -33,7 +33,7 @@ func TestAPIListLabelTemplates(t *testing.T) {
 func TestAPIGetLabelTemplateInfo(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	// If Gitea has for some reason no Label templates, we need to skip this test
+	// If the forge has for some reason no Label templates, we need to skip this test
 	if len(repo_module.LabelTemplateFiles) == 0 {
 		return
 	}

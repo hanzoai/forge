@@ -36,8 +36,8 @@ func TestHashEmail(t *testing.T) {
 		avatars_model.HashEmail(""),
 	)
 	assert.Equal(t,
-		"353cbad9b58e69c96154ad99f92bedc7",
-		avatars_model.HashEmail("gitea@example.com"),
+		"158ad8eecbf45909fc3ef995ac828077",
+		avatars_model.HashEmail("forge@example.com"),
 	)
 }
 
@@ -47,12 +47,12 @@ func TestSizedAvatarLink(t *testing.T) {
 	disableGravatar(t)
 	config.GetDynGetter().InvalidateCache()
 	assert.Equal(t, "/testsuburl/assets/img/avatar_default.png",
-		avatars_model.GenerateEmailAvatarFastLink(t.Context(), "gitea@example.com", 100))
+		avatars_model.GenerateEmailAvatarFastLink(t.Context(), "forge@example.com", 100))
 
 	enableGravatar(t)
 	config.GetDynGetter().InvalidateCache()
 	assert.Equal(t,
-		"https://secure.gravatar.com/avatar/353cbad9b58e69c96154ad99f92bedc7?d=identicon&s=100",
-		avatars_model.GenerateEmailAvatarFastLink(t.Context(), "gitea@example.com", 100),
+		"https://secure.gravatar.com/avatar/158ad8eecbf45909fc3ef995ac828077?d=identicon&s=100",
+		avatars_model.GenerateEmailAvatarFastLink(t.Context(), "forge@example.com", 100),
 	)
 }

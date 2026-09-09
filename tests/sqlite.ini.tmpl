@@ -1,10 +1,10 @@
 WORK_PATH = {{TEST_WORK_PATH}}
-APP_NAME = Gitea: Git with a cup of tea
+APP_NAME = Hanzo Git
 RUN_MODE = prod
 
 [database]
 DB_TYPE = sqlite3
-PATH    = gitea-test.db
+PATH    = forge-test.db
 
 [indexer]
 REPO_INDEXER_ENABLED = true
@@ -45,7 +45,7 @@ SSH_TRUSTED_USER_CA_KEYS = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCb4DC1dMFnJ6pXW
 [mailer]
 ENABLED     = true
 PROTOCOL = dummy
-FROM        = sqlite-integration-test@gitea.io
+FROM        = sqlite-integration-test@forge.example
 
 [service]
 REGISTER_EMAIL_CONFIRM            = false

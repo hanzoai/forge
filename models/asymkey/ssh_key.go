@@ -315,7 +315,7 @@ func AddPublicKeysBySource(ctx context.Context, usr *user_model.User, s *auth.So
 	loop:
 		for len(keys) > 0 && err == nil {
 			var out ssh.PublicKey
-			// We ignore options as they are not relevant to Gitea
+			// We ignore options as they are not relevant here
 			out, _, _, keys, err = ssh.ParseAuthorizedKey(keys)
 			if err != nil {
 				break loop
@@ -395,10 +395,10 @@ func SynchronizePublicKeys(ctx context.Context, usr *user_model.User, s *auth.So
 
 	// Mark keys from DB that no longer exist in the source for deletion
 	var gitKeysToDelete []string
-	for _, giteaKey := range gitKeys {
-		if !util.SliceContainsString(providedKeys, giteaKey) {
-			log.Trace("synchronizePublicKeys[%s]: Marking Public SSH Key for deletion for user %s: %v", s.Name, usr.Name, giteaKey)
-			gitKeysToDelete = append(gitKeysToDelete, giteaKey)
+	for _, knownKey := range gitKeys {
+		if !util.SliceContainsString(providedKeys, knownKey) {
+			log.Trace("synchronizePublicKeys[%s]: Marking Public SSH Key for deletion for user %s: %v", s.Name, usr.Name, knownKey)
+			gitKeysToDelete = append(gitKeysToDelete, knownKey)
 		}
 	}
 

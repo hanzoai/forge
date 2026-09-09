@@ -793,7 +793,7 @@ func doAutoPRMerge(baseCtx *APITestContext, dstPath string) func(t *testing.T) {
 
 		// Call API to add Success status for commit
 		t.Run("CreateStatus", doAPICreateCommitStatusTest(ctx, commitID, commitstatus.CommitStatusSuccess, "testci"))
-		// wait to let gitea merge stuff
+		// wait to let the forge merge stuff
 		time.Sleep(time.Second)
 
 		// test pr status

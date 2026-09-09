@@ -110,7 +110,7 @@ func TestHTTPSigCert(t *testing.T) {
 
 	// parse our private key and create the httpsig request
 	sshSigner, _ := ssh.ParsePrivateKey([]byte(httpsigPrivateKey))
-	keyID := "gitea"
+	keyID := "forge"
 
 	// create our certificate signer using the ssh signer and our certificate
 	certSigner, err := ssh.NewCertSigner(pkcert.(*ssh.Certificate), sshSigner)

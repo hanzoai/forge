@@ -101,19 +101,19 @@ func TestPackageNuGet(t *testing.T) {
 	packageID := packageName
 	packageVersion := "1.0.3"
 	packageAuthors := "KN4CK3R"
-	packageDescription := "Gitea Test Package"
+	packageDescription := "Forge Test Package"
 	isPrerelease := strings.Contains(packageVersion, "-")
 
 	symbolFilename := "test.pdb"
 	symbolID := "d910bb6948bd4c6cb40155bcf52c3c94"
 
 	packageCopyright := "Package Copyright"
-	packageIconURL := "https://gitea.io/favicon.png"
+	packageIconURL := "https://forge.example/favicon.png"
 	packageLanguage := "Package Language"
-	packageLicenseURL := "https://gitea.io/license"
+	packageLicenseURL := "https://forge.example/license"
 	packageMinClientVersion := "1.0.0.0"
 	packageOwners := "Package Owners"
-	packageProjectURL := "https://gitea.io"
+	packageProjectURL := "https://forge.example"
 	packageReleaseNotes := "Package Release Notes"
 	summary := "This is a test package."
 	packageTags := "tag_1 tag_2 tag_3"
@@ -498,7 +498,7 @@ AAAjQmxvYgAAAGm7ENm9SGxMtAFVvPUsPJTF6PbtAAAAAFcVogEJAAAAAQAAAA==`)
 		t.Run("Symbol", func(t *testing.T) {
 			defer tests.PrintCurrentTest(t)()
 
-			req := NewRequest(t, "GET", fmt.Sprintf("%s/symbols/%s/%sFFFFFFFF/gitea.pdb", url, symbolFilename, symbolID))
+			req := NewRequest(t, "GET", fmt.Sprintf("%s/symbols/%s/%sFFFFFFFF/forge.pdb", url, symbolFilename, symbolID))
 			MakeRequest(t, req, http.StatusBadRequest)
 
 			req = NewRequest(t, "GET", fmt.Sprintf("%s/symbols/%s/%sFFFFFFFF/%s", url, symbolFilename, "00000000000000000000000000000000", symbolFilename)).
@@ -543,7 +543,7 @@ AAAjQmxvYgAAAGm7ENm9SGxMtAFVvPUsPJTF6PbtAAAAAFcVogEJAAAAAQAAAA==`)
 		}{
 			{"", 0, 0, 4, 4, false},
 			{"", 0, 10, 4, 4, false},
-			{"gitea", 0, 10, 0, 0, false},
+			{"forge", 0, 10, 0, 0, false},
 			{"test", 0, 10, 1, 1, false},
 			{"test", 1, 10, 1, 0, false},
 			{"almost.similar", 0, 0, 3, 3, true},

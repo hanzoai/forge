@@ -32,7 +32,7 @@ func TestPackageHelm(t *testing.T) {
 	packageName := "test-chart"
 	packageVersion := "1.0.3"
 	packageAuthor := "KN4CK3R"
-	packageDescription := "Gitea Test Package"
+	packageDescription := "Forge Test Package"
 
 	filename := fmt.Sprintf("%s-%s.tgz", packageName, packageVersion)
 

@@ -115,14 +115,14 @@ func HashAndVerifyWithSubKeysCommitVerification(sig *packet.Signature, payload s
 }
 
 // CalculateTrustStatus will calculate the TrustStatus for a commit verification within a repository
-// There are several trust models in Gitea
+// There are several trust models here
 func CalculateTrustStatus(verification *CommitVerification, repoTrustModel repo_model.TrustModelType, isOwnerMemberCollaborator func(*user_model.User) (bool, error), keyMap *map[string]bool) error {
 	if !verification.Verified {
 		return nil
 	}
 
 	// In the Committer trust model a signature is trusted if it matches the committer
-	// - it doesn't matter if they're a collaborator, the owner, Gitea or Github
+	// - it doesn't matter if they're a collaborator, the owner, the forge or Github
 	// NB: This model is commit verification only
 	if repoTrustModel == repo_model.CommitterTrustModel {
 		// default to "unmatched"

@@ -150,7 +150,7 @@ func TestActionsJobTokenPermissiveAccess(t *testing.T) {
 				require.NoError(t, actions_model.UpdateRun(t.Context(), task.Job.Run, "is_fork_pull_request"))
 
 				testURL := *u
-				testURL.User = url.UserPassword("gitea-actions", task.Token)
+				testURL.User = url.UserPassword("hanzo-actions", task.Token)
 
 				t.Run("ReadGitContent", func(t *testing.T) {
 					testURL.Path = "/user5/repo4.git/HEAD"
@@ -444,7 +444,7 @@ jobs:
 		// but it should not have write access
 		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/%s/%s.git/info/lfs/objects/batch", user2.Name, repo2.Name), lfs.BatchRequest{Operation: "upload"}).
 			SetHeader("Accept", lfs.MediaType).
-			AddBasicAuth("gitea-actions", task1Token)
+			AddBasicAuth("hanzo-actions", task1Token)
 		MakeRequest(t, req, http.StatusUnauthorized)
 
 		// set repo1&repo2 max permission to "write" so that the actions token can access code
@@ -466,11 +466,11 @@ jobs:
 		// now task1 has write access to repo1, but still only read access to repo2 (different repo)
 		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/%s/%s.git/info/lfs/objects/batch", user2.Name, repo1.Name), lfs.BatchRequest{Operation: "upload"}).
 			SetHeader("Accept", lfs.MediaType).
-			AddBasicAuth("gitea-actions", task1Token)
+			AddBasicAuth("hanzo-actions", task1Token)
 		MakeRequest(t, req, http.StatusOK)
 		req = NewRequestWithJSON(t, "POST", fmt.Sprintf("/%s/%s.git/info/lfs/objects/batch", user2.Name, repo2.Name), lfs.BatchRequest{Operation: "upload"}).
 			SetHeader("Accept", lfs.MediaType).
-			AddBasicAuth("gitea-actions", task1Token)
+			AddBasicAuth("hanzo-actions", task1Token)
 		MakeRequest(t, req, http.StatusUnauthorized)
 	})
 }
