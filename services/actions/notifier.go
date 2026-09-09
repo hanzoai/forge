@@ -27,6 +27,12 @@ import (
 	notify_service "github.com/hanzoai/git/services/notify"
 )
 
+// actionsNotifier starts workflow runs from repository events.
+//
+// The Sync* events, which a pull-mirror fetch raises for every ref that moved
+// upstream, fall through to NullNotifier: a fetch carries no authorship, and a
+// rewrite of upstream history arrives as one event per ref, each carrying the
+// tree that ref pointed at. Workflows run where the refs are written.
 type actionsNotifier struct {
 	notify_service.NullNotifier
 }
@@ -614,43 +620,6 @@ func (n *actionsNotifier) DeleteRef(ctx context.Context, pusher *user_model.User
 			Sender:     apiPusher,
 		}).
 		Notify(ctx)
-}
-
-func (n *actionsNotifier) SyncPushCommits(ctx context.Context, pusher *user_model.User, repo *repo_model.Repository, opts *repository.PushUpdateOptions, commits *repository.PushCommits) {
-	ctx = withMethod(ctx, "SyncPushCommits")
-
-	apiPusher := convert.ToUser(ctx, pusher, nil)
-	apiCommits, apiHeadCommit, err := commits.ToAPIPayloadCommits(ctx, repo)
-	if err != nil {
-		log.Error("commits.ToAPIPayloadCommits failed: %v", err)
-		return
-	}
-
-	newNotifyInput(repo, pusher, webhook_module.HookEventPush).
-		WithRef(opts.RefFullName.String()).
-		WithPayload(&api.PushPayload{
-			Ref:          opts.RefFullName.String(),
-			Before:       opts.OldCommitID,
-			After:        opts.NewCommitID,
-			CompareURL:   setting.AppURL + commits.CompareURL,
-			Commits:      apiCommits,
-			TotalCommits: commits.Len,
-			HeadCommit:   apiHeadCommit,
-			Repo:         convert.ToRepo(ctx, repo, access_model.Permission{AccessMode: perm_model.AccessModeOwner}),
-			Pusher:       apiPusher,
-			Sender:       apiPusher,
-		}).
-		Notify(ctx)
-}
-
-func (n *actionsNotifier) SyncCreateRef(ctx context.Context, pusher *user_model.User, repo *repo_model.Repository, refFullName git.RefName, refID string) {
-	ctx = withMethod(ctx, "SyncCreateRef")
-	n.CreateRef(ctx, pusher, repo, refFullName, refID)
-}
-
-func (n *actionsNotifier) SyncDeleteRef(ctx context.Context, pusher *user_model.User, repo *repo_model.Repository, refFullName git.RefName) {
-	ctx = withMethod(ctx, "SyncDeleteRef")
-	n.DeleteRef(ctx, pusher, repo, refFullName)
 }
 
 func (n *actionsNotifier) NewRelease(ctx context.Context, rel *repo_model.Release) {
