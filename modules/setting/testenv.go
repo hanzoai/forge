@@ -30,7 +30,7 @@ func detectGitTestRoot() string {
 	gitRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
 	fixturesDir := filepath.Join(gitRoot, "models", "fixtures")
 	if _, err := os.Stat(fixturesDir); err != nil {
-		panic("in gitea source code directory, fixtures directory not found: " + fixturesDir)
+		panic("in forge source code directory, fixtures directory not found: " + fixturesDir)
 	}
 	return gitRoot
 }
@@ -52,7 +52,7 @@ func SetupGitTestEnv() {
 		os.Exit(0)
 	}
 
-	initGiteaRoot := func() string {
+	initForgeRoot := func() string {
 		gitRoot := os.Getenv("GIT_TEST_ROOT")
 		if gitRoot == "" {
 			gitRoot = detectGitTestRoot()
@@ -60,9 +60,9 @@ func SetupGitTestEnv() {
 		gitTestSourceRoot = &gitRoot
 		return gitRoot
 	}
-	gitRoot := initGiteaRoot()
+	gitRoot := initForgeRoot()
 
-	initGiteaPaths := func() {
+	initForgePaths := func() {
 		// need to load assets (options, public) from the source code directory for testing
 		StaticRootPath = gitRoot
 		// during testing, the AppPath must point to the pre-built daemon in the source root
@@ -70,22 +70,22 @@ func SetupGitTestEnv() {
 		AppPath = filepath.Join(gitRoot, "gitd") + util.Iif(IsWindows, ".exe", "")
 	}
 
-	initGiteaConf := func() string {
-		// giteaConf (GIT_CONF) must be relative because it is used in the git hooks as "$GIT_ROOT/$GIT_CONF"
-		giteaConf := os.Getenv("GIT_TEST_CONF")
-		if giteaConf == "" {
+	initForgeConf := func() string {
+		// forgeConf (GIT_CONF) must be relative because it is used in the git hooks as "$GIT_ROOT/$GIT_CONF"
+		forgeConf := os.Getenv("GIT_TEST_CONF")
+		if forgeConf == "" {
 			// if no GIT_TEST_CONF, then it is in unit test, use a temp (non-existing / empty) config file
 			// do not really use such config file, the test can run concurrently, using the same config file will cause data-race between tests
-			giteaConf = "custom/conf/app-test-tmp.ini"
-			customConfBuiltin = filepath.Join(AppWorkPath, giteaConf)
+			forgeConf = "custom/conf/app-test-tmp.ini"
+			customConfBuiltin = filepath.Join(AppWorkPath, forgeConf)
 			CustomConf = customConfBuiltin
 			_ = os.Remove(CustomConf)
 		} else {
 			// CustomConf must be absolute path to make tests pass.
-			// At the moment, GIT_TEST_CONF is always in Gitea's source root
-			CustomConf = filepath.Join(gitRoot, giteaConf)
+			// At the moment, GIT_TEST_CONF is always in the forge's source root
+			CustomConf = filepath.Join(gitRoot, forgeConf)
 		}
-		return giteaConf
+		return forgeConf
 	}
 
 	cleanUpEnv := func() {
@@ -113,8 +113,8 @@ func SetupGitTestEnv() {
 		PasswordHashAlgo, _ = hash.SetDefaultPasswordHashAlgorithm("dummy")
 	}
 
-	initGiteaPaths()
-	giteaConf := initGiteaConf()
+	initForgePaths()
+	forgeConf := initForgeConf()
 	cleanUpEnv()
 	initWorkPathAndConfig()
 
@@ -124,11 +124,11 @@ func SetupGitTestEnv() {
 
 	// TODO: some git repo hooks (test fixtures) still use these env variables, need to be refactored in the future
 	_ = os.Setenv("GIT_ROOT", gitRoot)
-	_ = os.Setenv("GIT_CONF", giteaConf) // test fixture git hooks use "$GIT_ROOT/$GIT_CONF" in their scripts
+	_ = os.Setenv("GIT_CONF", forgeConf) // test fixture git hooks use "$GIT_ROOT/$GIT_CONF" in their scripts
 }
 
 func PrepareIntegrationTestConfig() error {
-	giteaTestRoot := detectGitTestRoot()
+	forgeTestRoot := detectGitTestRoot()
 	isInCI := os.Getenv("CI") != ""
 	testDatabase := os.Getenv("GIT_TEST_DATABASE")
 	if testDatabase == "" {
@@ -140,15 +140,15 @@ func PrepareIntegrationTestConfig() error {
 		_, _ = fmt.Fprintf(os.Stderr, "Environment variable GIT_TEST_DATABASE not set - defaulting to %s\n", testDatabase)
 	}
 
-	_ = os.Setenv("GIT_TEST_ROOT", giteaTestRoot)
+	_ = os.Setenv("GIT_TEST_ROOT", forgeTestRoot)
 	_ = os.Setenv("GIT_TEST_CONF", filepath.Join("tests", testDatabase+".ini"))
 
-	workPath := filepath.Join(giteaTestRoot, "tests/integration/gitea-integration-"+testDatabase)
+	workPath := filepath.Join(forgeTestRoot, "tests/integration/gitea-integration-"+testDatabase)
 	if err := os.MkdirAll(workPath, 0o755); err != nil {
 		return err
 	}
 
-	confFile := filepath.Join(giteaTestRoot, "tests", testDatabase+".ini")
+	confFile := filepath.Join(forgeTestRoot, "tests", testDatabase+".ini")
 	tmplBuf, err := os.ReadFile(confFile + ".tmpl")
 	if err != nil {
 		return err

@@ -17,11 +17,11 @@ import (
 )
 
 // CommitActionsStatusMap maps CommitStatus.ID to the live ActionRunJob status
-// for Gitea Actions rows.
+// for Forge Actions rows.
 type CommitActionsStatusMap map[int64]actions_model.Status
 
 // IconStatus returns the action status name to route the icon through
-// repo/icons/action_status, or "" when the row isn't from Gitea Actions.
+// repo/icons/action_status, or "" when the row isn't from Forge Actions.
 func (m CommitActionsStatusMap) IconStatus(s *git_model.CommitStatus) string {
 	if status, ok := m[s.ID]; ok {
 		return status.String()
@@ -30,7 +30,7 @@ func (m CommitActionsStatusMap) IconStatus(s *git_model.CommitStatus) string {
 }
 
 // GetCommitActionsStatusMap resolves the live ActionRunJob.Status for every
-// CommitStatus row backed by Gitea Actions. Rows from other sources (external
+// CommitStatus row backed by Forge Actions. Rows from other sources (external
 // CIs, API) are left untouched and rendered from their stored State.
 func GetCommitActionsStatusMap(ctx context.Context, statuses []*git_model.CommitStatus) CommitActionsStatusMap {
 	if len(statuses) == 0 {

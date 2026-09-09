@@ -22,68 +22,68 @@ func TestShellEscape(t *testing.T) {
 			"a/b/c/d",
 		}, {
 			"Prefixed tilde - with normal stuff - should not escape",
-			"~/src/go/gitea/gitea",
-			"~/src/go/gitea/gitea",
+			"~/src/go/forge/forge",
+			"~/src/go/forge/forge",
 		}, {
 			"Typical windows path with spaces - should get doublequote escaped",
-			`C:\Program Files\Gitea v1.13 - I like lots of spaces\gitea`,
-			`"C:\\Program Files\\Gitea v1.13 - I like lots of spaces\\gitea"`,
+			`C:\Program Files\Forge v1.13 - I like lots of spaces\forge`,
+			`"C:\\Program Files\\Forge v1.13 - I like lots of spaces\\forge"`,
 		}, {
 			"Forward-slashed windows path with spaces - should get doublequote escaped",
-			"C:/Program Files/Gitea v1.13 - I like lots of spaces/gitea",
-			`"C:/Program Files/Gitea v1.13 - I like lots of spaces/gitea"`,
+			"C:/Program Files/Forge v1.13 - I like lots of spaces/forge",
+			`"C:/Program Files/Forge v1.13 - I like lots of spaces/forge"`,
 		}, {
 			"Prefixed tilde - but then a space filled path",
-			"~git/Gitea v1.13/gitea",
-			`~git/"Gitea v1.13/gitea"`,
+			"~git/Forge v1.13/forge",
+			`~git/"Forge v1.13/forge"`,
 		}, {
 			"Bangs are unfortunately not predictable so need to be singlequoted",
-			"C:/Program Files/Gitea!/gitea",
-			`'C:/Program Files/Gitea!/gitea'`,
+			"C:/Program Files/Forge!/forge",
+			`'C:/Program Files/Forge!/forge'`,
 		}, {
 			"Newlines are just irritating",
-			"/home/git/Gitea\n\nWHY-WOULD-YOU-DO-THIS\n\nGitea/gitea",
-			"'/home/git/Gitea\n\nWHY-WOULD-YOU-DO-THIS\n\nGitea/gitea'",
+			"/home/git/Forge\n\nWHY-WOULD-YOU-DO-THIS\n\nHanzo/forge",
+			"'/home/git/Forge\n\nWHY-WOULD-YOU-DO-THIS\n\nHanzo/forge'",
 		}, {
 			"Similarly we should nicely handle multiple single quotes if we have to single-quote",
 			"'!''!'''!''!'!'",
 			`\''!'\'\''!'\'\'\''!'\'\''!'\''!'\'`,
 		}, {
 			"Double quote < ...",
-			"~/<gitea",
-			"~/\"<gitea\"",
+			"~/<forge",
+			"~/\"<forge\"",
 		}, {
 			"Double quote > ...",
-			"~/gitea>",
-			"~/\"gitea>\"",
+			"~/forge>",
+			"~/\"forge>\"",
 		}, {
 			"Double quote and escape $ ...",
-			"~/$gitea",
-			"~/\"\\$gitea\"",
+			"~/$forge",
+			"~/\"\\$forge\"",
 		}, {
 			"Double quote {...",
-			"~/{gitea",
-			"~/\"{gitea\"",
+			"~/{forge",
+			"~/\"{forge\"",
 		}, {
 			"Double quote }...",
-			"~/gitea}",
-			"~/\"gitea}\"",
+			"~/forge}",
+			"~/\"forge}\"",
 		}, {
 			"Double quote ()...",
-			"~/(gitea)",
-			"~/\"(gitea)\"",
+			"~/(forge)",
+			"~/\"(forge)\"",
 		}, {
 			"Double quote and escape `...",
-			"~/gitea`",
-			"~/\"gitea\\`\"",
+			"~/forge`",
+			"~/\"forge\\`\"",
 		}, {
 			"Double quotes can handle a number of things without having to escape them but not everything ...",
-			"~/<gitea> ${gitea} `gitea` [gitea] (gitea) \"gitea\" \\gitea\\ 'gitea'",
-			"~/\"<gitea> \\${gitea} \\`gitea\\` [gitea] (gitea) \\\"gitea\\\" \\\\gitea\\\\ 'gitea'\"",
+			"~/<forge> ${forge} `forge` [forge] (forge) \"forge\" \\forge\\ 'forge'",
+			"~/\"<forge> \\${forge} \\`forge\\` [forge] (forge) \\\"forge\\\" \\\\forge\\\\ 'forge'\"",
 		}, {
 			"Single quotes don't need to escape except for '...",
-			"~/<gitea> ${gitea} `gitea` (gitea) !gitea! \"gitea\" \\gitea\\ 'gitea'",
-			"~/'<gitea> ${gitea} `gitea` (gitea) !gitea! \"gitea\" \\gitea\\ '\\''gitea'\\'",
+			"~/<forge> ${forge} `forge` (forge) !forge! \"forge\" \\forge\\ 'forge'",
+			"~/'<forge> ${forge} `forge` (forge) !forge! \"forge\" \\forge\\ '\\''forge'\\'",
 		},
 	}
 	for _, tt := range tests {

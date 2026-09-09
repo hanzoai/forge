@@ -16,10 +16,10 @@ import (
 )
 
 const (
-	packageName          = "gitea"
+	packageName          = "forge"
 	packageVersion       = "1.0.1"
 	packageDescription   = "Package Description"
-	packageRepositoryURL = "https://gitea.io/gitea/gitea"
+	packageRepositoryURL = "https://forge.example/forge/forge"
 	packageLicenseURL    = "https://opensource.org/license/mit"
 	packageAuthor        = "KN4CK3R"
 	packageLicense       = "MIT"

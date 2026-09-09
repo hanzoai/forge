@@ -19,7 +19,7 @@ func TestParseUses(t *testing.T) {
 			want UsesRef
 		}{
 			{
-				name: "gitea dir, .yml",
+				name: "forge dir, .yml",
 				in:   "./.hanzo/workflows/build.yml",
 				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/workflows/build.yml"},
 			},
@@ -29,7 +29,7 @@ func TestParseUses(t *testing.T) {
 				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".github/workflows/build.yml"},
 			},
 			{
-				name: "gitea dir, .yaml",
+				name: "forge dir, .yaml",
 				in:   "./.hanzo/workflows/build.yaml",
 				want: UsesRef{Kind: UsesKindLocalSameRepo, Path: ".hanzo/workflows/build.yaml"},
 			},
@@ -76,7 +76,7 @@ func TestParseUses(t *testing.T) {
 			want UsesRef
 		}{
 			{
-				name: "gitea dir, simple ref",
+				name: "forge dir, simple ref",
 				in:   "owner/repo/.hanzo/workflows/build.yml@v1",
 				want: UsesRef{
 					Kind:  UsesKindLocalCrossRepo,
@@ -176,7 +176,7 @@ func TestParseUses(t *testing.T) {
 			{name: "cross-repo wrong extension", in: "owner/repo/.hanzo/workflows/build.txt@v1"},
 			{name: "cross-repo path traversal", in: "owner/repo/.hanzo/workflows/../escape.yml@v1"},
 			{name: "cross-repo double slash in path", in: "owner/repo/.hanzo/workflows//build.yml@v1"},
-			// owner/repo with chars Gitea's name validators reject
+			// owner/repo with chars the forge's name validators reject
 			{name: "cross-repo owner with space", in: "bad owner/repo/.hanzo/workflows/build.yml@v1"},
 			{name: "cross-repo repo with @", in: "owner/re@po/.hanzo/workflows/build.yml@v1"},
 		}

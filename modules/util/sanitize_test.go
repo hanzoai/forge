@@ -23,24 +23,24 @@ func TestSanitizeCredentialURLs(t *testing.T) {
 		expected string
 	}{
 		{
-			"https://github.com/go-gitea/test_repo.git",
-			"https://github.com/go-gitea/test_repo.git",
+			"https://github.com/hanzoai/test_repo.git",
+			"https://github.com/hanzoai/test_repo.git",
 		},
 		{
-			"https://mytoken@github.com/go-gitea/test_repo.git",
-			"https://" + userInfoPlaceholder + "@github.com/go-gitea/test_repo.git",
+			"https://mytoken@github.com/hanzoai/test_repo.git",
+			"https://" + userInfoPlaceholder + "@github.com/hanzoai/test_repo.git",
 		},
 		{
-			"https://user:password@github.com/go-gitea/test_repo.git",
-			"https://" + userInfoPlaceholder + "@github.com/go-gitea/test_repo.git",
+			"https://user:password@github.com/hanzoai/test_repo.git",
+			"https://" + userInfoPlaceholder + "@github.com/hanzoai/test_repo.git",
 		},
 		{
-			"https://user:password@[::]/go-gitea/test_repo.git",
-			"https://" + userInfoPlaceholder + "@[::]/go-gitea/test_repo.git",
+			"https://user:password@[::]/hanzoai/test_repo.git",
+			"https://" + userInfoPlaceholder + "@[::]/hanzoai/test_repo.git",
 		},
 		{
-			"https://user:password@[2001:db8::1]:8080/go-gitea/test_repo.git",
-			"https://" + userInfoPlaceholder + "@[2001:db8::1]:8080/go-gitea/test_repo.git",
+			"https://user:password@[2001:db8::1]:8080/hanzoai/test_repo.git",
+			"https://" + userInfoPlaceholder + "@[2001:db8::1]:8080/hanzoai/test_repo.git",
 		},
 		{
 			"see https://u:p@[::1]/x and https://u2:p2@h2",
@@ -91,8 +91,8 @@ func TestSanitizeCredentialURLs(t *testing.T) {
 			"fatal: unable to look up " + userInfoPlaceholder + "@github.com (port 9418)",
 		},
 		{
-			"git failed for user:token@github.com/go-gitea/test_repo.git",
-			"git failed for " + userInfoPlaceholder + "@github.com/go-gitea/test_repo.git",
+			"git failed for user:token@github.com/hanzoai/test_repo.git",
+			"git failed for " + userInfoPlaceholder + "@github.com/hanzoai/test_repo.git",
 		},
 		{
 			// SSH-form git URL ("git@host:path") must not let a later credential URL through

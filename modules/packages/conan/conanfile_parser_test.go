@@ -15,11 +15,11 @@ const (
 	name             = "ConanPackage"
 	version          = "1.2"
 	license          = "MIT"
-	author           = "Gitea <info@gitea.io>"
-	homepage         = "https://gitea.io/"
-	url              = "https://gitea.com/"
+	author           = "Forge <info@forge.example>"
+	homepage         = "https://forge.example/"
+	url              = "https://forge.example/"
 	description      = "Description of ConanPackage"
-	topic1           = "gitea"
+	topic1           = "forge"
 	topic2           = "conan"
 	contentConanfile = `from conans import ConanFile, CMake, tools
 

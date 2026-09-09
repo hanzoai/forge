@@ -16,11 +16,11 @@ import (
 )
 
 const (
-	packageName    = "gitea"
+	packageName    = "forge"
 	packageVersion = "1.0.1"
 	author         = "KN4CK3R"
 	description    = "Package Description"
-	projectURL     = "https://gitea.io"
+	projectURL     = "https://forge.example"
 	license        = "GPL (>= 2)"
 )
 

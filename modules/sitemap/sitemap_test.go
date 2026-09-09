@@ -33,30 +33,30 @@ func TestNewSitemap(t *testing.T) {
 		{
 			name: "regular",
 			urls: []URL{
-				{URL: "https://gitea.io/test1", LastMod: &ts},
+				{URL: "https://forge.example/test1", LastMod: &ts},
 			},
 			want: xml.Header + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` +
-				"<url><loc>https://gitea.io/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></url>" +
+				"<url><loc>https://forge.example/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></url>" +
 				"</urlset>\n",
 		},
 		{
 			name: "without lastmod",
 			urls: []URL{
-				{URL: "https://gitea.io/test1"},
+				{URL: "https://forge.example/test1"},
 			},
 			want: xml.Header + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` +
-				"<url><loc>https://gitea.io/test1</loc></url>" +
+				"<url><loc>https://forge.example/test1</loc></url>" +
 				"</urlset>\n",
 		},
 		{
 			name: "multiple",
 			urls: []URL{
-				{URL: "https://gitea.io/test1", LastMod: &ts},
-				{URL: "https://gitea.io/test2", LastMod: nil},
+				{URL: "https://forge.example/test1", LastMod: &ts},
+				{URL: "https://forge.example/test2", LastMod: nil},
 			},
 			want: xml.Header + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` +
-				"<url><loc>https://gitea.io/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></url>" +
-				"<url><loc>https://gitea.io/test2</loc></url>" +
+				"<url><loc>https://forge.example/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></url>" +
+				"<url><loc>https://forge.example/test2</loc></url>" +
 				"</urlset>\n",
 		},
 		{
@@ -109,30 +109,30 @@ func TestNewSitemapIndex(t *testing.T) {
 		{
 			name: "regular",
 			urls: []URL{
-				{URL: "https://gitea.io/test1", LastMod: &ts},
+				{URL: "https://forge.example/test1", LastMod: &ts},
 			},
 			want: xml.Header + `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` +
-				"<sitemap><loc>https://gitea.io/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></sitemap>" +
+				"<sitemap><loc>https://forge.example/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></sitemap>" +
 				"</sitemapindex>\n",
 		},
 		{
 			name: "without lastmod",
 			urls: []URL{
-				{URL: "https://gitea.io/test1"},
+				{URL: "https://forge.example/test1"},
 			},
 			want: xml.Header + `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` +
-				"<sitemap><loc>https://gitea.io/test1</loc></sitemap>" +
+				"<sitemap><loc>https://forge.example/test1</loc></sitemap>" +
 				"</sitemapindex>\n",
 		},
 		{
 			name: "multiple",
 			urls: []URL{
-				{URL: "https://gitea.io/test1", LastMod: &ts},
-				{URL: "https://gitea.io/test2", LastMod: nil},
+				{URL: "https://forge.example/test1", LastMod: &ts},
+				{URL: "https://forge.example/test2", LastMod: nil},
 			},
 			want: xml.Header + `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` +
-				"<sitemap><loc>https://gitea.io/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></sitemap>" +
-				"<sitemap><loc>https://gitea.io/test2</loc></sitemap>" +
+				"<sitemap><loc>https://forge.example/test1</loc><lastmod>2022-04-30T12:33:28Z</lastmod></sitemap>" +
+				"<sitemap><loc>https://forge.example/test2</loc></sitemap>" +
 				"</sitemapindex>\n",
 		},
 		{

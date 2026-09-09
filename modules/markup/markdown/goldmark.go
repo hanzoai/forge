@@ -95,7 +95,7 @@ func (g *ASTTransformer) Transform(node *ast.Document, reader text.Reader, pc pa
 	}
 }
 
-// NewHTMLRenderer creates a HTMLRenderer to render in the gitea form.
+// NewHTMLRenderer creates a HTMLRenderer to render in the forge's form.
 func NewHTMLRenderer(renderInternal *internal.RenderInternal, opts ...html.Option) renderer.NodeRenderer {
 	r := &HTMLRenderer{
 		renderInternal: renderInternal,
@@ -108,7 +108,7 @@ func NewHTMLRenderer(renderInternal *internal.RenderInternal, opts ...html.Optio
 }
 
 // HTMLRenderer is a renderer.NodeRenderer implementation that
-// renders gitea specific features.
+// renders forge-specific features.
 type HTMLRenderer struct {
 	html.Config
 	renderInternal *internal.RenderInternal

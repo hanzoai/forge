@@ -23,139 +23,139 @@ func TestParseGitURLs(t *testing.T) {
 		expected *GitURL
 	}{
 		{
-			kase: "git@127.0.0.1:go-gitea/gitea.git",
+			kase: "git@127.0.0.1:hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "ssh",
 					User:   url.User("git"),
 					Host:   "127.0.0.1",
-					Path:   "go-gitea/gitea.git",
+					Path:   "hanzoai/forge.git",
 				},
 				extraMark: 1,
 			},
 		},
 		{
-			kase: "git@[fe80::14fc:cec5:c174:d88%2510]:go-gitea/gitea.git",
+			kase: "git@[fe80::14fc:cec5:c174:d88%2510]:hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "ssh",
 					User:   url.User("git"),
 					Host:   "[fe80::14fc:cec5:c174:d88%10]",
-					Path:   "go-gitea/gitea.git",
+					Path:   "hanzoai/forge.git",
 				},
 				extraMark: 1,
 			},
 		},
 		{
-			kase: "git@[::1]:go-gitea/gitea.git",
+			kase: "git@[::1]:hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "ssh",
 					User:   url.User("git"),
 					Host:   "[::1]",
-					Path:   "go-gitea/gitea.git",
+					Path:   "hanzoai/forge.git",
 				},
 				extraMark: 1,
 			},
 		},
 		{
-			kase: "git@github.com:go-gitea/gitea.git",
+			kase: "git@github.com:hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "ssh",
 					User:   url.User("git"),
 					Host:   "github.com",
-					Path:   "go-gitea/gitea.git",
+					Path:   "hanzoai/forge.git",
 				},
 				extraMark: 1,
 			},
 		},
 		{
-			kase: "ssh://git@github.com/go-gitea/gitea.git",
+			kase: "ssh://git@github.com/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "ssh",
 					User:   url.User("git"),
 					Host:   "github.com",
-					Path:   "/go-gitea/gitea.git",
+					Path:   "/hanzoai/forge.git",
 				},
 				extraMark: 0,
 			},
 		},
 		{
-			kase: "ssh://git@[::1]/go-gitea/gitea.git",
+			kase: "ssh://git@[::1]/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "ssh",
 					User:   url.User("git"),
 					Host:   "[::1]",
-					Path:   "/go-gitea/gitea.git",
+					Path:   "/hanzoai/forge.git",
 				},
 				extraMark: 0,
 			},
 		},
 		{
-			kase: "/repositories/go-gitea/gitea.git",
+			kase: "/repositories/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "file",
-					Path:   "/repositories/go-gitea/gitea.git",
+					Path:   "/repositories/hanzoai/forge.git",
 				},
 				extraMark: 2,
 			},
 		},
 		{
-			kase: "file:///repositories/go-gitea/gitea.git",
+			kase: "file:///repositories/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "file",
-					Path:   "/repositories/go-gitea/gitea.git",
+					Path:   "/repositories/hanzoai/forge.git",
 				},
 				extraMark: 0,
 			},
 		},
 		{
-			kase: "https://github.com/go-gitea/gitea.git",
+			kase: "https://github.com/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "https",
 					Host:   "github.com",
-					Path:   "/go-gitea/gitea.git",
+					Path:   "/hanzoai/forge.git",
 				},
 				extraMark: 0,
 			},
 		},
 		{
-			kase: "https://git:git@github.com/go-gitea/gitea.git",
+			kase: "https://git:git@github.com/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "https",
 					Host:   "github.com",
 					User:   url.UserPassword("git", "git"),
-					Path:   "/go-gitea/gitea.git",
+					Path:   "/hanzoai/forge.git",
 				},
 				extraMark: 0,
 			},
 		},
 		{
-			kase: "https://[fe80::14fc:cec5:c174:d88%2510]:20/go-gitea/gitea.git",
+			kase: "https://[fe80::14fc:cec5:c174:d88%2510]:20/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "https",
 					Host:   "[fe80::14fc:cec5:c174:d88%10]:20",
-					Path:   "/go-gitea/gitea.git",
+					Path:   "/hanzoai/forge.git",
 				},
 				extraMark: 0,
 			},
 		},
 
 		{
-			kase: "git://github.com/go-gitea/gitea.git",
+			kase: "git://github.com/hanzoai/forge.git",
 			expected: &GitURL{
 				URL: &url.URL{
 					Scheme: "git",
 					Host:   "github.com",
-					Path:   "/go-gitea/gitea.git",
+					Path:   "/hanzoai/forge.git",
 				},
 				extraMark: 0,
 			},
@@ -174,9 +174,9 @@ func TestParseGitURLs(t *testing.T) {
 
 func TestParseRepositoryURL(t *testing.T) {
 	defer test.MockVariableValue(&setting.AppURL, "https://localhost:3000")()
-	defer test.MockVariableValue(&setting.SSH.Domain, "try.gitea.io")()
+	defer test.MockVariableValue(&setting.SSH.Domain, "try.forge.example")()
 
-	ctxURL, _ := url.Parse("https://gitea")
+	ctxURL, _ := url.Parse("https://forge")
 	ctxReq := &http.Request{URL: ctxURL, Header: http.Header{}}
 	ctxReq.Host = ctxURL.Host
 	ctxReq.Header.Add("X-Forwarded-Proto", ctxURL.Scheme)
@@ -192,17 +192,17 @@ func TestParseRepositoryURL(t *testing.T) {
 
 		{input: "https://localhost:3000/user/repo.git/other", ownerName: "user", repoName: "repo", remaining: "/other"},
 
-		{input: "https://gitea/user/repo", ownerName: "user", repoName: "repo"},
-		{input: "https://gitea:3333/user/repo"},
+		{input: "https://forge/user/repo", ownerName: "user", repoName: "repo"},
+		{input: "https://forge:3333/user/repo"},
 
-		{input: "ssh://try.gitea.io:2222/user/repo", ownerName: "user", repoName: "repo"},
+		{input: "ssh://try.forge.example:2222/user/repo", ownerName: "user", repoName: "repo"},
 		{input: "ssh://external:2222/user/repo"},
 
-		{input: "git+ssh://user@try.gitea.io/user/repo.git", ownerName: "user", repoName: "repo"},
+		{input: "git+ssh://user@try.forge.example/user/repo.git", ownerName: "user", repoName: "repo"},
 		{input: "git+ssh://user@external/user/repo.git"},
 
-		{input: "root@try.gitea.io:user/repo.git", ownerName: "user", repoName: "repo"},
-		{input: "root@gitea:user/repo.git", ownerName: "user", repoName: "repo"},
+		{input: "root@try.forge.example:user/repo.git", ownerName: "user", repoName: "repo"},
+		{input: "root@forge:user/repo.git", ownerName: "user", repoName: "repo"},
 		{input: "root@external:user/repo.git"},
 	}
 
@@ -225,13 +225,13 @@ func TestParseRepositoryURL(t *testing.T) {
 			{input: "https://localhost:3000/user/repo"},
 			{input: "https://localhost:3000/subpath/user/repo.git/other", ownerName: "user", repoName: "repo", remaining: "/other"},
 
-			{input: "ssh://try.gitea.io:2222/user/repo", ownerName: "user", repoName: "repo"},
+			{input: "ssh://try.forge.example:2222/user/repo", ownerName: "user", repoName: "repo"},
 			{input: "ssh://external:2222/user/repo"},
 
-			{input: "git+ssh://user@try.gitea.io/user/repo.git", ownerName: "user", repoName: "repo"},
+			{input: "git+ssh://user@try.forge.example/user/repo.git", ownerName: "user", repoName: "repo"},
 			{input: "git+ssh://user@external/user/repo.git"},
 
-			{input: "root@try.gitea.io:user/repo.git", ownerName: "user", repoName: "repo"},
+			{input: "root@try.forge.example:user/repo.git", ownerName: "user", repoName: "repo"},
 			{input: "root@external:user/repo.git"},
 		}
 

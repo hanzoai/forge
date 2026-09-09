@@ -17,7 +17,7 @@ import (
 const namespace = "hanzogit_"
 
 // Collector implements the prometheus.Collector interface and
-// exposes gitea metrics for prometheus
+// exposes the forge metrics for prometheus
 type Collector struct {
 	Accesses           *prometheus.Desc
 	Attachments        *prometheus.Desc

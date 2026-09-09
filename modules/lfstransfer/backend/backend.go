@@ -31,7 +31,7 @@ var Capabilities = []string{
 
 var _ transfer.Backend = (*GitBackend)(nil)
 
-// GitBackend is an adapter between git-lfs-transfer library and Gitea's internal LFS API
+// GitBackend is an adapter between git-lfs-transfer library and the forge's internal LFS API
 type GitBackend struct {
 	ctx          context.Context
 	server       *url.URL

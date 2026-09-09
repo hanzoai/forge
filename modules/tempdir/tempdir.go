@@ -15,7 +15,7 @@ import (
 
 type TempDir struct {
 	// base is the base directory for temporary files, it must exist before accessing and won't be created automatically.
-	// for example: base="/system-tmpdir", sub="gitea-tmp"
+	// for example: base="/system-tmpdir", sub="forge-tmp"
 	base, sub string
 }
 

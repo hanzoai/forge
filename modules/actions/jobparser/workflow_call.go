@@ -290,7 +290,7 @@ var callerSecretValueRegexp = regexp.MustCompile(`^\s*\$\{\{\s*secrets\.([A-Za-z
 //   - inherit == false, mapping == {alias: source_name}: explicit mapping. Each value must be of the form `${{ secrets.NAME }}`.
 //
 // Both alias and source name are upper-cased: secret names are case-insensitive (matching GitHub),
-// and Gitea stores secrets upper-cased, so this keeps lookups and schema validation consistent.
+// and the forge stores secrets upper-cased, so this keeps lookups and schema validation consistent.
 func ParseCallerSecrets(node yaml.Node) (inherit bool, mapping map[string]string, err error) {
 	if node.IsZero() {
 		return false, nil, nil

@@ -55,7 +55,7 @@ func TestRender_Images(t *testing.T) {
 
 	url := "../../.images/src/02/train.jpg"
 	title := "Train"
-	href := "https://gitea.io"
+	href := "https://forge.example"
 	result := baseLink + "/.images/src/02/train.jpg" // resolved link should not go out of the base link
 	// hint: With Markdown v2.5.2, there is a new syntax: [link](URL){:target="_blank"} , but we do not support it now
 
@@ -324,8 +324,8 @@ func TestRenderSiblingImages_Issue12925(t *testing.T) {
 }
 
 func TestRenderEmojiInLinks_Issue12331(t *testing.T) {
-	testcase := `[Link with emoji :moon: in text](https://gitea.io)`
-	expected := `<p><a href="https://gitea.io" rel="nofollow">Link with emoji <span class="emoji" aria-label="waxing gibbous moon">🌔</span> in text</a></p>
+	testcase := `[Link with emoji :moon: in text](https://forge.example)`
+	expected := `<p><a href="https://forge.example" rel="nofollow">Link with emoji <span class="emoji" aria-label="waxing gibbous moon">🌔</span> in text</a></p>
 `
 	res, err := markdown.RenderString(markup.NewTestRenderContext(), testcase)
 	assert.NoError(t, err)

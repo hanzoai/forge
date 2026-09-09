@@ -166,7 +166,7 @@ func CreateBlameReader(ctx context.Context, objectFormat git.ObjectFormat, repo 
 			rd.ignoreRevsFile = ignoreRevsFileName
 			rd.cleanupFuncs = append(rd.cleanupFuncs, ignoreRevsFileCleanup)
 			// Possible improvement: use --ignore-revs-file /dev/stdin on unix
-			// There is no equivalent on Windows. May be implemented if Gitea uses an external git backend.
+			// There is no equivalent on Windows. May be implemented if the forge uses an external git backend.
 			cmd.AddOptionValues("--ignore-revs-file", ignoreRevsFileName)
 		}
 	}

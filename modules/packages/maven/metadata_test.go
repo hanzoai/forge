@@ -16,14 +16,14 @@ import (
 )
 
 const (
-	groupID              = "org.gitea"
+	groupID              = "org.forge"
 	artifactID           = "my-project"
 	version              = "1.0.1"
-	name                 = "My Gitea Project"
+	name                 = "My Forge Project"
 	description          = "Package Description"
-	projectURL           = "https://gitea.io"
+	projectURL           = "https://forge.example"
 	license              = "MIT"
-	dependencyGroupID    = "org.gitea.core"
+	dependencyGroupID    = "org.forge.core"
 	dependencyArtifactID = "git"
 	dependencyVersion    = "5.0.0"
 )

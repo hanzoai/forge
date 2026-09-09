@@ -26,7 +26,7 @@ const (
 	readme      = "Package Readme"
 	comments    = "Package Comment"
 	packageType = "composer-plugin"
-	author      = "Gitea Authors"
+	author      = "Forge Authors"
 	email       = "no.reply@hanzo.ai"
 	homepage    = "https://hanzo.ai"
 	license     = "MIT"
@@ -47,7 +47,7 @@ func buildComposerContent(version string) string {
     ],
     "homepage": "` + homepage + `",
     "autoload": {
-        "psr-4": {"Gitea\\ComposerPackage\\": "src/"}
+        "psr-4": {"Forge\\ComposerPackage\\": "src/"}
     },
     "require": {
         "php": ">=7.2 || ^8.0"

@@ -51,7 +51,7 @@ func (b *FileBackedBuffer) Write(p []byte) (int, error) {
 		n, err = b.file.Write(p)
 	} else {
 		if b.size+int64(len(p)) > b.maxMemorySize {
-			b.file, err = os.CreateTemp(b.tempDir, "gitea-buffer-")
+			b.file, err = os.CreateTemp(b.tempDir, "forge-buffer-")
 			if err != nil {
 				return 0, err
 			}

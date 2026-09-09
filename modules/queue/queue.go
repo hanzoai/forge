@@ -2,7 +2,7 @@
 // Copyright 2023 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// Package queue implements a specialized concurrent queue system for Gitea.
+// Package queue implements a specialized concurrent queue system for the forge.
 //
 // Terminology:
 //

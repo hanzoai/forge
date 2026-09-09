@@ -42,7 +42,7 @@ func (s SortField) source() map[string]any {
 	return map[string]any{s.Field: map[string]any{"order": order}}
 }
 
-// SearchRequest captures everything Gitea sends to the _search endpoint.
+// SearchRequest captures everything the forge sends to the _search endpoint.
 // Aggregations and Highlight are raw ES JSON bodies — callers write them as
 // map[string]any since each has exactly one call site with a fixed shape.
 type SearchRequest struct {
@@ -69,7 +69,7 @@ type AggBucket struct {
 	DocCount int64
 }
 
-// SearchResponse is Gitea's decoded view of the search reply.
+// SearchResponse is the forge's decoded view of the search reply.
 type SearchResponse struct {
 	Total        int64
 	Hits         []SearchHit

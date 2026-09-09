@@ -66,7 +66,7 @@ func prepareServeDirectOptions(optsOptional *ServeDirectOptions, name string) (r
 		ret.ContentType = public.DetectWellKnownMimeType(ext)
 	}
 	// When using ServeDirect, the URL is from the object storage's web server,
-	// it is not the same origin as Gitea server, so it should be safe enough to use "inline" to render the content directly.
+	// it is not the same origin as the forge server, so it should be safe enough to use "inline" to render the content directly.
 	// If a browser doesn't support the content type to be displayed inline, browser will download with the filename.
 	ret.ContentDisposition = httplib.EncodeContentDispositionInline(name)
 	return ret
@@ -85,9 +85,9 @@ type ObjectStorage interface {
 	Delete(path string) error
 
 	// ServeDirectURL generates a "serve-direct" URL for the specified blob storage file,
-	// end user (browser) will use this URL to access the file directly from the object storage, bypassing Gitea server.
+	// end user (browser) will use this URL to access the file directly from the object storage, bypassing the forge server.
 	// Usually the link is time-limited (a few minutes) and contains a signature to ensure security.
-	// The generated URL must NOT use the same origin as Gitea server, otherwise it will cause security issues.
+	// The generated URL must NOT use the same origin as the forge server, otherwise it will cause security issues.
 	// * method defines which HTTP method is permitted for certain storage providers (e.g., an S3-compatible object store).
 	// * opt allows customizing the Content-Type and Content-Disposition headers.
 	// TODO: need to merge "ServeDirect()" check into this function, avoid duplicate code and potential inconsistency.

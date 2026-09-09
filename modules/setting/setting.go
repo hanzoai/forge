@@ -24,7 +24,7 @@ var (
 	AppVer string
 	// AppBuiltWith represents a human-readable version go runtime build version and build tags. (See main.go formatBuiltWith().)
 	AppBuiltWith string
-	// AppStartTime store time gitea has started
+	// AppStartTime store time the forge has started
 	AppStartTime time.Time
 
 	CfgProvider ConfigProvider
@@ -68,8 +68,8 @@ func IsInE2eTesting() bool {
 // PrepareAppDataPath creates app data directory if necessary
 func PrepareAppDataPath() error {
 	// FIXME: There are too many calls to MkdirAll in old code. It is incorrect.
-	// For example, if someDir=/mnt/vol1/gitea-home/data, if the mount point /mnt/vol1 is not mounted when Hanzo Git runs,
-	// then gitea will make new empty directories in /mnt/vol1, all are stored in the root filesystem.
+	// For example, if someDir=/mnt/vol1/forge-home/data, if the mount point /mnt/vol1 is not mounted when Hanzo Git runs,
+	// then the forge will make new empty directories in /mnt/vol1, all are stored in the root filesystem.
 	// The correct behavior should be: creating parent directories is end users' duty. We only create sub-directories in existing parent directories.
 	// For quickstart, the parent directories should be created automatically for first startup (eg: a flag or a check of INSTALL_LOCK).
 	// Now we can take the first step to do correctly (using Mkdir) in other packages, and prepare the AppDataPath here, then make a refactor in future.
@@ -194,8 +194,8 @@ func mustNotRunAsRoot(rootSec ConfigSection) {
 
 	// The following is a purposefully undocumented option. Please do not run Hanzo Git as root. It will only cause future headaches.
 	// Please don't use root as a bandaid to "fix" something that is broken, instead the broken thing should instead be fixed properly.
-	allowRunAsRoot := ConfigSectionKeyBool(rootSec, "I_AM_BEING_UNSAFE_RUNNING_AS_ROOT") || // check gitea config
-		optional.ParseBool(os.Getenv("GIT_I_AM_BEING_UNSAFE_RUNNING_AS_ROOT")).Value() // check gitea env var
+	allowRunAsRoot := ConfigSectionKeyBool(rootSec, "I_AM_BEING_UNSAFE_RUNNING_AS_ROOT") || // check the forge config
+		optional.ParseBool(os.Getenv("GIT_I_AM_BEING_UNSAFE_RUNNING_AS_ROOT")).Value() // check the forge env var
 
 	if !allowRunAsRoot {
 		// Special thanks to VLC which inspired the wording of this messaging.

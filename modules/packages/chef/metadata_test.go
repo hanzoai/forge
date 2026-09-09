@@ -15,11 +15,11 @@ import (
 )
 
 const (
-	packageName          = "gitea"
+	packageName          = "forge"
 	packageVersion       = "1.0.1"
 	packageAuthor        = "KN4CK3R"
 	packageDescription   = "Package Description"
-	packageRepositoryURL = "https://gitea.io/gitea/gitea"
+	packageRepositoryURL = "https://forge.example/forge/forge"
 )
 
 func TestParsePackage(t *testing.T) {

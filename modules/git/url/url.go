@@ -101,13 +101,13 @@ func ParseGitURL(remote string) (*GitURL, error) {
 type RepositoryURL struct {
 	GitURL *GitURL
 
-	// if the URL belongs to current Gitea instance, then the below fields have values
+	// if the URL belongs to current forge instance, then the below fields have values
 	OwnerName     string
 	RepoName      string
 	RemainingPath string
 }
 
-// ParseRepositoryURL tries to parse a Git URL and extract the owner/repository name if it belongs to current Gitea instance.
+// ParseRepositoryURL tries to parse a Git URL and extract the owner/repository name if it belongs to current forge instance.
 func ParseRepositoryURL(ctx context.Context, repoURL string) (*RepositoryURL, error) {
 	// possible urls for git:
 	//  https://my.domain/sub-path/<owner>/<repo>[.git]

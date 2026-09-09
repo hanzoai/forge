@@ -190,7 +190,7 @@ func (g *Manager) doTerminate() {
 	g.lock.Unlock()
 }
 
-// IsChild returns if the current process is a child of previous Gitea process
+// IsChild returns if the current process is a child of previous forge process
 func (g *Manager) IsChild() bool {
 	return g.isChild
 }

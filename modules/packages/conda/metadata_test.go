@@ -18,11 +18,11 @@ import (
 )
 
 const (
-	packageName      = "gitea"
+	packageName      = "forge"
 	packageVersion   = "1.0.1"
 	description      = "Package Description"
-	projectURL       = "https://gitea.com"
-	repositoryURL    = "https://gitea.com/gitea/gitea"
+	projectURL       = "https://forge.example"
+	repositoryURL    = "https://forge.example/forge/forge"
 	documentationURL = "https://docs.hanzo.ai"
 )
 

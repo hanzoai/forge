@@ -42,7 +42,7 @@ func CreateArchive(ctx context.Context, repo Repository, format string, target i
 
 // CreateBundle create bundle content to the target path
 func CreateBundle(ctx context.Context, repo Repository, commit string, out io.Writer) error {
-	tmp, cleanup, err := setting.AppDataTempDir("git-repo-content").MkdirTempRandom("gitea-bundle")
+	tmp, cleanup, err := setting.AppDataTempDir("git-repo-content").MkdirTempRandom("forge-bundle")
 	if err != nil {
 		return err
 	}

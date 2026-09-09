@@ -27,7 +27,7 @@ var LFS = struct {
 	Storage *Storage
 }{}
 
-// LFSClient represents configuration for Gitea's LFS clients, for example: mirroring upstream Git LFS
+// LFSClient represents configuration for the forge's LFS clients, for example: mirroring upstream Git LFS
 var LFSClient = struct {
 	BatchSize                 int `ini:"BATCH_SIZE"`
 	BatchOperationConcurrency int `ini:"BATCH_OPERATION_CONCURRENCY"`

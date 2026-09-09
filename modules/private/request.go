@@ -45,7 +45,7 @@ func (re responseError) Error() string {
 	return fmt.Sprintf("internal API error response, status=%d, err=%s", re.statusCode, re.errorString)
 }
 
-// requestJSONResp sends a request to the gitea server and then parses the response.
+// requestJSONResp sends a request to the forge server and then parses the response.
 // If the status code is not 2xx, or any error occurs, the ResponseExtra.Error field is guaranteed to be non-nil,
 // and the ResponseExtra.UserMsg field will be set to a message for the end user.
 // Caller should check the ResponseExtra.HasError() first to see whether the request fails.
@@ -117,7 +117,7 @@ func requestJSONResp[T any](req *httplib.Request, res *T) (ret *T, extra Respons
 	return res, extra
 }
 
-// requestJSONClientMsg sends a request to the gitea server, server only responds text message status=200 with "success" body
+// requestJSONClientMsg sends a request to the forge server, server only responds text message status=200 with "success" body
 // If the request succeeds (200), the argument clientSuccessMsg will be used as ResponseExtra.UserMsg.
 func requestJSONClientMsg(req *httplib.Request, clientSuccessMsg string) ResponseExtra {
 	_, extra := requestJSONResp(req, &ResponseText{})

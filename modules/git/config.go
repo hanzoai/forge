@@ -34,7 +34,7 @@ func syncGitConfig(ctx context.Context) (err error) {
 		}
 	}
 
-	// Set git some configurations - these must be set to these values for gitea to work correctly
+	// Set git some configurations - these must be set to these values for the forge to work correctly
 	if err := configSet(ctx, "core.quotePath", "false"); err != nil {
 		return err
 	}

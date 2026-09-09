@@ -86,7 +86,7 @@ func getViteDevProxy() *httputil.ReverseProxy {
 // ViteDevMiddleware proxies matching requests to the Vite dev server.
 // It is registered as middleware in non-production mode and lazily discovers
 // the Vite dev server port from the port file written by the viteDevServerPortPlugin.
-// It is needed because there are container-based development, only Gitea web server's port is exposed.
+// It is needed because there are container-based development, only the forge web server's port is exposed.
 func ViteDevMiddleware(next http.Handler) http.Handler {
 	markLongPolling := routing.MarkLongPolling()
 	return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
@@ -176,7 +176,7 @@ func isViteDevRequest(req *http.Request) bool {
 	// Vite uses a path relative to project root and adds "?import" to non-JS/CSS asset imports:
 	// - {WebSite}/public/assets/... (e.g. SVG icons from "{RepoRoot}/public/assets/img/svg/")
 	// - {WebSite}/assets/<file>.json: exception for frontend-imported repo-root assets:
-	//   - KEEP IN MIND: all static frontend assets are served from "{AssetFS}/assets" to "{WebSite}/assets" by Gitea Web Server
+	//   - KEEP IN MIND: all static frontend assets are served from "{AssetFS}/assets" to "{WebSite}/assets" by Forge web server
 	//   - "{AssetFS}" is a layered filesystem from "{RepoRoot}/public" or embedded assets, and user's custom files in "{CustomPath}/public"
 	//   - "{RepoRoot}/assets/*.json" just happens to live under the dir name "assets"; it is not related to frontend assets
 	//   - BAD DESIGN: indeed it is a "conflicted and polluted name" sample

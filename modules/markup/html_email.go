@@ -24,7 +24,7 @@ func emailAddressProcessor(ctx *RenderContext, node *html.Node) {
 			nextByte = node.Data[m[3]]
 		}
 		if strings.IndexByte(":/", nextByte) != -1 {
-			// for cases: "git@gitea.com:owner/repo.git", "https://git@gitea.com/owner/repo.git"
+			// for cases: "git@forge.example:owner/repo.git", "https://git@forge.example/owner/repo.git"
 			return
 		}
 		mail := node.Data[m[2]:m[3]]

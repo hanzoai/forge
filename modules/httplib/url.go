@@ -85,13 +85,13 @@ func GuessCurrentHostURL(ctx context.Context) string {
 		return strings.TrimSuffix(setting.AppURL, setting.AppSubURL+"/")
 	}
 	// Try the best guess to get the current host URL (will be used for public URL) by http headers.
-	// At the moment, if site admin doesn't configure the proxy headers correctly, then Gitea would guess wrong.
+	// At the moment, if site admin doesn't configure the proxy headers correctly, then the forge would guess wrong.
 	// There are some cases:
-	// 1. The reverse proxy is configured correctly, it passes "X-Forwarded-Proto/Host" headers. Perfect, Gitea can handle it correctly.
-	// 2. The reverse proxy is not configured correctly, doesn't pass "X-Forwarded-Proto/Host" headers, eg: only one "proxy_pass http://gitea:3000" in Nginx.
+	// 1. The reverse proxy is configured correctly, it passes "X-Forwarded-Proto/Host" headers. Perfect, the forge can handle it correctly.
+	// 2. The reverse proxy is not configured correctly, doesn't pass "X-Forwarded-Proto/Host" headers, eg: only one "proxy_pass http://forge:3000" in Nginx.
 	// 3. There is no reverse proxy.
-	// Without more information, Gitea is impossible to distinguish between case 2 and case 3, then case 2 would result in
-	// wrong guess like guessed public URL becomes "http://gitea:3000/" behind a "https" reverse proxy, which is not accessible by end users.
+	// Without more information, the forge is impossible to distinguish between case 2 and case 3, then case 2 would result in
+	// wrong guess like guessed public URL becomes "http://forge:3000/" behind a "https" reverse proxy, which is not accessible by end users.
 	// So we introduced "PUBLIC_URL_DETECTION" option, to control the guessing behavior to satisfy different use cases.
 	req, ok := ctx.Value(RequestContextKey).(*http.Request)
 	if !ok {
@@ -134,9 +134,9 @@ func MakeAbsoluteURL(ctx context.Context, link string) string {
 type urlType int
 
 const (
-	urlTypeGiteaAbsolute     urlType = iota + 1 // "http://gitea/subpath"
-	urlTypeGiteaPageRelative                    // "/subpath"
-	urlTypeGiteaSiteRelative                    // "?key=val"
+	urlTypeForgeAbsolute     urlType = iota + 1 // "http://forge/subpath"
+	urlTypeForgePageRelative                    // "/subpath"
+	urlTypeForgeSiteRelative                    // "?key=val"
 	urlTypeUnknown                              // "http://other"
 )
 
@@ -152,21 +152,21 @@ func detectURLRoutePath(ctx context.Context, s string) (routePath string, ut url
 	}
 	if urlIsRelative(s, u) {
 		if u.Path == "" {
-			return "", urlTypeGiteaPageRelative
+			return "", urlTypeForgePageRelative
 		}
 		if strings.HasPrefix(strings.ToLower(cleanedPath+"/"), strings.ToLower(setting.AppSubURL+"/")) {
-			return cleanedPath[len(setting.AppSubURL):], urlTypeGiteaSiteRelative
+			return cleanedPath[len(setting.AppSubURL):], urlTypeForgeSiteRelative
 		}
 		return "", urlTypeUnknown
 	}
 	u.Path = cleanedPath + "/"
 	urlLower := strings.ToLower(u.String())
 	if strings.HasPrefix(urlLower, strings.ToLower(setting.AppURL)) {
-		return cleanedPath[len(setting.AppSubURL):], urlTypeGiteaAbsolute
+		return cleanedPath[len(setting.AppSubURL):], urlTypeForgeAbsolute
 	}
 	guessedCurURL := GuessCurrentAppURL(ctx)
 	if strings.HasPrefix(urlLower, strings.ToLower(guessedCurURL)) {
-		return cleanedPath[len(setting.AppSubURL):], urlTypeGiteaAbsolute
+		return cleanedPath[len(setting.AppSubURL):], urlTypeForgeAbsolute
 	}
 	return "", urlTypeUnknown
 }
@@ -185,7 +185,7 @@ type GitSiteURL struct {
 
 func ParseGitSiteURL(ctx context.Context, s string) *GitSiteURL {
 	routePath, ut := detectURLRoutePath(ctx, s)
-	if ut == urlTypeUnknown || ut == urlTypeGiteaPageRelative {
+	if ut == urlTypeUnknown || ut == urlTypeForgePageRelative {
 		return nil
 	}
 	ret := &GitSiteURL{RoutePath: routePath}
