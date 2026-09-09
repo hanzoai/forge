@@ -29,7 +29,7 @@ func Test_detectLicense(t *testing.T) {
 		},
 		{
 			name: "no detected license",
-			arg:  "Copyright (c) 2023 Gitea",
+			arg:  "Copyright (c) 2023 Hanzo AI",
 			want: nil,
 		},
 	}
@@ -37,9 +37,9 @@ func Test_detectLicense(t *testing.T) {
 	require.NoError(t, repo_module.LoadRepoConfig())
 	for _, licenseName := range repo_module.Licenses {
 		license, err := repo_module.GetLicense(licenseName, &repo_module.LicenseValues{
-			Owner: "Gitea",
-			Email: "teabot@gitea.io",
-			Repo:  "gitea",
+			Owner: "Hanzo AI",
+			Email: "bot@forge.example",
+			Repo:  "forge",
 			Year:  "2024",
 		})
 		assert.NoError(t, err)

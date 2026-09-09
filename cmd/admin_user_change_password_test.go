@@ -29,7 +29,7 @@ func TestChangePasswordCommand(t *testing.T) {
 		// }()
 		// Prepare test user
 		unittest.AssertNotExistsBean(t, &user_model.User{LowerName: "testuser"})
-		err := microcmdUserCreate().Run(ctx, []string{"create", "--username", "testuser", "--email", "testuser@gitea.local", "--random-password"})
+		err := microcmdUserCreate().Run(ctx, []string{"create", "--username", "testuser", "--email", "testuser@forge.local", "--random-password"})
 		require.NoError(t, err)
 
 		// load test user

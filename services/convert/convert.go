@@ -429,7 +429,7 @@ func ToWorkflowRunAction(status actions_model.Status) (action string) {
 func ToActionsStatus(status actions_model.Status) (action, conclusion string) {
 	switch status {
 	case actions_model.StatusWaiting:
-		action = "queued" // "waiting" is a naming conflict of the webhook between Gitea and GitHub Actions
+		action = "queued" // "waiting" is a naming conflict of the webhook between the forge and GitHub Actions
 	case actions_model.StatusBlocked:
 		action = "waiting" // naming conflict (as above)
 	case actions_model.StatusRunning, actions_model.StatusCancelling:

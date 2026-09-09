@@ -56,7 +56,7 @@ const bodyTpl = `
 	<p>
 		---
 		<br>
-		<a href="{{.Link}}">View it on Gitea</a>.
+		<a href="{{.Link}}">View it on the forge</a>.
 	</p>
 </body>
 </html>
@@ -64,9 +64,9 @@ const bodyTpl = `
 
 func prepareMailerTest(t *testing.T) (doer *user_model.User, repo *repo_model.Repository, issue *issues_model.Issue, comment *issues_model.Comment) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
-	setting.MailService = &setting.Mailer{From: "test@gitea.com"}
+	setting.MailService = &setting.Mailer{From: "test@forge.example"}
 	setting.Domain = "localhost"
-	setting.AppURL = "https://try.gitea.io/"
+	setting.AppURL = "https://forge.example/"
 
 	doer = unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 	repo = unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1, Owner: doer})
@@ -117,7 +117,7 @@ func TestComposeIssueComment(t *testing.T) {
 	defer test.MockVariableValue(&setting.IncomingEmail.Enabled, true)()
 	defer mockMailTemplates("repo/issue/comment", subjectTpl, bodyTpl)()
 
-	recipients := []*user_model.User{{Name: "Test", Email: "test@gitea.com"}, {Name: "Test2", Email: "test2@gitea.com"}}
+	recipients := []*user_model.User{{Name: "Test", Email: "test@forge.example"}, {Name: "Test2", Email: "test2@forge.example"}}
 	msgs, err := composeIssueCommentMessages(t.Context(), &mailComment{
 		Issue: issue, Doer: doer, ActionType: activities_model.ActionCommentIssue,
 		Content: fmt.Sprintf("test @%s %s#%d body", doer.Name, issue.Repo.FullName(), issue.Index),
@@ -176,7 +176,7 @@ func TestComposeIssueMessage(t *testing.T) {
 	doer, _, issue, _ := prepareMailerTest(t)
 
 	defer mockMailTemplates("repo/issue/new", subjectTpl, bodyTpl)()
-	recipients := []*user_model.User{{Name: "Test", Email: "test@gitea.com"}, {Name: "Test2", Email: "test2@gitea.com"}}
+	recipients := []*user_model.User{{Name: "Test", Email: "test@forge.example"}, {Name: "Test2", Email: "test2@forge.example"}}
 	msgs, err := composeIssueCommentMessages(t.Context(), &mailComment{
 		Issue: issue, Doer: doer, ActionType: activities_model.ActionCreateIssue,
 		Content: "test body",
@@ -202,7 +202,7 @@ func TestComposeIssueMessage(t *testing.T) {
 
 func TestTemplateSelection(t *testing.T) {
 	doer, repo, issue, comment := prepareMailerTest(t)
-	recipients := []*user_model.User{{Name: "Test", Email: "test@gitea.com"}}
+	recipients := []*user_model.User{{Name: "Test", Email: "test@forge.example"}}
 
 	defer mockMailTemplates("repo/issue/default", "repo/issue/default/subject", "repo/issue/default/body")()
 	defer mockMailTemplates("repo/issue/new", "repo/issue/new/subject", "repo/issue/new/body")()
@@ -253,7 +253,7 @@ func TestTemplateServices(t *testing.T) {
 		actionType activities_model.ActionType, fromMention bool, tplSubject, tplBody, expSubject, expBody string,
 	) {
 		defer mockMailTemplates("repo/issue/default", tplSubject, tplBody)()
-		recipients := []*user_model.User{{Name: "Test", Email: "test@gitea.com"}}
+		recipients := []*user_model.User{{Name: "Test", Email: "test@forge.example"}}
 		msg := testComposeIssueCommentMessage(t, &mailComment{
 			Issue: issue, Doer: doer, ActionType: actionType,
 			Content: "test body", Comment: comment,
@@ -298,22 +298,22 @@ func TestGenerateAdditionalHeadersForIssue(t *testing.T) {
 	doer, _, issue, _ := prepareMailerTest(t)
 
 	comment := &mailComment{Issue: issue, Doer: doer}
-	recipient := &user_model.User{Name: "test", Email: "test@gitea.com"}
+	recipient := &user_model.User{Name: "test", Email: "test@forge.example"}
 
 	headers := generateAdditionalHeadersForIssue(t.Context(), comment, "dummy-reason", recipient)
 
 	expected := map[string]string{
 		"List-ID":                 "user2/repo1 <repo1.user2.localhost>",
-		"List-Archive":            "<https://try.gitea.io/user2/repo1>",
+		"List-Archive":            "<https://forge.example/user2/repo1>",
 		"X-Git-Reason":            "dummy-reason",
 		"X-Git-Sender":            "user2",
 		"X-Git-Recipient":         "test",
-		"X-Git-Recipient-Address": "test@gitea.com",
+		"X-Git-Recipient-Address": "test@forge.example",
 		"X-Git-Repository":        "repo1",
 		"X-Git-Repository-Path":   "user2/repo1",
-		"X-Git-Repository-Link":   "https://try.gitea.io/user2/repo1",
+		"X-Git-Repository-Link":   "https://forge.example/user2/repo1",
 		"X-Git-Issue-ID":          "1",
-		"X-Git-Issue-Link":        "https://try.gitea.io/user2/repo1/issues/1",
+		"X-Git-Issue-Link":        "https://forge.example/user2/repo1/issues/1",
 	}
 
 	for key, value := range expected {
@@ -524,7 +524,7 @@ func TestEmbedBase64Images(t *testing.T) {
 		issue.Content = fmt.Sprintf(`MSG-BEFORE <image src="attachments/%s"> MSG-AFTER`, att1.UUID)
 		require.NoError(t, issues_model.UpdateIssueCols(t.Context(), issue, "content"))
 
-		recipients := []*user_model.User{{Name: "Test", Email: "test@gitea.com"}}
+		recipients := []*user_model.User{{Name: "Test", Email: "test@forge.example"}}
 		msgs, err := composeIssueCommentMessages(t.Context(), &mailComment{
 			Issue:      issue,
 			Doer:       user,
@@ -585,8 +585,8 @@ func TestMailPullRequestPush(t *testing.T) {
 		},
 	}
 
-	msgs, err := composeIssueCommentMessages(t.Context(), mc, "mock", []*user_model.User{{Name: "Test", Email: "test@gitea.com"}}, false, "pull request push")
+	msgs, err := composeIssueCommentMessages(t.Context(), mc, "mock", []*user_model.User{{Name: "Test", Email: "test@forge.example"}}, false, "pull request push")
 	require.NoError(t, err)
-	assert.Contains(t, msgs[0].Body, `<a href="https://try.gitea.io/user2/repo1/commit/0000000000000000000000000000000000000000">0000000000</a> - test commit msg`)
+	assert.Contains(t, msgs[0].Body, `<a href="https://forge.example/user2/repo1/commit/0000000000000000000000000000000000000000">0000000000</a> - test commit msg`)
 	assert.Contains(t, msgs[0].Body, `</html>`)
 }

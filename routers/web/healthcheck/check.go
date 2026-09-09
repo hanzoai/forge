@@ -68,11 +68,11 @@ type componentStatus struct {
 //
 // HINT: HEALTH-CHECK-ENDPOINT: there is no clear definition about what "health" means.
 // In most cases, end users don't need to check such endpoint, because even if database is down,
-// Gitea will reover after database is up again. Sysop should monitor database and cache status directly.
+// the forge will reover after database is up again. Sysop should monitor database and cache status directly.
 //
 // And keep in mind: this health check should NEVER be used as a "restart" trigger, for example: Docker's "HEALTHCHECK".
-// * If Gitea is upgrading and migrating database, there will be a long time before this endpoint starts to return "pass" status.
-// In this case, if the checker restarts Gitea just because it doesn't get "pass" status in short time,
+// * If the forge is upgrading and migrating database, there will be a long time before this endpoint starts to return "pass" status.
+// In this case, if the checker restarts the forge just because it doesn't get "pass" status in short time,
 // the instance will just be restarted again and again before the migration finishes and the situation just goes worse.
 func Check(w http.ResponseWriter, r *http.Request) {
 	rsp := response{
@@ -99,7 +99,7 @@ func Check(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-// database checks gitea database status
+// database checks the forge database status
 func checkDatabase(ctx context.Context, checks checks) status {
 	st := componentStatus{}
 	if err := db.GetEngine(ctx).Ping(); err != nil {
@@ -123,7 +123,7 @@ func checkDatabase(ctx context.Context, checks checks) status {
 	return st.Status
 }
 
-// cache checks gitea cache status
+// cache checks the forge cache status
 func checkCache(checks checks) status {
 	st := componentStatus{}
 	if err := cache.GetCache().Ping(); err != nil {

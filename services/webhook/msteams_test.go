@@ -336,8 +336,8 @@ func TestMSTeamsPayload(t *testing.T) {
 		pl, err := mc.Package(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, "Package created: GiteaContainer:latest", pl.Title)
-		assert.Equal(t, "Package created: GiteaContainer:latest", pl.Summary)
+		assert.Equal(t, "Package created: ForgeContainer:latest", pl.Title)
+		assert.Equal(t, "Package created: ForgeContainer:latest", pl.Summary)
 		assert.Len(t, pl.Sections, 1)
 		assert.Equal(t, "user1", pl.Sections[0].ActivitySubtitle)
 		assert.Empty(t, pl.Sections[0].Text)
@@ -351,7 +351,7 @@ func TestMSTeamsPayload(t *testing.T) {
 		}
 		assert.Len(t, pl.PotentialAction, 1)
 		assert.Len(t, pl.PotentialAction[0].Targets, 1)
-		assert.Equal(t, "http://localhost:3000/user1/-/packages/container/GiteaContainer/latest", pl.PotentialAction[0].Targets[0].URI)
+		assert.Equal(t, "http://localhost:3000/user1/-/packages/container/ForgeContainer/latest", pl.PotentialAction[0].Targets[0].URI)
 	})
 
 	t.Run("Wiki", func(t *testing.T) {

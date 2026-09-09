@@ -156,7 +156,7 @@ func (prInfo *pullRequestViewInfo) prepareMergeBoxFormProps(ctx *context.Context
 	// To test it:
 	//  Enable "Manually Merged" feature in the Repository Settings
 	//  Create a pull request, either:
-	//  - Merge the pull request branch locally and push the merged commit to Gitea
+	//  - Merge the pull request branch locally and push the merged commit to the forge
 	//  - Make some conflicts between the base branch and the pull request branch
 	//  Then the Manually Merged form will be shown in the merge form
 	canUseManualMerge := !pull.IsWorkInProgress(ctx) && !pull.IsChecking() && prConfig.AllowManualMerge

@@ -33,7 +33,7 @@ import (
 	repo_service "github.com/hanzoai/git/services/repository"
 )
 
-// Migrate migrate remote git repository to gitea
+// Migrate migrate remote git repository to the forge
 func Migrate(ctx *context.APIContext) {
 	// swagger:operation POST /repos/migrate repository repoMigrate
 	// ---

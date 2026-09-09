@@ -29,8 +29,8 @@ func RenderMarkup(ctx *context.Base, ctxRepo *context.Repository, mode, text, ur
 
 	// TODO: MARKUP-RENDER-CONTEXT: this logic is unnecessarily complicated.
 	//  Ideally: the "file path" should not appear in the "url path context", but it needs a lot of refactoring to achieve that
-	// for example, when previewing file "/gitea/owner/repo/src/branch/features/feat-123/doc/CHANGE.md", then filePath is "doc/CHANGE.md"
-	// and the urlPathContext is "/gitea/owner/repo/src/branch/features/feat-123/doc"
+	// for example, when previewing file "/forge/owner/repo/src/branch/features/feat-123/doc/CHANGE.md", then filePath is "doc/CHANGE.md"
+	// and the urlPathContext is "/forge/owner/repo/src/branch/features/feat-123/doc"
 
 	if mode == "" || mode == "markdown" {
 		// raw Markdown doesn't do any special handling

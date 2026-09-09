@@ -173,7 +173,6 @@ func verifier(ctx context.Context) (*edge.Verifier, int64) {
 	return reader.verifier, reader.sourceID
 }
 
-
 // discover reads the issuer and the key set address out of an OIDC discovery
 // document. Both empty on any failure, which leaves the credential unresolved
 // rather than verified against a guess.
@@ -227,7 +226,7 @@ func (*IAM) Name() string { return IAMTokenMethodName }
 
 // Verify reads a Bearer (or ?token=) credential and accepts it when IAM signed it
 // for a subject linked to an account here. Declines everything else so the rest of
-// the chain still runs — a Gitea token reaching this method is not ours to answer.
+// the chain still runs — a forge token reaching this method is not ours to answer.
 func (*IAM) Verify(req *http.Request, _ http.ResponseWriter, store DataStore, _ SessionStore) (*user_model.User, error) {
 	token, ok := parseToken(req)
 	if !ok {

@@ -84,7 +84,7 @@ func (b64embedder *mailAttachmentBase64Embedder) Base64InlineImages(ctx context.
 						attachmentSrc := attr.Val
 						dataURI, err := b64embedder.AttachmentSrcToBase64DataURI(ctx, attachmentSrc)
 						if err != nil {
-							// Not an error, just skip. This is probably an image from outside the gitea instance.
+							// Not an error, just skip. This is probably an image from outside this forge instance.
 							log.Trace("Unable to embed attachment %q to mail body: %v", attachmentSrc, err)
 						} else {
 							n.Attr[i].Val = dataURI

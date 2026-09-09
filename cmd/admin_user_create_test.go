@@ -32,7 +32,7 @@ func TestAdminUserCreate(t *testing.T) {
 		}
 
 		createCheck := func(name, args string) check {
-			require.NoError(t, microcmdUserCreate().Run(t.Context(), strings.Fields(fmt.Sprintf("create --username %s --email %s@gitea.local %s --password foobar", name, name, args))))
+			require.NoError(t, microcmdUserCreate().Run(t.Context(), strings.Fields(fmt.Sprintf("create --username %s --email %s@forge.local %s --password foobar", name, name, args))))
 			u := unittest.AssertExistsAndLoadBean(t, &user_model.User{LowerName: name})
 			return check{IsAdmin: u.IsAdmin, MustChangePassword: u.MustChangePassword}
 		}
@@ -51,7 +51,7 @@ func TestAdminUserCreate(t *testing.T) {
 	})
 
 	createUser := func(name string, args ...string) error {
-		return microcmdUserCreate().Run(t.Context(), append([]string{"create", "--username", name, "--email", name + "@gitea.local"}, args...))
+		return microcmdUserCreate().Run(t.Context(), append([]string{"create", "--username", name, "--email", name + "@forge.local"}, args...))
 	}
 
 	t.Run("UserType", func(t *testing.T) {
@@ -126,7 +126,7 @@ func TestAdminUserCreate(t *testing.T) {
 			Name:      "u-FullNameWithSpace",
 			LowerName: "u-fullnamewithspace",
 			FullName:  "First O'Middle Last",
-			Email:     "u-FullNameWithSpace@gitea.local",
+			Email:     "u-FullNameWithSpace@forge.local",
 		})
 
 		assert.NoError(t, createUser("u-FullNameEmpty", "--random-password", "--fullname", ""))

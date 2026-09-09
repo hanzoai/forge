@@ -29,8 +29,8 @@ func TestNewUserPost_MustChangePassword(t *testing.T) {
 
 	ctx.Doer = u
 
-	username := "gitea"
-	email := "gitea@gitea.io"
+	username := "forge"
+	email := "forge@forge.example"
 
 	form := forms.AdminCreateUserForm{
 		LoginType:          "local",
@@ -66,8 +66,8 @@ func TestNewUserPost_MustChangePasswordFalse(t *testing.T) {
 
 	ctx.Doer = u
 
-	username := "gitea"
-	email := "gitea@gitea.io"
+	username := "forge"
+	email := "forge@forge.example"
 
 	form := forms.AdminCreateUserForm{
 		LoginType:          "local",
@@ -103,8 +103,8 @@ func TestNewUserPost_InvalidEmail(t *testing.T) {
 
 	ctx.Doer = u
 
-	username := "gitea"
-	email := "gitea@gitea.io\r\n"
+	username := "forge"
+	email := "forge@forge.example\r\n"
 
 	form := forms.AdminCreateUserForm{
 		LoginType:          "local",
@@ -133,8 +133,8 @@ func TestNewUserPost_VisibilityDefaultPublic(t *testing.T) {
 
 	ctx.Doer = u
 
-	username := "gitea"
-	email := "gitea@gitea.io"
+	username := "forge"
+	email := "forge@forge.example"
 
 	form := forms.AdminCreateUserForm{
 		LoginType:          "local",
@@ -171,8 +171,8 @@ func TestNewUserPost_VisibilityPrivate(t *testing.T) {
 
 	ctx.Doer = u
 
-	username := "gitea"
-	email := "gitea@gitea.io"
+	username := "forge"
+	email := "forge@forge.example"
 
 	form := forms.AdminCreateUserForm{
 		LoginType:          "local",

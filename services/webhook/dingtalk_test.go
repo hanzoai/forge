@@ -166,10 +166,10 @@ func TestDingTalkPayload(t *testing.T) {
 		pl, err := dc.Package(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, "Package created: GiteaContainer:latest by user1", pl.ActionCard.Text)
-		assert.Equal(t, "Package created: GiteaContainer:latest by user1", pl.ActionCard.Title)
+		assert.Equal(t, "Package created: ForgeContainer:latest by user1", pl.ActionCard.Text)
+		assert.Equal(t, "Package created: ForgeContainer:latest by user1", pl.ActionCard.Title)
 		assert.Equal(t, "view package", pl.ActionCard.SingleTitle)
-		assert.Equal(t, "http://localhost:3000/user1/-/packages/container/GiteaContainer/latest", parseRealSingleURL(pl.ActionCard.SingleURL))
+		assert.Equal(t, "http://localhost:3000/user1/-/packages/container/ForgeContainer/latest", parseRealSingleURL(pl.ActionCard.SingleURL))
 	})
 
 	t.Run("Wiki", func(t *testing.T) {

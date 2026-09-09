@@ -34,7 +34,7 @@ func TestUpdateUser(t *testing.T) {
 	opts := &UpdateOptions{
 		KeepEmailPrivate:             optional.Some(false),
 		FullName:                     optional.Some("Changed Name"),
-		Website:                      optional.Some("https://gitea.com/"),
+		Website:                      optional.Some("https://forge.example/"),
 		Location:                     optional.Some("location"),
 		Description:                  optional.Some("description"),
 		AllowGitHook:                 optional.Some(true),

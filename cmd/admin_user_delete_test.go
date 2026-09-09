@@ -27,7 +27,7 @@ func TestAdminUserDelete(t *testing.T) {
 
 	setupTestUser := func(t *testing.T) {
 		unittest.AssertNotExistsBean(t, &user_model.User{LowerName: "testuser"})
-		err := microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuser", "--email", "testuser@gitea.local", "--random-password"})
+		err := microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuser", "--email", "testuser@forge.local", "--random-password"})
 		require.NoError(t, err)
 	}
 
@@ -49,7 +49,7 @@ func TestAdminUserDelete(t *testing.T) {
 	t.Run("delete user by email", func(t *testing.T) {
 		setupTestUser(t)
 
-		err := microcmdUserDelete().Run(ctx, []string{"delete-test", "--email", "testuser@gitea.local"})
+		err := microcmdUserDelete().Run(ctx, []string{"delete-test", "--email", "testuser@forge.local"})
 		require.NoError(t, err)
 		unittest.AssertNotExistsBean(t, &user_model.User{LowerName: "testuser"})
 	})
@@ -57,7 +57,7 @@ func TestAdminUserDelete(t *testing.T) {
 		setupTestUser(t)
 
 		u := unittest.AssertExistsAndLoadBean(t, &user_model.User{LowerName: "testuser"})
-		err := microcmdUserDelete().Run(ctx, []string{"delete", "--id", strconv.FormatInt(u.ID, 10), "--username", "testuser", "--email", "testuser@gitea.local"})
+		err := microcmdUserDelete().Run(ctx, []string{"delete", "--id", strconv.FormatInt(u.ID, 10), "--username", "testuser", "--email", "testuser@forge.local"})
 		require.NoError(t, err)
 		unittest.AssertNotExistsBean(t, &user_model.User{LowerName: "testuser"})
 	})
@@ -76,8 +76,8 @@ func TestAdminUserDeleteFailure(t *testing.T) {
 		},
 		{
 			name:        "user exists but provided username does not match",
-			args:        []string{"delete", "--email", "testuser@gitea.local", "--username", "wrongusername"},
-			expectedErr: "the user testuser who has email testuser@gitea.local does not match the provided username wrongusername",
+			args:        []string{"delete", "--email", "testuser@forge.local", "--username", "wrongusername"},
+			expectedErr: "the user testuser who has email testuser@forge.local does not match the provided username wrongusername",
 		},
 		{
 			name:        "user exists but provided id does not match",
@@ -96,7 +96,7 @@ func TestAdminUserDeleteFailure(t *testing.T) {
 			ctx := t.Context()
 			if strings.Contains(tc.name, "user exists") {
 				unittest.AssertNotExistsBean(t, &user_model.User{LowerName: "testuser"})
-				err := microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuser", "--email", "testuser@gitea.local", "--random-password"})
+				err := microcmdUserCreate().Run(t.Context(), []string{"create", "--username", "testuser", "--email", "testuser@forge.local", "--random-password"})
 				require.NoError(t, err)
 			}
 

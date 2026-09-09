@@ -34,7 +34,7 @@ k3=v3
 	t.Run("OutputToNewWithEnv", func(t *testing.T) {
 		configNew := tmpDir + "/app-new.ini"
 		err := NewMainApp(AppVersion{}).Run(t.Context(), []string{
-			"./gitea", "--config", configOld,
+			"./gitd", "--config", configOld,
 			"config", "edit-ini",
 			"--apply-env",
 			"--config-keep-keys", configTemplate,
@@ -59,7 +59,7 @@ KeY = val
 		// the legacy "environment-to-ini" (now a wrapper script) behavior:
 		// if no "--out", then "--in-place" must be used to overwrite the existing "--config" file
 		err := NewMainApp(AppVersion{}).Run(t.Context(), []string{
-			"./gitea", "config", "edit-ini",
+			"./gitd", "config", "edit-ini",
 			"--apply-env",
 			"--config", configOld,
 		})
@@ -67,7 +67,7 @@ KeY = val
 
 		// simulate the "environment-to-ini" behavior with "--in-place"
 		err = NewMainApp(AppVersion{}).Run(t.Context(), []string{
-			"./gitea", "config", "edit-ini",
+			"./gitd", "config", "edit-ini",
 			"--in-place",
 			"--apply-env",
 			"--config", configOld,

@@ -33,7 +33,7 @@ func TestGarbageCollectLFSMetaObjects(t *testing.T) {
 	assert.NoError(t, err)
 
 	// add lfs object
-	lfsContent := []byte("gitea1")
+	lfsContent := []byte("forge1")
 	lfsOid := storeObjectInRepo(t, repo.ID, &lfsContent)
 
 	// gc
@@ -60,7 +60,7 @@ func TestGarbageCollectLFSMetaObjectsForRepoAutoFix(t *testing.T) {
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
 
 	// add lfs object
-	lfsContent := []byte("gitea2")
+	lfsContent := []byte("forge2")
 	lfsOid := storeObjectInRepo(t, repo.ID, &lfsContent)
 
 	err = repo_service.GarbageCollectLFSMetaObjectsForRepo(t.Context(), repo, repo_service.GarbageCollectLFSMetaObjectsOptions{

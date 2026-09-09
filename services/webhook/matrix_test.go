@@ -149,8 +149,8 @@ func TestMatrixPayload(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, pl)
 
-		assert.Equal(t, `[[GiteaContainer](http://localhost:3000/user1/-/packages/container/GiteaContainer/latest)] Package published by [user1](https://try.gitea.io/user1)`, pl.Body)
-		assert.Equal(t, `[<a href="http://localhost:3000/user1/-/packages/container/GiteaContainer/latest">GiteaContainer</a>] Package published by <a href="https://try.gitea.io/user1">user1</a>`, pl.FormattedBody)
+		assert.Equal(t, `[[ForgeContainer](http://localhost:3000/user1/-/packages/container/ForgeContainer/latest)] Package published by [user1](https://try.gitea.io/user1)`, pl.Body)
+		assert.Equal(t, `[<a href="http://localhost:3000/user1/-/packages/container/ForgeContainer/latest">ForgeContainer</a>] Package published by <a href="https://try.gitea.io/user1">user1</a>`, pl.FormattedBody)
 	})
 
 	t.Run("Wiki", func(t *testing.T) {

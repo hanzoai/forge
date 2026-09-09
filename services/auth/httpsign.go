@@ -191,7 +191,7 @@ func VerifyCert(r *http.Request) (*asymkey_model.PublicKey, error) {
 		return publicKey, nil
 	}
 
-	// No public key matching a principal in the certificate is registered in gitea
+	// No public key matching a principal in the certificate is registered in the forge
 	return nil, errors.New("no valid principal found")
 }
 

@@ -105,7 +105,7 @@ func TestPurgeUser(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	user := &user_model.User{
 		Name:               "GitBot",
-		Email:              "GitBot@gitea.io",
+		Email:              "GitBot@forge.example",
 		Passwd:             ";p['////..-++']",
 		IsAdmin:            false,
 		Theme:              setting.UI.DefaultTheme,
@@ -125,7 +125,7 @@ func TestRenameUser(t *testing.T) {
 		adminUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1, IsAdmin: true})
 		externalUser := &user_model.User{
 			Name:      "external_user",
-			Email:     "external_user@gitea.io",
+			Email:     "external_user@forge.example",
 			LoginType: auth.LDAP,
 		}
 		require.NoError(t, user_model.CreateUser(t.Context(), externalUser, &user_model.Meta{}))
@@ -194,8 +194,8 @@ func TestCreateUser_Issue5882(t *testing.T) {
 		user               *user_model.User
 		disableOrgCreation bool
 	}{
-		{&user_model.User{Name: "GitBot", Email: "GitBot@gitea.io", Passwd: passwd, MustChangePassword: false}, false},
-		{&user_model.User{Name: "GiteaBot2", Email: "GiteaBot2@gitea.io", Passwd: passwd, MustChangePassword: false}, true},
+		{&user_model.User{Name: "GitBot", Email: "GitBot@forge.example", Passwd: passwd, MustChangePassword: false}, false},
+		{&user_model.User{Name: "ForgeBot2", Email: "ForgeBot2@forge.example", Passwd: passwd, MustChangePassword: false}, true},
 	}
 
 	setting.Service.DefaultAllowCreateOrganization = true

@@ -155,7 +155,7 @@ func (b *Base) Redirect(location string, status ...int) {
 		// Some browsers (Safari) have buggy behavior for Cookie + Cache + External Redirection, eg: /my-path => https://other/path
 		// 1. the first request to "/my-path" contains cookie
 		// 2. some time later, the request to "/my-path" doesn't contain cookie (caused by Prevent web tracking)
-		// 3. Gitea's Sessioner doesn't see the session cookie, so it generates a new session id, and returns it to browser
+		// 3. The forge's Sessioner doesn't see the session cookie, so it generates a new session id, and returns it to browser
 		// 4. then the browser accepts the empty session, then the user is logged out
 		// So in this case, we should remove the session cookie from the response header
 		removeSessionCookieHeader(b.Resp)

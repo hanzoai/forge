@@ -65,8 +65,8 @@ init project
 	})
 
 	t.Run("TrustedSSHKey", func(t *testing.T) {
-		defer test.MockVariableValue(&setting.Repository.Signing.SigningName, "gitea")()
-		defer test.MockVariableValue(&setting.Repository.Signing.SigningEmail, "gitea@fake.local")()
+		defer test.MockVariableValue(&setting.Repository.Signing.SigningName, "forge")()
+		defer test.MockVariableValue(&setting.Repository.Signing.SigningEmail, "forge@fake.local")()
 		defer test.MockVariableValue(&setting.Repository.Signing.TrustedSSHKeys, []string{"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH6Y4idVaW3E+bLw1uqoAfJD7o5Siu+HqS51E9oQLPE9"})()
 
 		commit, err := git.CommitFromReader(git.Sha1ObjectFormat.EmptyObjectID(), strings.NewReader(`tree 9a93ffa76e8b72bdb6431910b3a506fa2b39f42e
@@ -93,8 +93,8 @@ Initial commit with signed file
 		assert.False(t, ret.Warning)
 		assert.Equal(t, committingUser, ret.CommittingUser)
 		if assert.NotNil(t, ret.SigningUser) {
-			assert.Equal(t, "gitea", ret.SigningUser.Name)
-			assert.Equal(t, "gitea@fake.local", ret.SigningUser.Email)
+			assert.Equal(t, "forge", ret.SigningUser.Name)
+			assert.Equal(t, "forge@fake.local", ret.SigningUser.Email)
 		}
 	})
 }

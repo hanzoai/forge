@@ -335,9 +335,9 @@ func packageTestPayload() *api.PackagePayload {
 				AvatarURL: "http://localhost:3000/user1/avatar",
 			},
 			Type:    "container",
-			Name:    "GiteaContainer",
+			Name:    "ForgeContainer",
 			Version: "latest",
-			HTMLURL: "http://localhost:3000/user1/-/packages/container/GiteaContainer/latest",
+			HTMLURL: "http://localhost:3000/user1/-/packages/container/ForgeContainer/latest",
 		},
 	}
 }

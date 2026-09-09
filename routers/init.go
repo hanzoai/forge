@@ -209,7 +209,7 @@ func NormalRoutes() *web.Router {
 		// This implements package support for most package managers
 		r.Mount("/v1/packages", packages_router.CommonRoutes())
 		// This implements the OCI API, this container registry "/v2" endpoint must be in the root of the site.
-		// If site admin deploys Gitea in a sub-path, they must configure their reverse proxy to map the "https://host/v2" endpoint to Gitea.
+		// If site admin deploys the forge in a sub-path, they must configure their reverse proxy to map the "https://host/v2" endpoint to it.
 		r.Mount("/v2", packages_router.ContainerRoutes())
 	}
 
