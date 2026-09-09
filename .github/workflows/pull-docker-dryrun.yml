@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   files-changed:
-    uses: ./.hanzo/workflows/files-changed.yml
+    uses: ./.github/workflows/files-changed.yml
 
   # QEMU-based build is slow (40-50 minutes), so run arm64 and riscv64 when dockerfile changes.
   # Run amd64 when any docker-related files change, which is fast (4 minutes).
