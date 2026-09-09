@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   files-changed:
-    uses: ./.hanzo/workflows/files-changed.yml
+    uses: ./.github/workflows/files-changed.yml
 
   test-pgsql-shard-1:
     if: needs.files-changed.outputs.backend == 'true'

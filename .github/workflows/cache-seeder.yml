@@ -16,7 +16,7 @@ on:
       - ".golangci.yml"
       - ".github/actions/go-cache/action.yml"
       - ".github/actions/go-setup/action.yml"
-      - ".hanzo/workflows/cache-seeder.yml"
+      - ".github/workflows/cache-seeder.yml"
 
 concurrency:
   group: cache-seeder
