@@ -289,12 +289,12 @@ license = MIT`)
 		assert.NoError(t, err)
 		assert.Len(t, content, 2)
 
-		_, has := content["gitea-test-1.0.0/desc"]
+		_, has := content["git-test-1.0.0/desc"]
 		assert.False(t, has)
-		_, has = content["gitea-test-1.0.1/desc"]
+		_, has = content["git-test-1.0.1/desc"]
 		assert.True(t, has)
 
-		req = NewRequest(t, "DELETE", rootURL+"/gitea-test/1.0.1/aarch64").
+		req = NewRequest(t, "DELETE", rootURL+"/git-test/1.0.1/aarch64").
 			AddBasicAuth(user.Name)
 		MakeRequest(t, req, http.StatusNoContent)
 
@@ -303,7 +303,7 @@ license = MIT`)
 		content, err = test.ReadAllTarGzContent(resp.Body)
 		assert.NoError(t, err)
 		assert.Len(t, content, 2)
-		_, has = content["gitea-test-1.0.0/desc"]
+		_, has = content["git-test-1.0.0/desc"]
 		assert.True(t, has)
 	})
 }

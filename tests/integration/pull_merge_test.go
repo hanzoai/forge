@@ -100,7 +100,7 @@ func preparePullMergeWebhook(t *testing.T, repoID int64) {
 	require.NoError(t, db.TruncateBeans(t.Context(), &webhook.Webhook{}, &webhook.HookTask{}))
 	require.NoError(t, db.Insert(t.Context(), &webhook.Webhook{
 		RepoID:      repoID,
-		URL:         "http://localhost/gitea-test-webhook-pull-merge",
+		URL:         "http://localhost/forge-test-webhook-pull-merge",
 		ContentType: webhook.ContentTypeJSON,
 		Events:      `{"push_only":true,"send_everything":false,"choose_events":false,"events":{"create":false,"push":true,"pull_request":false}}`,
 		IsActive:    true,
@@ -807,7 +807,7 @@ func TestPullAutoMergeAfterCommitStatusSucceed(t *testing.T) {
 			"rule_name":             "master",
 			"enable_push":           "true",
 			"enable_status_check":   "true",
-			"status_check_contexts": "gitea/actions",
+			"status_check_contexts": "forge/actions",
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
 
@@ -850,8 +850,8 @@ func TestPullAutoMergeAfterCommitStatusSucceed(t *testing.T) {
 
 		err = commitstatus_service.CreateCommitStatus(t.Context(), baseRepo, user1, sha, &git_model.CommitStatus{
 			State:     commitstatus.CommitStatusSuccess,
-			TargetURL: "https://gitea.com",
-			Context:   "gitea/actions",
+			TargetURL: "https://example.com",
+			Context:   "forge/actions",
 		})
 		assert.NoError(t, err)
 
@@ -890,7 +890,7 @@ func TestPullAutoMergeAfterCommitStatusSucceedAndApproval(t *testing.T) {
 			"rule_name":             "master",
 			"enable_push":           "true",
 			"enable_status_check":   "true",
-			"status_check_contexts": "gitea/actions",
+			"status_check_contexts": "forge/actions",
 			"required_approvals":    "1",
 		})
 		baseSession.MakeRequest(t, req, http.StatusSeeOther)
@@ -919,8 +919,8 @@ func TestPullAutoMergeAfterCommitStatusSucceedAndApproval(t *testing.T) {
 
 		err = commitstatus_service.CreateCommitStatus(t.Context(), baseRepo, baseUser, sha, &git_model.CommitStatus{
 			State:     commitstatus.CommitStatusSuccess,
-			TargetURL: "https://gitea.com",
-			Context:   "gitea/actions",
+			TargetURL: "https://example.com",
+			Context:   "forge/actions",
 		})
 		assert.NoError(t, err)
 
@@ -1002,7 +1002,7 @@ func TestPullAutoMergeAfterCommitStatusSucceedAndApprovalForAgitFlow(t *testing.
 			"rule_name":             "master",
 			"enable_push":           "true",
 			"enable_status_check":   "true",
-			"status_check_contexts": "gitea/actions",
+			"status_check_contexts": "forge/actions",
 			"required_approvals":    "1",
 		})
 		session.MakeRequest(t, req, http.StatusSeeOther)
@@ -1031,8 +1031,8 @@ func TestPullAutoMergeAfterCommitStatusSucceedAndApprovalForAgitFlow(t *testing.
 		baseGitRepo.Close()
 		err = commitstatus_service.CreateCommitStatus(t.Context(), baseRepo, user1, sha, &git_model.CommitStatus{
 			State:     commitstatus.CommitStatusSuccess,
-			TargetURL: "https://gitea.com",
-			Context:   "gitea/actions",
+			TargetURL: "https://example.com",
+			Context:   "forge/actions",
 		})
 		assert.NoError(t, err)
 
@@ -1077,7 +1077,7 @@ func TestPullNonMergeForAdminWithBranchProtection(t *testing.T) {
 			"rule_name":                  "master",
 			"enable_push":                "true",
 			"enable_status_check":        "true",
-			"status_check_contexts":      "gitea/actions",
+			"status_check_contexts":      "forge/actions",
 			"block_admin_merge_override": "true",
 		})
 		session.MakeRequest(t, pbCreateReq, http.StatusSeeOther)
@@ -1121,7 +1121,7 @@ func TestPullForceMergeForBypassAllowlistUser(t *testing.T) {
 			"rule_name":                  "master",
 			"enable_push":                "all",
 			"enable_status_check":        "true",
-			"status_check_contexts":      "gitea/actions",
+			"status_check_contexts":      "forge/actions",
 			"block_admin_merge_override": "true",
 			"enable_bypass_allowlist":    "on",
 			"bypass_allowlist_users":     strconv.FormatInt(bypassUser.ID, 10),

@@ -31,13 +31,13 @@ func TestPackageComposer(t *testing.T) {
 	otherUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 5})
 	privateUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 31})
 
-	vendorName := "gitea"
+	vendorName := "forge"
 	projectName := "composer-package"
 	packageName := vendorName + "/" + projectName
 	packageVersion := "1.0.3"
 	packageDescription := "Package Description"
 	packageType := "composer-plugin"
-	packageAuthor := "Gitea Authors"
+	packageAuthor := "Forge Authors"
 	packageLicense := "MIT"
 	packageBin := "./bin/script"
 
@@ -157,11 +157,11 @@ func TestPackageComposer(t *testing.T) {
 			{"", "", 0, 0, 1, 1},
 			{"", "", 1, 1, 1, 1},
 			{"test", "", 1, 0, 0, 0},
-			{"gitea", "", 1, 1, 1, 1},
-			{"gitea", "", 2, 1, 1, 0},
+			{"forge", "", 1, 1, 1, 1},
+			{"forge", "", 2, 1, 1, 0},
 			{"", packageType, 1, 1, 1, 1},
-			{"gitea", packageType, 1, 1, 1, 1},
-			{"gitea", "dummy", 1, 1, 0, 0},
+			{"forge", packageType, 1, 1, 1, 1},
+			{"forge", "dummy", 1, 1, 0, 0},
 		}
 
 		for i, c := range cases {

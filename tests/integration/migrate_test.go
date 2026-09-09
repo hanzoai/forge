@@ -120,8 +120,8 @@ func Test_UpdateCommentsMigrationsByType(t *testing.T) {
 func setupGitMockServer(t *testing.T) *httptest.Server {
 	t.Helper()
 
-	giteaToken := os.Getenv("GIT_TOKEN")
-	liveMode := giteaToken != ""
+	liveToken := os.Getenv("GIT_TOKEN")
+	liveMode := liveToken != ""
 
 	// fast-import data creates deterministic commits (fixed author/committer/timestamps),
 	// so the resulting SHAs are always the same across runs.

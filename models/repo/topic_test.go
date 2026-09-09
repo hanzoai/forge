@@ -49,10 +49,10 @@ func TestAddTopic(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, topics, repo2NrOfTopics)
 
-	assert.NoError(t, repo_model.SaveTopics(t.Context(), 2, "golang", "gitea"))
+	assert.NoError(t, repo_model.SaveTopics(t.Context(), 2, "golang", "forge"))
 	repo2NrOfTopics = 2
 	totalNrOfTopics++
-	topic, err := repo_model.GetTopicByName(t.Context(), "gitea")
+	topic, err := repo_model.GetTopicByName(t.Context(), "forge")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, topic.RepoCount)
 

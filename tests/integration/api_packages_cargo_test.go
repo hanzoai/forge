@@ -39,7 +39,7 @@ func testPackageCargo(t *testing.T, _ *neturl.URL) {
 	packageVersion := "1.0.3"
 	packageDescription := "Package Description"
 	packageAuthor := "KN4CK3R"
-	packageHomepage := "https://gitea.io/"
+	packageHomepage := "https://forge.example/"
 	packageLicense := "MIT"
 
 	createPackage := func(name, version string) io.Reader {
@@ -52,7 +52,7 @@ func testPackageCargo(t *testing.T, _ *neturl.URL) {
       {
          "name":"dep",
          "version_req":"1.0",
-         "registry": "https://gitea.io/user/_cargo-index",
+         "registry": "https://forge.example/user/_cargo-index",
          "kind": "normal",
          "default_features": true
       }
@@ -227,7 +227,7 @@ func testPackageCargo(t *testing.T, _ *neturl.URL) {
 						assert.False(t, dep.Optional)
 						assert.Nil(t, dep.Target)
 						assert.NotNil(t, dep.Registry)
-						assert.Equal(t, "https://gitea.io/user/_cargo-index", *dep.Registry)
+						assert.Equal(t, "https://forge.example/user/_cargo-index", *dep.Registry)
 						assert.Nil(t, dep.Package)
 					})
 
@@ -266,7 +266,7 @@ func testPackageCargo(t *testing.T, _ *neturl.URL) {
 						assert.False(t, dep.Optional)
 						assert.Nil(t, dep.Target)
 						assert.NotNil(t, dep.Registry)
-						assert.Equal(t, "https://gitea.io/user/_cargo-index", *dep.Registry)
+						assert.Equal(t, "https://forge.example/user/_cargo-index", *dep.Registry)
 						assert.Nil(t, dep.Package)
 					})
 				})

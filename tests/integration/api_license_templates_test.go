@@ -35,7 +35,7 @@ func TestAPIListLicenseTemplates(t *testing.T) {
 func TestAPIGetLicenseTemplateInfo(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	// If Gitea has for some reason no License templates, we need to skip this test
+	// If the forge has for some reason no License templates, we need to skip this test
 	if len(repo_module.Licenses) == 0 {
 		return
 	}

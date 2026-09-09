@@ -141,7 +141,7 @@ func testAPICreateBranches(t *testing.T, gitURL *url.URL) {
 		},
 		// Trying to create from other branch (not default branch)
 		// ps: it can't test the case-sensitive behavior here: the "BRANCH_2" can't be created by git on a case-insensitive filesystem, it makes the test fail quickly before the database code.
-		// Suppose some users are running Gitea on a case-insensitive filesystem, it seems that it's unable to support case-sensitive branch names.
+		// Suppose some users are running the forge on a case-insensitive filesystem, it seems that it's unable to support case-sensitive branch names.
 		{
 			OldBranch:          "new_branch_from_master_1",
 			NewBranch:          "branch_2",

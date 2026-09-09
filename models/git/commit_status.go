@@ -38,7 +38,7 @@ type CommitStatus struct {
 	SHA    string                         `xorm:"VARCHAR(64) NOT NULL INDEX UNIQUE(repo_sha_index)"`
 
 	// TargetURL points to the commit status page reported by a CI system
-	// If Gitea Actions is used, it is a relative link like "{RepoLink}/actions/runs/{RunID}/jobs{JobID}"
+	// If Actions is used, it is a relative link like "{RepoLink}/actions/runs/{RunID}/jobs{JobID}"
 	TargetURL string `xorm:"TEXT"`
 
 	Description string           `xorm:"TEXT"`
@@ -213,7 +213,7 @@ func (status *CommitStatus) LocaleString(lang translation.Locale) string {
 	return lang.TrString("repo.commitstatus." + status.State.String())
 }
 
-// HideActionsURL set `TargetURL` to an empty string if the status comes from Gitea Actions
+// HideActionsURL set `TargetURL` to an empty string if the status comes from Actions
 func (status *CommitStatus) HideActionsURL(ctx context.Context) {
 	if _, ok := status.cutTargetURLGitActionsPrefix(ctx); ok {
 		status.TargetURL = ""
@@ -236,7 +236,7 @@ func (status *CommitStatus) cutTargetURLGitActionsPrefix(ctx context.Context) (s
 	return strings.CutPrefix(status.TargetURL, prefix)
 }
 
-// ParseGiteaActionsTargetURL parses the commit status target URL as Gitea Actions link
+// ParseGiteaActionsTargetURL parses the commit status target URL as an Actions link
 func (status *CommitStatus) ParseGiteaActionsTargetURL(ctx context.Context) (runID, jobID int64, ok bool) {
 	s, ok := status.cutTargetURLGitActionsPrefix(ctx)
 	if !ok {
@@ -544,7 +544,7 @@ func HashCommitStatusContext(context string) string {
 	return fmt.Sprintf("%x", sha1.Sum([]byte(context)))
 }
 
-// CommitStatusesHideActionsURL hide Gitea Actions urls
+// CommitStatusesHideActionsURL hide Actions urls
 func CommitStatusesHideActionsURL(ctx context.Context, statuses []*CommitStatus) {
 	idToRepos := make(map[int64]*repo_model.Repository)
 	for _, status := range statuses {

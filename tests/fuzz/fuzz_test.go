@@ -15,7 +15,7 @@ import (
 )
 
 func newFuzzRenderContext() *markup.RenderContext {
-	return markup.NewTestRenderContext("https://example.com/go-gitea/gitea", map[string]string{"user": "go-gitea", "repo": "gitea"})
+	return markup.NewTestRenderContext("https://example.com/hanzoai/forge", map[string]string{"user": "hanzoai", "repo": "forge"})
 }
 
 func FuzzMarkdownRenderRaw(f *testing.F) {

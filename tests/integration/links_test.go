@@ -69,7 +69,7 @@ func testLinksRedirectsNoLogin(t *testing.T) {
 		{"/user2/repo1/tree/a%2fb?a=1", "/user2/repo1/src/a%2fb?a=1"},
 		{"/user2/repo1/blob/123456/%20?a=1", "/user2/repo1/src/commit/123456/%20?a=1"},
 		{"/user/avatar/GhosT/-1", "/assets/img/avatar_default.png"},
-		{"/user/avatar/Gitea-ActionS/0", "/assets/img/avatar_default.png"},
+		{"/user/avatar/Hanzo-ActionS/0", "/assets/img/avatar_default.png"},
 		{"/v1/swagger", "/swagger"},
 	}
 	for _, c := range redirects {

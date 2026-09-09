@@ -40,7 +40,7 @@ import (
 	"github.com/hanzoai/xorm/names"
 )
 
-const minDBVersion = 70 // Gitea 1.5.3
+const minDBVersion = 70 // upstream 1.5.3
 
 type migration struct {
 	idNumber    int64 // DB version is "the last migration's idNumber" + 1
@@ -84,19 +84,19 @@ func prepareMigrationTasks() []*migration {
 		return preparedMigrations
 	}
 	preparedMigrations = []*migration{
-		// Gitea 1.5.0 ends at database version 69
+		// upstream 1.5.0 ends at database version 69
 
 		newMigration(70, "add issue_dependencies", v1_6.AddIssueDependencies),
 		newMigration(71, "protect each scratch token", v1_6.AddScratchHash),
 		newMigration(72, "add review", v1_6.AddReview),
 
-		// Gitea 1.6.0 ends at database version 73
+		// upstream 1.6.0 ends at database version 73
 
 		newMigration(73, "add must_change_password column for users table", v1_7.AddMustChangePassword),
 		newMigration(74, "add approval whitelists to protected branches", v1_7.AddApprovalWhitelistsToProtectedBranches),
 		newMigration(75, "clear nonused data which not deleted when user was deleted", v1_7.ClearNonusedData),
 
-		// Gitea 1.7.0 ends at database version 76
+		// upstream 1.7.0 ends at database version 76
 
 		newMigration(76, "add pull request rebase with merge commit", v1_8.AddPullRequestRebaseWithMerge),
 		newMigration(77, "add theme to users", v1_8.AddUserDefaultTheme),
@@ -105,7 +105,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(80, "add is locked to issues", v1_8.AddIsLockedToIssues),
 		newMigration(81, "update U2F counter type", v1_8.ChangeU2FCounterType),
 
-		// Gitea 1.8.0 ends at database version 82
+		// upstream 1.8.0 ends at database version 82
 
 		newMigration(82, "hot fix for wrong release sha1 on release table", v1_9.FixReleaseSha1OnReleaseTable),
 		newMigration(83, "add uploader id for table attachment", v1_9.AddUploaderIDForAttachment),
@@ -114,7 +114,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(86, "add http method to webhook", v1_9.AddHTTPMethodToWebhook),
 		newMigration(87, "add avatar field to repository", v1_9.AddAvatarFieldToRepository),
 
-		// Gitea 1.9.0 ends at database version 88
+		// upstream 1.9.0 ends at database version 88
 
 		newMigration(88, "add commit status context field to commit_status", v1_10.AddCommitStatusContext),
 		newMigration(89, "add original author/url migration info to issues, comments, and repo ", v1_10.AddOriginalMigrationInfo),
@@ -131,7 +131,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(100, "update migration repositories' service type", v1_10.UpdateMigrationServiceTypes),
 		newMigration(101, "change length of some external login users columns", v1_10.ChangeSomeColumnsLengthOfExternalLoginUser),
 
-		// Gitea 1.10.0 ends at database version 102
+		// upstream 1.10.0 ends at database version 102
 
 		newMigration(102, "update migration repositories' service type", v1_11.DropColumnHeadUserNameOnPullRequest),
 		newMigration(103, "Add WhitelistDeployKeys to protected branch", v1_11.AddWhitelistDeployKeysToBranches),
@@ -149,7 +149,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(115, "add user_id prefix to existing user avatar name", v1_11.RenameExistingUserAvatarName),
 		newMigration(116, "Extend TrackedTimes", v1_11.ExtendTrackedTimes),
 
-		// Gitea 1.11.0 ends at database version 117
+		// upstream 1.11.0 ends at database version 117
 
 		newMigration(117, "Add block on rejected reviews branch protection", v1_12.AddBlockOnRejectedReviews),
 		newMigration(118, "Add commit id and stale to reviews", v1_12.AddReviewCommitAndStale),
@@ -175,7 +175,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(138, "Add ResolveDoerID to Comment table", v1_12.AddResolveDoerIDCommentColumn),
 		newMigration(139, "prepend refs/heads/ to issue refs", v1_12.PrependRefsHeadsToIssueRefs),
 
-		// Gitea 1.12.0 ends at database version 140
+		// upstream 1.12.0 ends at database version 140
 
 		newMigration(140, "Save detected language file size to database instead of percent", v1_13.FixLanguageStatsToSaveSize),
 		newMigration(141, "Add KeepActivityPrivate to User table", v1_13.AddKeepActivityPrivateUserColumn),
@@ -193,7 +193,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(153, "add Team review request support", v1_13.AddTeamReviewRequestSupport),
 		newMigration(154, "add timestamps to Star, Label, Follow, Watch and Collaboration", v1_13.AddTimeStamps),
 
-		// Gitea 1.13.0 ends at database version 155
+		// upstream 1.13.0 ends at database version 155
 
 		newMigration(155, "add changed_protected_files column for pull_request table", v1_14.AddChangedProtectedFilesPullRequestColumn),
 		newMigration(156, "fix publisher ID for tag releases", v1_14.FixPublisherIDforTagReleases),
@@ -219,7 +219,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(176, "Remove invalid labels from comments", v1_14.RemoveInvalidLabels),
 		newMigration(177, "Delete orphaned IssueLabels", v1_14.DeleteOrphanedIssueLabels),
 
-		// Gitea 1.14.0 ends at database version 178
+		// upstream 1.14.0 ends at database version 178
 
 		newMigration(178, "Add LFS columns to Mirror", v1_15.AddLFSMirrorColumns),
 		newMigration(179, "Convert avatar url to text", v1_15.ConvertAvatarURLToText),
@@ -233,7 +233,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(187, "Drop unneeded webhook related columns", v1_15.DropWebhookColumns),
 		newMigration(188, "Add key is verified to gpg key", v1_15.AddKeyIsVerified),
 
-		// Gitea 1.15.0 ends at database version 189
+		// upstream 1.15.0 ends at database version 189
 
 		newMigration(189, "Unwrap ldap.Sources", v1_16.UnwrapLDAPSourceCfg),
 		newMigration(190, "Add agit flow pull request support", v1_16.AddAgitFlowPullRequest),
@@ -258,7 +258,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(209, "Increase WebAuthentication CredentialID size to 410 - NO-OPED", v1_16.IncreaseCredentialIDTo410),
 		newMigration(210, "v208 was completely broken - remigrate", v1_16.RemigrateU2FCredentials),
 
-		// Gitea 1.16.2 ends at database version 211
+		// upstream 1.16.2 ends at database version 211
 
 		newMigration(211, "Create ForeignReference table", v1_17.CreateForeignReferenceTable),
 		newMigration(212, "Add package tables", v1_17.AddPackageTables),
@@ -274,7 +274,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(222, "Drop old CredentialID column", v1_17.DropOldCredentialIDColumn),
 		newMigration(223, "Rename CredentialIDBytes column to CredentialID", v1_17.RenameCredentialIDBytes),
 
-		// Gitea 1.17.0 ends at database version 224
+		// upstream 1.17.0 ends at database version 224
 
 		newMigration(224, "Add badges to users", v1_18.CreateUserBadgesTable),
 		newMigration(225, "Alter gpg_key/public_key content TEXT fields to MEDIUMTEXT", v1_18.AlterPublicGPGKeyContentFieldsToMediumText),
@@ -284,7 +284,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(229, "Update counts of all open milestones", v1_18.UpdateOpenMilestoneCounts),
 		newMigration(230, "Add ConfidentialClient column (default true) to OAuth2Application table", v1_18.AddConfidentialClientColumnToOAuth2ApplicationTable),
 
-		// Gitea 1.18.0 ends at database version 231
+		// upstream 1.18.0 ends at database version 231
 
 		newMigration(231, "Add index for hook_task", v1_19.AddIndexForHookTask),
 		newMigration(232, "Alter package_version.metadata_json to LONGTEXT", v1_19.AlterPackageVersionMetadataToLongText),
@@ -300,7 +300,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(242, "Alter gpg_key_import content TEXT field to MEDIUMTEXT", v1_19.AlterPublicGPGKeyImportContentFieldToMediumText),
 		newMigration(243, "Add exclusive label", v1_19.AddExclusiveLabel),
 
-		// Gitea 1.19.0 ends at database version 244
+		// upstream 1.19.0 ends at database version 244
 
 		newMigration(244, "Add NeedApproval to actions tables", v1_20.AddNeedApprovalToActionRun),
 		newMigration(245, "Rename Webhook org_id to owner_id", v1_20.RenameWebhookOrgToOwner),
@@ -319,7 +319,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(258, "Add PinOrder Column", v1_20.AddPinOrderToIssue),
 		newMigration(259, "Convert scoped access tokens", v1_20.ConvertScopedAccessTokens),
 
-		// Gitea 1.20.0 ends at database version 260
+		// upstream 1.20.0 ends at database version 260
 
 		newMigration(260, "Drop custom_labels column of action_runner table", v1_21.DropCustomLabelsColumnOfActionRunner),
 		newMigration(261, "Add variable table", v1_21.CreateVariableTable),
@@ -342,7 +342,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(278, "Add Index to comment.dependent_issue_id", v1_21.AddIndexToCommentDependentIssueID),
 		newMigration(279, "Add Index to action.user_id", v1_21.AddIndexToActionUserID),
 
-		// Gitea 1.21.0 ends at database version 280
+		// upstream 1.21.0 ends at database version 280
 
 		newMigration(280, "Rename user themes", v1_22.RenameUserThemes),
 		newMigration(281, "Add auth_token table", v1_22.CreateAuthTokenTable),
@@ -359,7 +359,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(292, "Ensure every project has exactly one default column - No Op", noopMigration),
 		newMigration(293, "Ensure every project has exactly one default column", v1_22.CheckProjectColumnsConsistency),
 
-		// Gitea 1.22.0-rc0 ends at database version 294
+		// upstream 1.22.0-rc0 ends at database version 294
 
 		newMigration(294, "Add unique index for project issue table", v1_22.AddUniqueIndexForProjectIssue),
 		newMigration(295, "Add commit status summary table", v1_22.AddCommitStatusSummary),
@@ -367,7 +367,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(297, "Add everyone_access_mode for repo_unit", v1_22.AddRepoUnitEveryoneAccessMode),
 		newMigration(298, "Drop wrongly created table o_auth2_application", v1_22.DropWronglyCreatedTable),
 
-		// Gitea 1.22.0-rc1 ends at migration ID number 298 (database version 299)
+		// upstream 1.22.0-rc1 ends at migration ID number 298 (database version 299)
 
 		newMigration(299, "Add content version to issue and comment table", v1_23.AddContentVersionToIssueAndComment),
 		newMigration(300, "Add force-push branch protection support", v1_23.AddForcePushBranchProtection),
@@ -382,7 +382,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(309, "Improve Notification table indices", v1_23.ImproveNotificationTableIndices),
 		newMigration(310, "Add Priority to ProtectedBranch", v1_23.AddPriorityToProtectedBranch),
 		newMigration(311, "Add TimeEstimate to Issue table", v1_23.AddTimeEstimateColumnToIssueTable),
-		// Gitea 1.23.0-rc0 ends at migration ID number 311 (database version 312)
+		// upstream 1.23.0-rc0 ends at migration ID number 311 (database version 312)
 
 		newMigration(312, "Add DeleteBranchAfterMerge to AutoMerge", v1_24.AddDeleteBranchAfterMergeForAutoMerge),
 		newMigration(313, "Move PinOrder from issue table to a new table issue_pin", v1_24.MovePinOrderToTableIssuePin),
@@ -393,11 +393,11 @@ func prepareMigrationTasks() []*migration {
 		newMigration(318, "Add anonymous_access_mode for repo_unit", v1_24.AddRepoUnitAnonymousAccessMode),
 		newMigration(319, "Add ExclusiveOrder to Label table", v1_24.AddExclusiveOrderColumnToLabelTable),
 		newMigration(320, "Migrate two_factor_policy to login_source table", v1_24.MigrateSkipTwoFactor),
-		// Gitea 1.24.0 ends at migration ID number 320 (database version 321)
+		// upstream 1.24.0 ends at migration ID number 320 (database version 321)
 
 		newMigration(321, "Use LONGTEXT for some columns and fix review_state.updated_files column", v1_25.UseLongTextInSomeColumnsAndFixBugs),
 		newMigration(322, "Extend comment tree_path length limit", v1_25.ExtendCommentTreePathLength),
-		// Gitea 1.25.0 ends at migration ID number 322 (database version 323)
+		// upstream 1.25.0 ends at migration ID number 322 (database version 323)
 
 		newMigration(323, "Add support for actions concurrency", v1_26.AddActionsConcurrency),
 		newMigration(324, "Fix closed milestone completeness for milestones with no issues", v1_26.FixClosedMilestoneCompleteness),
@@ -407,7 +407,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(328, "Add TokenPermissions column to ActionRunJob", v1_26.AddTokenPermissionsToActionRunJob),
 		newMigration(329, "Add unique constraint for user badge", v1_26.AddUniqueIndexForUserBadge),
 		newMigration(330, "Add name column to webhook", v1_26.AddNameToWebhook),
-		// Gitea 1.26.0 ends at migration ID number 330 (database version 331)
+		// upstream 1.26.0 ends at migration ID number 330 (database version 331)
 
 		newMigration(331, "Add ActionRunAttempt model and related action fields", v1_27.AddActionRunAttemptModel),
 		newMigration(332, "Add last_sync_unix to mirror", v1_27.AddLastSyncUnixToMirror),
@@ -498,7 +498,7 @@ func Migrate(ctx context.Context, x db.EngineMigration) error {
 	migrations := prepareMigrationTasks()
 	maxDBVer := calcDBVersion(migrations)
 
-	// Set a new clean the default mapper to GonicMapper as that is the default for Gitea.
+	// Set a new clean the default mapper to GonicMapper as that is the default here.
 	x.SetMapper(names.GonicMapper{})
 	if err := x.Sync(new(Version)); err != nil {
 		return fmt.Errorf("sync: %w", err)
@@ -519,9 +519,9 @@ func Migrate(ctx context.Context, x db.EngineMigration) error {
 	}
 
 	curDBVer := currentVersion.Version
-	// Outdated Gitea database version is not supported
+	// Outdated database version is not supported
 	if curDBVer < minDBVersion {
-		log.Fatal(`Gitea no longer supports auto-migration from your previously installed version.
+		log.Fatal(`Hanzo Git no longer supports auto-migration from your previously installed version.
 Please try upgrading to a lower version first (suggested v1.6.4), then upgrade to this version.`)
 		return nil
 	}

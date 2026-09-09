@@ -30,7 +30,7 @@ func TestPackageCran(t *testing.T) {
 	packageName := "test.package"
 	packageVersion := "1.0.3"
 	packageAuthor := "KN4CK3R"
-	packageDescription := "Gitea Test Package"
+	packageDescription := "Forge Test Package"
 
 	createDescription := func(name, version string) []byte {
 		var buf bytes.Buffer

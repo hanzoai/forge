@@ -38,11 +38,11 @@ func TestPackageSwift(t *testing.T) {
 	packageVersion2 := "1.0.4"
 	packageVersion3 := "1.0.5"
 	packageAuthor := "KN4CK3R"
-	packageDescription := "Gitea Test Package"
-	packageCodeRepositoryURL := "https://gitea.io/gitea/gitea" // this one is not used as a property, it is meta
+	packageDescription := "Forge Test Package"
+	packageCodeRepositoryURL := "https://forge.example/forge/forge" // this one is not used as a property, it is meta
 	packageLicenseURL := "https://opensource.org/license/mit"
-	packageRepositoryURL1 := "https://gitea.io/gitea/repo"
-	packageRepositoryURLs := []string{packageRepositoryURL1, "https://gitea.io/gitea/repo.git", "ssh://git@gitea.io/gitea/repo.git"}
+	packageRepositoryURL1 := "https://forge.example/forge/repo"
+	packageRepositoryURLs := []string{packageRepositoryURL1, "https://forge.example/forge/repo.git", "ssh://git@forge.example/forge/repo.git"}
 	makePackageMetadataJSON := func(ver string) string {
 		tmpl := `{
 	"name":"` + packageName + `",

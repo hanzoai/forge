@@ -364,8 +364,8 @@ func TestPackageContainer(t *testing.T) {
 			t.Run("UploadBlob/Mount", func(t *testing.T) {
 				defer tests.PrintCurrentTest(t)()
 
-				privateBlobDigest := "sha256:6ccce4863b70f258d691f59609d31b4502e1ba5199942d3bc5d35d17a4ce771d"
-				req := NewRequestWithBody(t, "POST", fmt.Sprintf("%sv2/%s/%s/blobs/uploads?digest=%s", setting.AppURL, privateUser.Name, image, privateBlobDigest), strings.NewReader("gitea")).
+				privateBlobDigest := "sha256:71b41d6dd48dc58eba8f5cf9edf30fef6597fdf285a521bb8fcbad4b3d50887d"
+				req := NewRequestWithBody(t, "POST", fmt.Sprintf("%sv2/%s/%s/blobs/uploads?digest=%s", setting.AppURL, privateUser.Name, image, privateBlobDigest), strings.NewReader("forge")).
 					AddBasicAuth(privateUser.Name)
 				MakeRequest(t, req, http.StatusCreated)
 

@@ -37,7 +37,7 @@ func TestRepoLanguages(t *testing.T) {
 		resp = session.MakeRequest(t, req, http.StatusOK)
 		assert.NotEmpty(t, test.RedirectURL(resp))
 
-		// let gitea calculate language stats
+		// let the forge calculate language stats
 		time.Sleep(time.Second)
 
 		// Save new file to master branch

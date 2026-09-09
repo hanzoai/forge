@@ -58,7 +58,7 @@ jobs:
 		// prepare for clone
 		dstPath := t.TempDir()
 		u.Path = fmt.Sprintf("%s/%s.git", "user2", "reusable_workflow")
-		u.User = url.UserPassword("gitea-actions", taskToken)
+		u.User = url.UserPassword("hanzo-actions", taskToken)
 
 		// the git clone will fail
 		doGitCloneFail(u)(t)

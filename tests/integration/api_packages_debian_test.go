@@ -31,7 +31,7 @@ func TestPackageDebian(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
-	packageName := "gitea"
+	packageName := "forge"
 	packageVersion := "1.0.3"
 	packageVersion2 := "1.0.4"
 	packageDescription := "Package Description"
@@ -62,7 +62,7 @@ func TestPackageDebian(t *testing.T) {
 		return &buf
 	}
 
-	distributions := []string{"test", "gitea"}
+	distributions := []string{"test", "forge"}
 	components := []string{"main", "stable"}
 	architectures := []string{"all", "amd64"}
 

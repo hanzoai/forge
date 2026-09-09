@@ -52,7 +52,7 @@ func TestOAuth2Application_LoadUser(t *testing.T) {
 
 func TestUserEmails(t *testing.T) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
-	defer test.MockVariableValue(&setting.Service.NoReplyAddress, "NoReply.gitea.internal")()
+	defer test.MockVariableValue(&setting.Service.NoReplyAddress, "NoReply.forge.internal")()
 	t.Run("GetUserEmailsByNames", func(t *testing.T) {
 		// ignore not active user email
 		assert.ElementsMatch(t, []string{"user8@example.com"}, user_model.GetUserEmailsByNames(t.Context(), []string{"user8", "user9"}))
@@ -74,7 +74,7 @@ func TestUserEmails(t *testing.T) {
 		{"no-such", 0},
 	}
 	t.Run("GetUsersByEmails", func(t *testing.T) {
-		defer test.MockVariableValue(&setting.Service.NoReplyAddress, "NoReply.gitea.internal")()
+		defer test.MockVariableValue(&setting.Service.NoReplyAddress, "NoReply.forge.internal")()
 		testGetUserByEmail := func(t *testing.T, email string, uid int64) {
 			m, err := user_model.GetUsersByEmails(t.Context(), []string{email})
 			require.NoError(t, err)
@@ -301,7 +301,7 @@ func TestDisplayName(t *testing.T) {
 func TestCreateUserInvalidEmail(t *testing.T) {
 	user := &user_model.User{
 		Name:               "GitBot",
-		Email:              "GitBot@gitea.io\r\n",
+		Email:              "GitBot@forge.example\r\n",
 		Passwd:             ";p['////..-++']",
 		IsAdmin:            false,
 		Theme:              setting.UI.DefaultTheme,

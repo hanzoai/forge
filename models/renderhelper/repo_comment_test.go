@@ -37,7 +37,7 @@ func TestRepoComment(t *testing.T) {
 	t.Run("AbsoluteAndRelative", func(t *testing.T) {
 		rctx := NewRenderContextRepoComment(t.Context(), repo1).WithMarkupType(markdown.MarkupName)
 
-		// It is Gitea's old behavior, the relative path is resolved to the repo path
+		// It is upstream's old behavior, the relative path is resolved to the repo path
 		// It is different from GitHub, GitHub resolves relative links to current page's path
 		rendered, err := testRenderString(rctx, `
 [/test](/test)

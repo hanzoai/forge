@@ -33,7 +33,7 @@ func TestNewAccessToken(t *testing.T) {
 }
 
 func TestAccessTokenByNameExists(t *testing.T) {
-	name := "Token Gitea"
+	name := "Token Forge"
 
 	assert.NoError(t, unittest.PrepareTestDatabase())
 	token := &auth_model.AccessToken{

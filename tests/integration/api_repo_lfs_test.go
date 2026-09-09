@@ -414,9 +414,9 @@ func TestAPILFSUpload(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
-		p := lfs.Pointer{Oid: "6ccce4863b70f258d691f59609d31b4502e1ba5199942d3bc5d35d17a4ce771d", Size: 5}
+		p := lfs.Pointer{Oid: "71b41d6dd48dc58eba8f5cf9edf30fef6597fdf285a521bb8fcbad4b3d50887d", Size: 5}
 
-		req := newRequest(t, p, "gitea")
+		req := newRequest(t, p, "forge")
 
 		session.MakeRequest(t, req, http.StatusOK)
 

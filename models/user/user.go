@@ -121,10 +121,10 @@ type User struct {
 	// IsActive true: primary email is activated, user can access Web UI and Git SSH.
 	// false: an inactive user can only log in Web UI for account operations (ex: activate the account by email), no other access.
 	IsActive bool `xorm:"INDEX"`
-	// the user is a Gitea admin, who can access all repositories and the admin pages.
+	// the user is a site admin, who can access all repositories and the admin pages.
 	IsAdmin bool
 	// true: the user is only allowed to see organizations/repositories that they has explicit rights to.
-	// (ex: in private Gitea instances user won't be allowed to see even organizations/repositories that are set as public)
+	// (ex: on a private instance user won't be allowed to see even organizations/repositories that are set as public)
 	IsRestricted bool `xorm:"NOT NULL DEFAULT false"`
 
 	AllowGitHook            bool
@@ -509,7 +509,7 @@ func (u *User) GitName() string {
 }
 
 // IsMailable checks if a user is eligible to receive emails.
-// System users like Ghost and Gitea Actions are excluded.
+// System users like Ghost and the Actions bot are excluded.
 func (u *User) IsMailable() bool {
 	return u.IsActive && !u.IsGiteaActions() && !u.IsGhost()
 }
@@ -595,7 +595,7 @@ var (
 		"..",
 		".well-known",
 
-		"api",     // gitea api
+		"api",     // forge api
 		"metrics", // prometheus metrics api
 		"swagger", // api reference page
 		"v1",      // rest api, packages, internal api

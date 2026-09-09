@@ -341,7 +341,7 @@ func UpdateRun(ctx context.Context, run *ActionRun, cols ...string) error {
 	}
 	if affected == 0 {
 		return errors.New("run has changed")
-		// It's impossible that the run is not found, since Gitea never deletes runs.
+		// It's impossible that the run is not found, since runs are never deleted.
 	}
 
 	return nil

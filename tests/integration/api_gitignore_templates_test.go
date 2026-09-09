@@ -30,7 +30,7 @@ func TestAPIListGitignoresTemplates(t *testing.T) {
 func TestAPIGetGitignoreTemplateInfo(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
 
-	// If Gitea has for some reason no Gitignore templates, we need to skip this test
+	// If the forge has for some reason no Gitignore templates, we need to skip this test
 	if len(repo_module.Gitignores) == 0 {
 		return
 	}

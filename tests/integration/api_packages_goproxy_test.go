@@ -25,10 +25,10 @@ func TestPackageGo(t *testing.T) {
 
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
-	packageName := "gitea.com/go-gitea/gitea"
+	packageName := "example.com/hanzoai/forge"
 	packageVersion := "v0.0.1"
 	packageVersion2 := "v0.0.2"
-	goModContent := `module "gitea.com/go-gitea/gitea"`
+	goModContent := `module "example.com/hanzoai/forge"`
 
 	url := fmt.Sprintf("/v1/packages/%s/go", user.Name)
 
