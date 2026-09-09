@@ -49,7 +49,7 @@ about: bar
 		issueTemplates = DecodeJSON(t, resp, []*api.IssueTemplate{})
 		assert.Len(t, issueTemplates, 1)
 		assert.Equal(t, "foo", issueTemplates[0].Name)
-		assert.Equal(t, "error occurs when parsing issue template: count=2", resp.Header().Get("X-Gitea-Warning"))
+		assert.Equal(t, "error occurs when parsing issue template: count=2", resp.Header().Get("X-Git-Warning"))
 	})
 }
 

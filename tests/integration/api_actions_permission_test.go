@@ -29,14 +29,14 @@ func testActionUserAccessPublicRepo(t *testing.T) {
 	req := NewRequestf(t, "GET", "/v1/repos/user2/repo1/raw/README.md").
 		AddTokenAuth("8061e833a55f6fc0157c98b883e91fcfeeb1a71a")
 	resp := MakeRequest(t, req, http.StatusOK)
-	assert.Equal(t, "file", resp.Header().Get("x-gitea-object-type"))
+	assert.Equal(t, "file", resp.Header().Get("x-git-object-type"))
 
 	defer test.MockVariableValue(&setting.Service.RequireSignInViewStrict, true)()
 
 	req = NewRequestf(t, "GET", "/v1/repos/user2/repo1/raw/README.md").
 		AddTokenAuth("8061e833a55f6fc0157c98b883e91fcfeeb1a71a")
 	resp = MakeRequest(t, req, http.StatusOK)
-	assert.Equal(t, "file", resp.Header().Get("x-gitea-object-type"))
+	assert.Equal(t, "file", resp.Header().Get("x-git-object-type"))
 }
 
 func testActionUserNoAccessOtherPrivateRepo(t *testing.T) {

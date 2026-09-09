@@ -198,15 +198,25 @@ a different resource. Do NOT sed these:
   app.ini that set it `false` silently revert to the `true` default, which
   rejects pushes. Needs a migration, not a rename.
 
-Still branded upstream and needing an owner decision, because each is a wire
-contract with consumers we cannot enumerate: the `X-GITEA-OTP` request header
-(`services/auth/basic.go`, CORS allow-list, both swagger specs), the webhook
-delivery headers `X-Gitea-{Delivery,Event,Event-Type,Signature,Hook-Installation-Target-Type}`
-(`services/webhook/deliver.go`), and the notification-mail headers `X-Gitea-*`
-(`services/mailer/`). All three already ship vendor-compat aliases beside them
-(`X-GitHub-*`, `X-Hub-Signature-256`, `X-Gogs-*`, `X-GitLab-*`), so the target
-names are the platform's `X-Webhook-*` convention — but dropping `X-Gitea-*`
-breaks any receiver verifying signatures on it.
+**Every header we emit is `X-Git-*`.** Webhook delivery
+(`services/webhook/deliver.go`), notification mail (`services/mailer/`), and the
+API response headers `X-Git-Warning` and `X-Git-Object-Type` (`routers/api/v1/`).
+The vendor families beside them stay and carry the same values, because they are
+what lets a receiver written for another server work against us unchanged:
+`X-Gogs-*`, `X-GitHub-*`, `X-GitLab-*`, and `X-Hub-Signature`/`-256` — that last
+pair is GitHub's own spelling, which third parties genuinely send us.
+`TestWebhookDeliverGitHeaders` asserts the parity and refuses any delivery header
+whose name contains "gitea", so the emission cannot come back by accident.
+
+One inbound header is still branded upstream: **`X-GITEA-OTP`**, declared in the
+CORS allow-list (`routers/api/v1/api.go`) and in both swagger specs. Nothing
+reads it — `ValidateAndConsumeTOTP` has no caller outside `models/auth`, so the
+basic-auth TOTP path this header fed no longer exists and
+`tests/integration/api_twofa_test.go` expects a 200 the server cannot produce.
+Renaming it is one Go line plus the two generated specs under
+`templates/swagger/`, which `make swagger-check` compares, so it has to land as
+one commit; deciding whether the TOTP path comes back or the declaration goes is
+the larger question underneath it.
 
 ## Image / release lane
 

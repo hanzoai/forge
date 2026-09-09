@@ -95,13 +95,20 @@ func TestWebhookDeliverGitHeaders(t *testing.T) {
 		assert.Equal(t, "push", r.Header.Get("X-Git-Event-Type"))
 		assert.NotEmpty(t, r.Header.Get("X-Git-Delivery"))
 		assert.Equal(t, "repository", r.Header.Get("X-Git-Hook-Installation-Target-Type"))
+		for _, h := range []string{"Delivery", "Event", "Event-Type"} {
+			assert.Equal(t, r.Header.Get("X-Gogs-"+h), r.Header.Get("X-Git-"+h), "X-Gogs-%s must match X-Git-%s", h, h)
+		}
 		for _, h := range []string{"Delivery", "Event", "Event-Type", "Hook-Installation-Target-Type"} {
-			assert.Equal(t, r.Header.Get("X-Gitea-"+h), r.Header.Get("X-Git-"+h), "X-Git-%s must match X-Gitea-%s", h, h)
+			assert.Equal(t, r.Header.Get("X-GitHub-"+h), r.Header.Get("X-Git-"+h), "X-GitHub-%s must match X-Git-%s", h, h)
 		}
 		// Signed: the signature header must be present and identical across families.
 		assert.NotEmpty(t, r.Header.Get("X-Git-Signature"))
-		assert.Equal(t, r.Header.Get("X-Gitea-Signature"), r.Header.Get("X-Git-Signature"))
 		assert.Equal(t, r.Header.Get("X-Gogs-Signature"), r.Header.Get("X-Git-Signature"))
+		assert.Equal(t, "sha256="+r.Header.Get("X-Git-Signature"), r.Header.Get("X-Hub-Signature-256"))
+		// We do not name ourselves after the server we forked from.
+		for name := range r.Header {
+			assert.NotContains(t, strings.ToLower(name), "gitea", "no delivery header may be branded upstream")
+		}
 		w.WriteHeader(http.StatusOK)
 		done <- struct{}{}
 	}))

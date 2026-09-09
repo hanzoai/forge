@@ -188,9 +188,9 @@ func generateMetadataHeaders(repo *repo_model.Repository) map[string]string {
 
 		"X-Mailer": "Hanzo Git",
 
-		"X-Gitea-Repository":      repo.Name,
-		"X-Gitea-Repository-Path": repo.FullName(),
-		"X-Gitea-Repository-Link": repo.HTMLURL(),
+		"X-Git-Repository":      repo.Name,
+		"X-Git-Repository-Path": repo.FullName(),
+		"X-Git-Repository-Link": repo.HTMLURL(),
 
 		"X-GitLab-Project":      repo.Name,
 		"X-GitLab-Project-Path": repo.FullName(),
@@ -199,9 +199,9 @@ func generateMetadataHeaders(repo *repo_model.Repository) map[string]string {
 
 func generateSenderRecipientHeaders(doer, recipient *user_model.User) map[string]string {
 	return map[string]string{
-		"X-Gitea-Sender":             doer.Name,
-		"X-Gitea-Recipient":          recipient.Name,
-		"X-Gitea-Recipient-Address":  recipient.Email,
+		"X-Git-Sender":               doer.Name,
+		"X-Git-Recipient":            recipient.Name,
+		"X-Git-Recipient-Address":    recipient.Email,
 		"X-GitHub-Sender":            doer.Name,
 		"X-GitHub-Recipient":         recipient.Name,
 		"X-GitHub-Recipient-Address": recipient.Email,
@@ -210,7 +210,7 @@ func generateSenderRecipientHeaders(doer, recipient *user_model.User) map[string
 
 func generateReasonHeaders(reason string) map[string]string {
 	return map[string]string{
-		"X-Gitea-Reason":              reason,
+		"X-Git-Reason":                reason,
 		"X-GitHub-Reason":             reason,
 		"X-GitLab-NotificationReason": reason,
 	}

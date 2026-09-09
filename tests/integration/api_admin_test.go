@@ -350,7 +350,7 @@ func TestAPICreateUser_NotAllowedEmailDomain(t *testing.T) {
 		"must_change_password": "true",
 	}).AddTokenAuth(token)
 	resp := MakeRequest(t, req, http.StatusCreated)
-	assert.Equal(t, "the domain of user email allowedUser1@example1.org conflicts with EMAIL_DOMAIN_ALLOWLIST or EMAIL_DOMAIN_BLOCKLIST", resp.Header().Get("X-Gitea-Warning"))
+	assert.Equal(t, "the domain of user email allowedUser1@example1.org conflicts with EMAIL_DOMAIN_ALLOWLIST or EMAIL_DOMAIN_BLOCKLIST", resp.Header().Get("X-Git-Warning"))
 
 	req = NewRequest(t, "DELETE", "/v1/admin/users/allowedUser1").AddTokenAuth(token)
 	MakeRequest(t, req, http.StatusNoContent)

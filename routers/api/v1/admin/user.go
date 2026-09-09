@@ -150,7 +150,7 @@ func CreateUser(ctx *context.APIContext) {
 	}
 
 	if !user_model.IsEmailDomainAllowed(u.Email) {
-		ctx.Resp.Header().Add("X-Gitea-Warning", fmt.Sprintf("the domain of user email %s conflicts with EMAIL_DOMAIN_ALLOWLIST or EMAIL_DOMAIN_BLOCKLIST", u.Email))
+		ctx.Resp.Header().Add("X-Git-Warning", fmt.Sprintf("the domain of user email %s conflicts with EMAIL_DOMAIN_ALLOWLIST or EMAIL_DOMAIN_BLOCKLIST", u.Email))
 	}
 
 	log.Trace("Account created by admin (%s): %s", ctx.Doer.Name, u.Name)
