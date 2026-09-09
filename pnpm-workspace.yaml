@@ -64,7 +64,9 @@ catalog:
   'codemirror-lang-elixir': '^4.0.1'
   'colord': '^2.10.0'
   'compare-versions': '^6.1.1'
-  'cropperjs': '^2.2.0'
+  # Held at 1: v2 restructured the package and dropped dist/cropper.css, which
+  # web_src/css/features/cropper.css imports by that path.
+  'cropperjs': '1.6.3'
   'dayjs': '^1.11.23'
   'easymde': '^2.21.0'
   'esbuild': '^0.28.2'
@@ -103,7 +105,9 @@ catalog:
   'stylelint-value-no-unknown-custom-properties': '^6.1.1'
   'svgo': '^4.1.0'
   'swagger-ui-dist': '^5.32.14'
-  'tailwindcss': '^4.3.3'
+  # Held at 3: v4 moved the PostCSS plugin to @tailwindcss/postcss and replaced
+  # the JS config this tree still uses, so vite.config.ts cannot load it.
+  'tailwindcss': '3.4.19'
   'throttle-debounce': '^5.0.2'
   'tippy.js': '^6.3.7'
   'toastify-js': '^1.12.0'
