@@ -1,6 +1,6 @@
 # Testing
 
-Gitea has four kinds of automated tests: backend unit tests, integration tests,
+Hanzo Forge has four kinds of automated tests: backend unit tests, integration tests,
 end-to-end (e2e) tests, and migration tests. Local runs default to SQLite, so no
 extra services are required to get started.
 
@@ -33,7 +33,7 @@ pnpm exec vitest <path-filter>
 
 ## Integration tests
 
-Integration tests exercise Gitea against a real database. They live in
+Integration tests exercise Hanzo Forge against a real database. They live in
 `tests/integration/` and require [Git LFS](https://git-lfs.com/) to be installed.
 The database is selected with `GIT_TEST_DATABASE`; an empty value defaults to
 SQLite, which needs no external service:
@@ -91,29 +91,29 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_PID=Standard" -e "SA_PASSWORD=MwantsaSec
 ```
 
 ```bash
-GIT_TEST_DATABASE=mssql TEST_MSSQL_HOST=localhost:1433 TEST_MSSQL_DBNAME=gitea_test TEST_MSSQL_USERNAME=sa TEST_MSSQL_PASSWORD=MwantsaSecurePassword1 make test-integration
+GIT_TEST_DATABASE=mssql TEST_MSSQL_HOST=localhost:1433 TEST_MSSQL_DBNAME=test TEST_MSSQL_USERNAME=sa TEST_MSSQL_PASSWORD=MwantsaSecurePassword1 make test-integration
 ```
 
-### Running the database test workflow with Gitea Runner
+### Running the database test workflow with the runner
 
 The CI database test jobs can be run locally with
-[Gitea Runner](https://gitea.com/gitea/runner). Running every job is
+[`hanzoai/git-runner`](https://github.com/hanzoai/git-runner). Running every job is
 resource-intensive and not recommended:
 
 ```bash
-gitea-runner exec -W ./.hanzo/workflows/pull-db-tests.yml --event=pull_request --default-actions-url="https://github.com" -i catthehacker/ubuntu:runner-latest
+git-runner exec -W ./.hanzo/workflows/pull-db-tests.yml --event=pull_request --default-actions-url="https://github.com" -i catthehacker/ubuntu:runner-latest
 ```
 
 List the available job names, then run a single one:
 
 ```bash
-gitea-runner exec -W ./.hanzo/workflows/pull-db-tests.yml --event=pull_request --default-actions-url="https://github.com" -i catthehacker/ubuntu:runner-latest -l
-gitea-runner exec -W ./.hanzo/workflows/pull-db-tests.yml --event=pull_request --default-actions-url="https://github.com" -i catthehacker/ubuntu:runner-latest -j <job_name>
+git-runner exec -W ./.hanzo/workflows/pull-db-tests.yml --event=pull_request --default-actions-url="https://github.com" -i catthehacker/ubuntu:runner-latest -l
+git-runner exec -W ./.hanzo/workflows/pull-db-tests.yml --event=pull_request --default-actions-url="https://github.com" -i catthehacker/ubuntu:runner-latest -j <job_name>
 ```
 
 ## End-to-end tests
 
-End-to-end tests drive a running Gitea instance with [Playwright](https://playwright.dev/):
+End-to-end tests drive a running Hanzo Forge instance with [Playwright](https://playwright.dev/):
 
 ```bash
 make test-e2e
@@ -129,7 +129,7 @@ Useful environment variables:
 
 | Variable | Description |
 | :--- | :--- |
-| `GIT_TEST_E2E_DEBUG` | When set, show the Gitea server output. |
+| `GIT_TEST_E2E_DEBUG` | When set, show the server output. |
 | `GIT_TEST_E2E_FLAGS` | Additional flags passed to Playwright, e.g. `--ui`. |
 | `GIT_TEST_E2E_TIMEOUT_FACTOR` | Timeout multiplier (default: 4 on CI, 1 locally). |
 
@@ -145,7 +145,7 @@ make test-migration
 ## Continuous integration
 
 CI runs the unit tests, runs the integration tests against every supported database,
-and tests migration from several recent Gitea versions. Please submit your pull
+and tests migration from several recent versions. Please submit your pull
 request with additional unit and integration tests as appropriate. Prefer unit tests
 when the logic can be tested in isolation, and keep local integration and e2e tests
 fast (aim for sub-2s runtime).

@@ -1,6 +1,6 @@
 # Development
 
-This document describes how to build Gitea from source and the day-to-day
+This document describes how to build Hanzo Forge from source and the day-to-day
 development workflow. For prerequisites and how to obtain the code, see
 [build-setup.md](build-setup.md). For running tests, see [testing.md](testing.md). For the
 contribution workflow and review process, see [CONTRIBUTING.md](../CONTRIBUTING.md).
@@ -13,7 +13,7 @@ Area-specific guidelines:
 
 ## Building
 
-To build Gitea for development, run:
+To build Hanzo Forge for development, run:
 
 ```bash
 make build
@@ -26,8 +26,8 @@ only needed when packaging a self-contained build, so leave it out during
 development.
 
 See `make help` for all available targets, and the workflows in
-[`.github/workflows`](https://github.com/go-gitea/gitea/tree/main/.github/workflows)
-to see how continuous integration builds and checks Gitea.
+[`.hanzo/workflows`](../.hanzo/workflows)
+to see how continuous integration builds and checks Hanzo Forge.
 
 ## Building continuously
 
@@ -102,9 +102,9 @@ make swagger-check
 
 When adding configuration options it is not enough to add them to the
 `modules/setting` files. Also update
-[`custom/conf/app.example.ini`](../custom/conf/app.example.ini), and document them in
-the [configuration cheat sheet](https://docs.gitea.com/administration/config-cheat-sheet),
-which lives in the [documentation repository](https://gitea.com/gitea/docs).
+[`custom/conf/app.example.ini`](../custom/conf/app.example.ini), which is where a new
+section or key is documented. Deployments set them as `GIT__<section>__<KEY>`
+environment variables rather than through a config file.
 
 ## Database migrations
 
@@ -127,15 +127,14 @@ A `launch.json` and `tasks.json` are provided in
 ### GoLand
 
 Clicking the `Run Application` arrow on `func main()` in `/main.go` starts a
-debuggable Gitea instance.
+debuggable Hanzo Forge instance.
 
-The `Output Directory` in `Run/Debug Configuration` **must** be set to the Gitea
-project directory (the one containing `main.go` and `go.mod`). Otherwise the working
-directory is a GoLand temporary directory, which prevents Gitea from loading dynamic
+The `Output Directory` in `Run/Debug Configuration` **must** be set to the project
+directory (the one containing `main.go` and `go.mod`). Otherwise the working
+directory is a GoLand temporary directory, which prevents the server from loading dynamic
 resources (such as templates) in development.
 
 ## Submitting your changes
 
 Push your branch and open a pull request. See [CONTRIBUTING.md](../CONTRIBUTING.md)
-for the review process and PR requirements. For help, join the `#Develop` channel on
-[Discord](https://discord.gg/gitea).
+for the review process and PR requirements.

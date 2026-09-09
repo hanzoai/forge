@@ -1,4 +1,4 @@
-# Hanzo Git - Docker
+# Hanzo Forge - Docker
 
 Dockerfile is found in the root of the repository.
 

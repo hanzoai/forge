@@ -5,7 +5,7 @@
 > It also declared `ghcr.io/hanzoai/git`, the tag `hanzoai/git` owns, so a push here
 > could have published over it. That declaration is removed.
 
-# Hanzo Git
+# Hanzo Forge
 
 [![](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT "License: MIT")
 
@@ -15,7 +15,7 @@ CI/CD (GitHub-Actions-compatible), IAM-native via hanzo.id OIDC. Runs at
 
 A white-label fork of [Gitea](https://gitea.com) (MIT). Upstream copyright and
 licensing are preserved in [LICENSE](LICENSE); identity is wired to Hanzo IAM
-rather than local accounts, and the product is branded Hanzo Git.
+rather than local accounts, and the product is branded Hanzo Forge.
 
 ## Build & deploy
 

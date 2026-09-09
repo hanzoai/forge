@@ -17,13 +17,8 @@ We backport PRs given the following circumstances:
 
 ### How to backport?
 
-In the past, it was necessary to manually backport your PRs. \
-Now, that's not a requirement anymore as our [backport bot](https://github.com/GiteaBot) tries to create backports automatically once the PR is merged when the PR
-
-- does not have the label `backport/manual`
-- has the label `backport/<version>`
-
-The `backport/manual` label signifies either that you want to backport the change yourself, or that there were conflicts when backporting, thus you **must** do it yourself.
+Backports are opened by hand: cherry-pick the merged commit onto the release branch
+and open a PR against it.
 
 ### Format of backport PRs
 
@@ -86,30 +81,29 @@ Also we always try to support the latest on main branch, so if you are using the
 
 ## Versions
 
-Gitea has the `main` branch as a tip branch and has version branches
+Hanzo Forge has the `main` branch as a tip branch and has version branches
 such as `release/v1.19`. `release/v1.19` is a release branch and we will
 tag `v1.19.0` for binary download. If `v1.19.0` has bugs, we will accept
 pull requests on the `release/v1.19` branch and publish a `v1.19.1` tag,
 after bringing the bug fix also to the main branch.
 
-Since the `main` branch is a tip version, if you wish to use Gitea
-in production, please download the latest release tag version. All the
-branches will be protected via GitHub, all the PRs to every branch must
-be reviewed by two maintainers and must pass the automatic tests.
+Since the `main` branch is a tip version, if you wish to run Hanzo Forge
+in production, deploy a release tag. Every PR must be reviewed and must pass
+the automatic tests before it is merged.
 
-## Releasing Gitea
+## Cutting a release
 
-- Let MAJOR, MINOR and PATCH be Major, Minor and Patch version numbers, PATCH should be rc1, rc2, 0, 1, ...... MAJOR.MINOR will be kept the same as milestones on github or gitea in future.
-- Before releasing, confirm all the version's milestone issues or PRs has been resolved. Then discuss the release on Discord channel #maintainers and get agreed with almost all the owners and mergers. Or you can declare the version and if nobody is against it in about several hours.
-- If this is a big version first you have to create PR for changelog on branch `main` with PRs with label `changelog` and after it has been merged do following steps:
-  - Create `-dev` tag as `git tag -s -F release.notes vMAJOR.MINOR.0-dev` and push the tag as `git push origin vMAJOR.MINOR.0-dev`.
-  - When CI has finished building tag then you have to create a new branch named `release/vMAJOR.MINOR`
-- If it is bugfix version create PR for changelog on branch `release/vMAJOR.MINOR` and wait till it is reviewed and merged.
-- Add a tag as `git tag -s -F release.notes vMAJOR.MINOR.PATCH`, release.notes file could be a temporary file to only include the changelog this version which you added to `CHANGELOG.md`.
-- And then push the tag as `git push origin vMAJOR.MINOR.$`. CI will automatically create a release and upload all the compiled binary. (But currently it doesn't add the release notes automatically. Maybe we should fix that.)
-- If needed send a frontport PR for the changelog to branch `main` and update the version in `docs/config.yaml` to refer to the new version.
-- Send PR to [blog repository](https://gitea.com/gitea/blog) announcing the release.
-- Verify all release assets were correctly published through CI on dl.gitea.com and GitHub releases. Once ACKed:
-  - bump the version of https://dl.gitea.com/gitea/version.json
-  - merge the blog post PR
-  - announce the release in discord `#announcements`
+The git tag is the version. The Makefile derives `main.Version` from `git describe`,
+so the tag, the image tag and `gitd --version` are one fact.
+
+- Land the changelog entry on the branch you are releasing from.
+- Tag it and push the tag to `canonical` (`git.hanzo.ai/hanzoai/git`), which is where
+  CI runs: `git tag -a vMAJOR.MINOR.PATCH && git push canonical vMAJOR.MINOR.PATCH`.
+  Pushing a tag to the GitHub mirror builds nothing.
+- `.hanzo/workflows/cicd.yml` then publishes `ghcr.io/hanzoai/git:vMAJOR.MINOR.PATCH`
+  and the v-stripped `MAJOR.MINOR.PATCH`. A branch push gets only `sha-<sha7>-amd64`.
+- Never `crane copy` a `sha-` image onto a semver name: the binary inside reports its
+  commit instead of its version.
+- Rolling git.hanzo.ai onto the new tag is a separate, reviewed change to the `git`
+  operator App CR in `hanzoai/universe`. CD restores that pin on every poll, so a
+  `kubectl patch` does not hold.

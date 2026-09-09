@@ -1,6 +1,6 @@
 # Contribution Guidelines
 
-This document explains how to contribute changes to the Gitea project. Topic-specific guides live in separate files so the essentials are easier to find.
+This document explains how to contribute changes to Hanzo Forge. Topic-specific guides live in separate files so the essentials are easier to find.
 
 | Topic                  | Document                                                         |
 |:-----------------------|:-----------------------------------------------------------------|
@@ -24,7 +24,7 @@ This document explains how to contribute changes to the Gitea project. Topic-spe
     - [Types of issues](#types-of-issues)
     - [Discuss your design before the implementation](#discuss-your-design-before-the-implementation)
     - [Issue locking](#issue-locking)
-  - [Building Gitea](#building-gitea)
+  - [Building Hanzo Forge](#building-hanzo-forge)
   - [Styleguide](#styleguide)
   - [Copyright](#copyright)
   - [Testing](#testing)
@@ -45,10 +45,10 @@ This document explains how to contribute changes to the Gitea project. Topic-spe
 
 ## Introduction
 
-It assumes you have followed the [installation instructions](https://docs.gitea.com/category/installation). \
-Sensitive security-related issues should be reported to [security@gitea.io](mailto:security@gitea.io).
+It assumes you have a working build environment; see [docs/build-setup.md](docs/build-setup.md). \
+Sensitive security-related issues should be reported as described in [SECURITY.md](SECURITY.md), not to the upstream this fork came from.
 
-For configuring IDEs for Gitea development, see the [IDE setup notes](docs/development.md#ide-configuration) and the [contributed configurations](contrib/development/).
+For configuring IDEs for development here, see the [IDE setup notes](docs/development.md#ide-configuration) and the [contributed configurations](contrib/development/).
 
 ## AI Contribution Policy
 
@@ -71,29 +71,29 @@ We welcome new contributors, but cannot sustain the effort of supporting contrib
 
 Please search the issues on the issue tracker with a variety of related keywords to ensure that your issue has not already been reported.
 
-If your issue has not been reported yet, [open an issue](https://github.com/go-gitea/gitea/issues/new)
+If your issue has not been reported yet, [open an issue](https://github.com/hanzoai/forge/issues/new)
 and answer the questions so we can understand and reproduce the problematic behavior. \
 Please write clear and concise instructions so that we can reproduce the behavior — even if it seems obvious. \
 The more detailed and specific you are, the faster we can fix the issue. \
-It is really helpful if you can reproduce your problem on a site running on the latest commits, i.e. <https://demo.gitea.com>, as perhaps your problem has already been fixed on a current version. \
+It is really helpful if you can reproduce your problem on a build of the current `main`, as perhaps your problem has already been fixed. \
 Please follow the guidelines described in [How to Report Bugs Effectively](http://www.chiark.greenend.org.uk/~sgtatham/bugs.html) for your report.
 
-Please be kind—remember that Gitea comes at no cost to you, and you're getting free help.
+Please be kind—remember that Hanzo Forge comes at no cost to you, and you're getting free help.
 
 ### Types of issues
 
 Typically, issues fall in one of the following categories:
 
 - `bug`: Something in the frontend or backend behaves unexpectedly
-- `security issue`: bug that has serious implications such as leaking another users data. Please do not file such issues on the public tracker and send a mail to security@gitea.io instead
+- `security issue`: bug that has serious implications such as leaking another users data. Please do not file such issues on the public tracker and follow [SECURITY.md](SECURITY.md) instead
 - `feature`: Completely new functionality. You should describe this feature in enough detail that anyone who reads the issue can understand how it is supposed to be implemented
 - `enhancement`: An existing feature should get an upgrade
-- `refactoring`: Parts of the code base don't conform with other parts and should be changed to improve Gitea's maintainability
+- `refactoring`: Parts of the code base don't conform with other parts and should be changed to improve Hanzo Forge's maintainability
 
 ### Discuss your design before the implementation
 
 We welcome submissions. \
-If you want to change or add something, please let everyone know what you're working on — [file an issue](https://github.com/go-gitea/gitea/issues/new) or comment on an existing one before starting your work!
+If you want to change or add something, please let everyone know what you're working on — [file an issue](https://github.com/hanzoai/forge/issues/new) or comment on an existing one before starting your work!
 
 Significant changes such as new features must go through the change proposal process before they can be accepted. \
 This is mainly to save yourself the trouble of implementing it, only to find out that your proposed implementation has some potential problems. \
@@ -109,14 +109,14 @@ Such comments will likely be overlooked as some maintainers may not view notific
 As such, commenting on closed/merged issues/PRs may be disabled prior to the scheduled auto-locking if a discussion starts or if unrelated comments are posted.
 If further discussion is needed, we encourage you to open a new issue instead and we recommend linking to the issue/PR in question for context.
 
-## Building Gitea
+## Building Hanzo Forge
 
-See [docs/setup.md](docs/setup.md) for prerequisites and [docs/development.md](docs/development.md)
-for building Gitea and the development workflow.
+See [docs/build-setup.md](docs/build-setup.md) for prerequisites and [docs/development.md](docs/development.md)
+for building Hanzo Forge and the development workflow.
 
 ## Styleguide
 
-You should always run `make fmt` before committing to conform to Gitea's styleguide.
+You should always run `make fmt` before committing to conform to Hanzo Forge's styleguide.
 
 ## Copyright
 
@@ -135,13 +135,9 @@ Before submitting a pull request, run the linters (`make lint`, or the scoped `m
 
 ## Translation
 
-All translation work happens on [Crowdin](https://translate.gitea.com).
-The only translation that is maintained in this repository is [the English translation](https://github.com/go-gitea/gitea/blob/main/options/locale/locale_en-US.json).
-It is synced regularly with Crowdin. \
-Other locales on main branch **should not** be updated manually as they will be overwritten with each sync. \
-Once a language has reached a **satisfactory percentage** of translated keys (~25%), it will be synced back into this repo and included in the next released version.
-
-The tool `go run build/backport-locale.go` can be used to backport locales from the main branch to release branches that were missed.
+Strings live in [`options/locale/`](options/locale/). English
+([`locale_en-US.json`](options/locale/locale_en-US.json)) is the one maintained here; \
+the other locales arrived with the fork and are not translated in this repository.
 
 ## Code review
 
@@ -217,7 +213,7 @@ For pull requests that use a valid Conventional Commits title, CI automatically 
 That label is kept in sync with the PR title when the title is edited.\
 Other title prefixes do not get an automatic `type/…` label; the merger still assigns the correct labels (including `type/…` when needed) for changelog and backport decisions.
 
-If your PR closes some issues, you must note that in a way that both GitHub and Gitea understand, i.e. by appending a paragraph like
+If your PR closes some issues, you must note that in a way that both GitHub and Hanzo Forge understand, i.e. by appending a paragraph like
 
 ```text
 Fixes/Closes/Resolves #<ISSUE_NR_X>.
@@ -275,8 +271,7 @@ Guidance for reviewers, the merge queue, and the squash commit message format is
 
 ## Documentation
 
-If you add a new feature or change an existing aspect of Gitea, the documentation for that feature must be created or updated in another PR at [https://gitea.com/gitea/docs](https://gitea.com/gitea/docs).
-**The docs directory on main repository will be removed at some time. We will have a yaml file to store configuration file's meta data. After that completed, configuration documentation should be in the main repository.**
+If you add a new feature or change an existing aspect of Hanzo Forge, the documentation for that feature must be created or updated in the same PR, under [`docs/`](docs/).
 
 ## Developer Certificate of Origin (DCO)
 
