@@ -64,7 +64,7 @@ $.fn.modal = function(parameters) {
         moduleNamespace = 'module-' + namespace,
 
         $module         = $(this),
-        $context        = (typeof settings.context === 'string') ? $(document).find(settings.context) : $(settings.context), // GITEA-PATCH: use "jQuery.find(selector)" instead of "jQuery(selector)"
+        $context        = (typeof settings.context === 'string') ? $(document).find(settings.context) : $(settings.context), // FORGE-PATCH: use "jQuery.find(selector)" instead of "jQuery(selector)"
         $close          = $module.find(selector.close),
 
         $allModals,
@@ -467,7 +467,7 @@ $.fn.modal = function(parameters) {
             ignoreRepeatedEvents = false;
             return false;
           }
-          $module.fomanticExt.onModalBeforeHidden.call(element); // GITEA-PATCH: handle more UI updates before hidden
+          $module.fomanticExt.onModalBeforeHidden.call(element); // FORGE-PATCH: handle more UI updates before hidden
           if( module.is.animating() || module.is.active() ) {
             if(settings.transition && $.fn.transition !== undefined && $module.transition('is supported')) {
               module.remove.active();

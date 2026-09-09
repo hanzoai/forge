@@ -22,7 +22,7 @@ export function initCompWebHookEditor() {
     });
   }
 
-  // some webhooks (like Gitea) allow to set the request method (GET/POST), and it would toggle the "Content Type" field
+  // some webhook types allow to set the request method (GET/POST), and it would toggle the "Content Type" field
   const httpMethodInput = document.querySelector<HTMLInputElement>('#http_method');
   if (httpMethodInput) {
     const updateContentType = function () {

@@ -1,52 +1,51 @@
 {
   _config+:: {
     local c = self,
-    dashboardNamePrefix: 'Gitea',
-    dashboardTags: ['gitea'],
+    dashboardNamePrefix: 'Hanzo Forge',
+    dashboardTags: ['forge'],
     dashboardPeriod: 'now-1h',
     dashboardTimezone: 'default',
     dashboardRefresh: '1m',
 
     // please see https://docs.gitea.com/administration/config-cheat-sheet#metrics-metrics
-    // Show issue by repository metrics with format gitea_issues_by_repository{repository="org/repo"} 5.
-    // Requires Gitea 1.16.0 with ENABLED_ISSUE_BY_REPOSITORY set to true.
+    // Show issue by repository metrics with format hanzogit_issues_by_repository{repository="org/repo"} 5.
+    // Requires ENABLED_ISSUE_BY_REPOSITORY set to true.
     showIssuesByRepository: true,
-    // Show graphs for issue by label metrics with format gitea_issues_by_label{label="bug"} 2.
-    // Requires Gitea 1.16.0 with ENABLED_ISSUE_BY_LABEL set to true.
+    // Show graphs for issue by label metrics with format hanzogit_issues_by_label{label="bug"} 2.
+    // Requires ENABLED_ISSUE_BY_LABEL set to true.
     showIssuesByLabel: true,
 
-    // Requires Gitea 1.16.0.
     showIssuesOpenClose: true,
 
     // add or remove metrics from dashboard
-    giteaStatMetrics:
+    statMetrics:
       [
         {
-          name: 'gitea_organizations',
+          name: 'hanzogit_organizations',
           description: 'Organizations',
         },
         {
-          name: 'gitea_teams',
+          name: 'hanzogit_teams',
           description: 'Teams',
         },
         {
-          name: 'gitea_users',
+          name: 'hanzogit_users',
           description: 'Users',
         },
         {
-          name: 'gitea_repositories',
+          name: 'hanzogit_repositories',
           description: 'Repositories',
         },
         {
-          name: 'gitea_milestones',
+          name: 'hanzogit_milestones',
           description: 'Milestones',
         },
         {
-          name: 'gitea_stars',
+          name: 'hanzogit_stars',
           description: 'Stars',
         },
         {
-          name: 'gitea_releases',
+          name: 'hanzogit_releases',
           description: 'Releases',
         },
       ]
@@ -54,17 +53,17 @@
       if c.showIssuesOpenClose then
         [
           {
-            name: 'gitea_issues_open',
+            name: 'hanzogit_issues_open',
             description: 'Issues opened',
           },
           {
-            name: 'gitea_issues_closed',
+            name: 'hanzogit_issues_closed',
             description: 'Issues closed',
           },
         ] else
         [
           {
-            name: 'gitea_issues',
+            name: 'hanzogit_issues',
             description: 'Issues',
           },
         ],

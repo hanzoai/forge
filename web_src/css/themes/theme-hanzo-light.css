@@ -7,7 +7,7 @@ hanzo-theme-meta-info {
   --is-dark-theme: false;
 
   /* Hanzo estate tokens (design/tokens/colors.css, @hanzo/tokens) — light,
-     the .light half: the alphas restated as black. Gitea's own --color-* below
+     the .light half: the alphas restated as black. the inherited --color-* below
      are aliased onto these, so the estate is the single source of the palette. */
   --background: #f7f7f7;
   --card: #ffffff;

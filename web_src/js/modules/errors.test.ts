@@ -1,22 +1,22 @@
-import {isGiteaError, processWindowErrorEvent, showGlobalErrorMessage} from './errors.ts';
+import {isOwnError, processWindowErrorEvent, showGlobalErrorMessage} from './errors.ts';
 
 beforeEach(() => {
   document.body.innerHTML = '<div class="page-content"></div>';
 });
 
-test('isGiteaError', () => {
-  expect(isGiteaError('', '')).toBe(true);
-  expect(isGiteaError('moz-extension://abc/content.js', '')).toBe(false);
-  expect(isGiteaError('safari-extension://abc/content.js', '')).toBe(false);
-  expect(isGiteaError('safari-web-extension://abc/content.js', '')).toBe(false);
-  expect(isGiteaError('chrome-extension://abc/content.js', '')).toBe(false);
-  expect(isGiteaError('https://other-site.com/script.js', '')).toBe(false);
-  expect(isGiteaError('http://localhost:3000/some/page', '')).toBe(true);
-  expect(isGiteaError('http://localhost:3000/assets/js/index.abc123.js', '')).toBe(true);
-  expect(isGiteaError('', `Error\n    at chrome-extension://abc/content.js:1:1`)).toBe(false);
-  expect(isGiteaError('', `Error\n    at https://other-site.com/script.js:1:1`)).toBe(false);
-  expect(isGiteaError('', `Error\n    at http://localhost:3000/assets/js/index.abc123.js:1:1`)).toBe(true);
-  expect(isGiteaError('http://localhost:3000/assets/js/index.js', `Error\n    at chrome-extension://abc/content.js:1:1`)).toBe(false);
+test('isOwnError', () => {
+  expect(isOwnError('', '')).toBe(true);
+  expect(isOwnError('moz-extension://abc/content.js', '')).toBe(false);
+  expect(isOwnError('safari-extension://abc/content.js', '')).toBe(false);
+  expect(isOwnError('safari-web-extension://abc/content.js', '')).toBe(false);
+  expect(isOwnError('chrome-extension://abc/content.js', '')).toBe(false);
+  expect(isOwnError('https://other-site.com/script.js', '')).toBe(false);
+  expect(isOwnError('http://localhost:3000/some/page', '')).toBe(true);
+  expect(isOwnError('http://localhost:3000/assets/js/index.abc123.js', '')).toBe(true);
+  expect(isOwnError('', `Error\n    at chrome-extension://abc/content.js:1:1`)).toBe(false);
+  expect(isOwnError('', `Error\n    at https://other-site.com/script.js:1:1`)).toBe(false);
+  expect(isOwnError('', `Error\n    at http://localhost:3000/assets/js/index.abc123.js:1:1`)).toBe(true);
+  expect(isOwnError('http://localhost:3000/assets/js/index.js', `Error\n    at chrome-extension://abc/content.js:1:1`)).toBe(false);
 });
 
 test('showGlobalErrorMessage', () => {
