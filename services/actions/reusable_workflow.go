@@ -26,6 +26,7 @@ import (
 	"github.com/hanzoai/git/services/convert"
 
 	"github.com/hanzoai/builder"
+	"go.yaml.in/yaml/v4"
 )
 
 // MaxReusableCallLevels caps how deep a reusable workflow can nest:
@@ -337,6 +338,22 @@ func insertCallerChildren(ctx context.Context, run *actions_model.ActionRun, att
 			ParentJobID:             caller.ID,
 			WorkflowSourceRepoID:    sourceRepoID,
 			WorkflowSourceCommitSHA: sourceCommitSHA,
+		}
+		// A called workflow's job-level `concurrency:` travels with the job, the
+		// same as its permissions and its `runs-on`. It is the only way a
+		// reusable pipeline names a group at all: workflow-level concurrency is
+		// read from the file that TRIGGERED the run, and that file is the
+		// caller's.
+		//
+		// Raw, not evaluated. The child is inserted blocked and the job emitter
+		// evaluates the group when it becomes ready, which is also when the
+		// expressions it may name (`needs`, job outputs) can be read.
+		if parsedChild.RawConcurrency != nil {
+			rawConcurrency, err := yaml.Marshal(parsedChild.RawConcurrency)
+			if err != nil {
+				return fmt.Errorf("marshal raw concurrency of child %q: %w", jobID, err)
+			}
+			child.RawConcurrency = string(rawConcurrency)
 		}
 		if perms := ExtractJobPermissionsFromWorkflow(sw, parsedChild); perms != nil {
 			child.TokenPermissions = perms

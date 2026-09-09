@@ -781,3 +781,71 @@ func getWorkflowCallPayloadFromTask(t *testing.T, runnerTask *runner_module.Task
 	assert.NoError(t, json.Unmarshal(eventJSON, &payload))
 	return &payload
 }
+
+// A called workflow's job-level concurrency reaches the child job it was
+// declared on, which is what lets a shared pipeline make a push supersede the
+// one it replaces for every repo that imports it. It is the only level a
+// reusable can say it at: workflow-level concurrency is read from the file that
+// TRIGGERED the run, and that file is always the caller's.
+func TestReusableWorkflowJobConcurrency(t *testing.T) {
+	onGitRun(t, func(t *testing.T, u *url.URL) {
+		user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
+		session := loginUser(t, user2.Name)
+		token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
+
+		apiRepo := createActionsTestRepo(t, token, "reusable-concurrency", false)
+		repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: apiRepo.ID})
+		httpContext := NewAPITestContext(t, user2.Name, repo.Name, auth_model.AccessTokenScopeWriteRepository)
+		defer doAPIDeleteRepository(httpContext)(t)
+
+		runner := newMockRunner()
+		runner.registerAsRepoRunner(t, user2.Name, repo.Name, "mock-runner", []string{"ubuntu-latest"}, false)
+
+		createRepoWorkflowFile(t, user2, token, repo, ".hanzo/workflows/reusable.yaml",
+			`name: Reusable
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: reusable-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref_type != 'tag' }}
+    steps:
+      - run: echo 'build'
+`)
+
+		createRepoWorkflowFile(t, user2, token, repo, ".hanzo/workflows/caller.yaml",
+			`name: Caller
+on:
+  push:
+    paths:
+      - 'push/**'
+
+jobs:
+  call:
+    uses: './.hanzo/workflows/reusable.yaml'
+`)
+
+		// First push: the child carries the group the CALLED workflow declared,
+		// evaluated against the caller run's ref.
+		createRepoWorkflowFile(t, user2, token, repo, "push/1", "one")
+		task1 := runner.fetchTask(t)
+		_, job1, run1 := getTaskAndJobAndRunByTaskID(t, task1.ID)
+		assert.Equal(t, "reusable-refs/heads/main", job1.ConcurrencyGroup)
+		assert.True(t, job1.ConcurrencyCancel)
+		assert.Equal(t, actions_model.StatusRunning, job1.Status)
+
+		// Second push to the same branch supersedes the first.
+		createRepoWorkflowFile(t, user2, token, repo, "push/2", "two")
+		task2 := runner.fetchTask(t)
+		_, job2, run2 := getTaskAndJobAndRunByTaskID(t, task2.ID)
+		assert.NotEqual(t, run1.ID, run2.ID)
+		assert.Equal(t, job1.ConcurrencyGroup, job2.ConcurrencyGroup)
+		assert.Equal(t, actions_model.StatusRunning, job2.Status)
+
+		_, job1, _ = getTaskAndJobAndRunByTaskID(t, task1.ID)
+		assert.Equal(t, actions_model.StatusCancelled, job1.Status)
+	})
+}
