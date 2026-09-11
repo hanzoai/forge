@@ -252,7 +252,7 @@ require (
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/go-tpm v0.9.8 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
-	github.com/hanzoai/builder v0.3.14
+	github.com/hanzoai/builder v0.4.1
 	github.com/hanzoai/orm v0.6.18
 	github.com/hanzoai/xorm v1.4.4
 	github.com/hanzos3/go v1.0.1
