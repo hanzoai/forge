@@ -13,34 +13,35 @@ import (
 )
 
 func TestParsePackage(t *testing.T) {
-	base64RpmPackageContent := `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`
+	base64RpmPackageContent := `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
+5vDmvppPzv30YP5DCFWtXPUXwl5dQcwbAAA=`
 	rpmPackageContent, err := base64.StdEncoding.DecodeString(base64RpmPackageContent)
 	assert.NoError(t, err)
 
@@ -51,13 +52,13 @@ Mu0UFYgZ/bYnuvn/vz4wtCz8qMwsHUvP0PX3tbYFUctAPdrY6tiiDtcCddDECahx7SuVNP5dpmb5
 	assert.NotNil(t, p)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "gitea-test", p.Name)
+	assert.Equal(t, "forge-test", p.Name)
 	assert.Equal(t, "1.0.2-1", p.Version)
 	assert.NotNil(t, p.VersionMetadata)
 	assert.NotNil(t, p.FileMetadata)
 
 	assert.Equal(t, "MIT", p.VersionMetadata.License)
-	assert.Equal(t, "https://gitea.io", p.VersionMetadata.ProjectURL)
+	assert.Equal(t, "https://ex.test", p.VersionMetadata.ProjectURL)
 	assert.Equal(t, "RPM package summary", p.VersionMetadata.Summary)
 	assert.Equal(t, "RPM package description", p.VersionMetadata.Description)
 
@@ -67,7 +68,7 @@ Mu0UFYgZ/bYnuvn/vz4wtCz8qMwsHUvP0PX3tbYFUctAPdrY6tiiDtcCddDECahx7SuVNP5dpmb5
 	assert.Equal(t, "1", p.FileMetadata.Release)
 	assert.Empty(t, p.FileMetadata.Vendor)
 	assert.Equal(t, "KN4CK3R", p.FileMetadata.Packager)
-	assert.Equal(t, "gitea-test-1.0.2-1.src.rpm", p.FileMetadata.SourceRpm)
+	assert.Equal(t, "forge-test-1.0.2-1.src.rpm", p.FileMetadata.SourceRpm)
 	assert.Equal(t, "e44b1687d04b", p.FileMetadata.BuildHost)
 	assert.EqualValues(t, 1678225964, p.FileMetadata.BuildTime)
 	assert.EqualValues(t, 1678225964, p.FileMetadata.FileTime)
@@ -80,14 +81,14 @@ Mu0UFYgZ/bYnuvn/vz4wtCz8qMwsHUvP0PX3tbYFUctAPdrY6tiiDtcCddDECahx7SuVNP5dpmb5
 		t,
 		[]*Entry{
 			{
-				Name:    "gitea-test",
+				Name:    "forge-test",
 				Flags:   "EQ",
 				Version: "1.0.2",
 				Epoch:   "0",
 				Release: "1",
 			},
 			{
-				Name:    "gitea-test(x86-64)",
+				Name:    "forge-test(x86-64)",
 				Flags:   "EQ",
 				Version: "1.0.2",
 				Epoch:   "0",
@@ -153,7 +154,7 @@ Mu0UFYgZ/bYnuvn/vz4wtCz8qMwsHUvP0PX3tbYFUctAPdrY6tiiDtcCddDECahx7SuVNP5dpmb5
 		t,
 		[]*Changelog{
 			{
-				Author: "KN4CK3R <dummy@gitea.io>",
+				Author: "KN4CK3R <dummy@ex.test>",
 				Date:   1678276800,
 				Text:   "- Changelog message.",
 			},

@@ -19,11 +19,11 @@ import (
 )
 
 const (
-	packageName        = "gitea"
+	packageName        = "forge"
 	packageVersion     = "1.0.1"
 	packageDescription = "Package Description"
-	packageProjectURL  = "https://gitea.com"
-	packagePackager    = "KN4CK3R <packager@gitea.com>"
+	packageProjectURL  = "https://example.com"
+	packagePackager    = "KN4CK3R <packager@example.com>"
 )
 
 func createPKGINFOContent(name, version string) []byte {
@@ -41,9 +41,9 @@ license = MIT
 packager = ` + packagePackager + `
 depend = common
 xdata = value
-depend = gitea
+depend = forge
 provides = common
-provides = gitea
+provides = forge
 optdepend = hex
 replaces = gogs
 checkdepend = common
@@ -160,8 +160,8 @@ func TestParsePackageInfo(t *testing.T) {
 		assert.Equal(t, "x86_64", p.FileMetadata.Architecture)
 		assert.ElementsMatch(t, []string{"value"}, p.FileMetadata.XData)
 		assert.ElementsMatch(t, []string{"group"}, p.FileMetadata.Groups)
-		assert.ElementsMatch(t, []string{"common", "gitea"}, p.FileMetadata.Provides)
-		assert.ElementsMatch(t, []string{"common", "gitea"}, p.FileMetadata.Depends)
+		assert.ElementsMatch(t, []string{"common", "forge"}, p.FileMetadata.Provides)
+		assert.ElementsMatch(t, []string{"common", "forge"}, p.FileMetadata.Depends)
 		assert.ElementsMatch(t, []string{"gogs"}, p.FileMetadata.Replaces)
 		assert.ElementsMatch(t, []string{"hex"}, p.FileMetadata.OptDepends)
 		assert.ElementsMatch(t, []string{"common"}, p.FileMetadata.CheckDepends)

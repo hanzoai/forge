@@ -439,7 +439,7 @@ func TestAPIPullReviewCommentResolveEndpoints(t *testing.T) {
 }
 
 func TestAPIPullReviewStayDismissed(t *testing.T) {
-	// This test against issue https://github.com/go-gitea/gitea/issues/28542
+	// a review on a deleted line must not drop the whole review
 	// where old reviews surface after a review request got dismissed.
 	defer tests.PrepareTestEnv(t)()
 	pullIssue := unittest.AssertExistsAndLoadBean(t, &issues_model.Issue{ID: 3})

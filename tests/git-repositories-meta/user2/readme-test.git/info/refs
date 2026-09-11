@@ -1,4 +1,5 @@
 ea9ef877d1d88af76682d8798418081264f10cfc	refs/heads/fallbacks
+fe495ea336f079ef2bed68648d0ba9a37cdbd4aa	refs/heads/fallbacks-broken-symlinks
 0d4c14db927c9ffba01fa7e126cc748b5c02c01e	refs/heads/fallbacks2
 c66d5b07c2063d3268707f22226c708b589574ef	refs/heads/fallbacks3
 89f8426e9eb5eff35c09b3565836c8f8e15d0ce9	refs/heads/fallbacks4
@@ -11,8 +12,8 @@ cf406a96e416d7de5c4c1bbfffdd672300c822bf	refs/heads/fallbacks7
 744d2441e55bc0010d6b340d303f0106a627ad29	refs/heads/master
 3c492566170b057e962c025515ab38bbd7444077	refs/heads/plain
 3882d6373a0882a6739b3cd9b24d21c630621234	refs/heads/sp-ace
-bf5ed898252eaa50dcc01108ed4417c3ea98a294	refs/heads/special-subdir-.gitea
 c03543573ab088ce1cf7090a387d2be621426234	refs/heads/special-subdir-.github
+00306b4c6a57b0a38f54db67b2e93d3b9d32dfd1	refs/heads/special-subdir-.hanzo
 e75957ad9b7e6ed16dda183529ec283db0bbc5fe	refs/heads/special-subdir-docs
 46f5d5ab33d701642e08c713fab42af89fdd4fea	refs/heads/special-subdir-nested
 9c0f872256b839c2b97ec22fd348d87b14045513	refs/heads/subdir

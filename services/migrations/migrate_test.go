@@ -28,10 +28,10 @@ func TestMigrateWhiteBlocklist(t *testing.T) {
 	err := IsMigrateURLAllowed("https://gitlab.com/gitlab/gitlab.git", nonAdminUser)
 	assert.Error(t, err)
 
-	err = IsMigrateURLAllowed("https://github.com/go-gitea/gitea.git", nonAdminUser)
+	err = IsMigrateURLAllowed("https://github.com/example/example.git", nonAdminUser)
 	assert.NoError(t, err)
 
-	err = IsMigrateURLAllowed("https://gITHUb.com/go-gitea/gitea.git", nonAdminUser)
+	err = IsMigrateURLAllowed("https://gITHUb.com/example/example.git", nonAdminUser)
 	assert.NoError(t, err)
 
 	setting.Migrations.AllowedDomains = ""
@@ -41,15 +41,15 @@ func TestMigrateWhiteBlocklist(t *testing.T) {
 	err = IsMigrateURLAllowed("https://gitlab.com/gitlab/gitlab.git", nonAdminUser)
 	assert.NoError(t, err)
 
-	err = IsMigrateURLAllowed("https://github.com/go-gitea/gitea.git", nonAdminUser)
+	err = IsMigrateURLAllowed("https://github.com/example/example.git", nonAdminUser)
 	assert.Error(t, err)
 
-	err = IsMigrateURLAllowed("https://10.0.0.1/go-gitea/gitea.git", nonAdminUser)
+	err = IsMigrateURLAllowed("https://10.0.0.1/example/example.git", nonAdminUser)
 	assert.Error(t, err)
 
 	setting.Migrations.AllowLocalNetworks = true
 	assert.NoError(t, Init())
-	err = IsMigrateURLAllowed("https://10.0.0.1/go-gitea/gitea.git", nonAdminUser)
+	err = IsMigrateURLAllowed("https://10.0.0.1/example/example.git", nonAdminUser)
 	assert.NoError(t, err)
 
 	old := setting.ImportLocalPaths

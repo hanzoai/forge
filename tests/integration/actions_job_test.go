@@ -482,7 +482,7 @@ func TestActionsGitContext(t *testing.T) {
 		user2Session := loginUser(t, user2.Name)
 		user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
 
-		apiBaseRepo := createActionsTestRepo(t, user2Token, "actions-gitea-context", false)
+		apiBaseRepo := createActionsTestRepo(t, user2Token, "actions-context", false)
 		baseRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: apiBaseRepo.ID})
 		user2APICtx := NewAPITestContext(t, baseRepo.OwnerName, baseRepo.Name, auth_model.AccessTokenScopeWriteRepository)
 
@@ -541,7 +541,7 @@ func TestActionsGitContextEphemeral(t *testing.T) {
 		user2Session := loginUser(t, user2.Name)
 		user2Token := getTokenForLoggedInUser(t, user2Session, auth_model.AccessTokenScopeWriteRepository, auth_model.AccessTokenScopeWriteUser)
 
-		apiBaseRepo := createActionsTestRepo(t, user2Token, "actions-gitea-context", false)
+		apiBaseRepo := createActionsTestRepo(t, user2Token, "actions-context", false)
 		baseRepo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: apiBaseRepo.ID})
 		user2APICtx := NewAPITestContext(t, baseRepo.OwnerName, baseRepo.Name, auth_model.AccessTokenScopeWriteRepository)
 

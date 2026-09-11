@@ -60,13 +60,13 @@ func mainTest(m *testing.M, testOptsArg ...*TestOptions) int {
 		return testlogger.MainErrorf("Error creating test database engine: %v", err)
 	}
 
-	setting.AppURL = "https://try.gitea.io/"
-	setting.Domain = "try.gitea.io"
+	setting.AppURL = "https://git.example.com/"
+	setting.Domain = "git.example.com"
 	setting.RunUser = "runuser"
 	setting.SSH.User = "sshuser"
 	setting.SSH.BuiltinServerUser = "builtinuser"
 	setting.SSH.Port = 3000
-	setting.SSH.Domain = "try.gitea.io"
+	setting.SSH.Domain = "git.example.com"
 	// Under a real HOME the authorized_keys rewrite would replace the user's own
 	// keys with the fixtures'; keep it inside the test tree.
 	setting.SSH.RootPath = filepath.Join(tempWorkPath, "ssh")

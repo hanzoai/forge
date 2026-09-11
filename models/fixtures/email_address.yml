@@ -281,8 +281,8 @@
 -
   id: 36
   uid: 36
-  email: abcde@gitea.com
-  lower_email: abcde@gitea.com
+  email: abcde@example.com
+  lower_email: abcde@example.com
   is_activated: true
   is_primary: false
 

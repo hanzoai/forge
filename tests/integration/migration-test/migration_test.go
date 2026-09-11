@@ -52,7 +52,7 @@ func availableVersions() ([]string, error) {
 		return nil, err
 	}
 	defer migrationsDir.Close()
-	versionRE, err := regexp.Compile("gitea-v(?P<version>.+)" + regexp.QuoteMeta("."+string(setting.Database.Type)+".sql.gz"))
+	versionRE, err := regexp.Compile("schema-v(?P<version>.+)" + regexp.QuoteMeta("."+string(setting.Database.Type)+".sql.gz"))
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func availableVersions() ([]string, error) {
 }
 
 func readSQLFromFile(version string) (string, error) {
-	filename := fmt.Sprintf("tests/integration/migration-test/gitea-v%s.%s.sql.gz", version, setting.Database.Type)
+	filename := fmt.Sprintf("tests/integration/migration-test/schema-v%s.%s.sql.gz", version, setting.Database.Type)
 	filename = filepath.Join(setting.GetGitTestSourceRoot(), filename)
 
 	file, err := os.Open(filename)
@@ -122,14 +122,14 @@ func restoreOldDB(t *testing.T, version string) {
 		return
 	}
 
-	// MSSQL is special. the test fixture will create the [testgitea] database again, so drop it ahead if it exists
+	// MSSQL is special. the test fixture will create the [testforge] database again, so drop it ahead if it exists
 	driver, connStr, err := db.ConnStrDefaultDatabase(connOpts)
 	require.NoError(t, err)
 	sqlDB, err := sql.Open(driver, connStr)
 	require.NoError(t, err)
 
-	_, err = sqlDB.Exec("DROP DATABASE IF EXISTS [testgitea]")
-	require.NoError(t, err, "drop existing database testgitea")
+	_, err = sqlDB.Exec("DROP DATABASE IF EXISTS [testforge]")
+	require.NoError(t, err, "drop existing database testforge")
 
 	for statement := range strings.SplitSeq(data, "\nGO\n") {
 		if useStmtAfter, ok := strings.CutPrefix(statement, "USE ["); ok {

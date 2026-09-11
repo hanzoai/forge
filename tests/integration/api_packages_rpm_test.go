@@ -105,7 +105,7 @@ Mu0UFYgZ/bYnuvn/vz4wtCz8qMwsHUvP0PX3tbYFUctAPdrY6tiiDtcCddDECahx7SuVNP5dpmb5
 				req := NewRequest(t, "GET", groupURL+".repo")
 				resp := MakeRequest(t, req, http.StatusOK)
 
-				expected := fmt.Sprintf(`[gitea-%s]
+				expected := fmt.Sprintf(`[forge-%s]
 name=%s
 baseurl=%s
 enabled=1
@@ -335,7 +335,7 @@ gpgkey=%sv1/packages/%s/rpm/repository.key`,
 					assert.Equal(t, "YES", p.Checksum.Pkgid)
 					assert.Equal(t, "sha256", p.Checksum.Type)
 					assert.Equal(t, "f1d5d2ffcbe4a7568e98b864f40d923ecca084e9b9bcd5977ed6521c46d3fa4c", p.Checksum.Checksum)
-					assert.Equal(t, "https://gitea.io", p.URL)
+					assert.Equal(t, "https://example.com", p.URL)
 					assert.EqualValues(t, len(packageRpmContent), p.Size.Package)
 					assert.EqualValues(t, 13, p.Size.Installed)
 					assert.EqualValues(t, 272, p.Size.Archive)
@@ -420,7 +420,7 @@ gpgkey=%sv1/packages/%s/rpm/repository.key`,
 					assert.Equal(t, packageArchitecture, p.Architecture)
 					assert.Len(t, p.Changelogs, 1)
 					c := p.Changelogs[0]
-					assert.Equal(t, "KN4CK3R <dummy@gitea.io>", c.Author)
+					assert.Equal(t, "KN4CK3R <dummy@example.com>", c.Author)
 					assert.EqualValues(t, 1678276800, c.Date)
 					assert.Equal(t, "- Changelog message.", c.Text)
 				})
@@ -461,7 +461,7 @@ gpgkey=%sv1/packages/%s/rpm/repository.key`,
 									Arch:     packageArchitecture,
 									Name:     packageName,
 									Release:  "1",
-									Src:      "gitea-test-1.0.2-1.src.rpm",
+									Src:      "forge-test-1.0.2-1.src.rpm",
 									Version:  "1.0.2",
 									Filename: fmt.Sprintf("%s-%s.%s.rpm", packageName, packageVersion, packageArchitecture),
 								},
@@ -545,11 +545,11 @@ gpgkey=%sv1/packages/%s/rpm/repository.key`,
 										null,
 										{
 											"arch": "x86_64",
-											"name": "gitea",
+											"name": "forge",
 											"release": "1",
-											"src": "gitea-1.0.0-1.src.rpm",
+											"src": "forge-1.0.0-1.src.rpm",
 											"version": "1.0.0",
-											"filename": "gitea-1.0.0-1.x86_64.rpm"
+											"filename": "forge-1.0.0-1.x86_64.rpm"
 										}
 									]
 								}
@@ -581,7 +581,7 @@ gpgkey=%sv1/packages/%s/rpm/repository.key`,
 					assert.Len(t, newAdvisory.PkgList, 1)
 					assert.Equal(t, "el9", newAdvisory.PkgList[0].Short)
 					assert.Len(t, newAdvisory.PkgList[0].Packages, 1)
-					assert.Equal(t, "gitea", newAdvisory.PkgList[0].Packages[0].Name)
+					assert.Equal(t, "forge", newAdvisory.PkgList[0].Packages[0].Name)
 				})
 
 				t.Run("PackageNotFound", func(t *testing.T) {
@@ -661,7 +661,7 @@ gpgkey=%sv1/packages/%s/rpm/repository.key`,
 									Arch:     packageArchitecture,
 									Name:     packageName,
 									Release:  "1",
-									Src:      "gitea-test-1.0.2-1.src.rpm",
+									Src:      "forge-test-1.0.2-1.src.rpm",
 									Version:  "1.0.2",
 									Filename: fmt.Sprintf("%s-%s.%s.rpm", packageName, packageVersion, packageArchitecture),
 								},
@@ -751,7 +751,7 @@ gpgkey=%sv1/packages/%s/rpm/repository.key`,
 			t.Run("NoArch", func(t *testing.T) {
 				defer tests.PrintCurrentTest(t)()
 
-				noarchPackageName := "gitea-noarch-test"
+				noarchPackageName := "forge-noarch-test"
 				noarchPackageVersion := "1.0.0-1"
 				noarchPackageGzipBase64 := `H4sICKC05mkAA2dpdGVhLW5vYXJjaC10ZXN0LTEuMC4wLTEubm9hcmNoLnJwbQDtmLtrFEEcx+dy` +
 					`p0ZROYliFMUTLJJiz53HPgbBBwZR0Jgiglo5sztzLt6Lu0uIYmEhFhFUsBUJahd8gHZWKvgnpLES` +

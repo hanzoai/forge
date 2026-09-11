@@ -1,4 +1,4 @@
-# GPG key for abcde@gitea.com
+# GPG key for abcde@example.com
 
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 

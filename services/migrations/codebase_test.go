@@ -26,12 +26,12 @@ func TestCodebaseDownloadRepo(t *testing.T) {
 	fixtureDir := filepath.Join(filepath.Dir(callerFile), "_mock_data/TestCodebaseDownloadRepo")
 	mockServer := unittest.NewMockWebServer(t, "https://api3.codebasehq.com", fixtureDir, liveMode)
 
-	cloneAddr := "https://gitea-test.codebasehq.com/gitea-test/test.git"
+	cloneAddr := "https://example-test.codebasehq.com/example-test/test.git"
 	projectURL, _ := url.Parse(cloneAddr)
 	projectURL.User = nil
 
 	ctx := t.Context()
-	downloader := NewCodebaseDownloader(ctx, projectURL, "gitea-test", "test", apiUser, apiPassword)
+	downloader := NewCodebaseDownloader(ctx, projectURL, "example-test", "test", apiUser, apiPassword)
 	downloader.baseURL, _ = url.Parse(mockServer.URL)
 
 	repo, err := downloader.GetRepoInfo(ctx)
@@ -40,7 +40,7 @@ func TestCodebaseDownloadRepo(t *testing.T) {
 		Name:        "test",
 		Owner:       "",
 		Description: "Repository Description",
-		CloneURL:    "git@codebasehq.com:gitea-test/gitea-test/test.git",
+		CloneURL:    "git@codebasehq.com:example-test/example-test/test.git",
 		OriginalURL: cloneAddr,
 	}, repo)
 
@@ -71,7 +71,7 @@ func TestCodebaseDownloadRepo(t *testing.T) {
 			Number:      2,
 			Title:       "Open Ticket",
 			Content:     "Open Ticket Message",
-			PosterName:  "gitea-test-43",
+			PosterName:  "example-test-43",
 			PosterEmail: "hanzo-codebase@smack.email",
 			State:       "open",
 			Created:     time.Date(2021, time.September, 26, 19, 19, 14, 0, time.UTC),
@@ -86,7 +86,7 @@ func TestCodebaseDownloadRepo(t *testing.T) {
 			Number:      1,
 			Title:       "Closed Ticket",
 			Content:     "Closed Ticket Message",
-			PosterName:  "gitea-test-43",
+			PosterName:  "example-test-43",
 			PosterEmail: "hanzo-codebase@smack.email",
 			State:       "closed",
 			Milestone:   "Milestone1",
@@ -105,7 +105,7 @@ func TestCodebaseDownloadRepo(t *testing.T) {
 	assertCommentsEqual(t, []*base.Comment{
 		{
 			IssueIndex:  2,
-			PosterName:  "gitea-test-43",
+			PosterName:  "example-test-43",
 			PosterEmail: "hanzo-codebase@smack.email",
 			Created:     time.Date(2021, time.September, 26, 19, 19, 34, 0, time.UTC),
 			Updated:     time.Date(2021, time.September, 26, 19, 19, 34, 0, time.UTC),
@@ -120,7 +120,7 @@ func TestCodebaseDownloadRepo(t *testing.T) {
 			Number:      3,
 			Title:       "Readme Change",
 			Content:     "Merge Request comment",
-			PosterName:  "gitea-test-43",
+			PosterName:  "example-test-43",
 			PosterEmail: "hanzo-codebase@smack.email",
 			State:       "open",
 			Created:     time.Date(2021, time.September, 26, 20, 25, 47, 0, time.UTC),

@@ -419,7 +419,7 @@ func testAPIRepoMigrateConflict(t *testing.T, u *url.URL) {
 		assert.NoError(t, err)
 		userID := user.ID
 
-		cloneURL := "https://github.com/go-gitea/test_repo.git"
+		cloneURL := "https://github.com/example/test_repo.git"
 
 		req := NewRequestWithJSON(t, "POST", "/v1/repos/migrate",
 			&api.MigrateRepoOptions{

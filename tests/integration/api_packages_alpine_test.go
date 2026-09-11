@@ -223,13 +223,13 @@ AACAX/AKARNTyAAoAAA=`
 					assert.Contains(t, content, "V:"+packageVersion+"\n")
 					assert.Contains(t, content, "A:x86_64\n")
 					assert.NotContains(t, content, "A:noarch\n")
-					assert.Contains(t, content, "T:Gitea Test Package\n")
-					assert.Contains(t, content, "U:https://gitea.io/\n")
+					assert.Contains(t, content, "T:Forge Test Package\n")
+					assert.Contains(t, content, "U:https://example.com/\n")
 					assert.Contains(t, content, "L:MIT\n")
 					assert.Contains(t, content, "S:1353\n")
 					assert.Contains(t, content, "I:4096\n")
-					assert.Contains(t, content, "o:gitea-test\n")
-					assert.Contains(t, content, "m:KN4CK3R <kn4ck3r@gitea.io>\n")
+					assert.Contains(t, content, "o:forge-test\n")
+					assert.Contains(t, content, "m:KN4CK3R <kn4ck3r@example.com>\n")
 					assert.Contains(t, content, "t:1679498030\n")
 				})
 
@@ -260,11 +260,11 @@ AACAX/AKARNTyAAoAAA=`
 
 					// noarch package should be available with every architecture requested
 					for _, arch := range []string{alpine_module.NoArch, "x86_64", "my_arch"} {
-						req := NewRequest(t, "GET", fmt.Sprintf("%s/%s/%s/%s/gitea-noarch-1.4-r0.apk", rootURL, branch, repository, arch))
+						req := NewRequest(t, "GET", fmt.Sprintf("%s/%s/%s/%s/forge-noarch-1.4-r0.apk", rootURL, branch, repository, arch))
 						MakeRequest(t, req, http.StatusOK)
 					}
 
-					req = NewRequest(t, "DELETE", fmt.Sprintf("%s/%s/%s/noarch/gitea-noarch-1.4-r0.apk", rootURL, branch, repository)).
+					req = NewRequest(t, "DELETE", fmt.Sprintf("%s/%s/%s/noarch/forge-noarch-1.4-r0.apk", rootURL, branch, repository)).
 						AddBasicAuth(user.Name)
 					MakeRequest(t, req, http.StatusNoContent)
 				})

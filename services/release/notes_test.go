@@ -38,15 +38,15 @@ func TestGenerateReleaseNotes(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, `## What's Changed
-* Release notes test pull request in [#6](https://try.gitea.io/user2/repo1/pulls/6)
+* Release notes test pull request in [#6](https://git.example.com/user2/repo1/pulls/6)
 
 ## Contributors
 * @user5
 
 ## New Contributors
-* @user5 made their first contribution in [#6](https://try.gitea.io/user2/repo1/pulls/6)
+* @user5 made their first contribution in [#6](https://git.example.com/user2/repo1/pulls/6)
 
-**Full Changelog**: [v1.1...v1.2.0](https://try.gitea.io/user2/repo1/compare/v1.1...v1.2.0)
+**Full Changelog**: [v1.1...v1.2.0](https://git.example.com/user2/repo1/compare/v1.1...v1.2.0)
 `, content)
 	})
 
@@ -78,7 +78,7 @@ func TestGenerateReleaseNotes(t *testing.T) {
 		assert.Contains(t, content, "* @user5 made their first contribution in [#")
 		assert.Contains(t, content, "* @user4 made their first contribution in [#")
 		assert.Contains(t, content, "* @user8 made their first contribution in [#")
-		assert.Contains(t, content, "**Full Changelog**: https://try.gitea.io/user2/repo16/commits/tag/v0.1.0\n")
+		assert.Contains(t, content, "**Full Changelog**: https://git.example.com/user2/repo16/commits/tag/v0.1.0\n")
 	})
 
 	t.Run("EmptyPreviousTagWithExistingTags", func(t *testing.T) {
