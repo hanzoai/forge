@@ -5,8 +5,8 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 
 ## What it is
 
-- **Base:** Gitea **1.26.4** (upstream `go-gitea/gitea`; see `CHANGELOG.md` top
-  entry). Module path is `github.com/hanzoai/git` — the GitHub repo rename to
+- **Base:** upstream **1.26.4**, credited in `NOTICE`. Module path is
+  `github.com/hanzoai/git` — the GitHub repo rename to
   `hanzoai/forge` did not change it. The daemon is **`gitd`**
   (`/app/git/gitd`, wrapper `/usr/local/bin/gitd`); upstream's CLI subcommands
   are intact under the new name (`gitd admin auth …`, `gitd migrate`).
