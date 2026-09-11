@@ -28,7 +28,7 @@ func Notifications(ctx *context.Context) {
 	ctx.Data["PageIsSettingsNotifications"] = true
 	ctx.Data["EmailNotificationsPreference"] = ctx.Doer.EmailNotificationsPreference
 
-	actionsEmailPref, err := user_model.GetUserSetting(ctx, ctx.Doer.ID, user_model.SettingsKeyEmailNotificationGiteaActions, user_model.SettingEmailNotificationGiteaActionsFailureOnly)
+	actionsEmailPref, err := user_model.GetUserSetting(ctx, ctx.Doer.ID, user_model.SettingsKeyEmailNotificationActions, user_model.SettingEmailNotificationActionsFailureOnly)
 	if err != nil {
 		ctx.ServerError("GetUserSetting", err)
 		return
@@ -73,14 +73,14 @@ func NotificationsActionsEmailPost(ctx *context.Context) {
 	}
 
 	preference := ctx.FormString("preference")
-	if !(preference == user_model.SettingEmailNotificationGiteaActionsAll ||
-		preference == user_model.SettingEmailNotificationGiteaActionsDisabled ||
-		preference == user_model.SettingEmailNotificationGiteaActionsFailureOnly) {
+	if !(preference == user_model.SettingEmailNotificationActionsAll ||
+		preference == user_model.SettingEmailNotificationActionsDisabled ||
+		preference == user_model.SettingEmailNotificationActionsFailureOnly) {
 		ctx.Flash.Error(ctx.Tr("invalid_data", preference))
 		ctx.Redirect(setting.AppSubURL + "/user/settings/notifications")
 		return
 	}
-	if err := user_model.SetUserSetting(ctx, ctx.Doer.ID, user_model.SettingsKeyEmailNotificationGiteaActions, preference); err != nil {
+	if err := user_model.SetUserSetting(ctx, ctx.Doer.ID, user_model.SettingsKeyEmailNotificationActions, preference); err != nil {
 		ctx.ServerError("SetUserSetting", err)
 		return
 	}

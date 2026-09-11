@@ -24,7 +24,7 @@
   "enable_javascript": "Для этого сайта требуется поддержка JavaScript.",
   "toc": "Содержание",
   "licenses": "Лицензии",
-  "return_to_gitea": "Вернуться к Forge",
+  "return_to_forge": "Вернуться к Forge",
   "username": "Имя пользователя",
   "email": "Адрес электронной почты",
   "password": "Пароль",

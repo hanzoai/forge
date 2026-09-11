@@ -69,7 +69,7 @@ func syncGitConfig(ctx context.Context) (err error) {
 	// However, some docker users and samba users find it difficult to configure their systems correctly,
 	// so that Hanzo Git's git repositories are owned by the Hanzo Git user.
 	// (Possibly Windows Service users - but ownership in this case should really be set correctly on the filesystem.)
-	// See issue: https://github.com/go-gitea/gitea/issues/19455
+	// See issue: a repository-level setting must not leak into the global config
 	// As Hanzo Git now always use its internal git config file, and access to the git repositories is managed through Hanzo Git,
 	// it is now safe to set "safe.directory=*" for internal usage only.
 	// Although this setting is only supported by some new git versions, it is also tolerated by earlier versions

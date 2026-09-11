@@ -19,7 +19,7 @@
   "signed_in_as": "Inloggad som",
   "toc": "Innehållsförteckning",
   "licenses": "Licenser",
-  "return_to_gitea": "Återgå till Forge",
+  "return_to_forge": "Återgå till Forge",
   "username": "Användarnamn",
   "email": "E-postadress",
   "password": "Lösenord",

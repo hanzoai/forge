@@ -11,16 +11,16 @@ import (
 )
 
 const (
-	expectedMD5    = "e3bef03c5f3b7f6b3ab3e3053ed71e9c"
-	expectedSHA1   = "060b3b99f88e96085b4a68e095bc9e3d1d91e1bc"
-	expectedSHA256 = "6ccce4863b70f258d691f59609d31b4502e1ba5199942d3bc5d35d17a4ce771d"
-	expectedSHA512 = "7f70e439ba8c52025c1f06cdf6ae443c4b8ed2e90059cdb9bbbf8adf80846f185a24acca9245b128b226d61753b0d7ed46580a69c8999eeff3bc13a4d0bd816c"
+	expectedMD5    = "228410f5c71f8af2b1266b70fa7824eb"
+	expectedSHA1   = "52b7362eed5e398bad39dafb5ad68515e6547a3a"
+	expectedSHA256 = "71b41d6dd48dc58eba8f5cf9edf30fef6597fdf285a521bb8fcbad4b3d50887d"
+	expectedSHA512 = "b2ccaa58071577713a0841e23b7c277da321f090e858afdd3e2f1568687c6140c1a3df4759355d7fd2d4a39eab9bf19c7197bee4c73a6814b206324025360db5"
 )
 
 func TestMultiHasherSums(t *testing.T) {
 	t.Run("Sums", func(t *testing.T) {
 		h := NewMultiHasher()
-		h.Write([]byte("gitea"))
+		h.Write([]byte("forge"))
 
 		hashMD5, hashSHA1, hashSHA256, hashSHA512 := h.Sums()
 
@@ -32,7 +32,7 @@ func TestMultiHasherSums(t *testing.T) {
 
 	t.Run("State", func(t *testing.T) {
 		h := NewMultiHasher()
-		h.Write([]byte("git"))
+		h.Write([]byte("for"))
 
 		state, err := h.MarshalBinary()
 		assert.NoError(t, err)
@@ -41,7 +41,7 @@ func TestMultiHasherSums(t *testing.T) {
 		err = h2.UnmarshalBinary(state)
 		assert.NoError(t, err)
 
-		h2.Write([]byte("ea"))
+		h2.Write([]byte("ge"))
 
 		hashMD5, hashSHA1, hashSHA256, hashSHA512 := h2.Sums()
 

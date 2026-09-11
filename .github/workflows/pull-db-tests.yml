@@ -185,7 +185,7 @@ jobs:
         image: bitnamilegacy/mysql:8.4
         env:
           ALLOW_EMPTY_PASSWORD: true
-          MYSQL_DATABASE: testgitea
+          MYSQL_DATABASE: testforge
         ports:
           - "3306:3306"
         options: >-

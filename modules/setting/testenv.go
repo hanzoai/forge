@@ -142,7 +142,7 @@ func PrepareIntegrationTestConfig() error {
 	_ = os.Setenv("GIT_TEST_ROOT", forgeTestRoot)
 	_ = os.Setenv("GIT_TEST_CONF", filepath.Join("tests", testDatabase+".ini"))
 
-	workPath := filepath.Join(forgeTestRoot, "tests/integration/gitea-integration-"+testDatabase)
+	workPath := filepath.Join(forgeTestRoot, "tests/integration/integration-"+testDatabase)
 	if err := os.MkdirAll(workPath, 0o755); err != nil {
 		return err
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func RecalculateStars(x db.EngineMigration) (err error) {
-	// because of issue https://github.com/go-gitea/gitea/issues/11949,
+	// because of a bug in an earlier release,
 	// recalculate Stars number for all users to fully fix it.
 
 	type User struct {

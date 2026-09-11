@@ -61,7 +61,7 @@ export default defineConfig([
       '@eslint-community/eslint-comments': comments,
       '@stylistic': stylistic,
       '@typescript-eslint': typescriptPlugin.plugin,
-      'gitea': {rules: {'unescaped-html-literal': unescapedHtmlLiteral}},
+      'forge': {rules: {'unescaped-html-literal': unescapedHtmlLiteral}},
       'import-x': importPlugin,
       regexp,
       sonarjs,
@@ -836,7 +836,7 @@ export default defineConfig([
       'unicorn/no-subtraction-comparison': [2],
       'unicorn/no-thenable': [2],
       'unicorn/no-this-assignment': [2],
-      'unicorn/no-this-outside-of-class': [0], // gitea uses `this` in non-class functions
+      'unicorn/no-this-outside-of-class': [0], // this tree uses `this` in non-class functions
       'unicorn/no-top-level-assignment-in-function': [0],
       'unicorn/no-top-level-side-effects': [0],
       'unicorn/no-typeof-undefined': [2],
@@ -1099,7 +1099,7 @@ export default defineConfig([
     plugins: {vitest},
     languageOptions: {globals: globals.vitest},
     rules: {
-      'gitea/unescaped-html-literal': [0],
+      'forge/unescaped-html-literal': [0],
       'unicorn/no-error-property-assignment': [0],
       'vitest/consistent-test-filename': [0],
       'vitest/consistent-test-it': [0],

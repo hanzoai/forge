@@ -63,8 +63,8 @@ func Update(ctx context.Context, pr *issues_model.PullRequest, doer *user_model.
 	}
 
 	defer func() {
-		// The code is from https://github.com/go-gitea/gitea/pull/9784,
-		// it seems a simple copy-paste from https://github.com/go-gitea/gitea/pull/7082 without a real reason.
+		// Inherited from an earlier change and kept only because nothing has
+		// shown it to be wrong.
 		// TODO: DUPLICATE-PR-TASK: search and see another TODO comment for more details
 		go AddTestPullRequestTask(TestPullRequestOptions{
 			RepoID:      pr.BaseRepo.ID,

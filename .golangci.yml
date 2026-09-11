@@ -36,28 +36,26 @@ linters:
         main:
           deny:
             - pkg: encoding/json
-              desc: use gitea's modules/json instead of encoding/json
+              desc: use modules/json instead of encoding/json
             - pkg: github.com/unknwon/com
-              desc: use gitea's util and replacements
+              desc: use modules/util and its replacements
             - pkg: io/ioutil
               desc: use os or io instead
             - pkg: golang.org/x/exp
               desc: it's experimental and unreliable
-            - pkg: gitea.dev/modules/git/internal
+            - pkg: github.com/hanzoai/git/modules/git/internal
               desc: do not use the internal package, use AddXxx function instead
             - pkg: gopkg.in/ini.v1
-              desc: do not use the ini package, use gitea's config system instead
-            - pkg: gitea.com/go-chi/cache
-              desc: do not use the go-chi cache package, use gitea's cache system
+              desc: do not use the ini package, use modules/setting instead
             - pkg: github.com/pkg/errors
               desc: use builtin errors package instead
         migrations:
           files:
             - '**/models/migrations/**/*.go'
           deny:
-            - pkg: gitea.dev/models$
+            - pkg: github.com/hanzoai/git/models$
               desc: migrations must not depend on the models package
-            - pkg: gitea.dev/modules/structs
+            - pkg: github.com/hanzoai/git/modules/structs
               desc: migrations must not depend on modules/structs (API structures change over time)
     nolintlint:
       allow-unused: false
@@ -174,7 +172,7 @@ formatters:
       custom-order: true
       sections:
         - standard
-        - prefix(gitea.dev)
+        - prefix(github.com/hanzoai/git)
         - blank
         - default
     gofumpt:

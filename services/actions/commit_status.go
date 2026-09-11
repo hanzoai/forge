@@ -63,7 +63,7 @@ func CreateCommitStatusForRunJobs(ctx context.Context, run *actions_model.Action
 func GetRunsFromCommitStatuses(ctx context.Context, statuses []*git_model.CommitStatus) ([]*actions_model.ActionRun, error) {
 	runMap := make(map[int64]*actions_model.ActionRun)
 	for _, status := range statuses {
-		runID, _, ok := status.ParseGiteaActionsTargetURL(ctx)
+		runID, _, ok := status.ParseActionsTargetURL(ctx)
 		if !ok {
 			continue
 		}

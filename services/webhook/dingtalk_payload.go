@@ -5,7 +5,7 @@ package webhook
 
 // The DingTalk message shapes.
 //
-// These were the only two things used from gitea.com/lunny/dingtalk_webhook —
+// These were the only two things used from the dingtalk webhook package —
 // pure JSON structs. The rest of that package is an HTTP client that posts them,
 // which this forge never called: every webhook goes out through the shared
 // deliverer, with its own retries, proxy settings and rate limits. So the

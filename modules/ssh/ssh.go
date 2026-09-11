@@ -412,12 +412,13 @@ func GenKeyPair(keyPath string, keyType generate.SSHKeyType, bits int) error {
 
 // InitDefaultHostKeys mirrors how ssh-keygen -A operates
 // it runs checks if public and private keys are already defined and creates new ones if not present
-// key naming does not follow the OpenSSH convention due to existing settings being gitea.{KeyType} so generation follows that convention
+// key naming does not follow the OpenSSH convention: SSH_SERVER_HOST_KEYS names them
+// <product>.{KeyType}, so generation follows the same shape
 func InitDefaultHostKeys(path string) (keyFiles []string, _ error) {
 	var errs []error
 	keyTypes := []generate.SSHKeyType{generate.SSHKeyRSA, generate.SSHKeyECDSA, generate.SSHKeyED25519}
 	for _, keyType := range keyTypes {
-		keyPath := filepath.Join(path, "gitea."+string(keyType))
+		keyPath := filepath.Join(path, "forge."+string(keyType))
 		_, errStatPriv := os.Stat(keyPath)
 		if errStatPriv != nil {
 			err := GenKeyPair(keyPath, keyType, 0)

@@ -68,7 +68,7 @@ cpu.out
 /log
 /public/assets/img/avatar
 /tests/e2e-output
-/tests/integration/gitea-integration-*
+/tests/integration/integration-*
 /tests/integration/indexers-*
 /tests/*.ini
 /tests/**/*.git/**/*.sample

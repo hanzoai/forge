@@ -59,14 +59,14 @@ func (rc *RenderConfig) UnmarshalYAML(value *yaml.Node) error {
 	rc.TOC = basic.TOC
 
 	type controlStringRenderConfig struct {
-		Gitea string `yaml:"gitea"`
+		Forge string `yaml:"forge"`
 	}
 
 	var stringBasic controlStringRenderConfig
 
 	if err := value.Decode(&stringBasic); err == nil {
-		if stringBasic.Gitea != "" {
-			rc.Meta = renderMetaModeFromString(stringBasic.Gitea)
+		if stringBasic.Forge != "" {
+			rc.Meta = renderMetaModeFromString(stringBasic.Forge)
 		}
 		return nil
 	}
@@ -79,7 +79,7 @@ func (rc *RenderConfig) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	type yamlRenderConfigWrapper struct {
-		Gitea *yamlRenderConfig `yaml:"gitea"`
+		Forge *yamlRenderConfig `yaml:"forge"`
 	}
 
 	var cfg yamlRenderConfigWrapper
@@ -87,20 +87,20 @@ func (rc *RenderConfig) UnmarshalYAML(value *yaml.Node) error {
 		return fmt.Errorf("unable to decode into yamlRenderConfigWrapper %w", err)
 	}
 
-	if cfg.Gitea == nil {
+	if cfg.Forge == nil {
 		return nil
 	}
 
-	if cfg.Gitea.Meta != nil {
-		rc.Meta = renderMetaModeFromString(*cfg.Gitea.Meta)
+	if cfg.Forge.Meta != nil {
+		rc.Meta = renderMetaModeFromString(*cfg.Forge.Meta)
 	}
 
-	if cfg.Gitea.Lang != nil && *cfg.Gitea.Lang != "" {
-		rc.Lang = *cfg.Gitea.Lang
+	if cfg.Forge.Lang != nil && *cfg.Forge.Lang != "" {
+		rc.Lang = *cfg.Forge.Lang
 	}
 
-	if cfg.Gitea.TOC != nil {
-		rc.TOC = *cfg.Gitea.TOC
+	if cfg.Forge.TOC != nil {
+		rc.TOC = *cfg.Forge.TOC
 	}
 
 	return nil

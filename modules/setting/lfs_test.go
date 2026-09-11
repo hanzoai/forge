@@ -96,7 +96,7 @@ STORAGE_TYPE = s3
 
 	assert.NoError(t, loadLFSFrom(cfg))
 	assert.EqualValues(t, "s3", LFS.Storage.Type)
-	assert.Equal(t, "gitea", LFS.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge", LFS.Storage.S3Config.Bucket)
 	assert.Equal(t, "lfs/", LFS.Storage.S3Config.BasePath)
 }
 

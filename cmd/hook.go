@@ -176,7 +176,7 @@ func runHookPreReceive(ctx context.Context, c *cli.Command) error {
 	setup(ctx, c.Bool("debug"))
 
 	if len(os.Getenv("SSH_ORIGINAL_COMMAND")) == 0 {
-		if setting.OnlyAllowPushIfGiteaEnvironmentSet {
+		if setting.OnlyAllowPushIfEnvironmentSet {
 			return fail(ctx, `Rejecting changes as Hanzo Git environment not set.
 If you are pushing over SSH you must push with a key managed by
 Hanzo Git or set your environment appropriately.`, "")
@@ -328,7 +328,7 @@ func runHookPostReceive(ctx context.Context, c *cli.Command) error {
 	}
 
 	if len(os.Getenv("SSH_ORIGINAL_COMMAND")) == 0 {
-		if setting.OnlyAllowPushIfGiteaEnvironmentSet {
+		if setting.OnlyAllowPushIfEnvironmentSet {
 			return fail(ctx, `Rejecting changes as Hanzo Git environment not set.
 If you are pushing over SSH you must push with a key managed by
 Hanzo Git or set your environment appropriately.`, "")
@@ -464,7 +464,7 @@ func runHookProcReceive(ctx context.Context, c *cli.Command) error {
 	setup(ctx, c.Bool("debug"))
 
 	if len(os.Getenv("SSH_ORIGINAL_COMMAND")) == 0 {
-		if setting.OnlyAllowPushIfGiteaEnvironmentSet {
+		if setting.OnlyAllowPushIfEnvironmentSet {
 			return fail(ctx, `Rejecting changes as Hanzo Git environment not set.
 If you are pushing over SSH you must push with a key managed by
 Hanzo Git or set your environment appropriately.`, "")

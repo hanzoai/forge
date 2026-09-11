@@ -119,7 +119,7 @@ mkdir -p "$WORK_DIR/custom/conf"
 cat > "$WORK_DIR/custom/conf/app.ini" <<EOF
 [database]
 DB_TYPE = sqlite3
-PATH = $WORK_DIR/data/gitea.db
+PATH = $WORK_DIR/data/forge.db
 
 [server]
 HTTP_PORT = $FREE_PORT

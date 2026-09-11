@@ -1,3 +1,3 @@
 # Git Module
 
-This module is merged from https://github.com/go-gitea/git which is a Go module to access Git through shell commands. Now it's a part of this repository for easier pull request.
+This module accesses Git through shell commands. It began as a separate Go module and lives here so changes to it travel with the code that uses it.

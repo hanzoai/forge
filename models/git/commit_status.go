@@ -236,8 +236,8 @@ func (status *CommitStatus) cutTargetURLGitActionsPrefix(ctx context.Context) (s
 	return strings.CutPrefix(status.TargetURL, prefix)
 }
 
-// ParseGiteaActionsTargetURL parses the commit status target URL as an Actions link
-func (status *CommitStatus) ParseGiteaActionsTargetURL(ctx context.Context) (runID, jobID int64, ok bool) {
+// ParseActionsTargetURL parses the commit status target URL as an Actions link
+func (status *CommitStatus) ParseActionsTargetURL(ctx context.Context) (runID, jobID int64, ok bool) {
 	s, ok := status.cutTargetURLGitActionsPrefix(ctx)
 	if !ok {
 		return 0, 0, false

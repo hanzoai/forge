@@ -38,14 +38,14 @@ var Indexer = struct {
 	IssuePath:        "indexers/issues.bleve",
 	IssueConnStr:     "",
 	IssueConnAuth:    "",
-	IssueIndexerName: "gitea_issues",
+	IssueIndexerName: "forge_issues",
 
 	RepoIndexerEnabled:   false,
 	RepoIndexerRepoTypes: []string{"sources", "forks", "mirrors", "templates"},
 	RepoType:             "bleve",
 	RepoPath:             "indexers/repos.bleve",
 	RepoConnStr:          "",
-	RepoIndexerName:      "gitea_codes",
+	RepoIndexerName:      "forge_codes",
 	MaxIndexerFileSize:   1024 * 1024,
 	ExcludeVendored:      true,
 }
@@ -83,7 +83,7 @@ func loadIndexerFrom(rootCfg ConfigProvider) {
 		Indexer.RepoPath = filepath.ToSlash(filepath.Join(AppWorkPath, Indexer.RepoPath))
 	}
 	Indexer.RepoConnStr = sec.Key("REPO_INDEXER_CONN_STR").MustString("")
-	Indexer.RepoIndexerName = sec.Key("REPO_INDEXER_NAME").MustString("gitea_codes")
+	Indexer.RepoIndexerName = sec.Key("REPO_INDEXER_NAME").MustString("forge_codes")
 
 	Indexer.IncludePatterns = IndexerGlobFromString(sec.Key("REPO_INDEXER_INCLUDE").MustString(""))
 	Indexer.ExcludePatterns = IndexerGlobFromString(sec.Key("REPO_INDEXER_EXCLUDE").MustString(""))

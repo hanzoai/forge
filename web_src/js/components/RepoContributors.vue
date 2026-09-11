@@ -195,7 +195,7 @@ export default defineComponent({
           }
           return false;
         });
-        // this line is required. See https://github.com/sahinakkaya/gitea/pull/3#discussion_r1396495722
+        // this line is required: the chart keeps a stale scale without it
         // for details.
         user.max_contribution_type += 1;
 

@@ -345,10 +345,8 @@ func TestRender_emoji(t *testing.T) {
 	}
 
 	// Text that should be turned into or recognized as emoji
-	// :git:, not :gitea: — the rebrand renamed the shipped asset to git.png and
-	// set CustomEmojis to {git, gitlab, github}. The code was complete; this
-	// assertion was the last thing still asking for an emoji that no longer
-	// exists, so it rendered as literal text.
+	// :git:, because the shipped asset is git.png and CustomEmojis is
+	// {git, gitlab, github}. An alias with no asset renders as literal text.
 	test(
 		":git:",
 		`<p><span class="emoji" aria-label="git"><img alt=":git:" src="`+setting.StaticURLPrefix+`/assets/img/emoji/git.png"/></span></p>`)

@@ -1,9 +1,9 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// generate-openapi converts Gitea's Swagger 2.0 spec into an OpenAPI 3.0 spec.
+// generate-openapi converts the Swagger 2.0 spec into an OpenAPI 3.0 spec.
 //
-// Gitea generates a Swagger 2.0 spec from code annotations (make generate-swagger).
+// The Swagger 2.0 spec is generated from code annotations (make generate-swagger).
 // This tool converts it to OAS3 so that SDK generators and tools that require
 // OAS3 (e.g. progenitor for Rust) can consume it directly. The conversion also
 // deduplicates inline enum definitions into named schema components, producing
@@ -38,7 +38,7 @@ const (
 	appVerVar    = "{{.SwaggerAppVer}}"
 
 	appSubUrlPlaceholder = "GIT_APP_SUB_URL_PLACEHOLDER"
-	appVerPlaceholder    = "0.0.0-gitea-placeholder"
+	appVerPlaceholder    = "0.0.0-placeholder"
 )
 
 var (

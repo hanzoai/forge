@@ -44,10 +44,10 @@ func TestIsValid(t *testing.T) {
 }
 
 func TestGeneratePointer(t *testing.T) {
-	p, err := GeneratePointer(strings.NewReader("Gitea"))
+	p, err := GeneratePointer(strings.NewReader("Forge"))
 	assert.NoError(t, err)
 	assert.True(t, p.IsValid())
-	assert.Equal(t, "94cb57646c54a297c9807697e80a30946f79a4b82cb079d2606847825b1812cc", p.Oid)
+	assert.Equal(t, "8899ecd1626db63dd12b9c57879efda72a1a78a21b498e943c07229dedc09ea7", p.Oid)
 	assert.Equal(t, int64(5), p.Size)
 }
 

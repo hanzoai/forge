@@ -96,7 +96,7 @@ SERVE_DIRECT = true
 [storage]
 STORAGE_TYPE            = s3
 S3_ENDPOINT          = s3.my-domain.net
-S3_BUCKET            = gitea
+S3_BUCKET            = forge
 S3_LOCATION          = homenet
 S3_USE_SSL           = true
 S3_ACCESS_KEY_ID     = correct_key
@@ -109,7 +109,7 @@ S3_SECRET_ACCESS_KEY = correct_key
 	storage := Packages.Storage
 
 	assert.EqualValues(t, "s3", storage.Type)
-	assert.Equal(t, "gitea", storage.S3Config.Bucket)
+	assert.Equal(t, "forge", storage.S3Config.Bucket)
 	assert.Equal(t, "packages/", storage.S3Config.BasePath)
 	assert.True(t, storage.S3Config.ServeDirect)
 }
@@ -123,7 +123,7 @@ SERVE_DIRECT = true
 [storage]
 STORAGE_TYPE            = s3
 S3_ENDPOINT          = s3.my-domain.net
-S3_BUCKET            = gitea
+S3_BUCKET            = forge
 S3_LOCATION          = homenet
 S3_USE_SSL           = true
 S3_ACCESS_KEY_ID     = correct_key
@@ -136,7 +136,7 @@ S3_SECRET_ACCESS_KEY = correct_key
 	storage := Packages.Storage
 
 	assert.EqualValues(t, "s3", storage.Type)
-	assert.Equal(t, "gitea", storage.S3Config.Bucket)
+	assert.Equal(t, "forge", storage.S3Config.Bucket)
 	assert.Equal(t, "packages/", storage.S3Config.BasePath)
 	assert.True(t, storage.S3Config.ServeDirect)
 }
@@ -151,7 +151,7 @@ SERVE_DIRECT = true
 [storage.my_cfg]
 STORAGE_TYPE            = s3
 S3_ENDPOINT          = s3.my-domain.net
-S3_BUCKET            = gitea
+S3_BUCKET            = forge
 S3_LOCATION          = homenet
 S3_USE_SSL           = true
 S3_ACCESS_KEY_ID     = correct_key
@@ -164,7 +164,7 @@ S3_SECRET_ACCESS_KEY = correct_key
 	storage := Packages.Storage
 
 	assert.EqualValues(t, "s3", storage.Type)
-	assert.Equal(t, "gitea", storage.S3Config.Bucket)
+	assert.Equal(t, "forge", storage.S3Config.Bucket)
 	assert.Equal(t, "my_packages/", storage.S3Config.BasePath)
 	assert.True(t, storage.S3Config.ServeDirect)
 }
@@ -179,7 +179,7 @@ SERVE_DIRECT = true
 [storage.my_cfg]
 STORAGE_TYPE            = s3
 S3_ENDPOINT          = s3.my-domain.net
-S3_BUCKET            = gitea
+S3_BUCKET            = forge
 S3_LOCATION          = homenet
 S3_USE_SSL           = true
 S3_ACCESS_KEY_ID     = correct_key
@@ -192,7 +192,7 @@ S3_SECRET_ACCESS_KEY = correct_key
 	storage := Packages.Storage
 
 	assert.EqualValues(t, "s3", storage.Type)
-	assert.Equal(t, "gitea", storage.S3Config.Bucket)
+	assert.Equal(t, "forge", storage.S3Config.Bucket)
 	assert.Equal(t, "my_packages/", storage.S3Config.BasePath)
 	assert.True(t, storage.S3Config.ServeDirect)
 }

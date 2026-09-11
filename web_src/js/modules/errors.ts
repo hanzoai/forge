@@ -60,7 +60,6 @@ export function processWindowErrorEvent({error, reason, message, type, filename,
   // non-critical event from the browser. We log them but don't show them to users. Examples:
   // - https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver#observation_errors
   // - https://github.com/mozilla-mobile/firefox-ios/issues/10817
-  // - https://github.com/go-gitea/gitea/issues/20240
   if (!err) {
     if (message) console.error(new Error(message));
     if (window.config.runModeIsProd) return;

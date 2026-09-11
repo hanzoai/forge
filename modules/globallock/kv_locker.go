@@ -17,7 +17,7 @@ import (
 	"github.com/hanzokv/lock/v4/kv/kvgo"
 )
 
-const kvLockKeyPrefix = "gitea:globallock:"
+const kvLockKeyPrefix = "forge:globallock:"
 
 // kvLockExpiry is the default expiry time for a lock.
 // Define it as a variable to make it possible to change it in tests.

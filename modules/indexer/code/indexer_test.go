@@ -316,7 +316,7 @@ func TestESIndexAndSearch(t *testing.T) {
 		return
 	}
 
-	indexer := elasticsearch.NewIndexer(u, "gitea_codes")
+	indexer := elasticsearch.NewIndexer(u, "forge_codes")
 	if _, err := indexer.Init(t.Context()); err != nil {
 		if indexer != nil {
 			indexer.Close()

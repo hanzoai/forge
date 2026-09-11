@@ -24,7 +24,7 @@
   "enable_javascript": "Este sitio web requiere JavaScript.",
   "toc": "Tabla de contenidos",
   "licenses": "Licencias",
-  "return_to_gitea": "Volver a Forge",
+  "return_to_forge": "Volver a Forge",
   "username": "Nombre de usuario",
   "email": "Correo electrónico",
   "password": "Contraseña",

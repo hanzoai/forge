@@ -224,7 +224,7 @@ DEFAULT_ACTIONS_URL = https://forge.example,https://github.com
 			name: "invalid",
 			iniStr: `
 [actions]
-DEFAULT_ACTIONS_URL = gitea
+DEFAULT_ACTIONS_URL = nowhere
 `,
 			wantErr: assert.Error,
 			wantURL: "https://github.com",

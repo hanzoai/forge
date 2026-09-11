@@ -245,7 +245,6 @@ func DeleteRun(ctx context.Context, run *actions_model.ActionRun) error {
 		//    delete affected ephemeral act_runners
 		//    I would make ephemeral runners fully delete directly before formally finishing the task
 		//
-		// See also: https://github.com/go-gitea/gitea/pull/34337#issuecomment-2862222788
 		if err := CleanupEphemeralRunners(ctx); err != nil {
 			return err
 		}

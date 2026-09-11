@@ -12,7 +12,6 @@ export const frontendRender: FrontendRenderFunc = async (opts): Promise<boolean>
       poster: 'npt:1:0:0',
     });
     // Related: https://github.com/asciinema/asciinema-player/blob/develop/src/components/Terminal.js : <div class="ap-term" ...>
-    // Old PR: Fix UI regression of asciinema player https://github.com/go-gitea/gitea/pull/26159
     opts.container.querySelector<HTMLElement>('.ap-term')!.style.overflow = 'hidden';
     opts.container.querySelector<HTMLElement>('.ap-player')!.style.borderRadius = '0';
     return true;

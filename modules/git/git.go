@@ -92,7 +92,7 @@ func parseGitVersionLine(s string) (*version.Version, error) {
 	// versionString can be:
 	// * "2.5.3"
 	// * "2.29.3.windows.1"
-	// * "2.28.0.618.gf4bc123cb7": https://github.com/go-gitea/gitea/issues/12731
+	// * "2.28.0.618.gf4bc123cb7": a build from a git checkout
 	versionString := fields[2]
 	versionFields := strings.Split(versionString, ".")
 	if len(versionFields) > 3 {

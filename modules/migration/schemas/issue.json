@@ -1,6 +1,6 @@
 {
     "title": "Issue",
-    "description": "Issues associated to a repository within a forge (Gitea, GitLab, etc.).",
+    "description": "Issues associated to a repository within a forge (GitLab, GitHub, etc.).",
 
     "type": "array",
     "items": {
