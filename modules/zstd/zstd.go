@@ -1,5 +1,4 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
-// Copyright 2024 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
 // Package zstd provides a high-level API for reading and writing zstd-compressed data.

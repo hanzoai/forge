@@ -1,7 +1,4 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
-// Copyright 2018 The Gitea Authors.
-// Copyright 2014 The Gogs Authors.
-// All rights reserved.
 // SPDX-License-Identifier: MIT
 
 package repo
