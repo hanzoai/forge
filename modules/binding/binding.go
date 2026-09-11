@@ -1,7 +1,6 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
 // Copyright 2014 Martini Authors
 // Copyright 2014 The Macaron Authors
-// Copyright 2020 The Gitea Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain

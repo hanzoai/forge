@@ -1,5 +1,4 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
-// Copyright 2017 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
 // Package private contains all internal routes. The package name "internal" isn't usable because Golang reserves it for disabling cross-package usage.

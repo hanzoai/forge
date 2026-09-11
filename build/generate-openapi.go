@@ -1,5 +1,4 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
-// Copyright 2026 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
 // generate-openapi converts Gitea's Swagger 2.0 spec into an OpenAPI 3.0 spec.

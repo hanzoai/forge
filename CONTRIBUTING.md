@@ -123,7 +123,7 @@ You should always run `make fmt` before committing to conform to Hanzo Forge's s
 New code files that you contribute should use the standard copyright header:
 
 ```
-// Copyright <current year> The Gitea Authors. All rights reserved.
+// Copyright <current year> Hanzo AI, Inc. All rights reserved.
 // SPDX-License-Identifier: MIT
 ```
 

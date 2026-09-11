@@ -1,6 +1,27 @@
-Git
+Hanzo Forge
 Copyright (c) 2026 Hanzo AI, Inc.
 
-This product includes software from Gitea (https://github.com/go-gitea/gitea), licensed under MIT:
+Licensed under the MIT License. See LICENSE for the full text.
+
+This is the central attribution record for this product. Source files carry an
+SPDX-License-Identifier and the Hanzo copyright line; upstream authorship is
+recorded here rather than repeated per file.
+
+--------------------------------------------------------------------------------
+Gitea -- https://github.com/go-gitea/gitea -- MIT
 
     Copyright (c) 2016 The Gitea Authors
+
+Hanzo Forge derives from Gitea, which in turn derives from Gogs.
+
+--------------------------------------------------------------------------------
+Gogs -- https://github.com/gogs/gogs -- MIT
+
+    Copyright (c) 2015 The Gogs Authors
+
+--------------------------------------------------------------------------------
+LFS Test Server -- https://github.com/git-lfs/lfs-test-server -- MIT
+
+    Copyright (c) GitHub, Inc. and LFS Test Server contributors
+
+Portions of modules/lfs derive from LFS Test Server.

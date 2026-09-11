@@ -1,5 +1,4 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
-// Copyright 2022 The Gitea Authors. All rights reserved.
 // SPDX-License-Identifier: MIT
 
 package db // it's not db_test, because this file is for testing the private type halfCommitter
