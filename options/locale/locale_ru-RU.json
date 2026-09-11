@@ -875,7 +875,6 @@
   "repo.migrate.github.description": "Переносите данные с github.com или других серверов GitHub.",
   "repo.migrate.git.description": "Перенести только репозиторий из любого Git сервиса.",
   "repo.migrate.gitlab.description": "Перенести данные с gitlab.com или других экземпляров GitLab.",
-  "repo.migrate.gitea.description": "Перенести данные с git.hanzo.ai или других экземпляров Forge.",
   "repo.migrate.gogs.description": "Перенести данные с notabug.org или других экземпляров Gogs.",
   "repo.migrate.onedev.description": "Перенести данные с code.onedev.io или других экземпляров OneDev.",
   "repo.migrate.codebase.description": "Перенос данных с codebasehq.com.",

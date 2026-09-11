@@ -1126,7 +1126,6 @@
   "repo.migrate.github.description": "Migrar dados de github.com ou de outras instâncias do GitHub.",
   "repo.migrate.git.description": "Migrar um repositório somente de qualquer serviço Git.",
   "repo.migrate.gitlab.description": "Migrar dados de gitlab.com ou de outras instâncias do GitLab.",
-  "repo.migrate.gitea.description": "Migrar dados de git.hanzo.ai ou de outras instâncias do Forge.",
   "repo.migrate.gogs.description": "Migrar dados de notabug.org ou de outras instâncias do Gogs.",
   "repo.migrate.onedev.description": "Migrar dados de code.onedev.io ou de outras instâncias do OneDev.",
   "repo.migrate.codebase.description": "Migrar dados de codebasehq.com.",

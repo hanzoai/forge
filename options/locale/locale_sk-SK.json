@@ -765,7 +765,6 @@
   "repo.migrate.migrating_failed": "Migrácia z <b>%s</b> zlyhala.",
   "repo.migrate.migrating_failed_no_addr": "Migrácia zlyhala.",
   "repo.migrate.gitlab.description": "Migrovať dáta z gitlab.com alebo iných inštancií GitLab.",
-  "repo.migrate.gitea.description": "Migrovať dáta z git.hanzo.ai alebo iných inštancií Forge.",
   "repo.migrate.gogs.description": "Migrovať dáta z notabug.org alebo iných inštancií Gogs.",
   "repo.migrate.onedev.description": "Migrovať dáta z code.onedev.io alebo iných inštancií OneDev.",
   "repo.migrate.codebase.description": "Migrovať dáta z codebasehq.com.",

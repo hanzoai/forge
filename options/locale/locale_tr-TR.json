@@ -1105,7 +1105,6 @@
   "repo.migrate.github.description": "Github.com veya diğer Github sunucularından veri aktar.",
   "repo.migrate.git.description": "Herhangi bir Git hizmetinden sadece bir depoyu aktar.",
   "repo.migrate.gitlab.description": "Gitlab.com veya diğer Gitlab sunucularından veri aktar.",
-  "repo.migrate.gitea.description": "git.hanzo.ai veya diğer Forge sunucularından veri aktar.",
   "repo.migrate.gogs.description": "Notabug.org veya diğer Gogs sunucularından veri aktar.",
   "repo.migrate.onedev.description": "Code.onedev.io ve diğer OneDev sunucularından veri aktar.",
   "repo.migrate.codebase.description": "Codebasehq.com sitesinden veri aktar.",

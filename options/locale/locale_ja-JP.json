@@ -1126,7 +1126,6 @@
   "repo.migrate.github.description": "github.com やその他の GitHub インスタンスからデータを移行します。",
   "repo.migrate.git.description": "Git サービスからリポジトリのみを移行します。",
   "repo.migrate.gitlab.description": "gitlab.com やその他の GitLab インスタンスからデータを移行します。",
-  "repo.migrate.gitea.description": "git.hanzo.ai やその他の Forge インスタンスからデータを移行します。",
   "repo.migrate.gogs.description": "notabug.org  やその他の Gogs インスタンスからデータを移行します。",
   "repo.migrate.onedev.description": "code.onedev.io やその他の OneDev インスタンスからデータを移行します。",
   "repo.migrate.codebase.description": "codebasehq.com からデータを移行します。",

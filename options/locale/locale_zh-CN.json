@@ -1126,7 +1126,6 @@
   "repo.migrate.github.description": "从 github.com 或其他 GitHub 实例迁移数据",
   "repo.migrate.git.description": "从任意 Git 服务迁移仓库。",
   "repo.migrate.gitlab.description": "从 gitlab.com 或其他 GitLab 实例迁移数据",
-  "repo.migrate.gitea.description": "从 git.hanzo.ai 或其他 Forge 实例迁移数据",
   "repo.migrate.gogs.description": "从 notabug.org 或其他 Gogs 实例迁移数据。",
   "repo.migrate.onedev.description": "从 code.onedev.io 或其他 OneDev 实例迁移数据",
   "repo.migrate.codebase.description": "从 codebasehq.com 迁移数据",

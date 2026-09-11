@@ -690,7 +690,6 @@
   "repo.migrate.migrating_failed_no_addr": "مهاجرت ناموفق بود.",
   "repo.migrate.git.description": "کوچ یک مخزن فقط از یک سرویس Git.",
   "repo.migrate.gitlab.description": "مهاجرت داده از gitlabb.com یا پیاده‌سازی‌های دیگر GitLab.",
-  "repo.migrate.gitea.description": "مهاجرت داده از git.hanzo.ai یا پیاده‌سازی‌های دیگر Forge.",
   "repo.migrate.gogs.description": "مهاجرت داده از notabug.com یا پیاده‌سازی‌های دیگر Gogs.",
   "repo.migrate.onedev.description": "مهاجرت داده از code.onedev.io یا پیاده‌سازی‌های دیگر OneDev.",
   "repo.migrate.codebase.description": "مهاجر داده ها از codebasehq.com.",

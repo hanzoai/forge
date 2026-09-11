@@ -347,7 +347,7 @@ const (
 	NotMigrated       GitServiceType = iota // 0 not migrated from external sites
 	PlainGitService                         // 1 plain git service
 	GithubService                           // 2 github.com
-	GiteaService                            // 3 gitea service
+	_                                       // 3 retired; the slot stays reserved so stored values keep their meaning
 	GitlabService                           // 4 gitlab service
 	GogsService                             // 5 gogs service
 	OneDevService                           // 6 onedev service
@@ -367,8 +367,6 @@ func (gt GitServiceType) Title() string {
 	switch gt {
 	case GithubService:
 		return "GitHub"
-	case GiteaService:
-		return "Gitea"
 	case GitlabService:
 		return "GitLab"
 	case GogsService:
@@ -399,7 +397,7 @@ type MigrateRepoOptions struct {
 	// required: true
 	RepoName string `json:"repo_name" binding:"Required;AlphaDashDot;MaxSize(100)"`
 
-	// enum: ["git","github","gitea","gitlab","gogs","onedev","gitbucket","codebase","codecommit"]
+	// enum: ["git","github","gitlab","gogs","onedev","gitbucket","codebase","codecommit"]
 	Service      string `json:"service"`
 	AuthUsername string `json:"auth_username"`
 	AuthPassword string `json:"auth_password"`
@@ -425,7 +423,7 @@ type MigrateRepoOptions struct {
 // TokenAuth represents whether a service type supports token-based auth
 func (gt GitServiceType) TokenAuth() bool {
 	switch gt {
-	case GithubService, GiteaService, GitlabService:
+	case GithubService, GitlabService:
 		return true
 	}
 	return false
@@ -436,7 +434,6 @@ func (gt GitServiceType) TokenAuth() bool {
 var SupportedFullGitService = []GitServiceType{
 	GithubService,
 	GitlabService,
-	GiteaService,
 	GogsService,
 	OneDevService,
 	GitBucketService,

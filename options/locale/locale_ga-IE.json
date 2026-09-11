@@ -1126,7 +1126,6 @@
   "repo.migrate.github.description": "Aistrigh sonraí ó github.com nó ó chásanna GitHub eile.",
   "repo.migrate.git.description": "Aistrigh stór amháin ó aon seirbhís Git.",
   "repo.migrate.gitlab.description": "Aistrigh sonraí ó gitlab.com nó ó chásanna GitLab eile.",
-  "repo.migrate.gitea.description": "Aistrigh sonraí ó git.hanzo.ai nó ó chásanna Forge eile.",
   "repo.migrate.gogs.description": "Aistrigh sonraí ó notabug.org nó ó chásanna eile de chuid Gogs.",
   "repo.migrate.onedev.description": "Aistrigh sonraí ó code.onedev.io nó ó chásanna OneDev eile.",
   "repo.migrate.codebase.description": "Aistrigh sonraí ó codebasehq.com.",

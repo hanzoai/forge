@@ -971,7 +971,6 @@
   "repo.migrate.github.description": "從 github.com 或其他 GitHub 執行個體遷移資料。",
   "repo.migrate.git.description": "從任何 Git 服務遷移儲存庫。",
   "repo.migrate.gitlab.description": "從 gitlab.com 或其他 GitLab 執行個體遷移資料。",
-  "repo.migrate.gitea.description": "從 git.hanzo.ai 或其他 Forge 執行個體遷移資料。",
   "repo.migrate.gogs.description": "從 notabug.org 或其他 Gogs 執行個體遷移資料。",
   "repo.migrate.onedev.description": "從 code.onedev.io 或其他 OneDev 執行個體遷移資料。",
   "repo.migrate.codebase.description": "從 codebasehq.com 遷移資料。",
