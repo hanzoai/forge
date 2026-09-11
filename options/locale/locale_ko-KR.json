@@ -2349,7 +2349,7 @@
   "repo.settings.slack_domain": "도메인",
   "repo.settings.slack_channel": "채널",
   "repo.settings.add_web_hook_desc": "<a target=\"_blank\" rel=\"noreferrer\" href=\"%s\">%s</a>를 당신의 리포지토리와 통합.",
-  "repo.settings.web_hook_name_gitea": "Forge",
+  "repo.settings.web_hook_name_native": "Forge",
   "repo.settings.web_hook_name_gogs": "Gogs",
   "repo.settings.web_hook_name_slack": "Slack",
   "repo.settings.web_hook_name_discord": "Discord",

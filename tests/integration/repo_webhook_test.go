@@ -54,7 +54,7 @@ func TestNewWebHookLink(t *testing.T) {
 	webhooksBaseHref := "/user2/repo1/settings/hooks"
 	cases := []string{
 		webhooksBaseHref,
-		webhooksBaseHref + "/gitea/new",
+		webhooksBaseHref + "/native/new",
 		webhooksBaseHref + "/" + strconv.FormatInt(hook.ID, 10), // edit webhook
 	}
 	for _, reqHref := range cases {
@@ -963,7 +963,7 @@ func Test_WebhookStatus_NoWrongTrigger(t *testing.T) {
 		session := loginUser(t, "user2")
 
 		// create a push_only webhook from web UI
-		testCreateWebhookForRepo(t, session, "gitea", "user2", "repo1", provider.URL(), "push_only")
+		testCreateWebhookForRepo(t, session, "native", "user2", "repo1", provider.URL(), "push_only")
 
 		// 2. trigger the webhook with a push action
 		testCreateFile(t, session, "user2", "repo1", "master", "", "test_webhook_push.md", "# a test file for webhook push")

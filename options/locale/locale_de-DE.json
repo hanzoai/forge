@@ -2352,7 +2352,7 @@
   "repo.settings.slack_domain": "Domain",
   "repo.settings.slack_channel": "Kanal",
   "repo.settings.add_web_hook_desc": "<a target=\"_blank\" rel=\"noreferrer\" href=\"%s\">%s</a> in das Repository integrieren.",
-  "repo.settings.web_hook_name_gitea": "Forge",
+  "repo.settings.web_hook_name_native": "Forge",
   "repo.settings.web_hook_name_gogs": "Gogs",
   "repo.settings.web_hook_name_slack": "Slack",
   "repo.settings.web_hook_name_discord": "Discord",

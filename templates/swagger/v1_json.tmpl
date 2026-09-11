@@ -3831,7 +3831,7 @@
         }
       }
     },
-    "/packages/{owner}": {
+    "/owners/{owner}/packages": {
       "get": {
         "produces": [
           "application/json"
@@ -3908,7 +3908,7 @@
         }
       }
     },
-    "/packages/{owner}/{type}/{name}": {
+    "/owners/{owner}/packages/{type}/{name}": {
       "get": {
         "produces": [
           "application/json"
@@ -4001,7 +4001,7 @@
         }
       }
     },
-    "/packages/{owner}/{type}/{name}/-/latest": {
+    "/owners/{owner}/packages/{type}/{name}/-/latest": {
       "get": {
         "produces": [
           "application/json"
@@ -4044,7 +4044,7 @@
         }
       }
     },
-    "/packages/{owner}/{type}/{name}/-/link/{repo_name}": {
+    "/owners/{owner}/packages/{type}/{name}/-/link/{repo_name}": {
       "post": {
         "tags": [
           "package"
@@ -4091,7 +4091,7 @@
         }
       }
     },
-    "/packages/{owner}/{type}/{name}/-/unlink": {
+    "/owners/{owner}/packages/{type}/{name}/-/unlink": {
       "post": {
         "tags": [
           "package"
@@ -4131,7 +4131,7 @@
         }
       }
     },
-    "/packages/{owner}/{type}/{name}/{version}": {
+    "/owners/{owner}/packages/{type}/{name}/{version}": {
       "get": {
         "produces": [
           "application/json"
@@ -4226,7 +4226,7 @@
         }
       }
     },
-    "/packages/{owner}/{type}/{name}/{version}/files": {
+    "/owners/{owner}/packages/{type}/{name}/{version}/files": {
       "get": {
         "produces": [
           "application/json"
@@ -14354,6 +14354,49 @@
         }
       }
     },
+    "/repos/{owner}/{repo}/pull-mirror": {
+      "delete": {
+        "description": "Deletes the pull-mirror configuration, so the repository stops being\noverwritten from upstream and starts accepting pushes and running\nActions. This is the API form of the web settings action.\n\nPropagation from upstream STOPS the moment this returns. The mirror row\nis gone, so mirror-sync answers 400 and the settings button 404, while\nthe /sync webhook receiver still answers ok without queueing anything —\nnothing pulls from upstream again. A repository whose copy here is\nincomplete therefore becomes authoritative while incomplete, so compare\nit against upstream before converting.\n",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "repository"
+        ],
+        "summary": "Convert a pull mirror into a regular repository",
+        "operationId": "repoConvertPullMirror",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "owner of the repo",
+            "name": "owner",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "name of the repo",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/empty"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notFound"
+          },
+          "422": {
+            "$ref": "#/responses/validationError"
+          }
+        }
+      }
+    },
     "/repos/{owner}/{repo}/pulls": {
       "get": {
         "produces": [
@@ -24266,9 +24309,9 @@
           "enum": [
             "dingtalk",
             "discord",
-            "native",
             "gogs",
             "msteams",
+            "native",
             "slack",
             "telegram",
             "feishu",
@@ -27138,7 +27181,7 @@
           "x-go-name": "Name"
         },
         "type": {
-          "description": "The type of the webhook (e.g., gitea, slack, discord)",
+          "description": "The type of the webhook (e.g., native, slack, discord)",
           "type": "string",
           "x-go-name": "Type"
         },
@@ -27891,7 +27934,6 @@
           "enum": [
             "git",
             "github",
-            "native",
             "gitlab",
             "gogs",
             "onedev",
