@@ -54,7 +54,7 @@ var SSH = struct {
 	Port:                          22,
 	MinimumKeySizeCheck:           true,
 	MinimumKeySizes:               map[string]int{"ed25519": consts.AsymKeyMinBitsEC, "ed25519-sk": consts.AsymKeyMinBitsEC, "ecdsa": consts.AsymKeyMinBitsEC, "ecdsa-sk": consts.AsymKeyMinBitsEC, "rsa": consts.AsymKeyMinBitsRsa},
-	ServerHostKeys:                []string{"ssh/gitea.rsa", "ssh/gitea.ed25519", "ssh/gitea.ecdsa", "ssh/gogs.rsa"},
+	ServerHostKeys:                []string{"ssh/forge.rsa", "ssh/forge.ed25519", "ssh/forge.ecdsa", "ssh/gogs.rsa"},
 	AuthorizedKeysCommandTemplate: "{{.AppPath}} --config={{.CustomConf}} serv key-{{.Key.ID}}",
 	PerWriteTimeout:               PerWriteTimeout,
 	PerWritePerKbTimeout:          PerWritePerKbTimeout,
@@ -134,7 +134,7 @@ func loadSSHFrom(rootCfg ConfigProvider) {
 		SSH.StartBuiltinServer = false
 	}
 
-	SSH.TrustedUserCAKeysFile = sec.Key("SSH_TRUSTED_USER_CA_KEYS_FILENAME").MustString(filepath.Join(SSH.RootPath, "gitea-trusted-user-ca-keys.pem"))
+	SSH.TrustedUserCAKeysFile = sec.Key("SSH_TRUSTED_USER_CA_KEYS_FILENAME").MustString(filepath.Join(SSH.RootPath, "trusted-user-ca-keys.pem"))
 
 	for _, caKey := range SSH.TrustedUserCAKeys {
 		pubKey, _, _, _, err := gossh.ParseAuthorizedKey([]byte(caKey))

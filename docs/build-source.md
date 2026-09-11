@@ -49,13 +49,13 @@ and will use the current working directory as the relative base path _`AppWorkPa
 
 These values, although useful when developing, may conflict with downstream users preferences.
 
-For packagers who need to use paths like `/etc/gitea/app.ini`,
+For packagers who need to use paths like `/etc/forge/app.ini`,
 they should define these values at build time for `make build` by environment variable like
 `LDFLAGS='-X "module.Var1=Value1" -X "module.Var2=Value2"' TAGS="bindata" make build`.
 
-- _`CustomConf`_: `-X "github.com/hanzoai/git/modules/setting.CustomConf=/etc/gitea/app.ini"`
-- _`AppWorkPath`_: `-X "github.com/hanzoai/git/modules/setting.AppWorkPath=/var/lib/gitea"`
-- _`CustomPath`_: `-X "github.com/hanzoai/git/modules/setting.CustomPath=/var/lib/gitea/custom"`
+- _`CustomConf`_: `-X "github.com/hanzoai/git/modules/setting.CustomConf=/etc/forge/app.ini"`
+- _`AppWorkPath`_: `-X "github.com/hanzoai/git/modules/setting.AppWorkPath=/var/lib/forge"`
+- _`CustomPath`_: `-X "github.com/hanzoai/git/modules/setting.CustomPath=/var/lib/forge/custom"`
 - Default PID file location: `-X "github.com/hanzoai/git/cmd.PIDFile=/run/gitd.pid"`
 
 Add as many of the strings with their preceding `-X` to the `LDFLAGS` variable and run `make build`

@@ -46,7 +46,7 @@ func TestDumpAuthSource(t *testing.T) {
 	}
 	require.NoError(t, auth_model.CreateSource(t.Context(), source))
 
-	// intentionally test the "dump" to make sure the dumped JSON is correct: https://github.com/go-gitea/gitea/pull/16847
+	// intentionally test the "dump" to make sure the dumped JSON is correct
 	sb := &strings.Builder{}
 	require.NoError(t, unittest.GetXORMEngine().DumpTables([]*schemas.Table{authSourceSchema}, sb))
 	// the dumped SQL is something like:

@@ -42,7 +42,7 @@ var UI = struct {
 
 	AmbiguousUnicodeDetection bool
 
-	// TODO: DefaultShowFullName is introduced by https://github.com/go-gitea/gitea/pull/6710
+	// TODO: DefaultShowFullName is introduced by the default was chosen to keep the sidebar readable
 	// But there are still many edge cases:
 	// * Many places still use "username", not respecting this setting
 	// * Many places use "Full Name" if it is not empty, cause inconsistent UI for users who have set their full name but some others don't

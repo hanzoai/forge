@@ -20,7 +20,7 @@
   "signed_in_as": "Kirjautuneena käyttäjänä",
   "toc": "Sisällysluettelo",
   "licenses": "Lisenssit",
-  "return_to_gitea": "Palaa Forgeen",
+  "return_to_forge": "Palaa Forgeen",
   "username": "Käyttäjätunnus",
   "email": "Sähköpostiosoite",
   "password": "Salasana",

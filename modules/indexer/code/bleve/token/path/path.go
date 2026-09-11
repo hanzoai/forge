@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	Name = "gitea/path"
+	Name = "forge/path"
 )
 
 type TokenFilter struct{}

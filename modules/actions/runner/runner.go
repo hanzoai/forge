@@ -192,7 +192,7 @@ type Need struct {
 //
 // It is a struct, and that is the change with the most behaviour behind it. As
 // a map the two sides could disagree in silence, and did: the forge wrote
-// git_runtime_token while the runner read gitea_runtime_token and quietly fell
+// one spelling of the key while the runner read another, and quietly fell
 // back to the task token, which nothing anywhere reported. A field is a compile
 // error instead.
 //

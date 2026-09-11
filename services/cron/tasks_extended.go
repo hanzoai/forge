@@ -147,7 +147,7 @@ func registerUpdateGitChecker() {
 	RegisterTaskFatal("update_checker", &UpdateCheckerConfig{
 		BaseConfig: BaseConfig{
 			// Off by default: our releases ship via the hanzoai/git CR pipeline,
-			// not upstream's dl.gitea.com feed — phoning it would compare against
+			// not an upstream feed — phoning one would compare against
 			// the WRONG product's versions (and leak telemetry upstream).
 			Enabled:    false,
 			RunAtStart: false,

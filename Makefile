@@ -203,7 +203,7 @@ clean-all: clean ## delete backend, frontend and integration files
 .PHONY: clean
 clean: ## delete backend and integration files
 	rm -f $(EXECUTABLE) test-*.test tests/*.ini
-	rm -rf  $(DIST) $(BINDATA_DEST_WILDCARD) man tests/integration/gitea-integration-*
+	rm -rf  $(DIST) $(BINDATA_DEST_WILDCARD) man tests/integration/integration-*
 
 .PHONY: fmt
 fmt: ## format the Go and template code

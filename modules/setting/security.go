@@ -28,29 +28,29 @@ var Security = struct {
 }
 
 var (
-	InstallLock                        bool
-	SecretKey                          string
-	InternalToken                      string // internal access token
-	LogInRememberDays                  int
-	CookieRememberName                 string
-	ReverseProxyAuthUser               string
-	ReverseProxyAuthEmail              string
-	ReverseProxyAuthFullName           string
-	ReverseProxyLimit                  int
-	ReverseProxyLogoutRedirect         string
-	ReverseProxyTrustedProxies         []string
-	MinPasswordLength                  int
-	ImportLocalPaths                   bool
-	DisableGitHooks                    = true
-	DisableWebhooks                    bool
-	OnlyAllowPushIfGiteaEnvironmentSet bool
-	PasswordComplexity                 []string
-	PasswordHashAlgo                   string
-	PasswordCheckPwn                   bool
-	SuccessfulTokensCacheSize          int
-	DisableQueryAuthToken              bool
-	RecordUserSignupMetadata           = false
-	TwoFactorAuthEnforced              = false
+	InstallLock                   bool
+	SecretKey                     string
+	InternalToken                 string // internal access token
+	LogInRememberDays             int
+	CookieRememberName            string
+	ReverseProxyAuthUser          string
+	ReverseProxyAuthEmail         string
+	ReverseProxyAuthFullName      string
+	ReverseProxyLimit             int
+	ReverseProxyLogoutRedirect    string
+	ReverseProxyTrustedProxies    []string
+	MinPasswordLength             int
+	ImportLocalPaths              bool
+	DisableGitHooks               = true
+	DisableWebhooks               bool
+	OnlyAllowPushIfEnvironmentSet bool
+	PasswordComplexity            []string
+	PasswordHashAlgo              string
+	PasswordCheckPwn              bool
+	SuccessfulTokensCacheSize     int
+	DisableQueryAuthToken         bool
+	RecordUserSignupMetadata      = false
+	TwoFactorAuthEnforced         = false
 )
 
 // loadSecret load the secret from ini by uriKey or verbatimKey, only one of them could be set
@@ -119,7 +119,6 @@ func loadSecurityFrom(rootCfg ConfigProvider) {
 	LogInRememberDays = sec.Key("LOGIN_REMEMBER_DAYS").MustInt(31)
 	SecretKey = loadSecret(sec, "SECRET_KEY_URI", "SECRET_KEY")
 	if SecretKey == "" {
-		// FIXME: https://github.com/go-gitea/gitea/issues/16832
 		// Until it supports rotating an existing secret key, we shouldn't move users off of the widely used default value
 		SecretKey = "!#@FDEWREWR&*("
 	}
@@ -141,7 +140,7 @@ func loadSecurityFrom(rootCfg ConfigProvider) {
 	ImportLocalPaths = sec.Key("IMPORT_LOCAL_PATHS").MustBool(false)
 	DisableGitHooks = sec.Key("DISABLE_GIT_HOOKS").MustBool(true)
 	DisableWebhooks = sec.Key("DISABLE_WEBHOOKS").MustBool(false)
-	OnlyAllowPushIfGiteaEnvironmentSet = sec.Key("ONLY_ALLOW_PUSH_IF_GITEA_ENVIRONMENT_SET").MustBool(true)
+	OnlyAllowPushIfEnvironmentSet = sec.Key("ONLY_ALLOW_PUSH_IF_ENVIRONMENT_SET").MustBool(true)
 
 	// Ensure that the provided default hash algorithm is a valid hash algorithm
 	var algorithm *hash.PasswordHashAlgorithm

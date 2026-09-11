@@ -28,7 +28,7 @@ type MailRender struct {
 	}
 
 	// FIXME: MAIL-TEMPLATE-SUBJECT: only "issue" related messages support using subject from templates
-	// It is an incomplete implementation from "Use templates for issue e-mail subject and body" https://github.com/go-gitea/gitea/pull/8329
+	// It is an incomplete implementation from "Use templates for issue e-mail subject and body" an earlier change
 	SubjectTemplates *texttmpl.Template
 
 	tmplRenderer *tmplRender
@@ -73,7 +73,6 @@ func mailBodyFuncMap() template.FuncMap {
 		"QueryBuild":  QueryBuild,
 
 		// deprecated, use "HTMLFormat" instead, but some user custom mail templates still use it
-		// see: https://github.com/go-gitea/gitea/issues/36049
 		"SanitizeHTML": sanitizeHTML,
 
 		"PathEscape":         url.PathEscape,

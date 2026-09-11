@@ -39,7 +39,7 @@ STORAGE_TYPE = s3
 S3_BUCKET = forge-s3
 
 [storage]
-S3_BUCKET = gitea
+S3_BUCKET = forge
 `
 	cfg, err := NewConfigProviderFromData(iniStr)
 	assert.NoError(t, err)
@@ -58,7 +58,7 @@ STORAGE_TYPE = s3
 S3_BUCKET = forge-attachment
 
 [storage.attachments]
-S3_BUCKET = gitea
+S3_BUCKET = forge
 
 [storage]
 STORAGE_TYPE = local
@@ -102,7 +102,7 @@ func Test_AttachmentStorage(t *testing.T) {
 [storage]
 STORAGE_TYPE            = s3
 S3_ENDPOINT          = s3.my-domain.net
-S3_BUCKET            = gitea
+S3_BUCKET            = forge
 S3_LOCATION          = homenet
 S3_USE_SSL           = true
 S3_ACCESS_KEY_ID     = correct_key
@@ -115,7 +115,7 @@ S3_SECRET_ACCESS_KEY = correct_key
 	storage := Attachment.Storage
 
 	assert.EqualValues(t, "s3", storage.Type)
-	assert.Equal(t, "gitea", storage.S3Config.Bucket)
+	assert.Equal(t, "forge", storage.S3Config.Bucket)
 }
 
 func Test_AttachmentStorage1(t *testing.T) {
@@ -128,6 +128,6 @@ STORAGE_TYPE = s3
 
 	assert.NoError(t, loadAttachmentFrom(cfg))
 	assert.EqualValues(t, "s3", Attachment.Storage.Type)
-	assert.Equal(t, "gitea", Attachment.Storage.S3Config.Bucket)
+	assert.Equal(t, "forge", Attachment.Storage.S3Config.Bucket)
 	assert.Equal(t, "attachments/", Attachment.Storage.S3Config.BasePath)
 }

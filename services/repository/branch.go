@@ -297,7 +297,6 @@ func SyncBranchesToDB(ctx context.Context, repoID, pusherID int64, branchNames, 
 	// 4. Check the branches in DB if they are already synced.
 	//
 	// If the user pushes many branches at once, the Git hook will call the internal API in batches, rather than all at once.
-	// See https://github.com/go-gitea/gitea/blob/cb52b17f92e2d2293f7c003649743464492bca48/cmd/hook.go#L27
 	// For the first batch, it will hit optimization 3.
 	// For other batches, it will hit optimization 4.
 

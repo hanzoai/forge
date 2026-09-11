@@ -64,10 +64,12 @@ fi
 # happened to keep — the failure this line used to swallow.
 environment-to-ini --config ${GIT_CUSTOM}/conf/app.ini || exit 1
 
-# only chown if current owner is not already the ${USER}. No recursive check to save time
-# (/data/gitea is the durable volume layout and stays put; /app/git is where the
-# daemon binary lives.)
-if ! [[ $(ls -ld /data/gitea | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git /data/gitea; fi
-if ! [[ $(ls -ld /app/git    | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git /app/git;    fi
-if ! [[ $(ls -ld /data/git   | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git /data/git;   fi
-chmod 0755 /data/gitea /app/git /data/git
+# only chown if current owner is not already the ${USER}. No recursive check, to
+# save time. /data holds the durable layout and /app/git the daemon binary. A
+# volume an earlier release wrote keeps its own app.ini, and so its own data
+# path, which is why a directory that is not there is skipped rather than made.
+for dir in /data/forge /app/git /data/git; do
+	[[ -d ${dir} ]] || continue
+	if ! [[ $(ls -ld ${dir} | awk '{print $3}') = ${USER} ]]; then chown -R ${USER}:git ${dir}; fi
+	chmod 0755 ${dir}
+done

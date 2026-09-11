@@ -308,7 +308,7 @@ func loadRepositoryFrom(rootCfg ConfigProvider) {
 	Repository.UserMaxCreationLimit = sec.Key("USER_MAX_CREATION_LIMIT").MustInt(Repository.MaxCreationLimit)
 	Repository.OrgMaxCreationLimit = sec.Key("ORG_MAX_CREATION_LIMIT").MustInt(Repository.MaxCreationLimit)
 	Repository.DefaultBranch = sec.Key("DEFAULT_BRANCH").MustString(Repository.DefaultBranch)
-	RepoRootPath = sec.Key("ROOT").MustString(filepath.Join(AppDataPath, "gitea-repositories"))
+	RepoRootPath = sec.Key("ROOT").MustString(filepath.Join(AppDataPath, "repositories"))
 	if !filepath.IsAbs(RepoRootPath) {
 		RepoRootPath = filepath.Join(AppWorkPath, RepoRootPath)
 	} else {

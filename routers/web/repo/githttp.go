@@ -147,13 +147,13 @@ func httpBase(ctx *context.Context, optGitService ...string) *serviceHandler {
 	if !canAnonymousPull { // not public pull, then either the pull needs auth, or the push needs "write" permission, so ask auth
 		if !ctx.IsSigned {
 			// TODO: support digit auth - which would be Authorization header with digit
-			if setting.OAuth2.Enabled {
-				// `Basic realm="Gitea"` tells the GCM to use builtin OAuth2 application: https://github.com/git-ecosystem/git-credential-manager/pull/1442
-				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Gitea"`)
-			} else {
-				// If OAuth2 is disabled, then use another realm to avoid GCM OAuth2 attempt
-				ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Hanzo Git (Basic Auth)"`)
-			}
+			// One realm, always. Git Credential Manager picks a built-in OAuth2
+			// application by matching the realm against a list of server names, and
+			// the client id it would then present is not one Hanzo IAM issued, so
+			// that flow cannot complete here. A realm it does not recognise sends
+			// it down the credential path our users actually have: an IAM token as
+			// the password.
+			ctx.Resp.Header().Set("WWW-Authenticate", `Basic realm="Hanzo Forge"`)
 			ctx.HTTPError(http.StatusUnauthorized)
 			return nil
 		}
@@ -163,7 +163,7 @@ func httpBase(ctx *context.Context, optGitService ...string) *serviceHandler {
 			return nil
 		}
 
-		if ctx.IsBasicAuth && ctx.Data["IsApiToken"] != true && !ctx.Doer.IsGiteaActions() {
+		if ctx.IsBasicAuth && ctx.Data["IsApiToken"] != true && !ctx.Doer.IsActions() {
 			_, err = auth_model.GetTwoFactorByUID(ctx, ctx.Doer.ID)
 			if err == nil {
 				// TODO: This response should be changed to "invalid credentials" for security reasons once the expectation behind it (creating an app token to authenticate) is properly documented

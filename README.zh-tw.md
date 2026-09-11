@@ -6,8 +6,8 @@ Hanzo 自架的 Git 平台 — Git 託管、程式碼審查、問題追蹤、套
 GitHub Actions 的 CI/CD，並透過 hanzo.id OIDC 原生整合 IAM。服務位於
 [git.hanzo.ai](https://git.hanzo.ai)。
 
-本專案是 [Gitea](https://gitea.com)（MIT）的白牌分支。上游版權與授權完整保留於
-[LICENSE](LICENSE)；身分驗證改接 Hanzo IAM 而非本機帳號，產品品牌為 Hanzo Forge。
+本專案採用 MIT 授權。上游版權與授權記錄於 [NOTICE](NOTICE) 與
+[LICENSE](LICENSE)；身分驗證改接 Hanzo IAM 而非本機帳號。
 
 ## 建置與部署
 

@@ -90,7 +90,7 @@ func (g *ASTTransformer) transformList(_ *markup.RenderContext, v *ast.List, rc 
 		}
 	}
 	if !nestedList {
-		// "dir=auto" should be only added to top-level "ul". https://github.com/go-gitea/gitea/issues/35058
+		// "dir=auto" should be only added to top-level "ul". nested task lists
 		g.applyElementDir(v)
 	}
 }

@@ -23,7 +23,7 @@ import (
 
 func main() {
 	var (
-		prefix         = "gitea-gitignore"
+		prefix         = "gitignore"
 		url            = "https://api.github.com/repos/github/gitignore/tarball"
 		githubApiToken = ""
 		githubUsername = ""

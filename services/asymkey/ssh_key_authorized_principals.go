@@ -10,7 +10,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	asymkey_model "github.com/hanzoai/git/models/asymkey"
@@ -110,7 +109,7 @@ func regeneratePrincipalKeys(ctx context.Context, t io.Writer) error {
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 			line := scanner.Text()
-			if strings.HasPrefix(line, asymkey_model.AuthorizedStringCommentPrefix) {
+			if asymkey_model.IsManagedAuthorizedLine(line) {
 				scanner.Scan()
 				continue
 			}

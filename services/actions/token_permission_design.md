@@ -1,6 +1,6 @@
 # Actions Token Permission System Design
 
-This document details the design of the Actions Token Permission system, originally proposed upstream in [#24635](https://github.com/go-gitea/gitea/issues/24635).
+This document details the design of the Actions Token Permission system, originally proposed upstream.
 
 ## Design Philosophy & GitHub Differences
 

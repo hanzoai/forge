@@ -121,7 +121,7 @@ wheels = [
 ]
 
 [[package]]
-name = "gitea"
+name = "forge"
 version = "0.0.0"
 source = { virtual = "." }
 

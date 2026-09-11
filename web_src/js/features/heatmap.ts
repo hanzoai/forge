@@ -31,7 +31,6 @@ export async function initHeatmap() {
     const totalFormatted = totalContributions.toLocaleString();
     const textTotalContributions = el.getAttribute('data-locale-total-contributions')!.replace('%s', totalFormatted);
 
-    // last heatmap tooltip localization attempt https://github.com/go-gitea/gitea/pull/24131/commits/a83761cbbae3c2e3b4bced71e680f44432073ac8
     const locale = {
       heatMapLocale: {
         months: new Array(12).fill(undefined).map((_, idx) => translateMonth(idx)),

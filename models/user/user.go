@@ -509,7 +509,7 @@ func (u *User) GitName() string {
 // IsMailable checks if a user is eligible to receive emails.
 // System users like Ghost and the Actions bot are excluded.
 func (u *User) IsMailable() bool {
-	return u.IsActive && !u.IsGiteaActions() && !u.IsGhost()
+	return u.IsActive && !u.IsActions() && !u.IsGhost()
 }
 
 // IsUserExist checks if given username exist,

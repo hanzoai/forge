@@ -42,7 +42,7 @@ func TestWriteAuthorizedStringForKey(t *testing.T) {
 			OwnerID: 123,
 			Content: validKeyContent + " any-comment",
 			Type:    KeyTypeUser,
-		}, `# gitea public key
+		}, `# forge public key
 command="/tmp/forge --config=/tmp/app.ini serv key-0",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,no-user-rc,restrict ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICV0MGX/W9IvLA4FXpIuUcdDcbj5KX4syHgsTy7soVgf user-123
 `)
 	})
@@ -52,7 +52,7 @@ command="/tmp/forge --config=/tmp/app.ini serv key-0",no-port-forwarding,no-X11-
 			OwnerID: 123,
 			Content: validKeyContent + "\nany-more", // the new line should be ignored
 			Type:    KeyTypeUser,
-		}, `# gitea public key
+		}, `# forge public key
 command="/tmp/forge --config=/tmp/app.ini serv key-0",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,no-user-rc,restrict ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICV0MGX/W9IvLA4FXpIuUcdDcbj5KX4syHgsTy7soVgf user-123
 `)
 	})
@@ -70,7 +70,7 @@ command="/tmp/forge --config=/tmp/app.ini serv key-0",no-port-forwarding,no-X11-
 			OwnerID: 123,
 			Content: "any-content",
 			Type:    KeyTypePrincipal,
-		}, `# gitea public key
+		}, `# forge public key
 command="/tmp/forge --config=/tmp/app.ini serv key-0",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,no-user-rc,restrict any-content # user-123
 `)
 	})

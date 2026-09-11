@@ -104,7 +104,7 @@ type ActionRunJob struct {
 	//   - JSON object  : explicit mapping {alias: source_name}; names only, no values.
 	// Only set when IsReusableCaller is true.
 	CallSecrets string `xorm:"LONGTEXT"`
-	// CallPayload is the JSON-encoded WorkflowCallPayload exposed to children as gitea.event.
+	// CallPayload is the JSON-encoded WorkflowCallPayload exposed to children as github.event.
 	// Populated atomically with IsExpanded at the end of expandReusableWorkflowCaller.
 	// Only set when IsReusableCaller is true.
 	CallPayload string `xorm:"LONGTEXT"`

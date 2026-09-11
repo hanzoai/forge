@@ -118,7 +118,7 @@ func (input *notifyInput) Notify(ctx context.Context) {
 
 func notify(ctx context.Context, input *notifyInput) error {
 	shouldDetectSchedules := input.Event == webhook_module.HookEventPush && input.Ref.BranchName() == input.Repo.DefaultBranch
-	if input.Doer.IsGiteaActions() {
+	if input.Doer.IsActions() {
 		// avoiding triggering cyclically, for example:
 		// a comment of an issue will trigger the runner to add a new comment as reply,
 		// and the new comment will trigger the runner again.
@@ -445,7 +445,6 @@ func notifyPackage(ctx context.Context, sender *user_model.User, pd *packages_mo
 	if pd.Repository == nil {
 		// When a package is uploaded to an organization, it could trigger an event to notify.
 		// So the repository could be nil, however, actions can't support that yet.
-		// See https://github.com/go-gitea/gitea/pull/17940
 		return
 	}
 

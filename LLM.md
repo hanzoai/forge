@@ -1,6 +1,6 @@
 # Hanzo Forge — `github.com/hanzoai/git`
 
-The rebranded **Gitea fork** that serves `git.hanzo.ai`: IAM-native code hosting
+The Git forge that serves `git.hanzo.ai`: IAM-native code hosting
 for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
 
 ## What it is
@@ -50,8 +50,8 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   fails to compile.
 - **A runner's job context is a struct, and that is the point.** As a map the
   two sides could disagree in silence, and did: the forge wrote
-  `git_runtime_token` while the runner read `gitea_runtime_token` and quietly
-  fell back to the task token. `runner.Context` names the twenty-one values the
+  one spelling of the runtime-token key while the runner read another, and
+  quietly fell back to the task token. `runner.Context` names the twenty-one values the
   forge computes AND the runner reads, so a missing one is a compile error.
   `GenerateGitContext` keeps its map — the forge evaluates workflow expressions
   against it — and `generateTaskContext` is the ONE place the two vocabularies
@@ -79,7 +79,7 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
   `https://hanzo.id/.well-known/openid-configuration`. Org membership is driven by
   the IAM `owner` claim (`--group-claim-name owner --group-team-map …
   --group-team-map-removal`), reconciled declaratively by the deploy's `oauth-sync`
-  init container. hanzo.id IAM app: `hanzo-gitea`.
+  init container. hanzo.id IAM app: see the universe repo for the registered name.
 - **A Hanzo IAM access token IS a git credential.** `iamUser` (`services/auth/iam.go`),
   called from the basic-auth path (`services/auth/basic.go`), takes a hanzo.id access
   token as the git-over-HTTP password so CI and buildkit stop needing a hand-made PAT.
@@ -125,8 +125,9 @@ for the Hanzo / Lux / Zoo orgs, with native GitHub-Actions-compatible CI.
     token of its own, which would outlive the short-lived IAM token and survive its
     revocation, so a longer-lived credential is not issued off a shorter-lived one.
 - **Config = env.** `GIT__<section>__<KEY>` (upstream's app.ini API under our
-  prefix; `modules/setting.EnvConfigKeyPrefixGit`). `GITEA__*` is NOT accepted —
-  there is no fallback, so a stale `GITEA__` var is silently ignored. No
+  prefix; `modules/setting.EnvConfigKeyPrefixGit`). No other prefix is accepted, and
+  there is no fallback, so a stale variable under an old prefix is ignored in
+  silence. No
   custom/conf baked, no Helm — the running config lives entirely in the
   deployment's env (see universe).
 - **KV, not redis.** The client is `github.com/hanzokv/go` and the vocabulary is
@@ -170,34 +171,47 @@ control plane, which is now `/v1/runner`. The host is `api.*` where an API
 surface deserves its own name; the path carries `/v1/` and never a second
 `/api/` segment as well.
 
-## Upstream naming: what stays, and why
+## Upstream naming: what is left, and why
 
-The rendered UI, locale strings, CLI help, log/error text, outbound User-Agents
-and our own `X-*` headers are Hanzo Forge. What is left is left on purpose — it is
-either legally required or an addressing value where a rename silently points at
-a different resource. Do NOT sed these:
+The tree names itself. Source files carry an SPDX line and the Hanzo copyright;
+upstream authorship is recorded once in `NOTICE`. Everything addressable is
+spelled for this product: webhook type `native`, storage bucket and container
+`forge`, indexer names `forge_issues` / `forge_codes`, bleve analyzer
+`forge/path`, lock prefix `forge:globallock:`, SSH host keys `ssh/forge.*`,
+markdown front-matter key `forge:`, metrics namespace `git_`.
 
-- **MIT attribution** — `Copyright ... The Gitea Authors` headers, `LICENSE`,
-  and the generated `licenses.txt` (17 hits, all dependency notices). Required.
-- **Dependency import paths** — `gitea.com/go-chi/*`, `gitea.com/gitea/runner/*`,
-  and `github.com/go-gitea/gitea` links in provenance comments.
-- **Addressing values.** Renaming these redirects to a resource that does not
-  exist, usually silently: webhook type `gitea` (DB column + API enum + the
-  `/settings/hooks/gitea/*` route and its templates), migration source service
-  `gitea`, `.gitea/` repo conventions (workflows, issue/PR templates — users'
-  own files), bleve analyzer `gitea/path`, indexer names `gitea_issues` /
-  `gitea_codes`, the `[storage]` S3/Azure default `gitea`, the user setting key
-  `email_notification.gitea_actions`, and `yaml:"gitea"` markdown front-matter.
-- **`/data/gitea`, `/etc/gitea`, `gitea.db`** — the durable volume layout. A
-  rename is a live PVC migration, not a branding change. `/app/git/gitd` and
-  `/usr/local/bin/gitd` (the binary) are already ours.
-- **`WWW-Authenticate: Basic realm="Gitea"`** in `routers/web/repo/githttp.go` —
-  Git Credential Manager matches this literal to offer built-in OAuth2
-  (git-ecosystem/git-credential-manager#1442). The OAuth2-disabled branch beside
-  it is ours, because its job is to NOT match that probe.
-- **`ONLY_ALLOW_PUSH_IF_GITEA_ENVIRONMENT_SET`** — renaming the key makes any
-  app.ini that set it `false` silently revert to the `true` default, which
-  rejects pushes. Needs a migration, not a rename.
+What remains is there for a reason. Do NOT sed these:
+
+- **Attribution.** `LICENSE` and `NOTICE` carry the upstream copyright the MIT
+  licence requires, and `assets/go-licenses.json` embeds each dependency's
+  licence text verbatim — including `github.com/hanzoai/act`, whose own LICENSE
+  still credits its upstream. Rewriting a licence text falsifies it.
+- **`go.sum`.** `gitea.com/xorm/sqlfiddle` is in the module graph because
+  `github.com/hanzoai/builder` keeps it as a test dependency. Dropping it there
+  and releasing a new builder clears the last entry here.
+- **Legacy on-disk names, which are load-bearing.**
+  `modules/gitrepo/hooks.go` keeps `legacyDelegateHookNames` and
+  `models/asymkey/ssh_key_authorized_keys.go` keeps the old authorized_keys
+  marker. Both exist so state an earlier release wrote is *removed*: an
+  unrecognised delegate exits 127 and rejects every push, and an unrecognised
+  marker is copied through as a hand-added key, leaving a revoked key
+  authorized. Forgetting these is a defect, not a cleanup.
+- **`"gitea-actions"` in the reserved-username list** (`models/user/user.go`).
+  Unblocking it would let an account squat the name the Actions bot used to
+  have.
+- **The reserved secret-name prefix** (`services/secrets/validation.go`) rejects
+  `GITEA_` alongside `GITHUB_`. Nothing in this tree injects the former, but the
+  runner is a separate component; narrow the denylist only after confirming it
+  there.
+- **`email_notification.gitea_actions`** (`models/user/setting_options.go`) is a
+  stored `user_setting` key. The Go identifiers around it were renamed; the
+  value needs a migration, so it waits for one.
+- **`models/migrations`.** A migration must keep describing what it did: theme
+  values, service-type enum values, the `io.gitea.commits` payload field it
+  reads, and the fixture rows it ran against all stay. Comment text is fair game;
+  nothing else is.
+- **`tools/generate-svg.ts`** names the upstream icons it prunes, because the
+  third-party icon theme is what ships them.
 
 **Every header we emit is `X-Git-*`.** Webhook delivery
 (`services/webhook/deliver.go`), notification mail (`services/mailer/`), and the
@@ -207,17 +221,12 @@ what lets a receiver written for another server work against us unchanged:
 `X-Gogs-*`, `X-GitHub-*`, `X-GitLab-*`, and `X-Hub-Signature`/`-256` — that last
 pair is GitHub's own spelling, which third parties genuinely send us.
 `TestWebhookDeliverGitHeaders` asserts the parity and refuses any delivery header
-whose name contains "gitea", so the emission cannot come back by accident.
+named after the upstream server, so the emission cannot come back by accident.
 
-One inbound header is still branded upstream: **`X-GITEA-OTP`**, declared in the
-CORS allow-list (`routers/api/v1/api.go`) and in both swagger specs. Nothing
-reads it — `ValidateAndConsumeTOTP` has no caller outside `models/auth`, so the
-basic-auth TOTP path this header fed no longer exists and
-`tests/integration/api_twofa_test.go` expects a 200 the server cannot produce.
-Renaming it is one Go line plus the two generated specs under
-`templates/swagger/`, which `make swagger-check` compares, so it has to land as
-one commit; deciding whether the TOTP path comes back or the declaration goes is
-the larger question underneath it.
+No inbound header is branded either. The OTP request header was declared in the
+CORS allow-list and both swagger specs and read by nothing — identity here is
+IAM's, and basic auth takes a token — so it and the test that asked for a
+response the server could not produce are gone.
 
 ## Image / release lane
 
@@ -243,11 +252,11 @@ the larger question underneath it.
 Operator-managed in `hanzoai/universe` (DOKS `hanzo-k8s`, namespace `hanzo`):
 
 - `infra/k8s/operator/crs/git.yaml` — the `hanzo-git` App (this image), SQLite on
-  the RWO `gitea-data` PVC, OIDC via the `oauth-sync` init container. Synced by
+  an RWO data PVC, OIDC via the `oauth-sync` init container. Synced by
   Hanzo CD (ArgoCD; the App-only successor to the operator GitSource).
 - `infra/k8s/git/` — the App's non-App supporting resources (Hanzo CD's project is
-  `hanzo.ai/App`-only): `gitea-data` PVC, `hanzo-git-oauth` ConfigMap, the
-  `git.hanzo.ai` Ingress, and `git-secrets-kms.yaml` (gitea-secrets from KMS).
+  `hanzo.ai/App`-only): the data PVC, `hanzo-git-oauth` ConfigMap, the
+  `git.hanzo.ai` Ingress, and `git-secrets-kms.yaml` (secrets from KMS).
 - `infra/k8s/git-runner/` — the DinD pool that runs Actions jobs
   (`statefulset.yaml`, image `oci.hanzo.ai/hanzoai/git-runner`); maps
   `hanzo-build-linux-amd64`. It rolls in the same change as this image, one
@@ -314,9 +323,9 @@ What pins the server to one node is the 250Gi RWO PVC, 166G used:
 
 | Path | Size | What it is |
 |---|---|---|
-| `/data/gitea/data` | 145G | bare repositories |
-| `/data/gitea/indexers` | 18.4G | bleve index (derived, rebuildable) |
-| `/data/gitea/gitea.db` | 2.3G | ONE SQLite for the whole instance |
+| `<data>/data` | 145G | bare repositories |
+| `<data>/indexers` | 18.4G | bleve index (derived, rebuildable) |
+| `<data>/forge.db` | 2.3G | ONE SQLite for the whole instance |
 
 That is why it is `replicas: 1` + `Recreate`, and why an image bump took
 git.hanzo.ai down ~10 min on 2026-07-26 (new pod hit Multi-Attach while
@@ -380,7 +389,7 @@ filesystem service and it does not give tenancy — only HA.
 
 Hooks re-exec the binary per push. That is node-local to whoever holds the repo,
 so it blocks neither HA nor tenancy. The hook scripts embed `setting.AppPath`
-(the runtime path), not a hardcoded name — which is why the gitea->gitd rename
+(the runtime path), not a hardcoded name — which is why the binary rename
 regenerated every repo's hooks by itself. Turning that into a constant would
 break the next rename.
 

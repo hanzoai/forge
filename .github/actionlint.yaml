@@ -8,9 +8,3 @@ self-hosted-runner:
     # source of truth for the taxonomy.
     - hanzo-linux-amd64
     - hanzo-build-linux-amd64
-    # Upstream go-gitea's own pools, kept so a rebase onto upstream lints clean.
-    - actuated-4cpu-8gb
-    - actuated-4cpu-16gb
-    - nscloud
-    - namespace-profile-gitea-release-docker
-    - namespace-profile-gitea-release-binary

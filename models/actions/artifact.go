@@ -1,7 +1,7 @@
 // Copyright 2026 Hanzo AI, Inc. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-// This artifact server is inspired by the Gitea runner artifact server implementation.
+// This artifact server follows the shape the Actions runner expects.
 // It updates url setting and uses ObjectStore to handle artifacts persistence.
 
 package actions

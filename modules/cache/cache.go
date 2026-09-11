@@ -41,7 +41,7 @@ func Init() error {
 const (
 	testCacheKey = "DefaultCache.TestKey"
 	// SlowCacheThreshold marks cache tests as slow
-	// set to 30ms per discussion: https://github.com/go-gitea/gitea/issues/33190
+	// set to 30ms per discussion: a cache miss must not be fatal
 	// TODO: Replace with metrics histogram
 	SlowCacheThreshold = 30 * time.Millisecond
 )

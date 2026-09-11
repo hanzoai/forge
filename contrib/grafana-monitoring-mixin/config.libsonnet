@@ -7,7 +7,7 @@
     dashboardTimezone: 'default',
     dashboardRefresh: '1m',
 
-    // please see https://docs.gitea.com/administration/config-cheat-sheet#metrics-metrics
+    // please see https://docs.forge.com/administration/config-cheat-sheet#metrics-metrics
     // Show issue by repository metrics with format git_issues_by_repository{repository="org/repo"} 5.
     // Requires ENABLED_ISSUE_BY_REPOSITORY set to true.
     showIssuesByRepository: true,

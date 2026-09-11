@@ -51,7 +51,7 @@ cpu.out
 /data
 /indexers
 /log
-/tests/integration/gitea-integration-*
+/tests/integration/integration-*
 /tests/*.ini
 /node_modules
 /yarn.lock

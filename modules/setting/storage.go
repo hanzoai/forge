@@ -110,7 +110,7 @@ func getDefaultStorageSection(rootCfg ConfigProvider) ConfigSection {
 	storageSec.Key("S3_ENDPOINT").MustString("localhost:9000")
 	storageSec.Key("S3_ACCESS_KEY_ID").MustString("")
 	storageSec.Key("S3_SECRET_ACCESS_KEY").MustString("")
-	storageSec.Key("S3_BUCKET").MustString("gitea")
+	storageSec.Key("S3_BUCKET").MustString("forge")
 	storageSec.Key("S3_LOCATION").MustString("us-east-1")
 	storageSec.Key("S3_USE_SSL").MustBool(false)
 	storageSec.Key("S3_INSECURE_SKIP_VERIFY").MustBool(false)
@@ -119,7 +119,7 @@ func getDefaultStorageSection(rootCfg ConfigProvider) ConfigSection {
 	storageSec.Key("AZURE_BLOB_ENDPOINT").MustString("")
 	storageSec.Key("AZURE_BLOB_ACCOUNT_NAME").MustString("")
 	storageSec.Key("AZURE_BLOB_ACCOUNT_KEY").MustString("")
-	storageSec.Key("AZURE_BLOB_CONTAINER").MustString("gitea")
+	storageSec.Key("AZURE_BLOB_CONTAINER").MustString("forge")
 	return storageSec
 }
 

@@ -11,8 +11,8 @@
 # migration, not a rename: the server rewrites every repo's hooks on the first
 # boot after it changes (routers.syncAppConfForGit) before the listener opens.
 GITD="/app/git/gitd"
-WORK_DIR="/data/gitea"
-CUSTOM_PATH="/data/gitea"
+WORK_DIR="/data/forge"
+CUSTOM_PATH="/data/forge"
 
 # Provide docker defaults
 GIT_WORK_DIR="${GIT_WORK_DIR:-$WORK_DIR}" GIT_CUSTOM="${GIT_CUSTOM:-$CUSTOM_PATH}" exec -a "$0" "$GITD" $CONF_ARG "$@"

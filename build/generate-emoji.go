@@ -138,7 +138,7 @@ func generate() ([]byte, error) {
 		}
 	}
 
-	// gitea customizations
+	// local customizations
 	i, ok := aliasMap["tada"]
 	if ok {
 		data[i].Aliases = append(data[i].Aliases, "hooray")

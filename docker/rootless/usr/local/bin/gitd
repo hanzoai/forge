@@ -7,8 +7,8 @@
 # Installed as gitd in /usr/local/bin; the real binary lives in /app/git. See
 # the rootful copy for why `exec -a "$0"` and this path are load-bearing.
 GITD="/app/git/gitd"
-WORK_DIR="/var/lib/gitea"
-APP_INI="/etc/gitea/app.ini"
+WORK_DIR="/var/lib/forge"
+APP_INI="/etc/forge/app.ini"
 
 APP_INI_SET=""
 for i in "$@"; do

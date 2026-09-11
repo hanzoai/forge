@@ -339,9 +339,6 @@ func (a *actionNotifier) PushCommits(ctx context.Context, pusher *user_model.Use
 
 	// HINT: USER-ACTIVITY-PUSH-COMMITS: it's said that the time of push commits (for user activity display) is designed this way,
 	// it doesn't use git commit's time, it only uses the doer's action time.
-	// ref: https://github.com/go-gitea/gitea/pull/36469#issuecomment-3901955347
-	// ref: https://github.com/go-gitea/gitea/issues/14051
-	// ref: https://github.com/go-gitea/gitea/issues/11861#issuecomment-643162143
 	if err = NotifyWatchers(ctx, &activities_model.Action{
 		ActUserID: pusher.ID,
 		ActUser:   pusher,

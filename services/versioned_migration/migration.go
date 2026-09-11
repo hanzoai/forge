@@ -13,7 +13,7 @@ import (
 
 func Migrate(ctx context.Context, x db.EngineMigration) error {
 	// only one instance can do the migration at the same time if there are multiple instances
-	release, err := globallock.Lock(ctx, "gitea_versioned_migration")
+	release, err := globallock.Lock(ctx, "versioned_migration")
 	if err != nil {
 		return err
 	}

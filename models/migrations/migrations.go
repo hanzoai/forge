@@ -471,7 +471,7 @@ func EnsureUpToDate(ctx context.Context, x db.EngineMigration) error {
 	}
 
 	if minDBVersion > currentDB {
-		return fmt.Errorf("DB version %d (<= %d) is too old for auto-migration. Upgrade to Gitea 1.6.4 (upstream) first then upgrade to this version", currentDB, minDBVersion)
+		return fmt.Errorf("DB version %d (<= %d) is too old for auto-migration. Upgrade to upstream release 1.6.4 first, then to this version", currentDB, minDBVersion)
 	}
 
 	expectedDB := ExpectedDBVersion()

@@ -72,7 +72,7 @@ func Test_RepoArchiveStorage(t *testing.T) {
 [storage]
 STORAGE_TYPE            = s3
 S3_ENDPOINT          = s3.my-domain.net
-S3_BUCKET            = gitea
+S3_BUCKET            = forge
 S3_LOCATION          = homenet
 S3_USE_SSL           = true
 S3_ACCESS_KEY_ID     = correct_key
@@ -85,7 +85,7 @@ S3_SECRET_ACCESS_KEY = correct_key
 	storage := RepoArchive.Storage
 
 	assert.EqualValues(t, "s3", storage.Type)
-	assert.Equal(t, "gitea", storage.S3Config.Bucket)
+	assert.Equal(t, "forge", storage.S3Config.Bucket)
 
 	iniStr = `
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -94,7 +94,7 @@ STORAGE_TYPE = s3
 [storage.s3]
 STORAGE_TYPE            = s3
 S3_ENDPOINT          = s3.my-domain.net
-S3_BUCKET            = gitea
+S3_BUCKET            = forge
 S3_LOCATION          = homenet
 S3_USE_SSL           = true
 S3_ACCESS_KEY_ID     = correct_key
@@ -107,5 +107,5 @@ S3_SECRET_ACCESS_KEY = correct_key
 	storage = RepoArchive.Storage
 
 	assert.EqualValues(t, "s3", storage.Type)
-	assert.Equal(t, "gitea", storage.S3Config.Bucket)
+	assert.Equal(t, "forge", storage.S3Config.Bucket)
 }

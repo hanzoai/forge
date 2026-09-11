@@ -75,7 +75,7 @@ func GetActionsUserTaskID(u *User) (int64, bool) {
 	return 0, false
 }
 
-func (u *User) IsGiteaActions() bool {
+func (u *User) IsActions() bool {
 	return u != nil && u.ID == ActionsUserID
 }
 

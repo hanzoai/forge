@@ -64,7 +64,7 @@ func loadDBSetting(rootCfg ConfigProvider) {
 	Database.SSLMode = sec.Key("SSL_MODE").MustString("disable")
 	Database.CharsetCollation = sec.Key("CHARSET_COLLATION").String()
 
-	Database.Path = sec.Key("PATH").MustString(filepath.Join(AppDataPath, "gitea.db"))
+	Database.Path = sec.Key("PATH").MustString(filepath.Join(AppDataPath, "forge.db"))
 
 	Database.SQLiteBusyTimeout = sec.Key("SQLITE_TIMEOUT").MustInt(DefaultSQLiteBusyTimeout)
 	// mattn driver isn't really affected by this timeout, but other drivers are affected

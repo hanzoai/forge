@@ -72,7 +72,7 @@ const (
 	defaultActionsURLGitHub = "github" // https://github.com
 	defaultActionsURLSelf   = "self"   // the root URL of the self-hosted forge instance
 	// DefaultActionsURL only supports GitHub and the self-hosted forge.
-	// It's intentionally not supported more, so please be cautious before adding more like "gitea" or "gitlab".
+	// It's intentionally not supported more, so please be cautious before adding more like "gitlab".
 	// If you get some trouble with `uses: username/action_name@version` in your workflow,
 	// please consider to use `uses: https://the_url_you_want_to_use/username/action_name@version` instead.
 )

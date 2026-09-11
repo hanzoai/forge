@@ -161,16 +161,16 @@ func MailActionsTrigger(ctx context.Context, recipient *user_model.User, repo *r
 	}
 
 	notifyPref, err := user_model.GetUserSetting(ctx, recipient.ID,
-		user_model.SettingsKeyEmailNotificationGiteaActions, user_model.SettingEmailNotificationGiteaActionsFailureOnly)
+		user_model.SettingsKeyEmailNotificationActions, user_model.SettingEmailNotificationActionsFailureOnly)
 	if err != nil {
 		return err
 	}
 	// "disabled" never sends
-	if notifyPref == user_model.SettingEmailNotificationGiteaActionsDisabled {
+	if notifyPref == user_model.SettingEmailNotificationActionsDisabled {
 		return nil
 	}
 	// "failure-only" skips non-failure runs
-	if notifyPref != user_model.SettingEmailNotificationGiteaActionsAll && !run.Status.IsFailure() {
+	if notifyPref != user_model.SettingEmailNotificationActionsAll && !run.Status.IsFailure() {
 		return nil
 	}
 

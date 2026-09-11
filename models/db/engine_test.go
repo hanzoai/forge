@@ -57,8 +57,6 @@ func TestDeleteOrphanedObjects(t *testing.T) {
 
 func TestPrimaryKeys(t *testing.T) {
 	// Some dbs require that all tables have primary keys, see
-	//   https://github.com/go-gitea/gitea/issues/21086
-	//   https://github.com/go-gitea/gitea/issues/16802
 	// To avoid creating tables without primary key again, this test will check them.
 	// Import "github.com/hanzoai/git/cmd" to make sure each db.RegisterModel in init functions has been called.
 

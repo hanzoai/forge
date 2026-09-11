@@ -18,10 +18,10 @@ const (
 
 	SettingsKeyCodeViewShowFileTree = "code_view.show_file_tree"
 
-	SettingsKeyEmailNotificationGiteaActions        = "email_notification.gitea_actions"
-	SettingEmailNotificationGiteaActionsAll         = "all"
-	SettingEmailNotificationGiteaActionsFailureOnly = "failure-only" // Default for actions email preference
-	SettingEmailNotificationGiteaActionsDisabled    = "disabled"
+	SettingsKeyEmailNotificationActions        = "email_notification.gitea_actions" //nolint:gosec // the value is a stored user_setting key; renaming it needs a migration
+	SettingEmailNotificationActionsAll         = "all"
+	SettingEmailNotificationActionsFailureOnly = "failure-only" // Default for actions email preference
+	SettingEmailNotificationActionsDisabled    = "disabled"
 
 	SettingsKeyActionsConfig = "actions.config"
 )

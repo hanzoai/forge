@@ -38,7 +38,7 @@ func TestGenKeyPair(t *testing.T) {
 	}
 	tmpDir := t.TempDir()
 	for _, tc := range testCases {
-		name := "gitea." + string(tc.keyType)
+		name := "forge." + string(tc.keyType)
 		fn := filepath.Join(tmpDir, name)
 		t.Run("Generate "+name, func(t *testing.T) {
 			require.NoError(t, GenKeyPair(fn, tc.keyType, 0))
@@ -62,8 +62,8 @@ func TestInitKeys(t *testing.T) {
 
 	keyTypes := []string{"rsa", "ecdsa", "ed25519"}
 	for _, keyType := range keyTypes {
-		privKeyPath := filepath.Join(tempDir, "gitea."+keyType)
-		pubKeyPath := filepath.Join(tempDir, "gitea."+keyType+".pub")
+		privKeyPath := filepath.Join(tempDir, "forge."+keyType)
+		pubKeyPath := filepath.Join(tempDir, "forge."+keyType+".pub")
 		assert.NoFileExists(t, privKeyPath)
 		assert.NoFileExists(t, pubKeyPath)
 	}
@@ -76,8 +76,8 @@ func TestInitKeys(t *testing.T) {
 	// Record file contents so regeneration can be detected
 	content := map[string][]byte{}
 	for _, keyType := range keyTypes {
-		privKeyPath := filepath.Join(tempDir, "gitea."+keyType)
-		pubKeyPath := filepath.Join(tempDir, "gitea."+keyType+".pub")
+		privKeyPath := filepath.Join(tempDir, "forge."+keyType)
+		pubKeyPath := filepath.Join(tempDir, "forge."+keyType+".pub")
 		data, err := os.ReadFile(privKeyPath)
 		require.NoError(t, err)
 		content[privKeyPath] = data
@@ -88,16 +88,16 @@ func TestInitKeys(t *testing.T) {
 	}
 
 	// Test recreation on missing private key and noop for missing pub key
-	require.NoError(t, os.Remove(filepath.Join(tempDir, "gitea.ecdsa.pub")))
-	require.NoError(t, os.Remove(filepath.Join(tempDir, "gitea.ed25519")))
+	require.NoError(t, os.Remove(filepath.Join(tempDir, "forge.ecdsa.pub")))
+	require.NoError(t, os.Remove(filepath.Join(tempDir, "forge.ed25519")))
 
 	keyFiles, err = InitDefaultHostKeys(tempDir)
 	require.NoError(t, err)
 	assert.Len(t, keyFiles, len(keyTypes))
 
 	for _, keyType := range keyTypes {
-		privKeyPath := filepath.Join(tempDir, "gitea."+keyType)
-		pubKeyPath := filepath.Join(tempDir, "gitea."+keyType+".pub")
+		privKeyPath := filepath.Join(tempDir, "forge."+keyType)
+		pubKeyPath := filepath.Join(tempDir, "forge."+keyType+".pub")
 
 		dataPriv, err := os.ReadFile(privKeyPath)
 		require.NoError(t, err)

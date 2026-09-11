@@ -44,9 +44,9 @@ func GetCommitActionsStatusMap(ctx context.Context, statuses []*git_model.Commit
 		if status.Repo == nil {
 			status.Repo = repoByID[status.RepoID]
 		}
-		// ParseGiteaActionsTargetURL lazy-loads status.Repo on miss; cache the
+		// ParseActionsTargetURL lazy-loads status.Repo on miss; cache the
 		// outcome so later entries with the same RepoID skip that load.
-		_, jobID, ok := status.ParseGiteaActionsTargetURL(ctx)
+		_, jobID, ok := status.ParseActionsTargetURL(ctx)
 		repoByID[status.RepoID] = status.Repo
 		if ok {
 			statusByJobID[jobID] = status

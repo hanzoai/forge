@@ -6,9 +6,9 @@ Hanzo's self-hosted Git forge — Git hosting, code review, issues, packages, an
 CI/CD (GitHub-Actions-compatible), IAM-native via hanzo.id OIDC. Runs at
 [git.hanzo.ai](https://git.hanzo.ai).
 
-A white-label fork of [Gitea](https://gitea.com) (MIT). Upstream copyright and
-licensing are preserved in [LICENSE](LICENSE); identity is wired to Hanzo IAM
-rather than local accounts, and the product is branded Hanzo Forge.
+MIT licensed. Upstream authorship and licensing are recorded in
+[NOTICE](NOTICE) and [LICENSE](LICENSE). Identity is wired to Hanzo IAM rather
+than local accounts.
 
 ## Build & deploy
 
