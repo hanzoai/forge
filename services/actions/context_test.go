@@ -12,7 +12,7 @@ import (
 	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/setting"
 	api "github.com/hanzoai/git/modules/structs"

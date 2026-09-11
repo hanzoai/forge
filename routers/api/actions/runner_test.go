@@ -15,7 +15,7 @@ import (
 	"time"
 
 	actions_model "github.com/hanzoai/git/models/actions"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/web"
 
 	"github.com/stretchr/testify/assert"

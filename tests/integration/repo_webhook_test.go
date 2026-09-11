@@ -24,7 +24,7 @@ import (
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/models/webhook"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/commitstatus"
 	"github.com/hanzoai/git/modules/git"
 	"github.com/hanzoai/git/modules/gitrepo"

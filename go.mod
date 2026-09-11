@@ -53,7 +53,7 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/hanzoai/act v1.0.0
 	github.com/hanzoai/authz v1.10.29
-	github.com/hanzoai/git/modules/actions/runner v0.0.0
+	github.com/hanzoai/forge/modules/actions/runner v0.0.0
 	github.com/hanzoai/sqlite v0.3.2
 	github.com/hanzoai/tasks v1.52.0
 	github.com/hanzokv/go/v9 v9.22.0
@@ -342,7 +342,7 @@ ignore (
 // The runner protocol lives in this repository, one directory down, and is
 // built from the working tree rather than the proxy so a change to it and to
 // its handlers lands in one commit.
-replace github.com/hanzoai/git/modules/actions/runner => ./modules/actions/runner
+replace github.com/hanzoai/forge/modules/actions/runner => ./modules/actions/runner
 
 replace go.yaml.in/yaml/v4 => go.yaml.in/yaml/v4 v4.0.0-rc.3 // rc.4 changes block scalar serialization, wait for stable release
 

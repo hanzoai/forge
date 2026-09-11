@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/actions/jobparser"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/test"
 	"github.com/hanzoai/git/modules/timeutil"

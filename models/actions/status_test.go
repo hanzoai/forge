@@ -7,7 +7,7 @@ package actions
 import (
 	"testing"
 
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -19,7 +19,7 @@ import (
 	unit_model "github.com/hanzoai/git/models/unit"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/commitstatus"
 	"github.com/hanzoai/git/modules/queue"
 	api "github.com/hanzoai/git/modules/structs"

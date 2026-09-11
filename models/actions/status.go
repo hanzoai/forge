@@ -7,7 +7,7 @@ package actions
 import (
 	"slices"
 
-	"github.com/hanzoai/git/modules/actions/runner"
+	"github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/translation"
 )
 
