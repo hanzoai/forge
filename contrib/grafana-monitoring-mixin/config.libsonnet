@@ -8,10 +8,10 @@
     dashboardRefresh: '1m',
 
     // please see https://docs.gitea.com/administration/config-cheat-sheet#metrics-metrics
-    // Show issue by repository metrics with format hanzogit_issues_by_repository{repository="org/repo"} 5.
+    // Show issue by repository metrics with format git_issues_by_repository{repository="org/repo"} 5.
     // Requires ENABLED_ISSUE_BY_REPOSITORY set to true.
     showIssuesByRepository: true,
-    // Show graphs for issue by label metrics with format hanzogit_issues_by_label{label="bug"} 2.
+    // Show graphs for issue by label metrics with format git_issues_by_label{label="bug"} 2.
     // Requires ENABLED_ISSUE_BY_LABEL set to true.
     showIssuesByLabel: true,
 
@@ -21,31 +21,31 @@
     statMetrics:
       [
         {
-          name: 'hanzogit_organizations',
+          name: 'git_organizations',
           description: 'Organizations',
         },
         {
-          name: 'hanzogit_teams',
+          name: 'git_teams',
           description: 'Teams',
         },
         {
-          name: 'hanzogit_users',
+          name: 'git_users',
           description: 'Users',
         },
         {
-          name: 'hanzogit_repositories',
+          name: 'git_repositories',
           description: 'Repositories',
         },
         {
-          name: 'hanzogit_milestones',
+          name: 'git_milestones',
           description: 'Milestones',
         },
         {
-          name: 'hanzogit_stars',
+          name: 'git_stars',
           description: 'Stars',
         },
         {
-          name: 'hanzogit_releases',
+          name: 'git_releases',
           description: 'Releases',
         },
       ]
@@ -53,17 +53,17 @@
       if c.showIssuesOpenClose then
         [
           {
-            name: 'hanzogit_issues_open',
+            name: 'git_issues_open',
             description: 'Issues opened',
           },
           {
-            name: 'hanzogit_issues_closed',
+            name: 'git_issues_closed',
             description: 'Issues closed',
           },
         ] else
         [
           {
-            name: 'hanzogit_issues',
+            name: 'git_issues',
             description: 'Issues',
           },
         ],
