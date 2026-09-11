@@ -40,7 +40,7 @@ func TestParsePatch_skipTo(t *testing.T) {
 --- "a/A \\ B"
 +++ "b/A \\ B"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -51,7 +51,7 @@ diff --git "\\a/README.md" "\\b/README.md"
 --- "\\a/README.md"
 +++ "\\b/README.md"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -71,7 +71,7 @@ diff --git "\\a/README.md" "\\b/README.md"
 --- "a/A \\ B"
 +++ "b/A \\ B"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -90,7 +90,7 @@ diff --git "\\a/README.md" "\\b/README.md"
 --- "\\a/README.md"
 +++ "\\b/README.md"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -101,7 +101,7 @@ diff --git "a/A \\ B" "b/A \\ B"
 --- "a/A \\ B"
 +++ "b/A \\ B"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -120,7 +120,7 @@ diff --git "a/A \\ B" "b/A \\ B"
 --- "a/A \\ B"
 +++ "b/A \\ B"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -131,7 +131,7 @@ diff --git "a/A \\ B" "b/A \\ B"
 --- "a/A \\ B"
 +++ "b/A \\ B"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -142,7 +142,7 @@ diff --git "\\a/README.md" "\\b/README.md"
 --- "\\a/README.md"
 +++ "\\b/README.md"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -205,7 +205,7 @@ func TestParsePatch_singlefile(t *testing.T) {
 --- "\\a/README.md"
 +++ "\\b/README.md"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -224,7 +224,7 @@ func TestParsePatch_singlefile(t *testing.T) {
 --- "a/A \\ B"
 +++ "b/A \\ B"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -485,7 +485,7 @@ index 0000000..6bb8f39
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -501,7 +501,7 @@ index 0000000..6bb8f39
 --- "a/A \\ B"
 +++ "b/A \\ B"
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -517,7 +517,7 @@ index 0000000..6bb8f39
 --- "a/A \\ B"
 +++ b/A/B
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release
@@ -533,7 +533,7 @@ index 0000000..6bb8f39
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,6 @@
- # gitea-github-migrator
+ # migrator
 +
 + Build Status
 - Latest Release

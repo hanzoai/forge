@@ -194,7 +194,7 @@ func TestWebhookDeliverHookTask(t *testing.T) {
   "msgtype": "",
   "format": "org.matrix.custom.html",
   "formatted_body": "[<a href=\"http://localhost:3000/test/repo\">test/repo</a>] user1 pushed 2 commits to <a href=\"http://localhost:3000/test/repo/src/branch/test\">test</a>:<br><a href=\"http://localhost:3000/test/repo/commit/2020558fe2e34debb818a514715839cabd25e778\">2020558</a>: commit message - user1<br><a href=\"http://localhost:3000/test/repo/commit/2020558fe2e34debb818a514715839cabd25e778\">2020558</a>: commit message - user1",
-  "io.gitea.commits": [
+  "ai.hanzo.commits": [
     {
       "id": "2020558fe2e34debb818a514715839cabd25e778",
       "message": "commit message",

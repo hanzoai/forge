@@ -162,17 +162,17 @@ SWAGGER_EXCLUDE := github.com/hanzoai/git/sdk
 OPENAPI3_SPEC := templates/swagger/v1_openapi3_json.tmpl
 
 TEST_MYSQL_HOST ?= mysql:3306
-TEST_MYSQL_DBNAME ?= testgitea
+TEST_MYSQL_DBNAME ?= testforge
 TEST_MYSQL_USERNAME ?= root
 TEST_MYSQL_PASSWORD ?=
 TEST_PGSQL_HOST ?= pgsql:5432
-TEST_PGSQL_DBNAME ?= testgitea
+TEST_PGSQL_DBNAME ?= testforge
 TEST_PGSQL_USERNAME ?= postgres
 TEST_PGSQL_PASSWORD ?= postgres
 TEST_PGSQL_SCHEMA ?= gtestschema
 TEST_MINIO_ENDPOINT ?= minio:9000
 TEST_MSSQL_HOST ?= mssql:1433
-TEST_MSSQL_DBNAME ?= testgitea
+TEST_MSSQL_DBNAME ?= testforge
 TEST_MSSQL_USERNAME ?= sa
 TEST_MSSQL_PASSWORD ?= MwantsaSecurePassword1
 

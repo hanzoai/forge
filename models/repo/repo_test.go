@@ -58,7 +58,7 @@ func TestRepoAPIURL(t *testing.T) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
 	repo := unittest.AssertExistsAndLoadBean(t, &Repository{ID: 10})
 
-	assert.Equal(t, "https://try.gitea.io/v1/repos/user12/repo10", repo.APIURL())
+	assert.Equal(t, "https://git.example.com/v1/repos/user12/repo10", repo.APIURL())
 }
 
 func TestWatchRepo(t *testing.T) {
@@ -144,21 +144,21 @@ func TestGetRepositoryByURL(t *testing.T) {
 	}
 
 	t.Run("ValidHttpURL", func(t *testing.T) {
-		testRepo2(t, "https://try.gitea.io/user2/repo2")
-		testRepo2(t, "https://try.gitea.io/user2/repo2.git")
+		testRepo2(t, "https://git.example.com/user2/repo2")
+		testRepo2(t, "https://git.example.com/user2/repo2.git")
 	})
 
 	t.Run("ValidGitSshURL", func(t *testing.T) {
-		testRepo2(t, "git+ssh://sshuser@try.gitea.io/user2/repo2")
-		testRepo2(t, "git+ssh://sshuser@try.gitea.io/user2/repo2.git")
+		testRepo2(t, "git+ssh://sshuser@git.example.com/user2/repo2")
+		testRepo2(t, "git+ssh://sshuser@git.example.com/user2/repo2.git")
 
-		testRepo2(t, "git+ssh://try.gitea.io/user2/repo2")
-		testRepo2(t, "git+ssh://try.gitea.io/user2/repo2.git")
+		testRepo2(t, "git+ssh://git.example.com/user2/repo2")
+		testRepo2(t, "git+ssh://git.example.com/user2/repo2.git")
 	})
 
 	t.Run("ValidImplicitSshURL", func(t *testing.T) {
-		testRepo2(t, "sshuser@try.gitea.io:user2/repo2")
-		testRepo2(t, "sshuser@try.gitea.io:user2/repo2.git")
+		testRepo2(t, "sshuser@git.example.com:user2/repo2")
+		testRepo2(t, "sshuser@git.example.com:user2/repo2.git")
 
 		testRelax := func(t *testing.T, url string) {
 			repo, err := GetRepositoryByURLRelax(t.Context(), url)
@@ -167,8 +167,8 @@ func TestGetRepositoryByURL(t *testing.T) {
 			assert.Equal(t, int64(2), repo.OwnerID)
 		}
 		// TODO: it doesn't seem to be common git ssh URL, should we really support this?
-		testRelax(t, "try.gitea.io:user2/repo2")
-		testRelax(t, "try.gitea.io:user2/repo2.git")
+		testRelax(t, "git.example.com:user2/repo2")
+		testRelax(t, "git.example.com:user2/repo2.git")
 	})
 }
 

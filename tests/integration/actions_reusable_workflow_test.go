@@ -137,7 +137,7 @@ jobs:
     with:
       str_input: 'from_caller_job2'
       num_input: ${{ 2.3e2 }}
-      bool_input: ${{ gitea.event_name == 'push' }}
+      bool_input: ${{ github.event_name == 'push' }}
       parent_var: ${{ vars.myvar }}
       needs_out: ${{ needs.caller_job1.outputs.prepared }}
     secrets:

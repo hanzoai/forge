@@ -72,7 +72,7 @@ func TestTelegramPayload(t *testing.T) {
 		pl, err := tc.Issue(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Issue opened: <a href="http://localhost:3000/test/repo/issues/2" rel="nofollow">#2 crash</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Issue opened: <a href="http://localhost:3000/test/repo/issues/2" rel="nofollow">#2 crash</a> by <a href="https://git.example.com/user1" rel="nofollow">user1</a>
 
 issue body`, pl.RichMessage.HTML)
 
@@ -80,7 +80,7 @@ issue body`, pl.RichMessage.HTML)
 		pl, err = tc.Issue(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Issue closed: <a href="http://localhost:3000/test/repo/issues/2" rel="nofollow">#2 crash</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Issue closed: <a href="http://localhost:3000/test/repo/issues/2" rel="nofollow">#2 crash</a> by <a href="https://git.example.com/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
 	})
 
 	t.Run("IssueComment", func(t *testing.T) {
@@ -89,7 +89,7 @@ issue body`, pl.RichMessage.HTML)
 		pl, err := tc.IssueComment(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] New comment on issue <a href="http://localhost:3000/test/repo/issues/2" rel="nofollow">#2 crash</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] New comment on issue <a href="http://localhost:3000/test/repo/issues/2" rel="nofollow">#2 crash</a> by <a href="https://git.example.com/user1" rel="nofollow">user1</a>
 more info needed`, pl.RichMessage.HTML)
 	})
 
@@ -99,7 +99,7 @@ more info needed`, pl.RichMessage.HTML)
 		pl, err := tc.PullRequest(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Pull request opened: <a href="http://localhost:3000/test/repo/pulls/12" rel="nofollow">#12 Fix bug</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Pull request opened: <a href="http://localhost:3000/test/repo/pulls/12" rel="nofollow">#12 Fix bug</a> by <a href="https://git.example.com/user1" rel="nofollow">user1</a>
 fixes bug #2`, pl.RichMessage.HTML)
 	})
 
@@ -109,7 +109,7 @@ fixes bug #2`, pl.RichMessage.HTML)
 		pl, err := tc.IssueComment(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] New comment on pull request <a href="http://localhost:3000/test/repo/pulls/12" rel="nofollow">#12 Fix bug</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] New comment on pull request <a href="http://localhost:3000/test/repo/pulls/12" rel="nofollow">#12 Fix bug</a> by <a href="https://git.example.com/user1" rel="nofollow">user1</a>
 changes requested`, pl.RichMessage.HTML)
 	})
 
@@ -139,7 +139,7 @@ good job`, pl.RichMessage.HTML)
 		pl, err := tc.Package(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `Package created: <a href="http://localhost:3000/user1/-/packages/container/ForgeContainer/latest" rel="nofollow">ForgeContainer:latest</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
+		assert.Equal(t, `Package created: <a href="http://localhost:3000/user1/-/packages/container/ForgeContainer/latest" rel="nofollow">ForgeContainer:latest</a> by <a href="https://git.example.com/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
 	})
 
 	t.Run("Wiki", func(t *testing.T) {
@@ -149,19 +149,19 @@ good job`, pl.RichMessage.HTML)
 		pl, err := tc.Wiki(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] New wiki page &#39;<a href="http://localhost:3000/test/repo/wiki/index" rel="nofollow">index</a>&#39; (Wiki change comment) by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] New wiki page &#39;<a href="http://localhost:3000/test/repo/wiki/index" rel="nofollow">index</a>&#39; (Wiki change comment) by <a href="https://git.example.com/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
 
 		p.Action = api.HookWikiEdited
 		pl, err = tc.Wiki(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Wiki page &#39;<a href="http://localhost:3000/test/repo/wiki/index" rel="nofollow">index</a>&#39; edited (Wiki change comment) by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Wiki page &#39;<a href="http://localhost:3000/test/repo/wiki/index" rel="nofollow">index</a>&#39; edited (Wiki change comment) by <a href="https://git.example.com/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
 
 		p.Action = api.HookWikiDeleted
 		pl, err = tc.Wiki(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Wiki page &#39;<a href="http://localhost:3000/test/repo/wiki/index" rel="nofollow">index</a>&#39; deleted by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Wiki page &#39;<a href="http://localhost:3000/test/repo/wiki/index" rel="nofollow">index</a>&#39; deleted by <a href="https://git.example.com/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
 	})
 
 	t.Run("Release", func(t *testing.T) {
@@ -170,7 +170,7 @@ good job`, pl.RichMessage.HTML)
 		pl, err := tc.Release(p)
 		require.NoError(t, err)
 
-		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Release created: <a href="http://localhost:3000/test/repo/releases/tag/v1.0" rel="nofollow">v1.0</a> by <a href="https://try.gitea.io/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
+		assert.Equal(t, `[<a href="http://localhost:3000/test/repo" rel="nofollow">test/repo</a>] Release created: <a href="http://localhost:3000/test/repo/releases/tag/v1.0" rel="nofollow">v1.0</a> by <a href="https://git.example.com/user1" rel="nofollow">user1</a>`, pl.RichMessage.HTML)
 	})
 }
 

@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-"$GIT_ROOT/gitea" hook --config="$GIT_ROOT/$GIT_CONF" pre-receive

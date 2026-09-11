@@ -1780,7 +1780,7 @@ func TestActionRunNameWithContextVariables(t *testing.T) {
 					ContentReader: strings.NewReader(`name: test
 on:
   [create,delete]
-run-name: ${{ gitea.actor }} is running this workflow
+run-name: ${{ github.actor }} is running this workflow
 jobs:
   test:
     runs-on: ubuntu-latest

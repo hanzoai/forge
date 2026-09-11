@@ -60,7 +60,7 @@ version: !ruby/object:Gem::Version
   version: %s
 platform: ruby
 authors:
-- Gitea
+- Forge
 autorequire:
 bindir: bin
 cert_chain: []
@@ -101,13 +101,13 @@ dependencies:
       - !ruby/object:Gem::Version
         version: '5.2'
 description: RubyGems package test
-email: rubygems@gitea.io
+email: rubygems@example.com
 executables: []
 extensions: []
 extra_rdoc_files: []
 files:
-- lib/gitea.rb
-homepage: https://gitea.io/
+- lib/forge.rb
+homepage: https://example.com/
 licenses:
 - MIT
 metadata: {}
@@ -130,15 +130,15 @@ rubyforge_project:
 rubygems_version: 2.7.6.2
 signing_key:
 specification_version: 4
-summary: Gitea package
+summary: Forge package
 test_files: []
 `, name, version)
 
 	metadataGz := makeArchiveFileGz([]byte(metadataContent))
 	dataTarGz := makeArchiveFileGz(makeArchiveFileTar([]*tarFile{
 		{
-			Name: "lib/gitea.rb",
-			Data: []byte("class Gitea\nend"),
+			Name: "lib/forge.rb",
+			Data: []byte("class Forge\nend"),
 		},
 	}))
 
@@ -173,12 +173,12 @@ func TestPackageRubyGems(t *testing.T) {
 
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
 
-	testGemName := "gitea"
+	testGemName := "forge"
 	testGemVersion := "1.0.5"
 	testGemContent := makeRubyGem(testGemName, testGemVersion)
 	testGemContentChecksum := fmt.Sprintf("%x", sha256.Sum256(testGemContent))
 
-	testAnotherGemName := "gitea-another"
+	testAnotherGemName := "forge-another"
 	testAnotherGemVersion := "0.99"
 
 	root := fmt.Sprintf("/v1/packages/%s/rubygems", user.Name)
@@ -295,8 +295,8 @@ gAAAAP//MS06Gw==`)
 		req := NewRequest(t, "GET", root+"/versions").AddBasicAuth(user.Name)
 		resp := MakeRequest(t, req, http.StatusOK)
 		assert.Equal(t, `---
-gitea 1.0.5 08843c2dd0ea19910e6b056b98e38f1c
-gitea-another 0.99 8b639e4048d282941485368ec42609be
+forge 1.0.5 08843c2dd0ea19910e6b056b98e38f1c
+forge-another 0.99 8b639e4048d282941485368ec42609be
 `, resp.Body.String())
 	})
 

@@ -62,7 +62,7 @@ func TestAPIRepoVariables(t *testing.T) {
 				ExpectedStatus: http.StatusBadRequest,
 			},
 			{
-				Name:           "gitea_var",
+				Name:           "forge_var",
 				ExpectedStatus: http.StatusBadRequest,
 			},
 		}

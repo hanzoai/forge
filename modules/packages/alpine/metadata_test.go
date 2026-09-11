@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	packageName        = "gitea"
+	packageName        = "forge"
 	packageVersion     = "1.0.1"
 	packageDescription = "Package Description"
-	packageProjectURL  = "https://gitea.io"
-	packageMaintainer  = "KN4CK3R <dummy@gitea.io>"
+	packageProjectURL  = "https://example.com"
+	packageMaintainer  = "KN4CK3R <dummy@example.com>"
 )
 
 func createPKGINFOContent(name, version string) []byte {
@@ -28,7 +28,7 @@ pkgdesc = ` + packageDescription + `
 url = ` + packageProjectURL + `
 # comment
 builddate = 1678834800
-packager = Gitea <pack@ag.er>
+packager = Forge <pack@ag.er>
 size = 123456
 arch = aarch64
 origin = origin
@@ -37,9 +37,9 @@ maintainer = ` + packageMaintainer + `
 license = MIT
 depend = common
 install_if = value
-depend = gitea
+depend = forge
 provides = common
-provides = gitea`)
+provides = forge`)
 }
 
 func TestParsePackage(t *testing.T) {
@@ -95,7 +95,7 @@ func TestParsePackage(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, p)
 
-		assert.Equal(t, "Q1SRYURM5+uQDqfHSwTnNIOIuuDVQ=", p.FileMetadata.Checksum)
+		assert.Equal(t, "Q1gC6+AwS0Y7ueIMvLHfH2BIqTVcM=", p.FileMetadata.Checksum)
 	})
 }
 
@@ -130,14 +130,14 @@ func TestParsePackageInfo(t *testing.T) {
 		assert.Equal(t, packageProjectURL, p.VersionMetadata.ProjectURL)
 		assert.Equal(t, "MIT", p.VersionMetadata.License)
 		assert.Empty(t, p.FileMetadata.Checksum)
-		assert.Equal(t, "Gitea <pack@ag.er>", p.FileMetadata.Packager)
+		assert.Equal(t, "Forge <pack@ag.er>", p.FileMetadata.Packager)
 		assert.EqualValues(t, 1678834800, p.FileMetadata.BuildDate)
 		assert.EqualValues(t, 123456, p.FileMetadata.Size)
 		assert.Equal(t, "aarch64", p.FileMetadata.Architecture)
 		assert.Equal(t, "origin", p.FileMetadata.Origin)
 		assert.Equal(t, "1111e709613fbc979651b09ac2bc27c6591a9999", p.FileMetadata.CommitHash)
 		assert.Equal(t, "value", p.FileMetadata.InstallIf)
-		assert.ElementsMatch(t, []string{"common", "gitea"}, p.FileMetadata.Provides)
-		assert.ElementsMatch(t, []string{"common", "gitea"}, p.FileMetadata.Dependencies)
+		assert.ElementsMatch(t, []string{"common", "forge"}, p.FileMetadata.Provides)
+		assert.ElementsMatch(t, []string{"common", "forge"}, p.FileMetadata.Dependencies)
 	})
 }

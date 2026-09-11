@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-"$GIT_ROOT/gitea" hook --config="$GIT_ROOT/$GIT_CONF" update $1 $2 $3

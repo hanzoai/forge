@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+"$GIT_ROOT/gitd" hook --config="$GIT_ROOT/$GIT_CONF" post-receive

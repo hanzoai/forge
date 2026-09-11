@@ -46,7 +46,7 @@ type MockServerOptions struct {
 // default run (no token) works offline.
 //
 //	token := os.Getenv("GIT_TOKEN")
-//	mock := NewMockWebServer(t, "https://gitea.com", fixtureDir, token != "")
+//	mock := NewMockWebServer(t, "https://api.github.com", fixtureDir, token != "")
 func NewMockWebServer(t *testing.T, liveServerBaseURL, testDataDir string, liveMode bool, opts ...MockServerOptions) *httptest.Server {
 	t.Helper()
 

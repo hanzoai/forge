@@ -72,7 +72,7 @@ on:
     paths:
       - '.hanzo/workflows/concurrent-workflow-2.yml'
 concurrency:
-  group: workflow-${{ gitea.ref_name }}-${{ vars.myvar }}-${{ gitea.event.pusher.username }}
+  group: workflow-${{ github.ref_name }}-${{ vars.myvar }}-${{ github.event.pusher.username }}
 jobs:
   wf2-job:
     runs-on: ubuntu-latest
@@ -86,7 +86,7 @@ on:
     paths:
       - '.hanzo/workflows/concurrent-workflow-3.yml'
 concurrency:
-  group: workflow-main-abc${{ 123 }}-${{ gitea.event.pusher.username }}
+  group: workflow-main-abc${{ 123 }}-${{ github.event.pusher.username }}
 jobs:
   wf3-job:
     runs-on: ubuntu-latest
@@ -178,7 +178,7 @@ on:
   push:
     paths:
       - '.hanzo/workflows/concurrent-workflow-2.yml'
-concurrency: workflow-${{ gitea.ref_name }}-${{ vars.myvar }}-${{ gitea.event.pusher.username }}
+concurrency: workflow-${{ github.ref_name }}-${{ vars.myvar }}-${{ github.event.pusher.username }}
 jobs:
   wf2-job:
     runs-on: ubuntu-latest
@@ -191,7 +191,7 @@ on:
   push:
     paths:
       - '.hanzo/workflows/concurrent-workflow-3.yml'
-concurrency: workflow-main-abc${{ 123 }}-${{ gitea.event.pusher.username }}
+concurrency: workflow-main-abc${{ 123 }}-${{ github.event.pusher.username }}
 jobs:
   wf3-job:
     runs-on: ubuntu-latest
@@ -383,7 +383,7 @@ func TestPullRequestWorkflowConcurrency(t *testing.T) {
 on: pull_request
 concurrency:
   group: pull-request-test
-  cancel-in-progress: ${{ !startsWith(gitea.head_ref, 'do-not-cancel/') }}
+  cancel-in-progress: ${{ !startsWith(github.head_ref, 'do-not-cancel/') }}
 jobs:
   wf1-job:
     runs-on: ubuntu-latest
@@ -1144,7 +1144,7 @@ on:
     - cron:  '@every 1m'
 concurrency:
   group: schedule-concurrency
-  cancel-in-progress: ${{ gitea.event_name == 'push' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 jobs:
   job:
     runs-on: ubuntu-latest

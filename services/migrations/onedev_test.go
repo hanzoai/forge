@@ -26,15 +26,15 @@ func TestOneDevDownloadRepo(t *testing.T) {
 
 	u, _ := url.Parse(mockServer.URL)
 	ctx := t.Context()
-	downloader := NewOneDevDownloader(ctx, u, "", "", "go-gitea-test_repo")
+	downloader := NewOneDevDownloader(ctx, u, "", "", "example-test_repo")
 	repo, err := downloader.GetRepoInfo(ctx)
 	assert.NoError(t, err)
 	assertRepositoryEqual(t, &base.Repository{
-		Name:        "go-gitea-test_repo",
+		Name:        "example-test_repo",
 		Owner:       "",
-		Description: "Test repository for testing migration from OneDev to gitea",
-		CloneURL:    mockServer.URL + "/go-gitea-test_repo",
-		OriginalURL: mockServer.URL + "/go-gitea-test_repo",
+		Description: "Test repository for testing migration from OneDev to example",
+		CloneURL:    mockServer.URL + "/example-test_repo",
+		OriginalURL: mockServer.URL + "/example-test_repo",
 	}, repo)
 
 	milestones, err := downloader.GetMilestones(ctx)
@@ -129,12 +129,12 @@ func TestOneDevDownloadRepo(t *testing.T) {
 			Head: base.PullRequestBranch{
 				Ref:      "branch-for-a-pull",
 				SHA:      "343deffe3526b9bc84e873743ff7f6e6d8b827c0",
-				RepoName: "go-gitea-test_repo",
+				RepoName: "example-test_repo",
 			},
 			Base: base.PullRequestBranch{
 				Ref:      "master",
 				SHA:      "f32b0a9dfd09a60f616f29158f772cedd89942d2",
-				RepoName: "go-gitea-test_repo",
+				RepoName: "example-test_repo",
 			},
 			ForeignIndex: 186,
 			Context:      onedevIssueContext{IsPullRequest: true},

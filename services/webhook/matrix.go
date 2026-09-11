@@ -89,7 +89,7 @@ type MatrixPayload struct {
 	MsgType       string               `json:"msgtype"`
 	Format        string               `json:"format"`
 	FormattedBody string               `json:"formatted_body"`
-	Commits       []*api.PayloadCommit `json:"io.gitea.commits,omitempty"`
+	Commits       []*api.PayloadCommit `json:"ai.hanzo.commits,omitempty"`
 }
 
 type matrixConvertor struct {

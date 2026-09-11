@@ -47,12 +47,12 @@ version:
 
 func TestParseMetadataFile(t *testing.T) {
 	content := test.CompressGzip(`--- !ruby/object:Gem::Specification
-name: gitea
+name: forge
 version: !ruby/object:Gem::Version
   version: 1.0.5
 platform: ruby
 authors:
-- Gitea
+- Forge
 autorequire:
 bindir: bin
 cert_chain: []
@@ -93,13 +93,13 @@ dependencies:
       - !ruby/object:Gem::Version
         version: '5.2'
 description: RubyGems package test
-email: rubygems@gitea.io
+email: rubygems@example.com
 executables: []
 extensions: []
 extra_rdoc_files: []
 files:
-- lib/gitea.rb
-homepage: https://gitea.io/
+- lib/forge.rb
+homepage: https://example.com/
 licenses:
 - MIT
 metadata: {}
@@ -122,20 +122,20 @@ rubyforge_project:
 rubygems_version: 2.7.6.2
 signing_key:
 specification_version: 4
-summary: Gitea package
+summary: Forge package
 test_files: []
 `)
 	rp, err := parseMetadataFile(content)
 	assert.NoError(t, err)
 	assert.NotNil(t, rp)
 
-	assert.Equal(t, "gitea", rp.Name)
+	assert.Equal(t, "forge", rp.Name)
 	assert.Equal(t, "1.0.5", rp.Version)
 	assert.Equal(t, "ruby", rp.Metadata.Platform)
-	assert.Equal(t, "Gitea package", rp.Metadata.Summary)
+	assert.Equal(t, "Forge package", rp.Metadata.Summary)
 	assert.Equal(t, "RubyGems package test", rp.Metadata.Description)
-	assert.Equal(t, []string{"Gitea"}, rp.Metadata.Authors)
-	assert.Equal(t, "https://gitea.io/", rp.Metadata.ProjectURL)
+	assert.Equal(t, []string{"Forge"}, rp.Metadata.Authors)
+	assert.Equal(t, "https://example.com/", rp.Metadata.ProjectURL)
 	assert.Equal(t, []string{"MIT"}, rp.Metadata.Licenses)
 	assert.Empty(t, rp.Metadata.RequiredRubygemsVersion)
 	assert.Len(t, rp.Metadata.RequiredRubyVersion, 1)

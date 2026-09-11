@@ -31,7 +31,7 @@ func TestGitlabDownloadRepo(t *testing.T) {
 	mockServer := unittest.NewMockWebServer(t, "https://gitlab.com", fixtureDir, liveMode)
 
 	ctx := t.Context()
-	downloader, err := NewGitlabDownloader(ctx, mockServer.URL, "gitea/test_repo", token)
+	downloader, err := NewGitlabDownloader(ctx, mockServer.URL, "example/test_repo", token)
 	if err != nil {
 		t.Fatalf("NewGitlabDownloader is nil: %v", err)
 	}
@@ -41,9 +41,9 @@ func TestGitlabDownloadRepo(t *testing.T) {
 	assertRepositoryEqual(t, &base.Repository{
 		Name:          "test_repo",
 		Owner:         "",
-		Description:   "Test repository for testing migration from gitlab to gitea",
-		CloneURL:      mockServer.URL + "/gitea/test_repo.git",
-		OriginalURL:   mockServer.URL + "/gitea/test_repo",
+		Description:   "Test repository for testing migration from gitlab to example",
+		CloneURL:      mockServer.URL + "/example/test_repo.git",
+		OriginalURL:   mockServer.URL + "/example/test_repo",
 		DefaultBranch: "master",
 	}, repo)
 
@@ -268,10 +268,10 @@ func TestGitlabDownloadRepo(t *testing.T) {
 			Created:    time.Date(2025, 11, 25, 9, 21, 42, 628000000, time.UTC),
 			Labels:     []*base.Label{},
 			Reactions:  []*base.Reaction{},
-			PatchURL:   mockServer.URL + "/gitea/test_repo/-/merge_requests/4.patch",
+			PatchURL:   mockServer.URL + "/example/test_repo/-/merge_requests/4.patch",
 			Head: base.PullRequestBranch{
 				Ref:       "test/parsing",
-				CloneURL:  mockServer.URL + "/gitea/test_repo/-/merge_requests/4",
+				CloneURL:  mockServer.URL + "/example/test_repo/-/merge_requests/4",
 				SHA:       "c59c9b451acca9d106cc19d61d87afe3fbbb8b83",
 				RepoName:  "test_repo",
 				OwnerName: "patdyn",
@@ -304,10 +304,10 @@ func TestGitlabDownloadRepo(t *testing.T) {
 				UserName: "oliverpool",
 				Content:  "thumbsup",
 			}},
-			PatchURL: mockServer.URL + "/gitea/test_repo/-/merge_requests/3.patch",
+			PatchURL: mockServer.URL + "/example/test_repo/-/merge_requests/3.patch",
 			Head: base.PullRequestBranch{
 				Ref:       "feat/test",
-				CloneURL:  mockServer.URL + "/gitea/test_repo/-/merge_requests/3",
+				CloneURL:  mockServer.URL + "/example/test_repo/-/merge_requests/3",
 				SHA:       "9f733b96b98a4175276edf6a2e1231489c3bdd23",
 				RepoName:  "test_repo",
 				OwnerName: "oliverpool",

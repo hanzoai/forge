@@ -6,7 +6,7 @@ Content-Type: application/xml; charset=utf-8
     <email-address>hanzo-codebase@smack.email</email-address>
     <id type="integer">43</id>
     <last-name>Test</last-name>
-    <first-name>Gitea</first-name>
-    <username>gitea-test-43</username>
+    <first-name>Example</first-name>
+    <username>example-test-43</username>
   </user>
 </users>

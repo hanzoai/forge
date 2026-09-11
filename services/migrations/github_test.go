@@ -30,7 +30,7 @@ func TestGitHubDownloadRepo(t *testing.T) {
 
 	GithubLimitRateRemaining = 3 // Wait at 3 remaining since we could have 3 CI in //
 	ctx := t.Context()
-	downloader, err := NewGithubDownloaderV3(ctx, mockServer.URL, "", "", token, "go-gitea", "test_repo")
+	downloader, err := NewGithubDownloaderV3(ctx, mockServer.URL, "", "", token, "example", "test_repo")
 	require.NoError(t, err)
 	err = downloader.RefreshRate(ctx)
 	require.NoError(t, err)
@@ -39,17 +39,17 @@ func TestGitHubDownloadRepo(t *testing.T) {
 	assert.NoError(t, err)
 	assertRepositoryEqual(t, &base.Repository{
 		Name:          "test_repo",
-		Owner:         "go-gitea",
-		Description:   "Test repository for testing migration from github to gitea",
-		Website:       "https://gitea.com/test-repo",
-		CloneURL:      "https://github.com/go-gitea/test_repo.git",
-		OriginalURL:   "https://github.com/go-gitea/test_repo",
+		Owner:         "example",
+		Description:   "Test repository for testing migration from github to example",
+		Website:       "https://example.com/test-repo",
+		CloneURL:      "https://github.com/example/test_repo.git",
+		OriginalURL:   "https://github.com/example/test_repo",
 		DefaultBranch: "master",
 	}, repo)
 
 	topics, err := downloader.GetTopics(ctx)
 	assert.NoError(t, err)
-	assert.Contains(t, topics, "gitea")
+	assert.Contains(t, topics, "example")
 
 	milestones, err := downloader.GetMilestones(ctx)
 	assert.NoError(t, err)
@@ -291,7 +291,7 @@ func TestGitHubDownloadRepo(t *testing.T) {
 			Base: base.PullRequestBranch{
 				Ref:       "master",
 				SHA:       "72866af952e98d02a73003501836074b286a78f6",
-				OwnerName: "go-gitea",
+				OwnerName: "example",
 				RepoName:  "test_repo",
 			},
 			Closed:         new(time.Date(2019, 11, 12, 21, 39, 27, 0, time.UTC)),
@@ -328,7 +328,7 @@ func TestGitHubDownloadRepo(t *testing.T) {
 			Base: base.PullRequestBranch{
 				Ref:       "master",
 				SHA:       "f32b0a9dfd09a60f616f29158f772cedd89942d2",
-				OwnerName: "go-gitea",
+				OwnerName: "example",
 				RepoName:  "test_repo",
 			},
 			Merged:         false,
@@ -397,7 +397,7 @@ func TestGitHubDownloadRepo(t *testing.T) {
 					ID:        363017488,
 					Content:   "This is a good pull request.",
 					TreePath:  "README.md",
-					DiffHunk:  "@@ -1,2 +1,4 @@\n # test_repo\n Test repository for testing migration from github to gitea\n+",
+					DiffHunk:  "@@ -1,2 +1,4 @@\n # test_repo\n Test repository for testing migration from github to example\n+",
 					Position:  3,
 					CommitID:  "2be9101c543658591222acbee3eb799edfc3853d",
 					PosterID:  81045,
@@ -462,7 +462,7 @@ func TestGithubMultiToken(t *testing.T) {
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			opts := base.MigrateOptions{CloneAddr: "https://github.com/go-gitea/gitea", AuthToken: tC.token}
+			opts := base.MigrateOptions{CloneAddr: "https://github.com/example/example", AuthToken: tC.token}
 			client, err := factory.New(t.Context(), opts)
 			require.NoError(t, err)
 

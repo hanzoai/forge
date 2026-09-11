@@ -758,7 +758,7 @@ func TestPackageContainer(t *testing.T) {
 		})
 	}
 
-	// https://github.com/go-gitea/gitea/issues/19586
+	// a manifest list may reference a blob the index does not name
 	t.Run("ParallelUpload", func(t *testing.T) {
 		defer tests.PrintCurrentTest(t)()
 
