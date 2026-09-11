@@ -21,7 +21,6 @@
 //	- AuthorizationHeaderToken :
 //	- SudoParam :
 //	- SudoHeader :
-//	- TOTPHeader :
 //
 //	SecurityDefinitions:
 //	BasicAuth:
@@ -51,11 +50,6 @@
 //	     name: Sudo
 //	     in: header
 //	     description: Sudo API request as the user provided as the key. Admin privileges are required.
-//	TOTPHeader:
-//	     type: apiKey
-//	     name: X-GITEA-OTP
-//	     in: header
-//	     description: Must be used in combination with BasicAuth if two-factor authentication is enabled.
 //
 // swagger:meta
 package v1
@@ -954,7 +948,7 @@ func Routes() *web.Router {
 			AllowedOrigins:   setting.CORSConfig.AllowDomain,
 			AllowedMethods:   setting.CORSConfig.Methods,
 			AllowCredentials: setting.CORSConfig.AllowCredentials,
-			AllowedHeaders:   append([]string{"Authorization", "X-Gitea-OTP"}, setting.CORSConfig.Headers...),
+			AllowedHeaders:   append([]string{"Authorization"}, setting.CORSConfig.Headers...),
 			MaxAge:           int(setting.CORSConfig.MaxAge.Seconds()),
 		}))
 	}

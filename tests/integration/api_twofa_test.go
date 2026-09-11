@@ -6,58 +6,14 @@ package integration
 import (
 	"net/http"
 	"testing"
-	"time"
 
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/tests"
 
-	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestAPITwoFactor(t *testing.T) {
-	defer tests.PrepareTestEnv(t)()
-
-	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 16})
-
-	req := NewRequest(t, "GET", "/v1/user").
-		AddBasicAuth(user.Name)
-	MakeRequest(t, req, http.StatusOK)
-
-	otpKey, err := totp.Generate(totp.GenerateOpts{
-		SecretSize:  40,
-		Issuer:      "git-test",
-		AccountName: user.Name,
-	})
-	assert.NoError(t, err)
-
-	tfa := &auth_model.TwoFactor{
-		UID: user.ID,
-	}
-	assert.NoError(t, tfa.SetSecret(otpKey.Secret()))
-
-	assert.NoError(t, auth_model.NewTwoFactor(t.Context(), tfa))
-
-	req = NewRequest(t, "GET", "/v1/user").
-		AddBasicAuth(user.Name)
-	MakeRequest(t, req, http.StatusUnauthorized)
-
-	passcode, err := totp.GenerateCode(otpKey.Secret(), time.Now())
-	assert.NoError(t, err)
-
-	req = NewRequest(t, "GET", "/v1/user").
-		AddBasicAuth(user.Name)
-	req.Header.Set("X-Gitea-OTP", passcode)
-	MakeRequest(t, req, http.StatusOK)
-
-	// the same passcode must not be replayable on the basic-auth surface (RFC 6238 single-use)
-	req = NewRequest(t, "GET", "/v1/user").
-		AddBasicAuth(user.Name)
-	req.Header.Set("X-Gitea-OTP", passcode)
-	MakeRequest(t, req, http.StatusUnauthorized)
-}
 
 func TestBasicAuthWithWebAuthn(t *testing.T) {
 	defer tests.PrepareTestEnv(t)()
