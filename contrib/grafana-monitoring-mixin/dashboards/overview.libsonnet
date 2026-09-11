@@ -303,7 +303,7 @@ local addIssueLabelsOverrides(labels) =
 
     local changesByRepositories =
       changesPanelPrototype
-      .addTarget(prometheus.target(expr='floor(increase(hanzogit_issues_by_repository{%s}[$__interval])) > 0' % [selector], legendFormat='{{ repository }}', intervalFactor=1))
+      .addTarget(prometheus.target(expr='floor(increase(git_issues_by_repository{%s}[$__interval])) > 0' % [selector], legendFormat='{{ repository }}', intervalFactor=1))
       + { id: 210 },  // some unique number, beyond the maximum number of panels in the dashboard,
 
     local changesByRepositoriesTotal =
@@ -336,7 +336,7 @@ local addIssueLabelsOverrides(labels) =
 
     local changesByLabel =
       changesPanelPrototype
-      .addTarget(prometheus.target(expr='floor(increase(hanzogit_issues_by_label{%s}[$__interval])) > 0' % [selector], legendFormat='{{ label }}', intervalFactor=1))
+      .addTarget(prometheus.target(expr='floor(increase(git_issues_by_label{%s}[$__interval])) > 0' % [selector], legendFormat='{{ label }}', intervalFactor=1))
       + addIssueLabelsOverrides($._config.issueLabels)
       + { id: 220 },  // some unique number, beyond the maximum number of panels in the dashboard,
 
@@ -403,7 +403,7 @@ local addIssueLabelsOverrides(labels) =
           name: 'job',
           options: [],
           datasource: '$datasource',
-          query: 'label_values(hanzogit_organizations, job)',
+          query: 'label_values(git_organizations, job)',
           refresh: 1,
           regex: '',
           type: 'query',
@@ -418,7 +418,7 @@ local addIssueLabelsOverrides(labels) =
           name: 'instance',
           options: [],
           datasource: '$datasource',
-          query: 'label_values(hanzogit_organizations{job="$job"}, instance)',
+          query: 'label_values(git_organizations{job="$job"}, instance)',
           refresh: 1,
           regex: '',
           type: 'query',

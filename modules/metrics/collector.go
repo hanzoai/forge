@@ -13,7 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-const namespace = "hanzogit_"
+const namespace = "git_"
 
 // Collector implements the prometheus.Collector interface and
 // exposes the forge metrics for prometheus
