@@ -2,7 +2,7 @@
 {{if .Size}}
 	{{$size = .Size}}
 {{end}}
-{{if eq .HookType "gitea"}}
+{{if eq .HookType "native"}}
 	{{svg "hanzo-hanzo" $size "img"}}
 {{else if eq .HookType "gogs"}}
 	<img alt width="{{$size}}" height="{{$size}}" src="{{AssetUrlPrefix}}/img/gogs.png">

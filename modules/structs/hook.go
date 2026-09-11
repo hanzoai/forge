@@ -20,7 +20,7 @@ type Hook struct {
 	ID int64 `json:"id"`
 	// Optional human-readable name for the webhook
 	Name string `json:"name"`
-	// The type of the webhook (e.g., gitea, slack, discord)
+	// The type of the webhook (e.g., native, slack, discord)
 	Type string `json:"type"`
 	// Branch filter pattern to determine which branches trigger the webhook
 	BranchFilter string `json:"branch_filter"`
@@ -52,7 +52,7 @@ type CreateHookOptionConfig map[string]string
 // CreateHookOption options when create a hook
 type CreateHookOption struct {
 	// required: true
-	// enum: ["dingtalk","discord","gitea","gogs","msteams","slack","telegram","feishu","wechatwork","packagist"]
+	// enum: ["dingtalk","discord","gogs","msteams","native","slack","telegram","feishu","wechatwork","packagist"]
 	// The type of the webhook to create
 	Type string `json:"type" binding:"Required"`
 	// required: true
