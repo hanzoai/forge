@@ -704,7 +704,6 @@
   "repo.migrate.github.description": "Gegevens overzetten van github.com of andere GitHub instanties.",
   "repo.migrate.git.description": "Migreer een repositorie van elke Git service.",
   "repo.migrate.gitlab.description": "Gegevens migreren van gitlab.com of andere GitLab-instanties.",
-  "repo.migrate.gitea.description": "Gegevens overzetten van git.hanzo.ai of andere Forge instanties.",
   "repo.migrate.gogs.description": "Gegevens overzetten van notabug.org of andere Gogs instanties.",
   "repo.migrate.onedev.description": "Gegevens overzetten van code.onedev.io of andere OneDev instanties.",
   "repo.migrate.codebase.description": "Gegevens migreren van codebasehq.com.",

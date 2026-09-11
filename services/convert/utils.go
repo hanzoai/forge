@@ -25,8 +25,6 @@ func ToGitServiceType(value string) structs.GitServiceType {
 	switch strings.ToLower(value) {
 	case "github":
 		return structs.GithubService
-	case "gitea":
-		return structs.GiteaService
 	case "gitlab":
 		return structs.GitlabService
 	case "gogs":

@@ -178,7 +178,7 @@ func TestGitUploadRemapExternalUser(t *testing.T) {
 	ctx := t.Context()
 	repoName := "migrated"
 	uploader := NewGitLocalUploader(ctx, doer, doer.Name, repoName)
-	uploader.gitServiceType = structs.GiteaService
+	uploader.gitServiceType = structs.GithubService
 	// call remapExternalUser
 	uploader.sameApp = false
 
@@ -207,7 +207,7 @@ func TestGitUploadRemapExternalUser(t *testing.T) {
 		ExternalID:    strconv.FormatInt(externalID, 10),
 		UserID:        linkedUser.ID,
 		LoginSourceID: 0,
-		Provider:      structs.GiteaService.Name(),
+		Provider:      structs.GithubService.Name(),
 	}
 	err = user_model.LinkExternalToUser(t.Context(), linkedUser, externalLoginUser)
 	assert.NoError(t, err)

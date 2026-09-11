@@ -47,6 +47,12 @@ function processAssetsSvgFiles(pattern: string, opts: Opts = {}) {
   return glob(pattern).map((path) => processAssetsSvgFile(path, opts));
 }
 
+// Names carried by the upstream icon theme that this product has no rule for.
+const unusedIcons = ['gitea'];
+function unusedIconName(name: string) {
+  return unusedIcons.some((n) => name.toLowerCase().includes(n));
+}
+
 function lowercaseKeys(obj: Record<string, any>) {
   return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key.toLowerCase(), value]));
 }
@@ -55,6 +61,8 @@ async function processMaterialFileIcons() {
   const paths = glob('node_modules/material-icon-theme/icons/*.svg');
   const svgSymbols: Record<string, string> = {};
   for (const path of paths) {
+    const svgName = parse(path).name;
+    if (unusedIconName(svgName)) continue;
     // remove all unnecessary attributes, only keep "viewBox"
     const {data} = optimize(await readFile(path, 'utf8'), {
       plugins: [
@@ -64,7 +72,6 @@ async function processMaterialFileIcons() {
         {name: 'removeAttrs', params: {attrs: 'xml:space', elemSeparator: ','}},
       ],
     });
-    const svgName = parse(path).name;
     // intentionally use single quote here to avoid escaping
     svgSymbols[svgName] = data.replace(/"/g, `'`);
   }
@@ -108,6 +115,14 @@ async function processMaterialFileIcons() {
       }
     }
   }
+  // Drop rules for names the theme carries but we have no use for.
+  for (const section of [iconRules.fileNames, iconRules.folderNames, iconRules.folderNamesExpanded, iconRules.fileExtensions]) {
+    if (!section) continue;
+    for (const key of Object.keys(section)) {
+      if (unusedIconName(key) || unusedIconName(section[key])) delete section[key];
+    }
+  }
+
   const iconRulesPretty = JSON.stringify(iconRules, null, 2);
   writeFileSync(fileURLToPath(new URL(`../options/fileicon/material-icon-rules.json`, import.meta.url)), iconRulesPretty);
 }

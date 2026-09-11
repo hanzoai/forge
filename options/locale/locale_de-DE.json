@@ -1126,7 +1126,6 @@
   "repo.migrate.github.description": "Daten von github.com oder anderen GitHub Instanzen migrieren.",
   "repo.migrate.git.description": "Ein Repository von einem beliebigen Git Service klonen.",
   "repo.migrate.gitlab.description": "Daten von gitlab.com oder anderen GitLab Instanzen migrieren.",
-  "repo.migrate.gitea.description": "Daten von git.hanzo.ai oder anderen Forge Instanzen migrieren.",
   "repo.migrate.gogs.description": "Daten von notabug.org oder anderen Gogs Instanzen migrieren.",
   "repo.migrate.onedev.description": "Daten von code.onedev.io oder anderen OneDev Instanzen migrieren.",
   "repo.migrate.codebase.description": "Daten von codebasehq.com migrieren.",

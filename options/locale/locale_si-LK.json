@@ -671,7 +671,6 @@
   "repo.migrate.migrating_failed_no_addr": "සංක්රමණය අසාර්ථකයි.",
   "repo.migrate.git.description": "ඕනෑම Git සේවාවකින් පමණක් ගබඩාවක් සංක්රමණය කරන්න.",
   "repo.migrate.gitlab.description": "gitlab.com හෝ වෙනත් GitLab අවස්ථා වලින් දත්ත සංක්රමණය කරන්න.",
-  "repo.migrate.gitea.description": "git.hanzo.ai හෝ වෙනත් Forge අවස්ථා වලින් දත්ත සංක්රමණය කරන්න.",
   "repo.migrate.gogs.description": "notabug.org හෝ වෙනත් Gogs අවස්ථා වලින් දත්ත සංක්රමණය කරන්න.",
   "repo.migrate.onedev.description": "code.onedev.io හෝ වෙනත් OnedeV අවස්ථා වලින් දත්ත සංක්රමණය කරන්න.",
   "repo.migrate.gitbucket.description": "GitBucket අවස්ථා වලින් දත්ත සංක්රමණය කරන්න.",

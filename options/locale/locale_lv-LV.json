@@ -892,7 +892,6 @@
   "repo.migrate.github.description": "Migrēt datus no github.com vai citām GitHub instancēm.",
   "repo.migrate.git.description": "Migrēt repozitorija datus no jebkura Git servisa.",
   "repo.migrate.gitlab.description": "Migrēt datus no gitlab.com vai citām GitLab instancēm.",
-  "repo.migrate.gitea.description": "Migrēt datus no git.hanzo.ai vai citām Forge instancēm.",
   "repo.migrate.gogs.description": "Migrēt datus no notabug.org vai citām Gogs instancēm.",
   "repo.migrate.onedev.description": "Migrēt datus no code.onedev.io vai citām OneDev instancēm.",
   "repo.migrate.codebase.description": "Migrēt datus no codebasehq.com.",

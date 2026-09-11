@@ -4,7 +4,6 @@ go 1.26.5
 
 require (
 	codeberg.org/gusted/mcaptcha v0.0.0-20220723083913-4f3072e1d570
-	gitea.dev/sdk v1.2.0
 	github.com/42wim/httpsig v1.2.4
 	github.com/42wim/sshsig v0.0.0-20260317195500-b9f38cf0d432
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.22.0
@@ -39,7 +38,6 @@ require (
 	github.com/go-enry/go-enry/v2 v2.9.6
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.19.1
-	github.com/go-ldap/ldap/v3 v3.4.13
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/go-webauthn/webauthn v0.17.4
 	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f
@@ -50,7 +48,6 @@ require (
 	github.com/google/pprof v0.0.0-20260604005048-7023385849c0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/feeds v1.2.0
-	github.com/gorilla/sessions v1.4.0
 	github.com/hanzoai/act v1.0.0
 	github.com/hanzoai/authz v1.10.29
 	github.com/hanzoai/forge/modules/actions/runner v0.0.0
@@ -79,7 +76,6 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pquerna/otp v1.5.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/quasoft/websspi v1.1.2
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/sassoftware/go-rpmutils v0.4.0
@@ -183,7 +179,6 @@ require (
 )
 
 require (
-	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.12.0 // indirect
@@ -237,13 +232,11 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/davidmz/go-pageant v1.0.2 // indirect
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.2 // indirect
 	github.com/git-lfs/pktline v0.0.0-20230103162542-ca444d533ef1 // indirect
-	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
 	github.com/go-enry/go-oniguruma v1.2.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-openapi/jsonpointer v0.23.1 // indirect
@@ -259,8 +252,6 @@ require (
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/go-tpm v0.9.8 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
-	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hanzoai/builder v0.3.13
 	github.com/hanzoai/orm v0.6.18
 	github.com/hanzoai/xorm v1.4.4
@@ -273,7 +264,6 @@ require (
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/libdns/libdns v1.1.1 // indirect
-	github.com/markbates/going v1.0.3 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/mattn/go-shellwords v1.0.13 // indirect
@@ -283,7 +273,6 @@ require (
 	github.com/minio/minlz v1.1.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/mrjones/oauth v0.0.0-20190623134757-126b35219450 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect

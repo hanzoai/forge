@@ -876,7 +876,6 @@
   "repo.migrate.github.description": "Μεταφορά δεδομένων από το github.com ή άλλους διακομιστές GitHub.",
   "repo.migrate.git.description": "Μεταφορά μόνο του αποθετηρίου από μια οποιαδήποτε υπηρεσία Git.",
   "repo.migrate.gitlab.description": "Μεταφορά δεδομένων από το gitlab.com ή άλλες εγκαταστάσεις GitLab.",
-  "repo.migrate.gitea.description": "Μεταφορά δεδομένων από το git.hanzo.ai ή άλλες εγκαταστάσεις Forge.",
   "repo.migrate.gogs.description": "Μεταφορά δεδομένων από το notabug.org ή άλλες εγκαταστάσεις Gogs.",
   "repo.migrate.onedev.description": "Μεταφορά δεδομένων από το code.onedev.io ή άλλες εγκαταστάσεις OneDev.",
   "repo.migrate.codebase.description": "Μεταφορά δεδομένων από το codebasehq.com.",

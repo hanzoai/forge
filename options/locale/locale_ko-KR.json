@@ -1126,7 +1126,6 @@
   "repo.migrate.github.description": "Github.com 또는 다른 GitHub 인스턴스로부터 데이터를 마이그레이션합니다.",
   "repo.migrate.git.description": "Git 서비스로부터 리포지토리만 마이그레이션합니다.",
   "repo.migrate.gitlab.description": "gitlab.com 또는 다른 GitLab 인스턴스로부터 데이터를 마이그레이션합니다.",
-  "repo.migrate.gitea.description": "git.hanzo.ai 또는 다른 Forge 인스턴스로부터 데이터를 마이그레이션합니다.",
   "repo.migrate.gogs.description": "notabug.org 또는 다른 Gogs 인스턴스로부터 데이터를 마이그레이션합니다.",
   "repo.migrate.onedev.description": "code.onedev.io 또는 다른 OneDev 인스턴스로부터 데이터를 마이그레이션합니다.",
   "repo.migrate.codebase.description": "codebasehq.com으로부터 데이터를 마이그레이션합니다.",

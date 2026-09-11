@@ -25,14 +25,14 @@ import (
 func newDumpRepositoryCommand() *cli.Command {
 	return &cli.Command{
 		Name:        "dump-repo",
-		Usage:       "Dump the repository from git/github/gitea/gitlab",
+		Usage:       "Dump the repository from git/github/gitlab",
 		Description: "This is a command for dumping the repository data.",
 		Action:      runDumpRepository,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "git_service",
 				Value: "",
-				Usage: "Git service, git, github, gitea, gitlab. If clone_addr could be recognized, this could be ignored.",
+				Usage: "Git service, git, github, gitlab. If clone_addr could be recognized, this could be ignored.",
 			},
 			&cli.StringFlag{
 				Name:    "repo_dir",
@@ -43,7 +43,7 @@ func newDumpRepositoryCommand() *cli.Command {
 			&cli.StringFlag{
 				Name:  "clone_addr",
 				Value: "",
-				Usage: "The URL will be clone, currently could be a git/github/gitea/gitlab http/https URL",
+				Usage: "The URL will be clone, currently could be a git/github/gitlab http/https URL",
 			},
 			&cli.StringFlag{
 				Name:  "auth_username",
@@ -111,8 +111,6 @@ func runDumpRepository(ctx context.Context, cmd *cli.Command) error {
 		serviceStr = "github"
 	} else if strings.HasPrefix(strings.ToLower(cloneAddr), "https://gitlab.com/") {
 		serviceStr = "gitlab"
-	} else if strings.HasPrefix(strings.ToLower(cloneAddr), "https://gitea.com/") {
-		serviceStr = "gitea"
 	}
 	if serviceStr == "" {
 		return errors.New("git_service missed or clone_addr cannot be recognized")

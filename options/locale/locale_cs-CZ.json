@@ -964,7 +964,6 @@
   "repo.migrate.github.description": "Migrovat data z github.com nebo jiných GitHub instancí.",
   "repo.migrate.git.description": "Migrovat pouze repozitář z libovolné služby Git.",
   "repo.migrate.gitlab.description": "Migrovat data z gitlab.com nebo jiných GitLab instancí.",
-  "repo.migrate.gitea.description": "Migrovat data z git.hanzo.ai nebo jiných Forge instancí.",
   "repo.migrate.gogs.description": "Migrovat data z notabug.com nebo jiných Gogs instancí.",
   "repo.migrate.onedev.description": "Migrovat data z code.onedev.io nebo jiných OneDev instancí.",
   "repo.migrate.codebase.description": "Migrovat data z codebasehq.com.",
