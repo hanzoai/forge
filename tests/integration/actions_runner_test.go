@@ -14,7 +14,7 @@ import (
 	"time"
 
 	auth_model "github.com/hanzoai/git/models/auth"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/stretchr/testify/assert"

@@ -16,7 +16,7 @@ import (
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/routers/web/repo/actions"
 

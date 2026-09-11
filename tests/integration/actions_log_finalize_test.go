@@ -17,7 +17,7 @@ import (
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
 	actions_module "github.com/hanzoai/git/modules/actions"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/storage"
 
 	"github.com/stretchr/testify/assert"

@@ -18,7 +18,7 @@ import (
 	repo_model "github.com/hanzoai/git/models/repo"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/actions"
-	runner_module "github.com/hanzoai/git/modules/actions/runner"
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/timeutil"
 	"github.com/hanzoai/git/modules/util"

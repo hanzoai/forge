@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unit"
 	"github.com/hanzoai/git/modules/actions/jobparser"
-	"github.com/hanzoai/git/modules/actions/runner"
+	"github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/globallock"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
