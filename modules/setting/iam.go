@@ -31,6 +31,12 @@ var IAM = struct {
 	// operators and for a future audience check; the issuer allowlist is what
 	// fails closed today (see services/auth/iam.go).
 	Audience string `ini:"AUDIENCE"`
+	// LoginSource is the id of the login source accounts are BOUND under: the
+	// platform provisions each forge account with login_source=<this> and
+	// login_name=<IAM subject> (hanzo-inc/cloud forge/member.go). Kept as a string
+	// because older app.ini files carry a name here; a non-numeric value means
+	// "any OAuth2 source" (see services/auth/iam.go boundUser).
+	LoginSource string `ini:"LOGIN_SOURCE"`
 }{}
 
 func loadIAMFrom(rootCfg ConfigProvider) {

@@ -39,13 +39,16 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/hanzoai/authz/edge"
+	"github.com/hanzoai/builder"
 
 	auth_model "github.com/hanzoai/git/models/auth"
+	"github.com/hanzoai/git/models/db"
 	user_model "github.com/hanzoai/git/models/user"
 	"github.com/hanzoai/git/modules/auth/httpauth"
 	"github.com/hanzoai/git/modules/log"
@@ -103,18 +106,13 @@ func iamUser(ctx context.Context, token string) *user_model.User {
 	if claims.Subject == "" {
 		return nil
 	}
-	link, ok, err := user_model.GetExternalLogin(ctx, sourceID, claims.Subject)
+	u, err := subjectUser(ctx, sourceID, claims.Subject)
 	if err != nil {
-		log.Error("GetExternalLogin: %v", err)
+		log.Error("IAM Authorization: resolve subject: %v", err)
 		return nil
 	}
-	if !ok {
-		log.Trace("IAM Authorization: subject is not linked to an account here")
-		return nil
-	}
-	u, err := user_model.GetUserByID(ctx, link.UserID)
-	if err != nil {
-		log.Error("GetUserByID: %v", err)
+	if u == nil {
+		log.Trace("IAM Authorization: subject is not bound to an account here")
 		return nil
 	}
 	// An account that may not sign in may not sign in HERE either. Every other
@@ -128,6 +126,53 @@ func iamUser(ctx context.Context, token string) *user_model.User {
 		return nil
 	}
 	return u
+}
+
+// subjectUser answers the account an IAM subject is bound to, or nil.
+//
+// Two bindings exist and both are exact matches on the immutable subject:
+//
+//   - external_login_user (sourceID, sub) — what browser sign-in USED to write.
+//     The OAuth2 source and LinkAccountToUser are gone from this fork, and
+//     verifier() always reports source 0, so on the live instance this never
+//     matches. Kept so an instance that still has the rows keeps working.
+//   - user.login_source / user.login_name = sub — what the platform writes when
+//     it provisions an account (hanzo-inc/cloud forge/member.go Provision). This
+//     is the binding every current account actually has, and reading only the
+//     first one is why every IAM bearer answered "invalid username, password or
+//     token".
+//
+// Seat accounts are bound as "seat:"+sub and carry ProhibitLogin, so they never
+// match here and, if they did, are refused below. That is deliberate.
+func subjectUser(ctx context.Context, sourceID int64, sub string) (*user_model.User, error) {
+	link, ok, err := user_model.GetExternalLogin(ctx, sourceID, sub)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return user_model.GetUserByID(ctx, link.UserID)
+	}
+	return boundUser(ctx, sub)
+}
+
+// boundUser finds the one individual whose login_name is sub under the configured
+// [iam] LOGIN_SOURCE (or, when that is not numeric, under any OAuth2 login type).
+// More than one match is ambiguous and resolves to nobody.
+func boundUser(ctx context.Context, sub string) (*user_model.User, error) {
+	cond := builder.Eq{"login_name": sub, "type": user_model.UserTypeIndividual}
+	if id, err := strconv.ParseInt(strings.TrimSpace(setting.IAM.LoginSource), 10, 64); err == nil && id > 0 {
+		cond["login_source"] = id
+	} else {
+		cond["login_type"] = auth_model.OAuth2
+	}
+	var users []*user_model.User
+	if err := db.GetEngine(ctx).Where(cond).Limit(2).Find(&users); err != nil {
+		return nil, err
+	}
+	if len(users) != 1 {
+		return nil, nil //nolint:nilnil // unbound or ambiguous
+	}
+	return users[0], nil
 }
 
 // verifier returns the reader for this instance's OIDC login source and that

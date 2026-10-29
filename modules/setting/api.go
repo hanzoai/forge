@@ -13,7 +13,7 @@ import (
 // API settings
 var API = struct {
 	EnableSwagger          bool
-	SwaggerURL             string
+	SwaggerURL             string `ini:"SWAGGER_URL"`
 	MaxResponseItems       int
 	DefaultPagingNum       int
 	DefaultGitTreesPerPage int
@@ -37,6 +37,14 @@ func loadAPIFrom(rootCfg ConfigProvider) {
 	if err != nil {
 		log.Fatal("Invalid ROOT_URL '%s': %s", AppURL, err)
 	}
-	u.Path = path.Join(u.Path, "api", "swagger")
+	// An explicit [api] SWAGGER_URL wins. It used to be overwritten here
+	// unconditionally with ROOT_URL + "/api/swagger" — a path this fork does not
+	// serve (the UI is /swagger and the spec /swagger.v1.json, routers/web/web.go)
+	// and, with ROOT_URL on the legacy git.hanzo.ai host, the wrong host too. Every
+	// API error body links this, so a wrong value sends every caller to a 404.
+	if API.SwaggerURL != "" {
+		return
+	}
+	u.Path = path.Join(u.Path, "swagger.v1.json")
 	API.SwaggerURL = u.String()
 }
