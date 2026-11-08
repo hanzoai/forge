@@ -189,6 +189,8 @@ type PushOptions struct {
 	Mirror         bool
 	Env            []string
 	Timeout        time.Duration
+	// ReceivePack is the command that runs on the receiving side, in place of git receive-pack.
+	ReceivePack string
 }
 
 // Push pushs local commits to given remote branch.
@@ -212,6 +214,9 @@ func Push(ctx context.Context, repoPath string, opts PushOptions) error {
 	// below replace it rather than inherit it.
 	if len(opts.Refspecs) > 0 && opts.Remote != "" && !opts.Mirror {
 		cmd.AddConfig("remote."+opts.Remote+".mirror", "false")
+	}
+	if opts.ReceivePack != "" {
+		cmd.AddOptionFormat("--receive-pack=%s", opts.ReceivePack)
 	}
 	remoteBranchArgs := []string{opts.Remote}
 	if len(opts.Branch) > 0 {
