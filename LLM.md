@@ -228,6 +228,30 @@ CORS allow-list and both swagger specs and read by nothing — identity here is
 IAM's, and basic auth takes a token — so it and the test that asked for a
 response the server could not produce are gone.
 
+## Sync with GitHub, both ways
+
+An estate repo lives at the same `<org>/<name>` here and on GitHub, and a push to
+either side reaches the other. There is no mode to set.
+
+- **Out (forge to GitHub):** a push mirror with `sync_on_commit`. It pushes
+  `refs/heads/*` and `refs/tags/*` without `+`, so a diverged GitHub ref is
+  refused, never overwritten (`services/mirror/mirror_push.go`).
+- **In, pull mirror:** the GitHub org webhook reaches `/v1/sync`
+  (`routers/web/misc/sync.go`, HMAC under `[mirror] SYNC_SECRET`) and queues a pull.
+- **In, regular repo:** with no pull mirror row, the same event finds the push
+  mirror whose address is `github.com/<owner>/<name>` (any scheme, credentials,
+  `.git`, case) and queues `InboundMirrorType`. `SyncInboundMirror`
+  (`services/mirror/mirror_inbound.go`) fetches that remote into `refs/upstream/*`
+  (forced; the namespace is ours, pruned each time) and moves each branch and tag
+  by compare-and-swap: absent is created, an ancestor of the upstream tip is
+  advanced, equal or ahead is left. A diverged ref is left alone and raises a
+  repository notice. A ref upstream lacks is never deleted, and nothing is forced.
+  What moved is announced as a push (`announce`, shared with the pull mirror), which
+  starts Actions and webhooks and fires the push mirror back as a no-op for the same
+  sha; GitHub emits no event for an unchanged ref, so there is no loop.
+- One lock per repo (`getRepoMirrorLockKey`) serializes pull, inbound and push out.
+- Not carried in: LFS objects and wikis.
+
 ## Image / release lane
 
 - Published as **`ghcr.io/hanzoai/git`** — v1-only, semver-pinned, never `:latest`.

@@ -5,6 +5,7 @@ package mirror
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/process"
 	"github.com/hanzoai/git/modules/proxy"
+	"github.com/hanzoai/git/modules/queue"
 	repo_module "github.com/hanzoai/git/modules/repository"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/timeutil"
@@ -106,23 +108,33 @@ func checkRecoverableSyncError(stderrMessage string) bool {
 	}
 }
 
-// runSync returns true if sync finished without error.
-func runSync(ctx context.Context, m *repo_model.Mirror) ([]*repo_module.SyncResult, bool) {
-	log.Trace("SyncMirrors [repo: %-v]: running git remote update...", m.Repo)
-
-	remoteURL, remoteErr := gitrepo.GitRemoteGetURL(ctx, m.Repo, m.GetRemoteName())
+// fetchableRemote returns the address of the named remote of repo, or false
+// when it cannot be read or may no longer be fetched from.
+func fetchableRemote(ctx context.Context, repo *repo_model.Repository, remoteName string) (*giturl.GitURL, bool) {
+	remoteURL, remoteErr := gitrepo.GitRemoteGetURL(ctx, repo, remoteName)
 	if remoteErr != nil {
-		log.Error("SyncMirrors [repo: %-v]: GetRemoteURL Error %v", m.Repo, remoteErr)
+		log.Error("SyncMirrors [repo: %-v]: GetRemoteURL Error %v", repo, remoteErr)
 		return nil, false
 	}
 	// re-validate on every sync: the host may now resolve to an internal IP (rebinding) or the
 	// allow/block list may have changed. ssh/file are skipped (not an HTTP SSRF vector).
 	switch remoteURL.URL.Scheme {
 	case "http", "https", "git":
-		if allowErr := migrations.IsMigrateURLAllowed(remoteURL.String(), m.Repo.MustOwner(ctx)); allowErr != nil {
-			log.Error("SyncMirrors [repo: %-v]: remote URL is not allowed: %v", m.Repo, allowErr)
+		if allowErr := migrations.IsMigrateURLAllowed(remoteURL.String(), repo.MustOwner(ctx)); allowErr != nil {
+			log.Error("SyncMirrors [repo: %-v]: remote URL is not allowed: %v", repo, allowErr)
 			return nil, false
 		}
+	}
+	return remoteURL, true
+}
+
+// runSync returns true if sync finished without error.
+func runSync(ctx context.Context, m *repo_model.Mirror) ([]*repo_module.SyncResult, bool) {
+	log.Trace("SyncMirrors [repo: %-v]: running git remote update...", m.Repo)
+
+	remoteURL, ok := fetchableRemote(ctx, m.Repo, m.GetRemoteName())
+	if !ok {
+		return nil, false
 	}
 	envs := proxy.EnvWithProxy(remoteURL.URL)
 	timeout := time.Duration(setting.Git.Timeout.Mirror) * time.Second
@@ -192,24 +204,8 @@ func runSync(ctx context.Context, m *repo_model.Mirror) ([]*repo_module.SyncResu
 		}
 	}
 
-	log.Trace("SyncMirrors [repo: %-v]: syncing branches...", m.Repo)
-	_, results, err := repo_module.SyncRepoBranchesWithRepo(ctx, m.Repo, gitRepo, 0)
-	if err != nil {
-		log.Error("SyncMirrors [repo: %-v]: failed to synchronize branches: %v", m.Repo, err)
-	}
-
-	log.Trace("SyncMirrors [repo: %-v]: syncing releases with tags...", m.Repo)
-	tagResults, err := repo_module.SyncReleasesWithTags(ctx, m.Repo, gitRepo)
-	if err != nil {
-		log.Error("SyncMirrors [repo: %-v]: failed to synchronize tags to releases: %v", m.Repo, err)
-	}
-	results = append(results, tagResults...)
+	results := reconcile(ctx, m.Repo, gitRepo)
 	gitRepo.Close()
-
-	log.Trace("SyncMirrors [repo: %-v]: updating size of repository", m.Repo)
-	if err := repo_module.UpdateRepoSize(ctx, m.Repo); err != nil {
-		log.Error("SyncMirrors [repo: %-v]: failed to update size for mirror repository: %v", m.Repo.FullName(), err)
-	}
 
 	cmdRemoteUpdatePrune := func() *gitcmd.Command {
 		// Never follow HTTP redirects, see cmdFetch above.
@@ -261,22 +257,53 @@ func runSync(ctx context.Context, m *repo_model.Mirror) ([]*repo_module.SyncResu
 	}
 
 	log.Trace("SyncMirrors [repo: %-v]: invalidating mirror branch caches...", m.Repo)
-	branches, _, err := gitrepo.GetBranchesByPath(ctx, m.Repo, 0, 0)
-	if err != nil {
+	if err := dropBranchCaches(ctx, m.Repo); err != nil {
 		log.Error("SyncMirrors [repo: %-v]: failed to GetBranches: %v", m.Repo, err)
 		return nil, false
-	}
-
-	for _, branch := range branches {
-		cache.Remove(m.Repo.GetCommitsCountCacheKey(branch, true))
 	}
 
 	m.UpdatedUnix = timeutil.TimeStampNow()
 	return results, true
 }
 
-func getRepoPullMirrorLockKey(repoID int64) string {
-	return fmt.Sprintf("repo_pull_mirror_%d", repoID)
+// reconcile brings the branch table, the releases and the size of repo in line
+// with the refs on disk, and returns what changed.
+func reconcile(ctx context.Context, repo *repo_model.Repository, gitRepo *git.Repository) []*repo_module.SyncResult {
+	log.Trace("SyncMirrors [repo: %-v]: syncing branches...", repo)
+	_, results, err := repo_module.SyncRepoBranchesWithRepo(ctx, repo, gitRepo, 0)
+	if err != nil {
+		log.Error("SyncMirrors [repo: %-v]: failed to synchronize branches: %v", repo, err)
+	}
+
+	log.Trace("SyncMirrors [repo: %-v]: syncing releases with tags...", repo)
+	tagResults, err := repo_module.SyncReleasesWithTags(ctx, repo, gitRepo)
+	if err != nil {
+		log.Error("SyncMirrors [repo: %-v]: failed to synchronize tags to releases: %v", repo, err)
+	}
+
+	log.Trace("SyncMirrors [repo: %-v]: updating size of repository", repo)
+	if err := repo_module.UpdateRepoSize(ctx, repo); err != nil {
+		log.Error("SyncMirrors [repo: %-v]: failed to update size for mirror repository: %v", repo.FullName(), err)
+	}
+	return append(results, tagResults...)
+}
+
+// dropBranchCaches forgets the cached commit counts of every branch of repo.
+func dropBranchCaches(ctx context.Context, repo *repo_model.Repository) error {
+	branches, _, err := gitrepo.GetBranchesByPath(ctx, repo, 0, 0)
+	if err != nil {
+		return err
+	}
+	for _, branch := range branches {
+		cache.Remove(repo.GetCommitsCountCacheKey(branch, true))
+	}
+	return nil
+}
+
+// getRepoMirrorLockKey serializes everything that moves the refs of one
+// repository: a pull, an inbound fast-forward and a push out.
+func getRepoMirrorLockKey(repoID int64) string {
+	return fmt.Sprintf("repo_mirror_%d", repoID)
 }
 
 // SyncPullMirror starts the sync of the pull mirror and schedules the next run.
@@ -291,7 +318,7 @@ func SyncPullMirror(ctx context.Context, repoID int64) bool {
 		log.Error("PANIC whilst SyncMirrors[repo_id: %d] Panic: %v\nStacktrace: %s", repoID, err, log.Stack(2))
 	}()
 
-	releaser, err := globallock.Lock(ctx, getRepoPullMirrorLockKey(repoID))
+	releaser, err := globallock.Lock(ctx, getRepoMirrorLockKey(repoID))
 	if err != nil {
 		log.Error("globallock.Lock(): %v", err)
 		return false
@@ -325,99 +352,7 @@ func SyncPullMirror(ctx context.Context, repoID int64) bool {
 		return false
 	}
 
-	gitRepo, err := gitrepo.OpenRepository(ctx, m.Repo)
-	if err != nil {
-		log.Error("SyncMirrors [repo: %-v]: unable to OpenRepository: %v", m.Repo, err)
-		return false
-	}
-	defer gitRepo.Close()
-
-	log.Trace("SyncMirrors [repo: %-v]: %d branches updated", m.Repo, len(results))
-	if len(results) > 0 {
-		if ok := checkAndUpdateEmptyRepository(ctx, m, results); !ok {
-			log.Error("SyncMirrors [repo: %-v]: checkAndUpdateEmptyRepository: %v", m.Repo, err)
-			return false
-		}
-	}
-
-	for _, result := range results {
-		// Discard GitHub pull requests, i.e. refs/pull/*
-		if result.RefName.IsPull() {
-			continue
-		}
-
-		// Create reference
-		if result.OldCommitID == "" {
-			commitID, err := gitRepo.GetRefCommitID(result.RefName.String())
-			if err != nil {
-				log.Error("SyncMirrors [repo: %-v]: unable to GetRefCommitID [ref_name: %s]: %v", m.Repo, result.RefName, err)
-				continue
-			}
-			objectFormat := git.ObjectFormatFromName(m.Repo.ObjectFormatName)
-			notify_service.SyncPushCommits(ctx, m.Repo.MustOwner(ctx), m.Repo, &repo_module.PushUpdateOptions{
-				RefFullName: result.RefName,
-				OldCommitID: objectFormat.EmptyObjectID().String(),
-				NewCommitID: commitID,
-			}, repo_module.NewPushCommits())
-			notify_service.SyncCreateRef(ctx, m.Repo.MustOwner(ctx), m.Repo, result.RefName, commitID)
-			continue
-		}
-
-		// Delete reference
-		if result.NewCommitID == "" {
-			notify_service.SyncDeleteRef(ctx, m.Repo.MustOwner(ctx), m.Repo, result.RefName)
-			continue
-		}
-
-		oldCommitID, newCommitID := result.OldCommitID, result.NewCommitID
-		commits, err := gitRepo.CommitsBetween(newCommitID, oldCommitID, setting.UI.FeedMaxCommitNum)
-		if err != nil {
-			log.Error("SyncMirrors [repo: %-v]: unable to get CommitsBetween [new_commit_id: %s, old_commit_id: %s]: %v", m.Repo, newCommitID, oldCommitID, err)
-			continue
-		}
-		theCommits := repo_module.GitToPushCommits(commits)
-
-		newCommit, err := gitRepo.GetCommit(newCommitID.String())
-		if err != nil {
-			log.Error("SyncMirrors [repo: %-v]: unable to get commit %s: %v", m.Repo, newCommitID, err)
-			continue
-		}
-
-		theCommits.HeadCommit = repo_module.CommitToPushCommit(newCommit)
-		theCommits.CompareURL = m.Repo.ComposeCompareURL(oldCommitID.String(), newCommitID.String())
-
-		notify_service.SyncPushCommits(ctx, m.Repo.MustOwner(ctx), m.Repo, &repo_module.PushUpdateOptions{
-			RefFullName: result.RefName,
-			OldCommitID: oldCommitID.String(),
-			NewCommitID: newCommitID.String(),
-		}, theCommits)
-	}
-	log.Trace("SyncMirrors [repo: %-v]: done notifying updated branches/tags - now updating last commit time", m.Repo)
-
-	isEmpty, err := gitRepo.IsEmpty()
-	if err != nil {
-		log.Error("SyncMirrors [repo: %-v]: unable to check empty git repo: %v", m.Repo, err)
-		return false
-	}
-	if !isEmpty {
-		// Get latest commit date and update to current repository updated time
-		commitDate, err := gitrepo.GetLatestCommitTime(ctx, m.Repo)
-		if err != nil {
-			log.Error("SyncMirrors [repo: %-v]: unable to GetLatestCommitDate: %v", m.Repo, err)
-			return false
-		}
-
-		if err = repo_model.UpdateRepositoryUpdatedTime(ctx, m.RepoID, commitDate); err != nil {
-			log.Error("SyncMirrors [repo: %-v]: unable to update repository 'updated_unix': %v", m.Repo, err)
-			return false
-		}
-	}
-
-	// Update License
-	if err = repo_service.AddRepoToLicenseUpdaterQueue(&repo_service.LicenseUpdaterOptions{
-		RepoID: m.Repo.ID,
-	}); err != nil {
-		log.Error("SyncMirrors [repo: %-v]: unable to add repo to license updater queue: %v", m.Repo, err)
+	if !announce(ctx, m.Repo, results) {
 		return false
 	}
 
@@ -437,15 +372,117 @@ func SyncPullMirror(ctx context.Context, repoID int64) bool {
 	return true
 }
 
-func checkAndUpdateEmptyRepository(ctx context.Context, m *repo_model.Mirror, results []*repo_module.SyncResult) bool {
-	if !m.Repo.IsEmpty {
+// announce tells the rest of the forge that results landed in repo as pushes,
+// so Actions, webhooks and push mirrors see them. It reports whether it finished.
+func announce(ctx context.Context, repo *repo_model.Repository, results []*repo_module.SyncResult) bool {
+	gitRepo, err := gitrepo.OpenRepository(ctx, repo)
+	if err != nil {
+		log.Error("SyncMirrors [repo: %-v]: unable to OpenRepository: %v", repo, err)
+		return false
+	}
+	defer gitRepo.Close()
+
+	log.Trace("SyncMirrors [repo: %-v]: %d branches updated", repo, len(results))
+	if len(results) > 0 {
+		if ok := checkAndUpdateEmptyRepository(ctx, repo, results); !ok {
+			log.Error("SyncMirrors [repo: %-v]: checkAndUpdateEmptyRepository failed", repo)
+			return false
+		}
+	}
+
+	for _, result := range results {
+		// Discard GitHub pull requests, i.e. refs/pull/*
+		if result.RefName.IsPull() {
+			continue
+		}
+
+		// Create reference
+		if result.OldCommitID == "" {
+			commitID, err := gitRepo.GetRefCommitID(result.RefName.String())
+			if err != nil {
+				log.Error("SyncMirrors [repo: %-v]: unable to GetRefCommitID [ref_name: %s]: %v", repo, result.RefName, err)
+				continue
+			}
+			objectFormat := git.ObjectFormatFromName(repo.ObjectFormatName)
+			notify_service.SyncPushCommits(ctx, repo.MustOwner(ctx), repo, &repo_module.PushUpdateOptions{
+				RefFullName: result.RefName,
+				OldCommitID: objectFormat.EmptyObjectID().String(),
+				NewCommitID: commitID,
+			}, repo_module.NewPushCommits())
+			notify_service.SyncCreateRef(ctx, repo.MustOwner(ctx), repo, result.RefName, commitID)
+			continue
+		}
+
+		// Delete reference
+		if result.NewCommitID == "" {
+			notify_service.SyncDeleteRef(ctx, repo.MustOwner(ctx), repo, result.RefName)
+			continue
+		}
+
+		oldCommitID, newCommitID := result.OldCommitID, result.NewCommitID
+		commits, err := gitRepo.CommitsBetween(newCommitID, oldCommitID, setting.UI.FeedMaxCommitNum)
+		if err != nil {
+			log.Error("SyncMirrors [repo: %-v]: unable to get CommitsBetween [new_commit_id: %s, old_commit_id: %s]: %v", repo, newCommitID, oldCommitID, err)
+			continue
+		}
+		theCommits := repo_module.GitToPushCommits(commits)
+
+		newCommit, err := gitRepo.GetCommit(newCommitID.String())
+		if err != nil {
+			log.Error("SyncMirrors [repo: %-v]: unable to get commit %s: %v", repo, newCommitID, err)
+			continue
+		}
+
+		theCommits.HeadCommit = repo_module.CommitToPushCommit(newCommit)
+		theCommits.CompareURL = repo.ComposeCompareURL(oldCommitID.String(), newCommitID.String())
+
+		notify_service.SyncPushCommits(ctx, repo.MustOwner(ctx), repo, &repo_module.PushUpdateOptions{
+			RefFullName: result.RefName,
+			OldCommitID: oldCommitID.String(),
+			NewCommitID: newCommitID.String(),
+		}, theCommits)
+	}
+	log.Trace("SyncMirrors [repo: %-v]: done notifying updated branches/tags - now updating last commit time", repo)
+
+	isEmpty, err := gitRepo.IsEmpty()
+	if err != nil {
+		log.Error("SyncMirrors [repo: %-v]: unable to check empty git repo: %v", repo, err)
+		return false
+	}
+	if !isEmpty {
+		// Get latest commit date and update to current repository updated time
+		commitDate, err := gitrepo.GetLatestCommitTime(ctx, repo)
+		if err != nil {
+			log.Error("SyncMirrors [repo: %-v]: unable to GetLatestCommitDate: %v", repo, err)
+			return false
+		}
+
+		if err = repo_model.UpdateRepositoryUpdatedTime(ctx, repo.ID, commitDate); err != nil {
+			log.Error("SyncMirrors [repo: %-v]: unable to update repository 'updated_unix': %v", repo, err)
+			return false
+		}
+	}
+
+	// Update License. A scan already waiting for this repository will see these changes too.
+	if err = repo_service.AddRepoToLicenseUpdaterQueue(&repo_service.LicenseUpdaterOptions{
+		RepoID: repo.ID,
+	}); err != nil && !errors.Is(err, queue.ErrAlreadyInQueue) {
+		log.Error("SyncMirrors [repo: %-v]: unable to add repo to license updater queue: %v", repo, err)
+		return false
+	}
+
+	return true
+}
+
+func checkAndUpdateEmptyRepository(ctx context.Context, repo *repo_model.Repository, results []*repo_module.SyncResult) bool {
+	if !repo.IsEmpty {
 		return true
 	}
 
 	hasDefault := false
 	hasMaster := false
 	hasMain := false
-	defaultBranchName := m.Repo.DefaultBranch
+	defaultBranchName := repo.DefaultBranch
 	if len(defaultBranchName) == 0 {
 		defaultBranchName = setting.Repository.DefaultBranch
 	}
@@ -467,24 +504,24 @@ func checkAndUpdateEmptyRepository(ctx context.Context, m *repo_model.Mirror, re
 
 	if len(firstName) > 0 {
 		if hasDefault {
-			m.Repo.DefaultBranch = defaultBranchName
+			repo.DefaultBranch = defaultBranchName
 		} else if hasMaster {
-			m.Repo.DefaultBranch = "master"
+			repo.DefaultBranch = "master"
 		} else if hasMain {
-			m.Repo.DefaultBranch = "main"
+			repo.DefaultBranch = "main"
 		} else {
-			m.Repo.DefaultBranch = firstName
+			repo.DefaultBranch = firstName
 		}
 		// Update the git repository default branch
-		if err := gitrepo.SetDefaultBranch(ctx, m.Repo, m.Repo.DefaultBranch); err != nil {
-			log.Error("Failed to update default branch of underlying git repository %-v. Error: %v", m.Repo, err)
+		if err := gitrepo.SetDefaultBranch(ctx, repo, repo.DefaultBranch); err != nil {
+			log.Error("Failed to update default branch of underlying git repository %-v. Error: %v", repo, err)
 			return false
 		}
-		m.Repo.IsEmpty = false
+		repo.IsEmpty = false
 		// Update the is empty and default_branch columns
-		if err := repo_model.UpdateRepositoryColsWithAutoTime(ctx, m.Repo, "default_branch", "is_empty"); err != nil {
-			log.Error("Failed to update default branch of repository %-v. Error: %v", m.Repo, err)
-			desc := fmt.Sprintf("Failed to update default branch of repository (%s): %v", m.Repo.FullName(), err)
+		if err := repo_model.UpdateRepositoryColsWithAutoTime(ctx, repo, "default_branch", "is_empty"); err != nil {
+			log.Error("Failed to update default branch of repository %-v. Error: %v", repo, err)
+			desc := fmt.Sprintf("Failed to update default branch of repository (%s): %v", repo.FullName(), err)
 			if err = system_model.CreateRepositoryNotice(desc); err != nil {
 				log.Error("CreateRepositoryNotice: %v", err)
 			}

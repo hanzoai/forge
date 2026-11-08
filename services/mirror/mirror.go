@@ -24,6 +24,8 @@ func doMirrorSync(ctx context.Context, req *SyncRequest) {
 		_ = SyncPushMirror(ctx, req.ReferenceID)
 	case PullMirrorType:
 		_ = SyncPullMirror(ctx, req.ReferenceID)
+	case InboundMirrorType:
+		_ = SyncInboundMirror(ctx, req.ReferenceID)
 	default:
 		log.Error("Unknown Request type in queue: %v for MirrorID[%d]", req.Type, req.ReferenceID)
 	}

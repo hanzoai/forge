@@ -4,6 +4,7 @@
 package misc
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -12,7 +13,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/hanzoai/git/models/db"
 	repo_model "github.com/hanzoai/git/models/repo"
+	giturl "github.com/hanzoai/git/modules/git/url"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 	mirror_service "github.com/hanzoai/git/services/mirror"
@@ -29,7 +32,10 @@ const maxSyncBody = 1 << 20
 //
 // Direction is a property of the repo, not of this route — a pull mirror
 // fetches, and that fetch propagates to its push mirrors (services/mirror), so
-// one upstream push reaches every platform we mirror to in one hop.
+// one upstream push reaches every platform we mirror to in one hop. A regular
+// repo pushes to its platform through a push mirror; when that platform is the
+// one speaking, the event fast-forwards the repo from the push mirror's remote,
+// so a push to either side reaches the other.
 //
 // Mounted ahead of the session middleware because the credential is the payload
 // itself: HMAC-SHA256 over the exact bytes in X-Hub-Signature-256, keyed by
@@ -69,16 +75,59 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// The mirror row is the single test for "has an upstream": a plain repo or
-	// a push-only repo has none and must never be queued for a fetch.
-	if _, err := repo_model.GetMirrorByRepoID(req.Context(), repo.ID); err != nil {
-		_, _ = w.Write([]byte("ok"))
+	// The mirror row is the test for "has an upstream"; failing that, a push
+	// mirror to the repo the event names is the way back in. A repo with
+	// neither must never be queued for a fetch.
+	if _, err := repo_model.GetMirrorByRepoID(req.Context(), repo.ID); err == nil {
+		queuePull(repo.ID)
+		log.Trace("sync: queued pull for %s", repo.FullName())
+		_, _ = w.Write([]byte("queued"))
 		return
 	}
 
-	mirror_service.AddPullMirrorToQueue(repo.ID)
-	log.Trace("sync: queued pull for %s", repo.FullName())
-	_, _ = w.Write([]byte("queued"))
+	if m := pushMirrorTo(req.Context(), repo, ownerName, repoName); m != nil {
+		queueInbound(m.ID)
+		log.Trace("sync: queued inbound for %s", repo.FullName())
+		_, _ = w.Write([]byte("queued"))
+		return
+	}
+
+	_, _ = w.Write([]byte("ok"))
+}
+
+// The queue entry points, held in variables so a test can see what was queued
+// without running a sync.
+var (
+	queuePull    = mirror_service.AddPullMirrorToQueue
+	queueInbound = mirror_service.AddInboundMirrorToQueue
+)
+
+// pushMirrorTo returns the push mirror of repo whose remote is the GitHub
+// repository ownerName/repoName, or nil if it has none.
+func pushMirrorTo(ctx context.Context, repo *repo_model.Repository, ownerName, repoName string) *repo_model.PushMirror {
+	mirrors, _, err := repo_model.GetPushMirrorsByRepoID(ctx, repo.ID, db.ListOptionsAll)
+	if err != nil {
+		log.Error("sync: unable to list push mirrors of %s: %v", repo.FullName(), err)
+		return nil
+	}
+	for _, m := range mirrors {
+		if isGitHubRepo(m.RemoteAddress, ownerName, repoName) {
+			return m
+		}
+	}
+	return nil
+}
+
+// isGitHubRepo reports whether address names github.com/ownerName/repoName,
+// whatever its scheme or credentials, with or without a trailing ".git" or "/",
+// and in any letter case.
+func isGitHubRepo(address, ownerName, repoName string) bool {
+	u, err := giturl.ParseGitURL(address)
+	if err != nil || !strings.EqualFold(u.Hostname(), "github.com") {
+		return false
+	}
+	path := strings.TrimSuffix(strings.Trim(u.Path, "/"), ".git")
+	return strings.EqualFold(path, ownerName+"/"+repoName)
 }
 
 // repoFromPayload reads the repository a push event names, a field every

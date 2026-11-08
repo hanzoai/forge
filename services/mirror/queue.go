@@ -20,12 +20,14 @@ const (
 	PullMirrorType SyncType = iota
 	// PushMirrorType for push mirrors
 	PushMirrorType
+	// InboundMirrorType for fast-forwarding a repository from the remote of its push mirror
+	InboundMirrorType
 )
 
 // SyncRequest for the mirror queue
 type SyncRequest struct {
 	Type        SyncType
-	ReferenceID int64 // RepoID for pull mirror, MirrorID for push mirror
+	ReferenceID int64 // RepoID for pull mirror, MirrorID for push and inbound mirror
 }
 
 func queueHandler(items ...*SyncRequest) []*SyncRequest {
@@ -55,6 +57,11 @@ func AddPullMirrorToQueue(repoID int64) {
 // AddPushMirrorToQueue adds the push mirror to the queue
 func AddPushMirrorToQueue(mirrorID int64) {
 	addMirrorToQueue(PushMirrorType, mirrorID)
+}
+
+// AddInboundMirrorToQueue adds the push mirror, whose remote is to be fast-forwarded in, to the queue
+func AddInboundMirrorToQueue(mirrorID int64) {
+	addMirrorToQueue(InboundMirrorType, mirrorID)
 }
 
 func addMirrorToQueue(syncType SyncType, referenceID int64) {
