@@ -72,6 +72,11 @@ func AddPushMirrorToQueue(mirrorID int64) {
 	addMirrorToQueue(PushToQueue, PushMirrorType, mirrorID)
 }
 
+// AddPushMirrorToEventQueue adds the push mirror to the queue of syncs an event asked for
+func AddPushMirrorToEventQueue(mirrorID int64) {
+	addMirrorToQueue(PushToEventQueue, PushMirrorType, mirrorID)
+}
+
 // AddPullMirrorToEventQueue adds repoID to the queue of syncs an event asked for
 func AddPullMirrorToEventQueue(repoID int64) {
 	addMirrorToQueue(PushToEventQueue, PullMirrorType, repoID)

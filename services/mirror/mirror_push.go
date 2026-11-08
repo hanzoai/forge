@@ -281,6 +281,8 @@ func pushAllLFSObjects(ctx context.Context, gitRepo *git.Repository, lfsClient l
 	return err
 }
 
+// syncPushMirrorWithSyncOnCommit queues the push out of new commits, on the
+// event queue so it does not wait behind the scheduled sweep.
 func syncPushMirrorWithSyncOnCommit(ctx context.Context, repoID int64) {
 	pushMirrors, err := repo_model.GetPushMirrorsSyncedOnCommit(ctx, repoID)
 	if err != nil {
@@ -289,6 +291,6 @@ func syncPushMirrorWithSyncOnCommit(ctx context.Context, repoID int64) {
 	}
 
 	for _, mirror := range pushMirrors {
-		AddPushMirrorToQueue(mirror.ID)
+		AddPushMirrorToEventQueue(mirror.ID)
 	}
 }

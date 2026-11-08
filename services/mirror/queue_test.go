@@ -8,6 +8,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hanzoai/git/models/db"
+	repo_model "github.com/hanzoai/git/models/repo"
+	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/test"
 
@@ -17,7 +20,9 @@ import (
 
 // A sync an event asked for runs while every worker of the sweep queue is busy
 // and more mirrors wait behind them, and the routing keeps the rest on the sweep.
+// Push out on commit is such a sync; the settings page and the schedule are not.
 func TestEventQueueDoesNotWaitForSweep(t *testing.T) {
+	unittest.PrepareTestEnv(t)
 	t.Cleanup(test.MockVariableValue(&setting.Mirror.Enabled, true))
 	t.Cleanup(test.MockVariableValue(&mirrorQueue))
 	t.Cleanup(test.MockVariableValue(&eventQueue))
@@ -48,13 +53,19 @@ func TestEventQueueDoesNotWaitForSweep(t *testing.T) {
 	}
 	require.Eventually(t, func() bool { return busy.Load() >= workers }, 10*time.Second, 10*time.Millisecond, "the sweep never filled its workers")
 
-	AddPullMirrorToEventQueue(1)
-	AddInboundMirrorToEventQueue(2)
-	AddPullMirrorToQueue(3)
-	AddPushMirrorToQueue(4)
+	// What the notifier does on a push, and what a pull mirror does after its fetch.
+	onCommit := &repo_model.PushMirror{RepoID: 1, RemoteName: "github", SyncOnCommit: true}
+	require.NoError(t, db.Insert(t.Context(), onCommit))
+	syncPushMirrorWithSyncOnCommit(t.Context(), 1)
+
+	AddPullMirrorToEventQueue(101)
+	AddInboundMirrorToEventQueue(102)
+	AddPushMirrorToEventQueue(103)
+	AddPullMirrorToQueue(104)
+	AddPushMirrorToQueue(105)
 
 	got := map[SyncRequest]bool{}
-	for range 2 {
+	for range 4 {
 		select {
 		case req := <-heard:
 			got[req] = true
@@ -62,11 +73,16 @@ func TestEventQueueDoesNotWaitForSweep(t *testing.T) {
 			t.Fatal("an event sync waited behind the sweep")
 		}
 	}
-	assert.Equal(t, map[SyncRequest]bool{{PullMirrorType, 1}: true, {InboundMirrorType, 2}: true}, got)
+	assert.Equal(t, map[SyncRequest]bool{
+		{PullMirrorType, 101}:         true,
+		{InboundMirrorType, 102}:      true,
+		{PushMirrorType, 103}:         true,
+		{PushMirrorType, onCommit.ID}: true,
+	}, got)
 
 	// Let the sweep drain: the plain adders land there, not on the event queue.
 	close(release)
-	want := map[SyncRequest]bool{{PullMirrorType, 3}: true, {PushMirrorType, 4}: true}
+	want := map[SyncRequest]bool{{PullMirrorType, 104}: true, {PushMirrorType, 105}: true}
 	require.Eventually(t, func() bool {
 		for {
 			select {

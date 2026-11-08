@@ -252,9 +252,9 @@ either side reaches the other. There is no mode to set.
 - One lock per repo (`getRepoMirrorLockKey`) serializes pull, inbound and push out.
 - Two queues run the same `doMirrorSync` (`services/mirror/queue.go`): `mirror`
   carries the scheduled sweep over every mirror (thousands), `mirror_event` the
-  syncs an event asked for (`/v1/sync`, `POST /v1/repos/{owner}/{repo}/mirror-sync`),
-  so an event never waits behind the sweep. Push out on commit and the settings
-  page still use `mirror`.
+  syncs an event asked for (`/v1/sync`, `POST /v1/repos/{owner}/{repo}/mirror-sync`,
+  and push out on commit), so an event never waits behind the sweep. The schedule
+  and the settings-page buttons use `mirror`.
 - Not carried in: LFS objects and wikis.
 
 ## Image / release lane
