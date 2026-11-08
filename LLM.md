@@ -245,18 +245,28 @@ either side reaches the other. There is no mode to set.
   answered `ok` and ignored. The whole payload (up to 25 MiB) goes through the HMAC
   as it is read, and only the first MiB is held, to read the repository name from.
 - **In, regular repo:** with no pull mirror row, the same event finds the push
-  mirror whose address is `github.com/<owner>/<name>` (`IsGitHubRepo`: any
-  scheme, credentials, `.git`, case; no port, query, fragment or odd path) and
+  mirror whose address is `github.com/<owner>/<name>` (`IsGitHubRepo`: `https://`
+  or ssh (`git@github.com:` / `ssh://`) only, any credentials, `.git`, case; no
+  `http://`, `git://`, port, query, fragment or odd path) and
   queues `InboundMirrorType`. `SyncInboundMirror` (`services/mirror/mirror_inbound.go`):
   - takes the pull lock (`repo_pull_mirror_<id>`) and re-checks that the repo is not
     archived (before each ref, too), has no pull mirror, and still mirrors to the
     GitHub repository of its own name (a forge rename turns it off, with a warning),
     and that `[mirror] SYNC_USER` is set and can write; otherwise it does nothing;
   - hides `refs/upstream` (`uploadpack.hideRefs`, `receive.hideRefs`; pre-receive
-    refuses any push there), except that receive-pack still advertises
-    `refs/upstream/staging`: a push is told which commits the repository has from
-    what it advertises, and without that, filling an empty repo from itself would
-    send it its whole history again. It fetches into `refs/upstream/staging/{heads,tags}/` with
+    refuses any push there; the dumb-HTTP `info/refs`, which lists every ref, is
+    refused). Only the sync's own pushes are told of `refs/upstream/staging`, by
+    `git push --receive-pack='git -c receive.hideRefs=!refs/upstream/staging
+    receive-pack'`: a push learns which commits the repository has from what
+    receive-pack advertises to it, and without that, filling an empty repo from itself
+    would send it its whole history again. (The environment cannot carry this: git
+    clears `GIT_CONFIG_*` for a push to a local path.) The repo's
+    `uploadpack.allowAnySHA1InWant` is set false, over the forge's global true, which
+    stops a client of the old protocol fetching a hidden tip by id; **the new
+    protocol serves any object it is asked for**, so what is not to be seen is
+    not brought in (bot branches are not fetched), and a tip the sync only records
+    (the first sync's branches) is held, reachable by its id for whoever knows it.
+    It fetches into `refs/upstream/staging/{heads,tags}/` with
     forced refspecs and `--prune`, and acts only on names whose staged tip is not
     the one recorded in `refs/upstream/{heads,tags}/`. A tip is recorded only after
     the forge has dealt with it (pushed, found equal or ahead, or skipped as below),
@@ -289,14 +299,22 @@ either side reaches the other. There is no mode to set.
   - creates tags the forge lacks one push each when it is one, and **in one push
     when it is more than one**, in any run, not only a seed: a push event per
     historical tag would run, for every old tag, every workflow a tag push starts,
-    which for a release workflow is a release. That one push skips the hooks
-    (`GIT_INTERNAL_PUSH`) and the releases are made from the tags, as a pull mirror
-    makes them, unless the repo has any protected branch or tag rule, which only
-    the hooks can apply: then it is a hooked push (events included), and if the
-    hooks refuse it the tags are tried one at a time. So two tags that appear
-    together on GitHub raise no tag events here;
-  - never brings in the branches bots open: `dependabot/*`, `renovate/*`,
-    `gh-readonly-queue/*`. Their tips are recorded as dealt with, once;
+    which for a release workflow is a release. The only rule pre-receive applies to a
+    tag is the protected tag list (a branch rule has no bearing on a tag), so that
+    is applied in Go, right before the push, by `IsUserAllowedToControlTag`: a tag
+    `SYNC_USER` may not create is left and noticed, once; the rest go in one push
+    that skips the hooks (`GIT_INTERNAL_PUSH`). After it, whatever landed, even in
+    a push that reports failure, is recorded and gets its release
+    (`SyncReleasesWithTags`), as a pull mirror makes them. Where the rules cannot be
+    read the hooks decide (one push, then tag by tag). A tag the hooks decline is not
+    offered to them again for an hour unless its tip or the rules change. So two tags
+    that appear together on GitHub raise no tag events here;
+  - never brings in the branches bots open, by name prefix in any case: `dependabot/`,
+    `renovate/`, `gh-readonly-queue/`, `copilot/`, `release-please--`,
+    `changeset-release/` (`botBranches`, the one list). The fetch excludes them with
+    negative refspecs (git 2.29), so their objects never reach the repo; one that
+    gets through under another case is skipped and recorded once. `deps/` is not a
+    bot prefix;
   - Not carried in: LFS objects and wikis.
 - **What the push path enforces for `SYNC_USER`.** Pre-receive applies what it
   applies to any direct push, not to a merge: the user's write permission; a
@@ -313,9 +331,10 @@ either side reaches the other. There is no mode to set.
 - **Trust.** Whoever can push to a repo on GitHub can push to it here, as
   `SYNC_USER`, and the forge then runs that repo's Actions with its org secrets.
   This is the same trust as GitHub Actions, and intended: there is no allowlist of
-  GitHub authors. The one exception is the branches bots open (`dependabot/*`,
-  `renovate/*`, `gh-readonly-queue/*`), which are never brought in, so the forge
-  never runs bot-authored code with those secrets. Pull requests are not brought in
+  GitHub authors. The one exception is the branches bots open (`dependabot/`,
+  `renovate/`, `gh-readonly-queue/`, `copilot/`, `release-please--`,
+  `changeset-release/`), which are never brought in, so the forge never runs
+  bot-authored code with those secrets. Pull requests are not brought in
   at all: only branches and tags are.
 - **Recovery:** the scheduled sweep (`Update`) queues an inbound sync for each push
   mirror of a regular repo that mirrors to GitHub when none has run for

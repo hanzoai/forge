@@ -45,17 +45,27 @@ const (
 	primedKey = "hanzo.inboundprimed"
 )
 
-// botBranches are the branches bots open on GitHub. They are never brought in:
-// what a push here runs is the repository's Actions, with the organization's
-// secrets, and a bot's branch carries code its author did not write.
+// botBranches are the branch name prefixes bots open on GitHub, in lower case.
+// They are never brought in: what a push here runs is the repository's Actions,
+// with the organization's secrets, and a bot's branch carries code its author
+// did not write.
 var botBranches = []string{
-	git.BranchPrefix + "dependabot/",
-	git.BranchPrefix + "renovate/",
-	git.BranchPrefix + "gh-readonly-queue/",
+	"dependabot/",
+	"renovate/",
+	"gh-readonly-queue/",
+	"copilot/",
+	"release-please--",
+	"changeset-release/",
 }
 
+// isBotBranch reports whether ref is a branch a bot opened, whatever the case of its name.
 func isBotBranch(ref string) bool {
-	return slices.ContainsFunc(botBranches, func(prefix string) bool { return strings.HasPrefix(ref, prefix) })
+	name, ok := strings.CutPrefix(ref, git.BranchPrefix)
+	if !ok {
+		return false
+	}
+	name = strings.ToLower(name)
+	return slices.ContainsFunc(botBranches, func(prefix string) bool { return strings.HasPrefix(name, prefix) })
 }
 
 // hexRun finds what in a refusal changes with each commit, and so is not part of its reason.
@@ -70,8 +80,8 @@ func githubRepoPath(address string) (string, bool) {
 	if err != nil || !strings.EqualFold(u.Hostname(), "github.com") || u.Port() != "" {
 		return "", false
 	}
-	switch u.Scheme {
-	case "http", "https", "ssh", "git":
+	switch u.Scheme { // not http, which carries the credentials in the clear, nor git, which has none
+	case "https", "ssh":
 	default:
 		return "", false
 	}
@@ -269,10 +279,18 @@ func runInbound(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.
 	}
 
 	// Never follow HTTP redirects, see runSync. The staging namespace is ours, so forcing it is safe.
+	refspecs := []string{
+		"+" + git.BranchPrefix + "*:" + stagingName(git.UpstreamPrefix+"heads/*"),
+		"+" + git.TagPrefix + "*:" + stagingName(git.UpstreamPrefix+"tags/*"),
+	}
+	if git.DefaultFeatures().CheckVersionAtLeast("2.29") {
+		// Not fetched at all, so what is never brought in is not in the repository for anyone to ask for by id.
+		for _, prefix := range botBranches {
+			refspecs = append(refspecs, "^"+git.BranchPrefix+prefix+"*")
+		}
+	}
 	fetch := gitcmd.NewCommand("fetch", "--no-tags", "--prune").AddConfig("http.followRedirects", "false").
-		AddDynamicArguments(m.RemoteName,
-			"+"+git.BranchPrefix+"*:"+stagingName(git.UpstreamPrefix+"heads/*"),
-			"+"+git.TagPrefix+"*:"+stagingName(git.UpstreamPrefix+"tags/*")).
+		AddDynamicArguments(append([]string{m.RemoteName}, refspecs...)...).
 		WithTimeout(mirrorTimeout()).
 		WithEnv(proxy.EnvWithProxy(remoteURL.URL))
 	if _, stderr, err := gitrepo.RunCmdString(ctx, repo, fetch); err != nil {
@@ -379,7 +397,7 @@ func runInbound(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.
 		// An absent branch is created only once upstream has been recorded: GitHub
 		// keeps every branch the forge ever deleted, since the push out never
 		// deletes.
-		if err := advance(ctx, repo, user, stagingName(name), ref, changed[name], old, primed); err != nil {
+		if err := advance(ctx, repo, user, ref, changed[name], old, primed); err != nil {
 			// Reported where it was found. Not recorded, so the next sync looks at this tip again.
 			log.Trace("SyncInboundMirror [repo: %-v]: %s: %v", repo, ref, err)
 			continue
@@ -429,83 +447,154 @@ func isProtected(ctx context.Context, repo *repo_model.Repository) bool {
 	return len(tags) > 0 || len(rules) > 0
 }
 
-// pushBatch pushes the staged tips of names to their refs in one push, as env, and records them.
-func pushBatch(ctx context.Context, repo *repo_model.Repository, env []string, names []string, tips map[string]string) error {
+// pushBatch pushes the staged tips of names to their refs in one push, as env, and
+// records the ones that arrived. A push that failed may still have landed some of
+// its refs, so what is recorded, and returned, is what the repository holds now.
+func pushBatch(ctx context.Context, repo *repo_model.Repository, env []string, names []string, tips map[string]string) (landed []string, err error) {
 	refspecs := make([]string, len(names))
-	set := map[string]string{}
 	for i, name := range names {
-		refspecs[i] = stagingName(name) + ":" + forgeRef(name)
-		set[name] = tips[name]
+		refspecs[i] = tips[name] + ":" + forgeRef(name)
 	}
-	if err := gitrepo.Push(ctx, repo, repo, git.PushOptions{Refspecs: refspecs, Env: env, Timeout: mirrorTimeout()}); err != nil {
-		return err
+	err = gitrepo.Push(ctx, repo, repo, git.PushOptions{Refspecs: refspecs, Env: env, ReceivePack: advertiseStaging(), Timeout: mirrorTimeout()})
+
+	settle := context.WithoutCancel(ctx)
+	here, listErr := forgeTips(settle, repo)
+	if listErr != nil {
+		log.Error("SyncInboundMirror [repo: %-v]: %v", repo, listErr)
+		return nil, err
 	}
-	if err := writeRecords(context.WithoutCancel(ctx), repo, set, nil); err != nil {
-		log.Error("SyncInboundMirror [repo: %-v]: %v", repo, err)
+	set := map[string]string{}
+	for _, name := range names {
+		if here[forgeRef(name)] == tips[name] {
+			set[name] = tips[name]
+			landed = append(landed, name)
+		}
 	}
-	return nil
+	if recordErr := writeRecords(settle, repo, set, nil); recordErr != nil {
+		log.Error("SyncInboundMirror [repo: %-v]: %v", repo, recordErr)
+	}
+	return landed, err
 }
 
-// importTags creates the tags the forge lacks. One new tag is pushed like any
-// ref. Several are pushed together: a push event for each would run, for every
-// old tag, every workflow that a tag push starts, which for a release workflow
-// is a release. Unless the repository protects branches or tags, whose
-// rules only the hooks can apply, that one push skips the hooks and the releases
-// are made from the tags, as a pull mirror makes them.
+// declinedTTL is how long a tag the hooks declined is not offered to them again. They
+// decline for a reason, which may last or may be an outage, so they are asked again.
+const declinedTTL = 60 * 60
+
+// tagRulesFingerprint says which protected tag rules, and which user, a decision
+// about a tag was taken under.
+func tagRulesFingerprint(rules []*git_model.ProtectedTag, userID int64) string {
+	lines := make([]string, len(rules))
+	for i, rule := range rules {
+		lines[i] = fmt.Sprintf("%s|%v|%v", rule.NamePattern, rule.AllowlistUserIDs, rule.AllowlistTeamIDs)
+	}
+	slices.Sort(lines)
+	return fmt.Sprintf("%x", sha1.Sum([]byte(fmt.Sprintf("%d\n%s", userID, strings.Join(lines, "\n")))))
+}
+
+// declinedKey names a tag's tip as the hooks declined it, under the rules of the day.
+func declinedKey(repo *repo_model.Repository, ref, tip, fingerprint string) string {
+	return fmt.Sprintf("inbound-declined:%d:%x", repo.ID, sha1.Sum([]byte(ref+"\x00"+tip+"\x00"+fingerprint)))
+}
+
+// importTags creates the tags the forge lacks. A tag the protected tag rules keep
+// the sync user from creating is left, and noticed. One tag is pushed like any ref.
+// Several are pushed together, and without the hooks: a push event for each would
+// run, for every old tag, every workflow that a tag push starts, which for a
+// release workflow is a release. The rules are the only part of the hooks that
+// bears on a tag, and are applied here, right before the push, so the releases
+// are made from the tags afterwards, as a pull mirror makes them. Where the rules
+// cannot be read, the hooks decide.
 func importTags(ctx context.Context, repo *repo_model.Repository, user *user_model.User, names []string, tips map[string]string) {
+	if len(names) == 0 || !writable(ctx, repo) {
+		return
+	}
 	settle := context.WithoutCancel(ctx)
-	one := func(name string) {
-		if err := advance(ctx, repo, user, stagingName(name), forgeRef(name), tips[name], "", true); err != nil {
-			log.Trace("SyncInboundMirror [repo: %-v]: %s: %v", repo, forgeRef(name), err)
+
+	// A hooked push of one tag. If the hooks decline it, they are not asked again
+	// for as long as neither the tag's tip nor the rules have changed.
+	hooked := func(name, fingerprint string) {
+		key := declinedKey(repo, forgeRef(name), tips[name], fingerprint)
+		if cache.GetCache().IsExist(key) {
 			return
 		}
-		if err := gitrepo.UpdateRef(settle, repo, name, tips[name]); err != nil {
-			log.Error("SyncInboundMirror [repo: %-v]: unable to record %s: %v", repo, name, err)
+		err := advance(ctx, repo, user, forgeRef(name), tips[name], "", true)
+		switch {
+		case err == nil:
+			if err := writeRecords(settle, repo, map[string]string{name: tips[name]}, nil); err != nil {
+				log.Error("SyncInboundMirror [repo: %-v]: unable to record %s: %v", repo, name, err)
+			}
+		case errors.Is(err, errDeclined):
+			if err := cache.GetCache().Put(key, "1", declinedTTL); err != nil {
+				log.Error("Unable to remember %s: %v", key, err)
+			}
 		}
 	}
-	if len(names) <= 1 {
-		for _, name := range names {
-			one(name)
-		}
-		return
-	}
-
-	if !writable(ctx, repo) {
-		return
-	}
-	hooked := isProtected(ctx, repo)
-	env := repo_module.InternalPushingEnvironment(user, repo)
-	if hooked {
-		env = repo_module.PushingEnvironment(user, repo)
-	}
-	if err := pushBatch(ctx, repo, env, names, tips); err != nil {
-		if ctx.Err() != nil {
+	// A hooked push of all of them, which the hooks accept or refuse as a whole. If
+	// they refuse it, they are asked about the tags one at a time, so that the ones
+	// that are allowed arrive.
+	hookedBatch := func(names []string) {
+		_, err := pushBatch(ctx, repo, repo_module.PushingEnvironment(user, repo), names, tips)
+		if err == nil || ctx.Err() != nil {
 			return
 		}
 		reason := refusal(err)
-		notify(repo, forgeRef(names[0]), "refused: "+reason, fmt.Sprintf("Inbound sync of %s could not create %d tags, starting at %s: %s", repo.FullName(), len(names), forgeRef(names[0]), reason))
-		if hooked {
-			// The hooks refuse a whole push for one tag. Try them one at a time, so the ones that are allowed arrive.
-			for _, name := range names {
-				if ctx.Err() != nil || !writable(ctx, repo) {
-					return
-				}
-				one(name)
+		notify(repo, forgeRef(names[0]), "refused: "+reason, fmt.Sprintf("Inbound sync of %s was refused %d new tags, the first of them %s: %s", repo.FullName(), len(names), forgeRef(names[0]), reason))
+		for _, name := range names {
+			if ctx.Err() != nil || !writable(ctx, repo) {
+				return
+			}
+			if here, err := forgeTip(ctx, repo, forgeRef(name)); err == nil && here == "" {
+				hooked(name, "")
 			}
 		}
-		return
 	}
-	if hooked {
-		return // the post-receive hook has made the releases
-	}
-	gitRepo, err := gitrepo.OpenRepository(ctx, repo)
+
+	rules, err := git_model.GetProtectedTags(ctx, repo.ID)
 	if err != nil {
 		log.Error("SyncInboundMirror [repo: %-v]: %v", repo, err)
+		hookedBatch(names)
+		return
+	}
+	fingerprint := tagRulesFingerprint(rules, user.ID)
+
+	var allowed []string
+	for _, name := range names {
+		ok, err := git_model.IsUserAllowedToControlTag(ctx, rules, strings.TrimPrefix(forgeRef(name), git.TagPrefix), user.ID)
+		if err != nil {
+			log.Error("SyncInboundMirror [repo: %-v]: %v", repo, err)
+			hookedBatch(names)
+			return
+		}
+		if ok {
+			allowed = append(allowed, name)
+			continue
+		}
+		ref := forgeRef(name)
+		notify(repo, ref, "protected tag", fmt.Sprintf("Inbound sync of %s left %s untouched: a protected tag rule keeps %s from creating it", repo.FullName(), ref, user.Name))
+	}
+
+	switch len(allowed) {
+	case 0:
+		return
+	case 1:
+		hooked(allowed[0], fingerprint)
+		return
+	}
+
+	_, err = pushBatch(ctx, repo, repo_module.InternalPushingEnvironment(user, repo), allowed, tips)
+	if err != nil && ctx.Err() == nil {
+		reason := refusal(err)
+		notify(repo, forgeRef(allowed[0]), "failed: "+reason, fmt.Sprintf("Inbound sync of %s failed to create some of its %d new tags, the first of them %s: %s", repo.FullName(), len(allowed), forgeRef(allowed[0]), reason))
+	}
+	// Whatever arrived has no release, whether or not the push says it failed.
+	gitRepo, openErr := gitrepo.OpenRepository(settle, repo)
+	if openErr != nil {
+		log.Error("SyncInboundMirror [repo: %-v]: %v", repo, openErr)
 		return
 	}
 	defer gitRepo.Close()
-	if _, err := repo_module.SyncReleasesWithTags(ctx, repo, gitRepo); err != nil {
-		log.Error("SyncInboundMirror [repo: %-v]: failed to synchronize tags to releases: %v", repo, err)
+	if _, syncErr := repo_module.SyncReleasesWithTags(settle, repo, gitRepo); syncErr != nil {
+		log.Error("SyncInboundMirror [repo: %-v]: failed to synchronize tags to releases: %v", repo, syncErr)
 	}
 }
 
@@ -514,25 +603,45 @@ func mirrorTimeout() time.Duration {
 }
 
 // hideUpstream hides the namespace from clients, and closes it to their pushes,
-// so only the sync writes there. Receive-pack still advertises the staging refs:
-// a push is told which commits the repository already has from what it
-// advertises, and a push of the staged tips to the same repository would
-// otherwise carry their whole history to a repository that has all of it.
+// so only the sync writes there. The staging refs are advertised to the sync's own
+// pushes alone, see advertiseStaging. Nothing under it can be fetched by id by a
+// client that speaks the old protocol; the new one asks for any object, so what
+// is not to be seen is also not brought in, see botBranches.
 func hideUpstream(ctx context.Context, repo *repo_model.Repository) error {
 	hide := strings.TrimSuffix(git.UpstreamPrefix, "/")
-	if err := gitrepo.GitConfigSet(ctx, repo, "uploadpack.hideRefs", hide); err != nil {
-		return fmt.Errorf("uploadpack.hideRefs: %w", err)
-	}
-	// The last pattern that matches a ref decides: the staging refs are unhidden again.
-	if err := gitrepo.GitConfigSetAll(ctx, repo, "receive.hideRefs", hide, "!"+hide+"/staging"); err != nil {
-		return fmt.Errorf("receive.hideRefs: %w", err)
+	for key, value := range map[string]string{
+		"uploadpack.hideRefs":           hide,
+		"receive.hideRefs":              hide,
+		"uploadpack.allowAnySHA1InWant": "false", // the forge allows it, for partial clones
+	} {
+		if err := gitrepo.GitConfigSetAll(ctx, repo, key, value); err != nil {
+			return fmt.Errorf("%s: %w", key, err)
+		}
 	}
 	return nil
 }
 
+// advertiseStaging is the command that receives the sync's own pushes: receive-pack
+// that advertises the staging refs, and nobody else's does. A push is told which
+// commits the repository has from what it advertises, and without this a push of
+// the staged tips to the same repository would carry their whole history back to
+// it. The last hideRefs pattern that matches a ref decides, and this one comes last.
+// (The environment cannot carry this: git clears it for a push to a local path.)
+func advertiseStaging() string {
+	return fmt.Sprintf("%s -c receive.hideRefs=!%sstaging receive-pack", util.ShellEscape(gitcmd.GitExecutable), git.UpstreamPrefix)
+}
+
+// configValue returns the repository setting key, or "" if it has none.
+func configValue(ctx context.Context, repo *repo_model.Repository, key string) string {
+	out, _, err := gitrepo.RunCmdString(ctx, repo, gitcmd.NewCommand("config", "--get").AddDynamicArguments(key))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(out)
+}
+
 func isPrimed(ctx context.Context, repo *repo_model.Repository) bool {
-	out, _, err := gitrepo.RunCmdString(ctx, repo, gitcmd.NewCommand("config", "--get").AddDynamicArguments(primedKey))
-	return err == nil && strings.TrimSpace(out) == "true"
+	return configValue(ctx, repo, primedKey) == "true"
 }
 
 func markPrimed(ctx context.Context, repo *repo_model.Repository) {
@@ -610,12 +719,12 @@ func recordPushed(ctx context.Context, repo *repo_model.Repository, pushed map[s
 	}
 }
 
-// advance pushes the staged upstream tip at name to ref as user, when that only
+// advance pushes the staged upstream tip to ref as user, when that only
 // adds history. old is where ref stands now, empty if it does not exist. It
 // returns nil when the tip is dealt with, including when it is left alone for
 // good reason, and an error for a ref it could not or would not move, after
 // reporting it.
-func advance(ctx context.Context, repo *repo_model.Repository, user *user_model.User, name, ref, tip, old string, create bool) error {
+func advance(ctx context.Context, repo *repo_model.Repository, user *user_model.User, ref, tip, old string, create bool) error {
 	switch {
 	case old == tip:
 		return nil
@@ -651,9 +760,10 @@ func advance(ctx context.Context, repo *repo_model.Repository, user *user_model.
 	// Not forced: the receiving side refuses anything but an addition, as well as
 	// whatever its hooks refuse.
 	err := gitrepo.Push(ctx, repo, repo, git.PushOptions{
-		Branch:  name + ":" + ref,
-		Env:     repo_module.PushingEnvironment(user, repo),
-		Timeout: mirrorTimeout(),
+		Branch:      tip + ":" + ref,
+		Env:         repo_module.PushingEnvironment(user, repo),
+		ReceivePack: advertiseStaging(),
+		Timeout:     mirrorTimeout(),
 	})
 	if err == nil {
 		return nil
@@ -663,8 +773,14 @@ func advance(ctx context.Context, repo *repo_model.Repository, user *user_model.
 	}
 	reason := refusal(err)
 	notify(repo, ref, "refused: "+reason, fmt.Sprintf("Inbound sync of %s could not move %s from %s to %s: %s", repo.FullName(), ref, short(old), short(tip), reason))
-	return errors.New("refused")
+	if _, declined := errors.AsType[*git.ErrPushRejected](err); declined {
+		return errDeclined
+	}
+	return errors.New("failed")
 }
+
+// errDeclined is advance's error for a push that the receiving side's hooks declined.
+var errDeclined = errors.New("declined")
 
 // refusal says why a push failed: what the hooks said if they declined it, without the local paths around it.
 func refusal(err error) string {
@@ -694,15 +810,16 @@ func seed(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.Reposi
 		if ctx.Err() != nil || !writable(ctx, repo) {
 			return false
 		}
-		if err := pushBatch(ctx, repo, repo_module.PushingEnvironment(user, repo), names, changed); err != nil {
+		landed, err := pushBatch(ctx, repo, repo_module.PushingEnvironment(user, repo), names, changed)
+		for _, name := range landed {
+			delete(changed, name)
+		}
+		if err != nil {
 			if ctx.Err() == nil {
 				reason := refusal(err)
 				notify(repo, forgeRef(names[0]), "refused: "+reason, fmt.Sprintf("Inbound sync of %s could not fill it from %s, starting at %s: %s", repo.FullName(), m.RemoteName, forgeRef(names[0]), reason))
 			}
 			return false
-		}
-		for _, name := range names {
-			delete(changed, name)
 		}
 		return true
 	}

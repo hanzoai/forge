@@ -142,6 +142,10 @@ echo "call $hook" >> "$dir/hooks.log"
 case $hook in
 update) echo "update $4" >> "$dir/hooks.log" ;;
 pre-receive|post-receive)
+  # What the push brought: pre-receive runs with its objects in a quarantine, apart from the repository's own.
+  if [ "$hook" = pre-receive ]; then
+    echo "received $(find "${GIT_QUARANTINE_PATH:-/nonexistent}" -type f \( -name '*.pack' -o -path '*/[0-9a-f][0-9a-f]/*' \) 2>/dev/null | wc -l | tr -d ' ')" >> "$dir/hooks.log"
+  fi
   while read -r old new ref; do
     echo "$hook $ref" >> "$dir/hooks.log"
     if [ "$hook" = pre-receive ] && grep -qxF "$ref" "$dir/refuse" 2>/dev/null; then
@@ -186,6 +190,23 @@ func (r *rig) calls(hook string) []string {
 		}
 	}
 	return refs
+}
+
+// received returns, for each push, how many objects files it carried to the repository.
+func (r *rig) received() []string {
+	r.t.Helper()
+	out, err := os.ReadFile(filepath.Join(r.dir, "hooks.log"))
+	if os.IsNotExist(err) {
+		return nil
+	}
+	require.NoError(r.t, err)
+	var counts []string
+	for line := range strings.SplitSeq(string(out), "\n") {
+		if count, ok := strings.CutPrefix(line, "received "); ok {
+			counts = append(counts, count)
+		}
+	}
+	return counts
 }
 
 // invocations returns how many times the given hook was run: one per push.
@@ -625,8 +646,9 @@ func TestInboundHidesTheNamespaceFromClients(t *testing.T) {
 	assert.Contains(t, advertised, "refs/heads/main")
 	assert.NotContains(t, advertised, "refs/upstream/")
 	assert.Equal(t, "refs/upstream", r.forge.git("config", "--get-all", "uploadpack.hideRefs"))
-	// Hidden from pushers too, bar the staged tips, which receive-pack advertises for the push's sake.
-	assert.Equal(t, "refs/upstream\n!refs/upstream/staging", r.forge.git("config", "--get-all", "receive.hideRefs"))
+	// Hidden from every pusher: the sync's own push is the only one told of the staged tips.
+	assert.Equal(t, "refs/upstream", r.forge.git("config", "--get-all", "receive.hideRefs"))
+	assert.Equal(t, "false", r.forge.git("config", "--get", "uploadpack.allowAnySHA1InWant"))
 }
 
 func TestInboundSkipsArchivedRepo(t *testing.T) {
@@ -719,7 +741,6 @@ func TestPushOutDoesNotWaitForPull(t *testing.T) {
 func TestIsGitHubRepo(t *testing.T) {
 	for address, want := range map[string]bool{
 		"https://github.com/hanzo-inc/app":                true,
-		"http://github.com/hanzo-inc/app":                 true,
 		"https://github.com/hanzo-inc/app.git":            true,
 		"https://github.com/hanzo-inc/app/":               true,
 		"https://github.com/hanzo-inc/app.git/":           true,
@@ -729,6 +750,8 @@ func TestIsGitHubRepo(t *testing.T) {
 		"ssh://git@github.com/hanzo-inc/app.git":          true,
 		"git@github.com:hanzo-inc/app.git":                true,
 
+		"http://github.com/hanzo-inc/app":               false, // credentials in the clear
+		"git://github.com/hanzo-inc/app":                false, // no credentials at all
 		"https://github.com/hanzo-inc/other":            false,
 		"https://github.com/other/app":                  false,
 		"https://github.com/hanzo-inc/app-extra":        false,
@@ -881,33 +904,54 @@ func TestInboundImportsSeveralTagsInOnePush(t *testing.T) {
 	require.True(t, r.sync())
 	assert.Equal(t, []string{"refs/tags/v6"}, r.calls("pre-receive"))
 
-	// Where tags are protected, the rules are the hooks' to apply: still one push.
+	// The rules for tags are applied in Go, as pre-receive would: a tag the sync user
+	// may not create is left, and noticed once; the rest still come in one push, unhooked.
 	require.NoError(t, db.Insert(t.Context(), &git_model.ProtectedTag{RepoID: r.repo.ID, NamePattern: "v*"}))
 	r.forget()
-	for _, tag := range []string{"v7", "v8", "v9"} {
+	for _, tag := range []string{"v7", "v8", "w1", "w2", "w3"} {
 		r.github.git("tag", tag, c1)
 	}
+	for range 3 {
+		require.True(t, r.sync())
+	}
+	assert.Empty(t, r.forge.tip("refs/tags/v7"))
+	assert.Empty(t, r.forge.tip("refs/tags/v8"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/w3"))
+	assert.Zero(t, r.invocations("pre-receive"), "the allowed ones came in one push without the hooks")
+	unittest.AssertExistsAndLoadBean(t, &repo_model.Release{RepoID: r.repo.ID, TagName: "w1"})
+	require.Len(t, r.notices(), 2, "one for each tag, however many syncs")
+	assert.Contains(t, strings.Join(r.notices(), "\n"), "refs/tags/v7")
+
+	// The sync user allowed to create them, they come: one push.
+	rule := unittest.AssertExistsAndLoadBean(t, &git_model.ProtectedTag{RepoID: r.repo.ID})
+	rule.AllowlistUserIDs = []int64{1}
+	require.NoError(t, git_model.UpdateProtectedTag(t.Context(), rule))
 	require.True(t, r.sync())
-	assert.Equal(t, 1, r.invocations("pre-receive"))
-	assert.ElementsMatch(t, []string{"refs/tags/v7", "refs/tags/v8", "refs/tags/v9"}, r.calls("pre-receive"))
-	assert.Equal(t, c1, r.forge.tip("refs/tags/v9"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v7"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v8"))
+	assert.Zero(t, r.invocations("pre-receive"))
 }
 
-// A protected branch is as much a rule as a protected tag: only the hooks apply it.
-func TestInboundSeedUsesTheHooksWhereBranchesAreProtected(t *testing.T) {
+// What a branch is protected by has no bearing on a tag: pre-receive looks at the
+// protected tags alone, so a repository that protects only main still has its old
+// tags come in one push, with no hooks.
+func TestInboundBranchProtectionDoesNotHookTags(t *testing.T) {
 	r := newRig(t)
 	require.NoError(t, db.Insert(t.Context(), &git_model.ProtectedBranch{RepoID: r.repo.ID, RuleName: "main"}))
 	c1 := r.github.commit("", "one")
 	r.github.set("refs/heads/main", c1)
-	for _, tag := range []string{"v1", "v2", "v3"} {
-		r.github.git("tag", tag, c1)
+	for i := range 12 {
+		r.github.git("tag", fmt.Sprintf("v%d", i), c1)
 	}
 
 	require.True(t, r.sync())
 
-	assert.Equal(t, c1, r.forge.tip("refs/tags/v3"))
-	assert.Equal(t, 2, r.invocations("pre-receive"), "the branch, then the three tags in one push")
-	assert.Equal(t, []string{"refs/heads/main", "refs/tags/v1", "refs/tags/v2", "refs/tags/v3"}, r.calls("pre-receive"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v11"))
+	assert.Equal(t, []string{"refs/heads/main"}, r.calls("pre-receive"), "the branch went through the hooks, the twelve tags did not")
+	assert.Equal(t, 1, r.invocations("pre-receive"))
+	for i := range 12 {
+		unittest.AssertExistsAndLoadBean(t, &repo_model.Release{RepoID: r.repo.ID, TagName: fmt.Sprintf("v%d", i)})
+	}
 }
 
 // A seed that stops partway is carried on by the next run, however the
@@ -942,9 +986,13 @@ func TestInboundSeedResumesAfterAPartialFailure(t *testing.T) {
 }
 
 // What a bot opens on GitHub is never brought in: it would run here with the
-// organization's secrets.
+// organization's secrets. It is not fetched at all, so it is not in the repository
+// to be asked for by id; a name in another case is fetched, and skipped.
 func TestInboundNeverBringsInBotBranches(t *testing.T) {
-	bots := []string{"refs/heads/dependabot/npm_and_yarn/x", "refs/heads/renovate/foo", "refs/heads/gh-readonly-queue/main/pr-1"}
+	bots := []string{
+		"refs/heads/dependabot/npm_and_yarn/x", "refs/heads/renovate/foo", "refs/heads/gh-readonly-queue/main/pr-1",
+		"refs/heads/copilot/fix-1", "refs/heads/release-please--branches--main", "refs/heads/changeset-release/main",
+	}
 	for _, filled := range []bool{false, true} {
 		r := newRig(t)
 		c1 := r.github.commit("", "one")
@@ -953,19 +1001,31 @@ func TestInboundNeverBringsInBotBranches(t *testing.T) {
 			require.True(t, r.sync()) // the repository has content now: the loop, not the seed
 			r.forget()
 		}
+		var tips []string
 		for _, bot := range bots {
-			r.github.set(bot, c1)
+			tip := r.github.commit(c1, "bot "+bot)
+			tips = append(tips, tip)
+			r.github.set(bot, tip)
 		}
+		cased := r.github.commit(c1, "bot, in capitals")
+		r.github.set("refs/heads/Dependabot/Capital", cased)
 		r.github.set("refs/heads/feature", c1)
+		// Not a bot's, whatever it looks like.
+		r.github.set("refs/heads/deps/update", c1)
 
 		require.True(t, r.sync())
 
 		assert.Equal(t, c1, r.forge.tip("refs/heads/feature"), "filled=%v", filled)
-		for _, bot := range bots {
+		assert.Equal(t, c1, r.forge.tip("refs/heads/deps/update"), "filled=%v", filled)
+		for i, bot := range bots {
 			assert.Empty(t, r.forge.tip(bot), "%s filled=%v", bot, filled)
-			assert.Equal(t, c1, r.forge.tip(recordName(bot)), "the skip is recorded, once")
+			assert.Empty(t, r.forge.tip(recordName(bot)), "never fetched, so nothing to record")
+			_, err := exec.Command("git", "-C", r.forge.path, "cat-file", "-e", tips[i]).CombinedOutput()
+			assert.Error(t, err, "%s: its objects are not in the repository", bot)
 		}
-		assert.NotContains(t, strings.Join(r.calls("pre-receive"), " "), "dependabot")
+		assert.Empty(t, r.forge.tip("refs/heads/Dependabot/Capital"), "filled=%v", filled)
+		assert.Equal(t, cased, r.forge.tip("refs/upstream/heads/Dependabot/Capital"), "skipped, and recorded once")
+		assert.NotContains(t, strings.Join(r.calls("pre-receive"), " "), "ependabot")
 		assert.Empty(t, r.notices())
 	}
 }
@@ -1018,8 +1078,8 @@ func TestInboundKeepsRecordsWhenTheRemoteAnswersEmpty(t *testing.T) {
 	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/main"))
 }
 
-// Filling a repository from itself does not send it its own history: receive-pack
-// advertises the staged tips, so the push is told the repository has them.
+// Filling a repository from itself does not send it its own history: the push is
+// told, by what receive-pack advertises to it alone, that the repository has the staged tips.
 func TestInboundSeedDoesNotSendHistoryBack(t *testing.T) {
 	r := newRig(t)
 	tip := ""
@@ -1031,12 +1091,10 @@ func TestInboundSeedDoesNotSendHistoryBack(t *testing.T) {
 	require.True(t, r.sync())
 
 	assert.Equal(t, tip, r.forge.tip("refs/heads/main"))
-	packs, err := filepath.Glob(filepath.Join(r.forge.path, "objects", "pack", "*.pack"))
-	require.NoError(t, err)
-	assert.Len(t, packs, 1, "the fetch's pack, and no second copy of it from the push")
+	assert.Equal(t, []string{"0"}, r.received(), "the push carried nothing: the repository already has all of it")
 
-	// The staged tips are in receive-pack's advertisement and not in upload-pack's.
-	assert.Contains(t, r.forge.git("receive-pack", "--advertise-refs", "."), "refs/upstream/staging/heads/main")
+	// Told to nobody else: not to a client, not to a person who pushes.
+	assert.NotContains(t, r.forge.git("receive-pack", "--advertise-refs", "."), "refs/upstream/")
 	assert.NotContains(t, r.forge.git("upload-pack", "--advertise-refs", "."), "refs/upstream/")
 }
 
@@ -1058,4 +1116,101 @@ func TestInboundSeedStopsWhenArchivedMidway(t *testing.T) {
 	assert.False(t, <-done)
 	assert.Equal(t, c1, r.forge.tip("refs/heads/trunk"), "the push under way finished")
 	assert.Empty(t, r.forge.tip("refs/heads/other"), "and the next one was not made")
+}
+
+// A push that fails for one tag may have landed the others. What landed gets its
+// release and its record all the same.
+func TestInboundMakesReleasesOfTagsThatLandedInAFailedPush(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync())
+	r.forget()
+
+	// The forge has the tag "rel", which keeps it from having "rel/1".
+	r.forge.git("tag", "rel", c1)
+	for _, tag := range []string{"a", "b", "c", "rel/1"} {
+		r.github.git("tag", tag, c1)
+	}
+	require.True(t, r.sync())
+
+	assert.Empty(t, r.forge.tip("refs/tags/rel/1"))
+	for _, tag := range []string{"a", "b", "c"} {
+		assert.Equal(t, c1, r.forge.tip("refs/tags/"+tag))
+		assert.Equal(t, c1, r.forge.tip("refs/upstream/tags/"+tag), "recorded: it is there")
+		unittest.AssertExistsAndLoadBean(t, &repo_model.Release{RepoID: r.repo.ID, TagName: tag})
+	}
+	assert.Empty(t, r.forge.tip("refs/upstream/tags/rel/1"), "and the one that did not land is not recorded")
+	require.Len(t, r.notices(), 1)
+}
+
+// The hooks declining a tag are not asked again until its tip, or the rules, change.
+func TestInboundDoesNotAskTheHooksAgainAboutADeclinedTag(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	c2 := r.github.commit(c1, "two")
+	r.github.set("refs/heads/main", c2)
+	require.True(t, r.sync())
+	r.forget()
+
+	r.refuse("refs/tags/v1")
+	r.github.git("tag", "v1", c1)
+	for range 3 {
+		require.True(t, r.sync())
+	}
+	assert.Equal(t, 1, r.invocations("pre-receive"), "asked once, not at every sync")
+	assert.Empty(t, r.forge.tip("refs/tags/v1"))
+	require.Len(t, r.notices(), 1)
+	assert.Contains(t, r.notices()[0], "protected branch")
+
+	// Upstream's tag is a different tag now.
+	r.github.git("tag", "-f", "v1", c2)
+	require.True(t, r.sync())
+	assert.Equal(t, 2, r.invocations("pre-receive"))
+
+	// And the rules are different.
+	require.NoError(t, db.Insert(t.Context(), &git_model.ProtectedTag{RepoID: r.repo.ID, NamePattern: "nothing-matches-this"}))
+	require.True(t, r.sync())
+	assert.Equal(t, 3, r.invocations("pre-receive"))
+	require.True(t, r.sync())
+	assert.Equal(t, 3, r.invocations("pre-receive"))
+}
+
+// What the sync skips is not for a client to ask for by id: not in the
+// repository if it was never fetched, and not served to a client that speaks the
+// protocol that checks, if it was. (The newer protocol serves any object it is
+// asked for; that is why the objects are not brought in.)
+func TestInboundSkippedTipsCannotBeFetchedById(t *testing.T) {
+	r := newRig(t)
+	r.repo.IsEmpty = false
+	require.NoError(t, repo_model.UpdateRepositoryColsNoAutoTime(t.Context(), r.repo, "is_empty"))
+	c1 := r.forge.commit("", "one")
+	r.forge.set("refs/heads/main", c1)
+	r.github.git("fetch", r.forge.path, "refs/heads/main:refs/heads/main")
+	// The forge allows any id in a want, for partial clones.
+	r.forge.git("config", "uploadpack.allowAnySHA1InWant", "true")
+
+	// A branch the forge lacks: on a first sync it is recorded, and held, not created.
+	old := r.github.commit(c1, "an old branch the forge deleted")
+	r.github.set("refs/heads/old", old)
+	require.True(t, r.sync())
+	require.Equal(t, old, r.forge.tip("refs/upstream/heads/old"))
+	assert.Empty(t, r.forge.tip("refs/heads/old"))
+
+	fetch := func(protocol string) error {
+		clone := t.TempDir()
+		for _, args := range [][]string{{"init", "-q"}, {"-c", "protocol.version=" + protocol, "fetch", r.forge.path, old}} {
+			cmd := exec.Command("git", args...)
+			cmd.Dir = clone
+			if out, err := cmd.CombinedOutput(); err != nil {
+				return fmt.Errorf("%w: %s", err, out)
+			}
+		}
+		return nil
+	}
+	assert.Error(t, fetch("0"), "not by its id, where the protocol checks")
+
+	// Which it would, were the forge's setting still in force: the test asks the right question.
+	r.forge.git("config", "uploadpack.allowAnySHA1InWant", "true")
+	assert.NoError(t, fetch("0"))
 }

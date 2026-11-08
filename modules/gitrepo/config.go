@@ -34,7 +34,7 @@ func GitConfigSet(ctx context.Context, repo Repository, key, value string) error
 	})
 }
 
-// GitConfigSetAll makes values, in that order, the whole of the multi-valued key.
+// GitConfigSetAll makes values, in that order, the whole of the key: whatever lines it had are replaced.
 func GitConfigSetAll(ctx context.Context, repo Repository, key string, values ...string) error {
 	return globallock.LockAndDo(ctx, getRepoConfigLockKey(repo.RelativePath()), func(ctx context.Context) error {
 		// The first value replaces every value the key has, in one write; the rest follow it.
