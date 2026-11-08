@@ -19,6 +19,7 @@ func initActionsTasks() {
 	registerStopEndlessTasks()
 	registerCancelAbandonedJobs()
 	registerFailUnsatisfiableJobs()
+	registerWakeRunners()
 	registerScheduleTasks()
 	registerActionsCleanup()
 }
@@ -63,6 +64,18 @@ func registerFailUnsatisfiableJobs() {
 		Schedule:   "@every 5m",
 	}, func(ctx context.Context, _ *user_model.User, cfg Config) error {
 		return actions_service.FailUnsatisfiableJobs(ctx)
+	})
+}
+
+// registerWakeRunners runs every minute: a job that has waited past the grace with no runner is
+// the sign that a runner is asleep on a version that should have moved.
+func registerWakeRunners() {
+	RegisterTaskFatal("wake_runners", &BaseConfig{
+		Enabled:    true,
+		RunAtStart: false,
+		Schedule:   "@every 1m",
+	}, func(ctx context.Context, _ *user_model.User, cfg Config) error {
+		return actions_service.WakeRunners(ctx)
 	})
 }
 

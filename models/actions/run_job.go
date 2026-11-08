@@ -373,6 +373,15 @@ func hasWaitingJobsToPick(ctx context.Context, repoID int64) (bool, error) {
 		Exist(&ActionRunJob{})
 }
 
+// HasStalledJobs reports whether a job a runner could take has waited, unclaimed, since before the given time.
+// A job with no runs-on is stored as an empty value, "null" or "[]", and is not one a runner is looking for.
+func HasStalledJobs(ctx context.Context, before timeutil.TimeStamp) (bool, error) {
+	return db.GetEngine(ctx).
+		Where("task_id = ? AND status = ? AND is_reusable_caller = ? AND updated < ?", 0, StatusWaiting, false, before).
+		And(builder.NotIn("runs_on", "", "null", "[]")).
+		Exist(&ActionRunJob{})
+}
+
 func UpdateRunJob(ctx context.Context, job *ActionRunJob, cond builder.Cond, cols ...string) (int64, error) {
 	e := db.GetEngine(ctx)
 

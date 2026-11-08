@@ -419,3 +419,4 @@ places for a rule to live, and a rule that exists twice drifts.
 - Always add `Assisted-By` trailers to commit messages in format `Assisted-by: AGENT_NAME:MODEL_VERSION`
 - Never add `Co-Authored-By` `Signed-off-by` trailer to commit messages. Sign off must be done by a human.
 - Work that must happen only if a transaction commits (a task-version bump) goes through `db.AfterCommit`, never inside the transaction: a row it locks stays locked until the whole transaction ends.
+- The `wake_runners` cron (every minute) bumps the global tasks version when a job has waited over a minute unclaimed, which repairs a bump that failed or was never made.
