@@ -19,12 +19,14 @@ import (
 	"github.com/hanzoai/git/models/unit"
 	"github.com/hanzoai/git/models/unittest"
 	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/cache"
 	"github.com/hanzoai/git/modules/git"
 	"github.com/hanzoai/git/modules/gitrepo"
 	"github.com/hanzoai/git/modules/globallock"
 	repo_module "github.com/hanzoai/git/modules/repository"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/test"
+	"github.com/hanzoai/git/modules/timeutil"
 	notify_service "github.com/hanzoai/git/services/notify"
 
 	"github.com/stretchr/testify/assert"
@@ -115,6 +117,7 @@ func newRig(t *testing.T) *rig {
 	t.Cleanup(test.MockVariableValue(&setting.Mirror.Enabled, false))
 	t.Cleanup(test.MockVariableValue(&setting.Mirror.SyncUser, "user1"))
 	*heardNotifier = heard{}
+	require.NoError(t, cache.GetCache().ChiCache().Flush()) // the notices already given belong to other tests
 
 	// org3/repo21: public, empty, with a code unit.
 	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 32})
@@ -130,7 +133,10 @@ func newRig(t *testing.T) *rig {
 	require.NoError(t, os.WriteFile(daemon, []byte(`#!/usr/bin/env bash
 dir=`+r.dir+`
 hook=$3
+# Like the real hook binary, it does not look at an internal push.
+[ "${GIT_INTERNAL_PUSH:-}" = true ] && exit 0
 echo "hook=$hook pusher=$GIT_PUSHER_NAME id=$GIT_PUSHER_ID repo=$GIT_REPO_USER_NAME/$GIT_REPO_NAME internal=${GIT_INTERNAL_PUSH:-}" >> "$dir/hooks.log"
+echo "call $hook" >> "$dir/hooks.log"
 case $hook in
 update) echo "update $4" >> "$dir/hooks.log" ;;
 pre-receive|post-receive)
@@ -140,7 +146,12 @@ pre-receive|post-receive)
       echo "protected branch" >&2
       exit 1
     fi
-  done ;;
+  done
+  if [ "$hook" = pre-receive ] && [ -e "$dir/delay" ]; then
+    touch "$dir/entered"
+    sleep "$(cat "$dir/delay")"
+    touch "$dir/finished"
+  fi ;;
 esac
 `), 0o755))
 	t.Cleanup(test.MockVariableValue(&setting.AppPath, daemon))
@@ -175,6 +186,17 @@ func (r *rig) calls(hook string) []string {
 	return refs
 }
 
+// invocations returns how many times the given hook was run: one per push.
+func (r *rig) invocations(hook string) int {
+	r.t.Helper()
+	out, err := os.ReadFile(filepath.Join(r.dir, "hooks.log"))
+	if os.IsNotExist(err) {
+		return 0
+	}
+	require.NoError(r.t, err)
+	return strings.Count("\n"+string(out), "\ncall "+hook+"\n")
+}
+
 // forget clears the record of hook calls.
 func (r *rig) forget() {
 	r.t.Helper()
@@ -205,11 +227,14 @@ func TestInboundCreatesAbsentRefsThroughThePushPath(t *testing.T) {
 	r := newRig(t)
 	c1 := r.github.commit("", "one")
 	c2 := r.github.commit(c1, "two")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync()) // fills the empty repository
+	r.forget()
+
 	r.github.set("refs/heads/main", c2)
 	r.github.set("refs/heads/topic", c1)
 	r.github.git("tag", "light", c1)
 	r.github.git("tag", "-a", "-m", "annotated", "v1", c2)
-
 	require.True(t, r.sync())
 
 	assert.Equal(t, c2, r.forge.tip("refs/heads/main"))
@@ -224,14 +249,63 @@ func TestInboundCreatesAbsentRefsThroughThePushPath(t *testing.T) {
 	assert.ElementsMatch(t, want, r.calls("pre-receive"))
 	assert.ElementsMatch(t, want, r.calls("post-receive"))
 	assert.ElementsMatch(t, want, r.calls("update"))
+	assert.Equal(t, 4, r.invocations("pre-receive"), "one push per ref: a refusal of one must not hold up the others")
 
 	// As the sync user, with the environment of a person's push: not an internal one that skips the hooks.
 	out, err := os.ReadFile(filepath.Join(r.dir, "hooks.log"))
 	require.NoError(t, err)
 	assert.Contains(t, string(out), "pusher=user1 id=1 repo=org3/repo21 internal=\n")
-	assert.NotContains(t, string(out), "internal=true")
 
 	assert.Empty(t, heardNotifier.synced, "the Sync* calls are a pull mirror's; they do not start Actions")
+
+	// Recorded only now that the forge has them.
+	assert.Equal(t, c2, r.forge.tip("refs/upstream/heads/main"))
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/topic"))
+}
+
+// An empty repository is filled with GitHub's default branch first, which becomes
+// its default, then the other branches in one push, then the tags in one push
+// that raises no push events: a release workflow would run for every old tag.
+func TestInboundSeedsAnEmptyRepository(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	c2 := r.github.commit(c1, "two")
+	r.github.git("symbolic-ref", "HEAD", "refs/heads/trunk")
+	r.github.set("refs/heads/trunk", c2)
+	r.github.set("refs/heads/dev", c1)
+	r.github.set("refs/heads/main", c1)
+	for _, tag := range []string{"v1", "v2", "v3", "v4", "v5"} {
+		r.github.git("tag", tag, c1)
+	}
+	r.github.git("tag", "-a", "-m", "annotated", "v6", c2)
+
+	require.True(t, r.sync())
+
+	assert.Equal(t, c2, r.forge.tip("refs/heads/trunk"))
+	assert.Equal(t, c1, r.forge.tip("refs/heads/dev"))
+	assert.Equal(t, c1, r.forge.tip("refs/heads/main"))
+	assert.Equal(t, r.github.tip("refs/tags/v6"), r.forge.tip("refs/tags/v6"))
+	assert.Equal(t, "refs/heads/trunk", r.forge.git("symbolic-ref", "HEAD"), "GitHub's default branch becomes the default")
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: r.repo.ID})
+	assert.Equal(t, "trunk", repo.DefaultBranch)
+
+	// The default branch alone, then the rest in one push; the tags raise no hooks at all.
+	assert.Equal(t, 2, r.invocations("pre-receive"))
+	assert.Equal(t, []string{"refs/heads/trunk", "refs/heads/dev", "refs/heads/main"}, r.calls("pre-receive"))
+	assert.NotContains(t, strings.Join(r.calls("post-receive"), " "), "refs/tags/")
+
+	// But the releases exist, as a pull mirror makes them.
+	for _, tag := range []string{"v1", "v2", "v3", "v4", "v5", "v6"} {
+		unittest.AssertExistsAndLoadBean(t, &repo_model.Release{RepoID: r.repo.ID, TagName: tag})
+	}
+	assert.Equal(t, c2, r.forge.tip("refs/upstream/heads/trunk"))
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/tags/v1"))
+	assert.Empty(t, r.notices())
+
+	// Nothing is left to do.
+	r.forget()
+	require.True(t, r.sync())
+	assert.Zero(t, r.invocations("pre-receive"))
 }
 
 func TestInboundFastForwardsOnlyWhatMoved(t *testing.T) {
@@ -286,13 +360,19 @@ func TestInboundDivergedIsLeftAndReportedOnce(t *testing.T) {
 
 	assert.Equal(t, mine, r.forge.tip("refs/heads/main"), "a diverged ref is never overwritten")
 	assert.Empty(t, r.calls("pre-receive"), "and never pushed")
-	require.Len(t, r.notices(), 1, "one notice per diverged pair, not one per event")
+	require.Len(t, r.notices(), 1, "one notice per diverged ref, not one per event")
 	assert.Contains(t, r.notices()[0], "refs/heads/main")
-	assert.Contains(t, r.notices()[0], mine[:12])
+	assert.Contains(t, r.notices()[0], mine[:12], "the first report says what diverged")
 	assert.Contains(t, r.notices()[0], theirs[:12])
 
-	// Upstream moving on is a new pair.
+	// Upstream moving on is the same condition: the ref is still diverged.
 	r.github.set("refs/heads/main", r.github.commit(theirs, "github again"))
+	require.True(t, r.sync())
+	require.Len(t, r.notices(), 1)
+
+	// A different ref, or a different reason, is a different one.
+	r.github.set("refs/heads/other", r.github.commit(c1, "other"))
+	r.forge.set("refs/heads/other", r.forge.commit(c1, "other, here"))
 	require.True(t, r.sync())
 	require.Len(t, r.notices(), 2)
 }
@@ -385,6 +465,7 @@ func TestInboundRefusedRefIsReportedAndRetried(t *testing.T) {
 	}
 
 	assert.Equal(t, c1, r.forge.tip("refs/heads/main"), "the refused ref did not move")
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/main"), "and upstream's tip for it is not recorded as dealt with")
 	assert.Equal(t, c1, r.forge.tip("refs/heads/free"), "and did not hold up the others")
 	require.Len(t, r.notices(), 1, "refused once, reported once")
 	assert.Contains(t, r.notices()[0], "refs/heads/main")
@@ -394,6 +475,43 @@ func TestInboundRefusedRefIsReportedAndRetried(t *testing.T) {
 	require.NoError(t, os.Remove(filepath.Join(r.dir, "refuse")))
 	require.True(t, r.sync())
 	assert.Equal(t, c2, r.forge.tip("refs/heads/main"))
+}
+
+// A push cut short, by a deploy say, leaves the forge where it was. The tip must
+// not be recorded as dealt with, or no later sync would look at it again.
+func TestInboundCancelledPushIsRetried(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync())
+	r.forget()
+
+	c2 := r.github.commit(c1, "two")
+	r.github.set("refs/heads/main", c2)
+	require.NoError(t, os.WriteFile(filepath.Join(r.dir, "delay"), []byte("2"), 0o644))
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	done := make(chan bool, 1)
+	go func() { done <- SyncInboundMirror(ctx, r.mirror.ID) }()
+	exists := func(name string) func() bool {
+		return func() bool { _, err := os.Stat(filepath.Join(r.dir, name)); return err == nil }
+	}
+	require.Eventually(t, exists("entered"), 10*time.Second, 10*time.Millisecond, "the push never reached pre-receive")
+	cancel()
+
+	assert.False(t, <-done)
+	assert.Empty(t, r.notices(), "a push cut short is not a refusal")
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/main"), "and the tip is not recorded as dealt with")
+
+	// Whether the receiving side lands the ref anyway is up to it. The next sync does the rest.
+	require.Eventually(t, exists("finished"), 10*time.Second, 10*time.Millisecond)
+	time.Sleep(time.Second)
+	require.NoError(t, os.Remove(filepath.Join(r.dir, "delay")))
+	require.True(t, r.sync())
+	assert.Equal(t, c2, r.forge.tip("refs/heads/main"))
+	assert.Equal(t, c2, r.forge.tip("refs/upstream/heads/main"))
+	assert.Empty(t, r.notices())
 }
 
 func TestInboundDoesNotResurrectDeletedBranch(t *testing.T) {
@@ -416,32 +534,52 @@ func TestInboundDoesNotResurrectDeletedBranch(t *testing.T) {
 	assert.Equal(t, r.github.tip("refs/heads/merged-pr"), r.forge.tip("refs/heads/merged-pr"))
 }
 
-func TestInboundFirstSyncOfPopulatedRepoOnlyRecords(t *testing.T) {
+func TestInboundFirstSyncOfPopulatedRepoOnlyRecordsBranches(t *testing.T) {
 	r := newRig(t)
-	c1 := r.github.commit("", "one")
-	r.github.set("refs/heads/main", c1)
-	require.True(t, r.sync())
 
-	// The repository is in use, and has never synced inbound before: no upstream tips are recorded.
+	// The repository is in use, and has never synced inbound: it has main and none of the rest.
+	c1 := r.forge.commit("", "one")
+	r.forge.set("refs/heads/main", c1)
+	r.github.git("fetch", r.forge.path, "refs/heads/main:refs/heads/main")
+	r.github.set("refs/heads/long-deleted", c1)
+	r.github.git("tag", "v1", c1)
 	r.repo.IsEmpty = false
 	require.NoError(t, repo_model.UpdateRepositoryColsNoAutoTime(t.Context(), r.repo, "is_empty"))
-	for _, ref := range []string{"refs/upstream/heads/main"} {
-		r.forge.delete(ref)
-	}
-	r.github.set("refs/heads/long-deleted", c1)
-	r.forge.delete("refs/heads/main")
-	r.forge.set("refs/heads/main", c1)
-	r.forget()
 
 	require.True(t, r.sync())
-	assert.Empty(t, r.forge.tip("refs/heads/long-deleted"), "what the forge lacks is not created by a first sync")
+	assert.Empty(t, r.forge.tip("refs/heads/long-deleted"), "a branch the forge lacks is not created by a first sync")
 	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/long-deleted"), "but upstream is now on record")
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v1"), "a tag is immutable: the forge lacking one is just missing it")
+	assert.Equal(t, []string{"refs/tags/v1"}, r.calls("pre-receive"))
 
 	// From here on, a new branch on GitHub arrives.
 	r.github.set("refs/heads/fresh", c1)
 	require.True(t, r.sync())
 	assert.Equal(t, c1, r.forge.tip("refs/heads/fresh"))
 	assert.Empty(t, r.forge.tip("refs/heads/long-deleted"))
+}
+
+// A branch the forge created and pushed out, then deleted, is on GitHub and
+// recorded, so GitHub having it is not news to the inbound sync.
+func TestPushedOutBranchDeletedHereStaysDeleted(t *testing.T) {
+	r := newRig(t)
+	c1 := r.forge.commit("", "one")
+	r.forge.set("refs/heads/main", c1)
+	r.forge.set("refs/heads/feature", c1)
+	r.forge.git("tag", "v1", c1)
+	require.True(t, SyncPushMirror(t.Context(), r.mirror.ID))
+	require.Equal(t, c1, r.github.tip("refs/heads/feature"))
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/feature"), "what was pushed out is on record")
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/tags/v1"))
+
+	// An inbound sync with nothing new establishes the baseline; then the branch goes.
+	require.True(t, r.sync())
+	r.forge.delete("refs/heads/feature")
+	r.github.set("refs/heads/other", r.github.commit(c1, "elsewhere"))
+	require.True(t, r.sync())
+
+	assert.Empty(t, r.forge.tip("refs/heads/feature"), "pushed out, then deleted here: not brought back")
+	assert.Equal(t, r.github.tip("refs/heads/other"), r.forge.tip("refs/heads/other"))
 }
 
 func TestInboundIgnoresOtherRefsUnderTheNamespace(t *testing.T) {
@@ -477,6 +615,7 @@ func TestInboundHidesTheNamespaceFromClients(t *testing.T) {
 	r.github.set("refs/heads/private-wip", c1)
 	require.True(t, r.sync())
 	require.NotEmpty(t, r.forge.tip("refs/upstream/heads/private-wip"))
+	require.NotEmpty(t, r.forge.tip("refs/upstream/staging/heads/private-wip"))
 
 	advertised := r.forge.git("ls-remote", r.forge.path)
 	assert.Contains(t, advertised, "refs/heads/main")
@@ -624,9 +763,10 @@ func TestIsGitHubRepo(t *testing.T) {
 	}
 }
 
-// A due push mirror to GitHub, on a regular repository, also looks for what an
-// event about it missed, so a lost webhook heals.
-func TestSweepAlsoLooksForWhatAnEventMissed(t *testing.T) {
+// The sweep looks for what an event missed in every push mirror of a regular
+// repository to GitHub, on a clock of its own: a repository that pushes out all
+// the time, or one that only pushes on commit, is no less likely to miss an event.
+func TestSweepHealsWhatAnEventMissed(t *testing.T) {
 	r := newRig(t)
 	t.Cleanup(test.MockVariableValue(&setting.Mirror.Enabled, true))
 	t.Cleanup(test.MockVariableValue(&mirrorQueue))
@@ -637,36 +777,64 @@ func TestSweepAlsoLooksForWhatAnEventMissed(t *testing.T) {
 		}
 		return nil
 	})
-
-	r.mirror.Interval = time.Hour // scheduled, and never run: due now
-	require.NoError(t, repo_model.UpdatePushMirror(t.Context(), r.mirror))
-
-	next := func() (SyncRequest, bool) {
-		select {
-		case req := <-queued:
-			return req, true
-		case <-time.After(3 * time.Second):
-			return SyncRequest{}, false
+	// sweep runs the sweep and returns what it queued: it waits for want requests
+	// to come through the queue, then for any that should not.
+	sweep := func(want int) []SyncRequest {
+		require.NoError(t, Update(t.Context(), 0, 10))
+		var got []SyncRequest
+		wait := 5 * time.Second
+		if want == 0 {
+			wait = 400 * time.Millisecond
+		}
+		for {
+			select {
+			case req := <-queued:
+				got = append(got, req)
+			case <-time.After(wait):
+				return got
+			}
+			if len(got) >= want {
+				wait = 400 * time.Millisecond
+			}
 		}
 	}
-	require.NoError(t, Update(t.Context(), 0, 10))
-	got := map[SyncRequest]bool{}
-	for range 2 {
-		req, ok := next()
-		require.True(t, ok, "the sweep queued too little")
-		got[req] = true
-	}
-	assert.Equal(t, map[SyncRequest]bool{{PushMirrorType, r.mirror.ID}: true, {InboundMirrorType, r.mirror.ID}: true}, got)
+	inbound := []SyncRequest{{InboundMirrorType, r.mirror.ID}}
 
-	// Without a sync user there is nothing to pull in as: only the push out is queued.
-	setting.Mirror.SyncUser = ""
-	require.NoError(t, Update(t.Context(), 0, 10))
-	req, ok := next()
-	require.True(t, ok)
-	assert.Equal(t, SyncRequest{PushMirrorType, r.mirror.ID}, req)
-	select {
-	case req := <-queued:
-		t.Fatalf("unexpected %v", req)
-	case <-time.After(300 * time.Millisecond):
+	// A busy one: it pushed out a moment ago and is not due for that for an hour.
+	r.mirror.Interval = time.Hour
+	r.mirror.LastUpdateUnix = timeutil.TimeStampNow()
+	require.NoError(t, repo_model.UpdatePushMirror(t.Context(), r.mirror))
+	assert.Equal(t, inbound, sweep(1), "due on its own clock, with no push out due")
+
+	// It has just been looked at, so it is not due again straight away.
+	assert.Empty(t, sweep(0))
+
+	// Once the period has passed it is, whatever the push out has done since.
+	r.mirror.LastInboundUnix = timeutil.TimeStampNow() - timeutil.TimeStamp(setting.Mirror.DefaultInterval/time.Second) - 1
+	require.NoError(t, repo_model.UpdatePushMirrorLastInbound(t.Context(), r.mirror))
+	assert.Equal(t, inbound, sweep(1))
+
+	// A push mirror that only pushes on commit has no push out due, and is covered the same.
+	r.mirror.Interval = 0
+	require.NoError(t, repo_model.UpdatePushMirror(t.Context(), r.mirror))
+	r.mirror.LastInboundUnix = 0
+	require.NoError(t, repo_model.UpdatePushMirrorLastInbound(t.Context(), r.mirror))
+	assert.Equal(t, inbound, sweep(1))
+
+	// Not one whose address is another repository, another host, or not here: the repository was renamed, say.
+	for _, address := range []string{"https://github.com/org3/renamed", "https://example.com/org3/repo21"} {
+		r.mirror.RemoteAddress = address
+		require.NoError(t, repo_model.UpdatePushMirror(t.Context(), r.mirror))
+		r.mirror.LastInboundUnix = 0
+		require.NoError(t, repo_model.UpdatePushMirrorLastInbound(t.Context(), r.mirror))
+		assert.Empty(t, sweep(0), address)
 	}
+
+	// Nor with nobody to pull in as.
+	r.mirror.RemoteAddress = "https://github.com/org3/repo21"
+	require.NoError(t, repo_model.UpdatePushMirror(t.Context(), r.mirror))
+	r.mirror.LastInboundUnix = 0
+	require.NoError(t, repo_model.UpdatePushMirrorLastInbound(t.Context(), r.mirror))
+	setting.Mirror.SyncUser = ""
+	assert.Empty(t, sweep(0))
 }

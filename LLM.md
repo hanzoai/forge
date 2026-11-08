@@ -236,41 +236,74 @@ either side reaches the other. There is no mode to set.
 - **Out (forge to GitHub):** a push mirror with `sync_on_commit`. It pushes
   `refs/heads/*` and `refs/tags/*` without `+`, so a diverged GitHub ref is
   refused, never overwritten (`services/mirror/mirror_push.go`). It takes no lock.
+  Where the inbound sync is on, a successful push out also records the tips it
+  put there under `refs/upstream`, so a branch pushed out and then deleted here
+  is not brought back.
 - **In, pull mirror:** the GitHub org webhook reaches `/v1/sync`
   (`routers/web/misc/sync.go`, HMAC under `[mirror] SYNC_SECRET`) and queues a
   pull. Only `X-GitHub-Event: push`, `create` and `delete` do; any other event is
-  answered `ok` and ignored.
+  answered `ok` and ignored. The whole payload (up to 25 MiB) goes through the HMAC
+  as it is read, and only the first MiB is held, to read the repository name from.
 - **In, regular repo:** with no pull mirror row, the same event finds the push
   mirror whose address is `github.com/<owner>/<name>` (`IsGitHubRepo`: any
   scheme, credentials, `.git`, case; no port, query, fragment or odd path) and
   queues `InboundMirrorType`. `SyncInboundMirror` (`services/mirror/mirror_inbound.go`):
-  - takes the pull lock (`repo_pull_mirror_<id>`), re-checks that the repo is not
-    archived, has no pull mirror, and still mirrors to GitHub, and that `[mirror]
-    SYNC_USER` is set and can write (otherwise it does nothing);
+  - takes the pull lock (`repo_pull_mirror_<id>`) and re-checks that the repo is not
+    archived (before each ref, too), has no pull mirror, and still mirrors to the
+    GitHub repository of its own name (a forge rename turns it off, with a warning),
+    and that `[mirror] SYNC_USER` is set and can write; otherwise it does nothing;
   - hides `refs/upstream` (`uploadpack.hideRefs`, `receive.hideRefs`; pre-receive
-    refuses any push there) and records the tips under `refs/upstream/{heads,tags}/`
-    before the fetch, fetches with forced refspecs and `--prune`, and acts only on
-    names whose tip changed. `refs/upstream/*` is "the last upstream tip handled",
-    so a branch deleted on the forge stays deleted until GitHub moves it again;
+    refuses any push there), fetches into `refs/upstream/staging/{heads,tags}/` with
+    forced refspecs and `--prune`, and acts only on names whose staged tip is not
+    the one recorded in `refs/upstream/{heads,tags}/`. A tip is recorded only after
+    the forge has dealt with it (pushed, found equal or ahead, or skipped as below),
+    so a push cut short, refused or failed is looked at again, and a branch deleted
+    on the forge stays deleted until GitHub moves it again;
   - enters through the normal push path: one non-force `git push` per ref, from
-    the repo to itself, under `PushingEnvironment` of the sync user. Pre-receive
-    enforces protected branches and tags, approvals, status checks, signed commits
-    and quota for that user; post-receive runs the push queue, which is what starts
-    Actions (`PushCommits`), pull request checks, issue references and the push
-    out. The `Sync*` notifiers are a pull mirror's and are not used. Archived
-    repos are not written (pre-receive does not check it);
+    the repo to itself, under `PushingEnvironment` of the sync user. Post-receive
+    runs the push queue, which starts Actions (`PushCommits`), pull request checks,
+    issue references and the push out. The `Sync*` notifiers are a pull mirror's
+    and are not used. Archived repos are not written (pre-receive does not check it);
   - creates an absent ref, and fast-forwards a branch the forge holds an ancestor
     of. A branch the forge is ahead of is left. A diverged branch, a tag that
     differs (tags are create-only, so an annotated tag is never retyped), and a
-    ref the push refuses each raise one repository notice per (ref, forge sha,
-    upstream sha) and are looked at again on the next sync;
-  - on the first sync of a repo that has content and no `refs/upstream` record,
-    only records upstream: GitHub keeps every branch the forge ever deleted, since
-    the push out never deletes, and creating them all would bring them back.
+    ref the push refuses each raise a repository notice and are looked at again on
+    the next sync. A notice is raised once per (repository, ref, reason) for a week
+    (`cache`, not a scan of the notice table), however far the commits move;
+  - on the first sync of a repo that has content, only records upstream's branches
+    (a tag the forge lacks is still created: tags are immutable). GitHub keeps
+    every branch the forge ever deleted, since the push out never deletes, and
+    creating them all would bring them back. The repository setting
+    `hanzo.inboundprimed` says that first sync is done; a branch GitHub gained in
+    that very first event waits until it next moves;
+  - on an empty repo, sets the default branch to GitHub's (`ls-remote --symref`,
+    else `main`, `master`, the first), pushes it alone, then the other branches in
+    one push, then all the tags in one push that skips the hooks (`GIT_INTERNAL_PUSH`)
+    and makes the releases from them. A push event per historical tag would run
+    every release workflow once for each;
   - Not carried in: LFS objects and wikis.
-- **Recovery:** the scheduled sweep (`Update`) also queues an inbound sync for each
-  due push mirror of a regular repo that mirrors to GitHub, when `SYNC_USER` is set.
-  A push mirror with interval 0 is never due, so a missed event is not healed for it.
+- **What the push path enforces for `SYNC_USER`.** Pre-receive applies what it
+  applies to any direct push, not to a merge: the user's write permission; a
+  protected branch's push rule (push enabled, and `SYNC_USER` in the push whitelist
+  if there is one, or the push is refused); signed commits if the branch requires
+  them (GitHub's own merge commits are signed with a key the forge must know);
+  protected file patterns; no force push or deletion; and a protected tag's allow
+  list for creating a tag. Required approvals and status checks gate **merges**, not
+  pushes, so they do not apply; there is no quota on a push. Give `SYNC_USER`
+  write access and add it to the push whitelist of every protected branch that
+  GitHub also moves and to the allow list of every protected tag pattern; where a
+  branch is protected with push disabled, inbound sync cannot move it and says so
+  in a notice.
+- **Trust.** Whoever can push to a repo on GitHub can push to it here, as
+  `SYNC_USER`, and the forge then runs that repo's Actions with its org secrets.
+  This is the same trust as GitHub Actions, and intended: there is no allowlist of
+  GitHub authors.
+- **Recovery:** the scheduled sweep (`Update`) queues an inbound sync for each push
+  mirror of a regular repo that mirrors to GitHub when none has run for
+  `[mirror] DEFAULT_INTERVAL`, when `SYNC_USER` is set. It runs on its own clock,
+  `push_mirror.last_inbound_unix`, set whenever an inbound sync looks at the
+  remote or is scheduled, so a repo that pushes out constantly, or only on commit,
+  is covered like any other.
 - **Queues**, all running `doMirrorSync` (`services/mirror/queue.go`): `mirror`
   carries the scheduled sweep over every mirror (thousands), `mirror_event` the
   syncs an event asked for (`/v1/sync`, `POST /v1/repos/{owner}/{repo}/mirror-sync`,

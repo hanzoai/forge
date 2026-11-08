@@ -45,28 +45,6 @@ func TestCreateRepositoryNotice(t *testing.T) {
 	unittest.AssertExistsAndLoadBean(t, noticeBean)
 }
 
-func TestCreateRepositoryNoticeOnce(t *testing.T) {
-	assert.NoError(t, unittest.PrepareTestDatabase())
-
-	noticeBean := &system.Notice{
-		Type:        system.NoticeRepository,
-		Description: "diverged at abc",
-	}
-	for range 3 {
-		assert.NoError(t, system.CreateRepositoryNoticeOnce(noticeBean.Description))
-	}
-	assert.Equal(t, 1, unittest.GetCount(t, noticeBean))
-
-	// A different description is a different condition.
-	assert.NoError(t, system.CreateRepositoryNoticeOnce("diverged at def"))
-	assert.Equal(t, 1, unittest.GetCount(t, &system.Notice{Description: "diverged at def"}))
-
-	// A notice an admin has cleared is reported again if the condition is still there.
-	assert.NoError(t, db.DeleteByIDs[system.Notice](t.Context(), unittest.AssertExistsAndLoadBean(t, noticeBean).ID))
-	assert.NoError(t, system.CreateRepositoryNoticeOnce("diverged at abc"))
-	assert.Equal(t, 1, unittest.GetCount(t, &system.Notice{Description: "diverged at abc"}))
-}
-
 func TestCountNotices(t *testing.T) {
 	assert.NoError(t, unittest.PrepareTestDatabase())
 	assert.Equal(t, int64(3), system.CountNotices(t.Context()))

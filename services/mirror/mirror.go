@@ -11,6 +11,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/queue"
 	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
 )
 
 // doMirrorSync causes this request to mirror itself
@@ -45,7 +46,6 @@ func Update(ctx context.Context, pullLimit, pushLimit int) error {
 		var repo *repo_model.Repository
 		var mirrorType SyncType
 		var referenceID int64
-		var inbound bool
 
 		if m, ok := bean.(*repo_model.Mirror); ok {
 			if m.GetRepository(ctx) == nil {
@@ -63,8 +63,6 @@ func Update(ctx context.Context, pullLimit, pushLimit int) error {
 			repo = m.Repo
 			mirrorType = PushMirrorType
 			referenceID = m.ID
-			// A due push mirror to GitHub also looks for what an event about it missed.
-			inbound = setting.Mirror.SyncUser != "" && isRegular(ctx, repo) && IsGitHubRepo(m.RemoteAddress, repo.OwnerName, repo.Name)
 		} else {
 			log.Error("Unknown bean: %v", bean)
 			return nil
@@ -78,11 +76,6 @@ func Update(ctx context.Context, pullLimit, pushLimit int) error {
 		}
 
 		// Push to the Queue
-		if inbound {
-			if err := PushToQueue(InboundMirrorType, referenceID); err != nil && !errors.Is(err, queue.ErrAlreadyInQueue) {
-				return err
-			}
-		}
 		if err := PushToQueue(mirrorType, referenceID); err != nil {
 			if err == queue.ErrAlreadyInQueue {
 				if mirrorType == PushMirrorType {
@@ -124,8 +117,66 @@ func Update(ctx context.Context, pullLimit, pushLimit int) error {
 			return err
 		}
 	}
-	log.Trace("Finished: Update: %d pull mirrors and %d push mirrors queued", pullMirrorsRequested, pushMirrorsRequested)
+	inboundRequested := 0
+	if pushLimit != 0 && setting.Mirror.SyncUser != "" {
+		n, err := updateInbound(ctx, pushLimit)
+		if err != nil {
+			return err
+		}
+		inboundRequested = n
+	}
+	log.Trace("Finished: Update: %d pull mirrors, %d push mirrors and %d inbound syncs queued", pullMirrorsRequested, pushMirrorsRequested, inboundRequested)
 	return nil
+}
+
+// updateInbound queues an inbound sync for each push mirror of a regular
+// repository to GitHub that has had none for a while, so a missed event heals.
+// It runs on its own clock: a busy repository pushes out all the time, and
+// would never come due on the push out's.
+func updateInbound(ctx context.Context, limit int) (int, error) {
+	var due []*repo_model.PushMirror
+	if err := repo_model.InboundPushMirrorsIterate(ctx, limit, setting.Mirror.DefaultInterval, func(_ int, bean any) error {
+		due = append(due, bean.(*repo_model.PushMirror))
+		return nil
+	}); err != nil {
+		log.Error("InboundPushMirrorsIterate: %v", err)
+		return 0, err
+	}
+
+	queued := 0
+	for _, m := range due {
+		select {
+		case <-ctx.Done():
+			return queued, errors.New("aborted")
+		default:
+		}
+		repo := m.GetRepository(ctx)
+		if repo == nil {
+			log.Error("Disconnected push-mirror found: %d", m.ID)
+			continue
+		}
+
+		// Either way it goes to the back of the line, or the same ones would be picked every time.
+		m.LastInboundUnix = timeutil.TimeStampNow()
+		if err := repo_model.UpdatePushMirrorLastInbound(ctx, m); err != nil {
+			return queued, err
+		}
+
+		if !isRegular(ctx, repo) {
+			continue
+		}
+		if !IsGitHubRepo(m.RemoteAddress, repo.OwnerName, repo.Name) {
+			if path, ok := githubRepoPath(m.RemoteAddress); ok {
+				log.Warn("Push mirror %d of %s mirrors to github.com/%s, so inbound sync is off for it", m.ID, repo.FullName(), path)
+			}
+			continue
+		}
+		if err := PushToQueue(InboundMirrorType, m.ID); err != nil && !errors.Is(err, queue.ErrAlreadyInQueue) {
+			return queued, err
+		}
+		queued++
+	}
+	return queued, nil
 }
 
 // InitSyncMirrors initializes a go routine to sync the mirrors

@@ -158,6 +158,16 @@ func runPushSync(ctx context.Context, m *repo_model.PushMirror) error {
 
 		log.Trace("Pushing %s mirror[%d] remote %s", storageRepo.RelativePath(), m.ID, m.RemoteName)
 
+		// Where this repository is mirrored to GitHub and the inbound sync is on,
+		// take the tips as they stand before the push, to record once it is done.
+		var pushed map[string]string
+		if !isWiki && setting.Mirror.SyncUser != "" && isRegular(ctx, repo) && IsGitHubRepo(m.RemoteAddress, repo.OwnerName, repo.Name) {
+			var err error
+			if pushed, err = forgeTips(ctx, repo); err != nil {
+				log.Error("SyncPushMirror [mirror: %d]: %v", m.ID, err)
+			}
+		}
+
 		envs := proxy.EnvWithProxy(remoteURL.URL)
 		// Carry branches and tags outward, additively. This deliberately does NOT
 		// use Force or Mirror: together those made the push authoritative over the
@@ -187,6 +197,10 @@ func runPushSync(ctx context.Context, m *repo_model.PushMirror) error {
 			return util.SanitizeErrorCredentialURLs(err)
 		}
 
+		if pushed != nil {
+			// Even if the request ends now, GitHub has these.
+			recordPushed(context.WithoutCancel(ctx), repo, pushed)
+		}
 		return nil
 	}
 
