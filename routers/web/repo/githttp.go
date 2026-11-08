@@ -470,13 +470,10 @@ func GetInfoRefs(ctx *context.Context) {
 
 	setHeaderNoCache(ctx)
 	if h.serviceType == "" {
-		// it's said that some legacy git clients will send requests to "/info/refs" without "service" parameter,
-		// although there should be no such case client in the modern days. TODO: not quite sure why we need this UpdateServerInfo logic
-		if err := gitrepo.UpdateServerInfo(ctx, h.getStorageRepo()); err != nil {
-			ctx.ServerError("UpdateServerInfo", err)
-			return
-		}
-		h.sendFile(ctx, "text/plain; charset=utf-8", "info/refs")
+		// The dumb protocol's list of refs is written by git update-server-info,
+		// which lists every ref the repository has, those that are hidden from
+		// clients too. No client of this century asks for it without a service.
+		ctx.PlainText(http.StatusForbidden, "The dumb HTTP protocol is not served; ask for a service")
 		return
 	}
 
