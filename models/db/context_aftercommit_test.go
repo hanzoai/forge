@@ -139,7 +139,7 @@ func TestAfterCommit(t *testing.T) {
 	t.Run("FailureDoesNotFailCommitOrStopTheRest", func(t *testing.T) {
 		reset()
 		lc, cleanup := test.NewLogChecker(log.DEFAULT)
-		lc.Filter("AfterCommit a: hook failed")
+		lc.Filter("AfterCommit a: hook failed").StopMark("logs-done")
 		defer cleanup()
 
 		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
@@ -148,14 +148,15 @@ func TestAfterCommit(t *testing.T) {
 			return nil
 		}))
 		assert.Equal(t, []string{"b"}, ran)
-		seen, _ := lc.Check(200 * time.Millisecond)
+		log.Error("logs-done") // events are read in order, so everything logged before this has been seen
+		seen, _ := lc.Check(5 * time.Second)
 		assert.True(t, seen[0], "the failure must be logged")
 	})
 
 	t.Run("PanicIsContained", func(t *testing.T) {
 		reset()
 		lc, cleanup := test.NewLogChecker(log.DEFAULT)
-		lc.Filter("AfterCommit a panicked: boom")
+		lc.Filter("AfterCommit a panicked: boom").StopMark("logs-done")
 		defer cleanup()
 
 		require.NotPanics(t, func() {
@@ -166,7 +167,8 @@ func TestAfterCommit(t *testing.T) {
 			}))
 		})
 		assert.Equal(t, []string{"b"}, ran)
-		seen, _ := lc.Check(200 * time.Millisecond)
+		log.Error("logs-done") // events are read in order, so everything logged before this has been seen
+		seen, _ := lc.Check(5 * time.Second)
 		assert.True(t, seen[0], "the panic must be logged")
 	})
 

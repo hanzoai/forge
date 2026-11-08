@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	runnerv1 "github.com/hanzo-git/actions-proto-go/runner/v1"
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/log"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestIncreaseTaskVersion(t *testing.T) {
@@ -44,17 +46,17 @@ func TestIncreaseTaskVersion(t *testing.T) {
 
 	t.Run("OutsideTransactionImmediate", func(t *testing.T) {
 		before := read(t, t.Context())
-		require.NoError(t, IncreaseTaskVersion(t.Context(), ownerID, repoID))
+		IncreaseTaskVersion(t.Context(), ownerID, repoID)
 		assert.Equal(t, advanced(before, 1, 1, 1, 0), read(t, t.Context()))
 	})
 
 	t.Run("CommitBumpsOncePerScope", func(t *testing.T) {
 		before := read(t, t.Context())
 		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
-			require.NoError(t, IncreaseTaskVersion(ctx, ownerID, repoID))
-			require.NoError(t, IncreaseTaskVersion(ctx, ownerID, repoID))
-			require.NoError(t, IncreaseTaskVersion(ctx, ownerID, otherRepoID))
-			require.NoError(t, IncreaseTaskVersion(ctx, ownerID, repoID))
+			IncreaseTaskVersion(ctx, ownerID, repoID)
+			IncreaseTaskVersion(ctx, ownerID, repoID)
+			IncreaseTaskVersion(ctx, ownerID, otherRepoID)
+			IncreaseTaskVersion(ctx, ownerID, repoID)
 			assert.Equal(t, before, read(t, ctx), "unchanged until the transaction commits")
 			return nil
 		}))
@@ -65,10 +67,12 @@ func TestIncreaseTaskVersion(t *testing.T) {
 		before := read(t, t.Context())
 		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
 			require.NoError(t, db.WithTx(ctx, func(ctx context.Context) error {
-				return IncreaseTaskVersion(ctx, ownerID, repoID)
+				IncreaseTaskVersion(ctx, ownerID, repoID)
+				return nil
 			}))
 			assert.Equal(t, before, read(t, ctx), "the inner transaction does not commit")
-			return IncreaseTaskVersion(ctx, ownerID, repoID)
+			IncreaseTaskVersion(ctx, ownerID, repoID)
+			return nil
 		}))
 		assert.Equal(t, advanced(before, 1, 1, 1, 0), read(t, t.Context()))
 	})
@@ -76,7 +80,7 @@ func TestIncreaseTaskVersion(t *testing.T) {
 	t.Run("RollbackUnchanged", func(t *testing.T) {
 		before := read(t, t.Context())
 		assert.Error(t, db.WithTx(t.Context(), func(ctx context.Context) error {
-			require.NoError(t, IncreaseTaskVersion(ctx, ownerID, repoID))
+			IncreaseTaskVersion(ctx, ownerID, repoID)
 			return errors.New("fail")
 		}))
 		assert.Equal(t, before, read(t, t.Context()))
@@ -85,90 +89,137 @@ func TestIncreaseTaskVersion(t *testing.T) {
 	t.Run("GlobalOnly", func(t *testing.T) {
 		before := read(t, t.Context())
 		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
-			return IncreaseTaskVersion(ctx, 0, 0)
+			IncreaseTaskVersion(ctx, 0, 0)
+			return nil
 		}))
 		assert.Equal(t, advanced(before, 1, 0, 0, 0), read(t, t.Context()))
 	})
 }
 
-// flaky increases through the real statement, except that the first failures[s] attempts on scope s fail.
+// flaky increases through the real statement, except that scopes in failing always fail.
 type flaky struct {
-	failures map[scope]int
-	calls    []scope
+	failing map[scope]bool
+	calls   []scope
 }
 
 func (f *flaky) increase(ctx context.Context, ownerID, repoID int64) error {
 	s := scope{ownerID, repoID}
 	f.calls = append(f.calls, s)
-	if f.failures[s] > 0 {
-		f.failures[s]--
+	if f.failing[s] {
 		return errors.New("database is busy")
 	}
 	return increaseTasksVersionByScope(ctx, ownerID, repoID)
 }
 
-func (f *flaky) callsOn(s scope) (n int) {
-	for _, c := range f.calls {
-		if c == s {
-			n++
-		}
-	}
-	return n
-}
-
-func TestIncreaseTaskVersionRetry(t *testing.T) {
+func TestIncreaseTaskVersionFailure(t *testing.T) {
 	require.NoError(t, unittest.PrepareTestDatabase())
 
 	const ownerID, repoID = 9101, 9102
 	repo, owner, global := scope{repoID: repoID}, scope{ownerID: ownerID}, scope{}
-	read := func(s scope) int64 {
-		v, err := GetTasksVersionByScope(t.Context(), s.ownerID, s.repoID)
-		require.NoError(t, err)
+	read := func() [3]int64 {
+		var v [3]int64
+		for i, s := range []scope{repo, owner, global} {
+			var err error
+			v[i], err = GetTasksVersionByScope(t.Context(), s.ownerID, s.repoID)
+			require.NoError(t, err)
+		}
 		return v
-	}
-	// commit runs one bump inside a transaction that commits.
-	commit := func(f *flaky) {
-		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
-			return increaseTaskVersion(ctx, ownerID, repoID, f.increase)
-		}))
 	}
 
 	t.Run("NarrowFirstGlobalLast", func(t *testing.T) {
 		f := &flaky{}
-		commit(f)
+		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
+			increaseTaskVersion(ctx, ownerID, repoID, f.increase)
+			return nil
+		}))
 		assert.Equal(t, []scope{repo, owner, global}, f.calls)
 	})
 
-	t.Run("RetryThenSuccess", func(t *testing.T) {
-		before := [3]int64{read(repo), read(owner), read(global)}
-		f := &flaky{failures: map[scope]int{global: bumpAttempts - 1}}
-		commit(f)
-		assert.Equal(t, bumpAttempts, f.callsOn(global))
-		assert.Equal(t, [3]int64{before[0] + 1, before[1] + 1, before[2] + 1}, [3]int64{read(repo), read(owner), read(global)})
-	})
-
 	t.Run("OneScopeFailingKeepsTheOthers", func(t *testing.T) {
-		before := [3]int64{read(repo), read(owner), read(global)}
+		before := read()
 		lc, cleanup := test.NewLogChecker(log.DEFAULT)
-		lc.Filter("after 3 attempts: database is busy")
+		lc.Filter("AfterCommit {ownerID:9101 repoID:0}: database is busy").StopMark("logs-done")
 		defer cleanup()
 
-		f := &flaky{failures: map[scope]int{owner: bumpAttempts}}
-		commit(f)
+		f := &flaky{failing: map[scope]bool{owner: true}}
+		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
+			increaseTaskVersion(ctx, ownerID, repoID, f.increase)
+			return nil
+		}))
 
-		assert.Equal(t, bumpAttempts, f.callsOn(owner), "gives up after the attempts")
-		assert.Equal(t, 1, f.callsOn(repo))
-		assert.Equal(t, 1, f.callsOn(global))
-		assert.Equal(t, [3]int64{before[0] + 1, before[1], before[2] + 1}, [3]int64{read(repo), read(owner), read(global)})
-		seen, _ := lc.Check(200 * time.Millisecond)
-		assert.True(t, seen[0], "the final failure must be logged")
+		assert.Equal(t, []scope{repo, owner, global}, f.calls, "each scope is tried once, and the failure stops none")
+		assert.Equal(t, [3]int64{before[0] + 1, before[1], before[2] + 1}, read())
+		log.Error("logs-done") // events are read in order, so everything logged before this has been seen
+		seen, _ := lc.Check(5 * time.Second)
+		assert.True(t, seen[0], "the failure must be logged")
 	})
 
-	t.Run("OutsideTransactionReturnsTheFailure", func(t *testing.T) {
-		before := [3]int64{read(repo), read(owner), read(global)}
-		f := &flaky{failures: map[scope]int{repo: bumpAttempts}}
-		err := increaseTaskVersion(t.Context(), ownerID, repoID, f.increase)
-		require.ErrorContains(t, err, "after 3 attempts: database is busy")
-		assert.Equal(t, [3]int64{before[0], before[1] + 1, before[2] + 1}, [3]int64{read(repo), read(owner), read(global)})
+	t.Run("OutsideTransactionLogsAndDoesNotReturn", func(t *testing.T) {
+		before := read()
+		lc, cleanup := test.NewLogChecker(log.DEFAULT)
+		lc.Filter("IncreaseTaskVersion {ownerID:0 repoID:9102}: database is busy").StopMark("logs-done")
+		defer cleanup()
+
+		f := &flaky{failing: map[scope]bool{repo: true}}
+		increaseTaskVersion(t.Context(), ownerID, repoID, f.increase)
+
+		assert.Equal(t, [3]int64{before[0], before[1] + 1, before[2] + 1}, read())
+		log.Error("logs-done") // events are read in order, so everything logged before this has been seen
+		seen, _ := lc.Check(5 * time.Second)
+		assert.True(t, seen[0], "the failure must be logged")
 	})
+}
+
+// withoutTasksVersion takes the version table away, so every bump fails, until the returned function puts it back.
+func withoutTasksVersion(t *testing.T) (restore func()) {
+	t.Helper()
+	_, err := db.Exec(t.Context(), "ALTER TABLE action_tasks_version RENAME TO action_tasks_version_off")
+	require.NoError(t, err)
+	return func() {
+		_, err := db.Exec(t.Context(), "ALTER TABLE action_tasks_version_off RENAME TO action_tasks_version")
+		require.NoError(t, err)
+	}
+}
+
+// UpdateTaskByState settles a finished task outside any transaction, and a runner that gets an error back reports
+// again into "state is final", which skips the rest of the job's settlement. A bump that fails must not be that error.
+func TestUpdateTaskByStateSurvivesAFailedBump(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	defer withoutTasksVersion(t)()
+
+	task, job := newDroppedTask(t, "bump-fails-finished", 9930, 0)
+	// Waiting work remains in the repo, which is what makes a finished job bump the version.
+	require.NoError(t, db.Insert(t.Context(), &ActionRunJob{
+		RunID: -1, RepoID: job.RepoID, OwnerID: job.OwnerID, Name: "waiting", JobID: "waiting",
+		Status: StatusWaiting, RunsOn: []string{"linux-amd64"},
+	}))
+
+	now := timestamppb.Now()
+	_, err := UpdateTaskByState(t.Context(), task.RunnerID, &runnerv1.TaskState{
+		Id:        task.ID,
+		Result:    runnerv1.Result_RESULT_SUCCESS,
+		StoppedAt: now,
+		Steps: []*runnerv1.StepState{
+			{Id: 0, Result: runnerv1.Result_RESULT_SUCCESS, StartedAt: now, StoppedAt: now},
+			{Id: 1, Result: runnerv1.Result_RESULT_SUCCESS, StartedAt: now, StoppedAt: now},
+		},
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, StatusSuccess, unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID}).Status)
+	assert.Equal(t, StatusSuccess, unittest.AssertExistsAndLoadBean(t, &ActionRun{ID: job.RunID}).Status,
+		"the run must still be settled from its jobs")
+}
+
+// Same, for the transaction that puts a dropped job back in the queue: its bump follows the commit.
+func TestUpdateTaskByStateRequeuesThroughAFailedBump(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	defer withoutTasksVersion(t)()
+
+	task, job := newDroppedTask(t, "bump-fails-requeued", 9931, 0)
+
+	_, err := UpdateTaskByState(t.Context(), task.RunnerID, droppedState(task.ID))
+	require.NoError(t, err)
+
+	assert.Equal(t, StatusWaiting, unittest.AssertExistsAndLoadBean(t, &ActionRunJob{ID: job.ID}).Status)
 }

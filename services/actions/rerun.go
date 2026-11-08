@@ -337,9 +337,7 @@ func execRerunPlan(ctx context.Context, plan *rerunPlan) (*actions_model.ActionR
 		}
 
 		if hasWaitingJobs {
-			if err := actions_model.IncreaseTaskVersion(ctx, plan.run.OwnerID, plan.run.RepoID); err != nil {
-				return err
-			}
+			actions_model.IncreaseTaskVersion(ctx, plan.run.OwnerID, plan.run.RepoID)
 		}
 
 		return nil

@@ -339,7 +339,8 @@ func SetRunnerDisabled(ctx context.Context, runner *ActionRunner, isDisabled boo
 		if err := UpdateRunner(ctx, runner, "is_disabled"); err != nil {
 			return err
 		}
-		return IncreaseTaskVersion(ctx, runner.OwnerID, runner.RepoID)
+		IncreaseTaskVersion(ctx, runner.OwnerID, runner.RepoID)
+		return nil
 	})
 }
 

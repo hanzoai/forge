@@ -6,11 +6,9 @@ package actions
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"time"
 
 	"github.com/hanzoai/git/models/db"
+	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/timeutil"
 )
 
@@ -78,20 +76,16 @@ func increaseTasksVersionByScope(ctx context.Context, ownerID, repoID int64) err
 // scope names one version row: {0, 0} is global, {owner, 0} an org, {0, repo} a repo.
 type scope struct{ ownerID, repoID int64 }
 
-const (
-	bumpAttempts = 3
-	bumpBackoff  = 50 * time.Millisecond
-)
-
 // IncreaseTaskVersion bumps the repo, owner and global versions, in that order, so idle runners poll again.
 // In a transaction the bumps wait for it to commit, and a rollback bumps nothing. Each scope is bumped once however
-// often this is called, in a single autocommit statement of its own, so no version row is ever held across work.
-// A scope that still fails after retries is logged and the others are unaffected; the stalled-job sweep repairs it.
-func IncreaseTaskVersion(ctx context.Context, ownerID, repoID int64) error {
-	return increaseTaskVersion(ctx, ownerID, repoID, increaseTasksVersionByScope)
+// often this is called, by a single autocommit statement of its own, so no version row is ever held across work.
+// A bump announces work that has already committed, so a failure is logged and never returned to the caller;
+// the wake_runners sweep repairs it.
+func IncreaseTaskVersion(ctx context.Context, ownerID, repoID int64) {
+	increaseTaskVersion(ctx, ownerID, repoID, increaseTasksVersionByScope)
 }
 
-func increaseTaskVersion(ctx context.Context, ownerID, repoID int64, increase func(ctx context.Context, ownerID, repoID int64) error) error {
+func increaseTaskVersion(ctx context.Context, ownerID, repoID int64, increase func(ctx context.Context, ownerID, repoID int64) error) {
 	scopes := make([]scope, 0, 3)
 	if repoID > 0 {
 		scopes = append(scopes, scope{repoID: repoID})
@@ -99,32 +93,14 @@ func increaseTaskVersion(ctx context.Context, ownerID, repoID int64, increase fu
 	if ownerID > 0 {
 		scopes = append(scopes, scope{ownerID: ownerID})
 	}
-	scopes = append(scopes, scope{}) // the global row is the busiest, so its retries come last
+	scopes = append(scopes, scope{}) // the global row is the busiest, so waiting on it delays the others least when it is last
 
-	var errs []error
 	for _, s := range scopes {
-		bump := func(ctx context.Context) error { return bumpWithRetry(ctx, s, increase) }
+		bump := func(ctx context.Context) error { return increase(ctx, s.ownerID, s.repoID) }
 		if !db.AfterCommit(ctx, s, bump) { // not in a transaction: bump now
-			errs = append(errs, bump(ctx))
-		}
-	}
-	return errors.Join(errs...)
-}
-
-// bumpWithRetry bumps one scope, trying up to bumpAttempts times with a growing pause: a lost bump leaves idle runners asleep.
-func bumpWithRetry(ctx context.Context, s scope, increase func(ctx context.Context, ownerID, repoID int64) error) error {
-	var err error
-	for attempt := range bumpAttempts {
-		if attempt > 0 {
-			select {
-			case <-ctx.Done():
-				return err
-			case <-time.After(time.Duration(attempt) * bumpBackoff):
+			if err := bump(ctx); err != nil {
+				log.Error("IncreaseTaskVersion %+v: %v", s, err)
 			}
 		}
-		if err = increase(ctx, s.ownerID, s.repoID); err == nil {
-			return nil
-		}
 	}
-	return fmt.Errorf("after %d attempts: %w", bumpAttempts, err)
 }
