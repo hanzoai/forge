@@ -373,13 +373,17 @@ func hasWaitingJobsToPick(ctx context.Context, repoID int64) (bool, error) {
 		Exist(&ActionRunJob{})
 }
 
-// HasStalledJobs reports whether a job a runner could take has waited, unclaimed, since before the given time.
+// FindStalledJobs returns one job per owner and repo among those a runner could take that have waited, unclaimed,
+// since before the given time. Only OwnerID and RepoID are loaded.
 // A job with no runs-on is stored as an empty value, "null" or "[]", and is not one a runner is looking for.
-func HasStalledJobs(ctx context.Context, before timeutil.TimeStamp) (bool, error) {
-	return db.GetEngine(ctx).
+func FindStalledJobs(ctx context.Context, before timeutil.TimeStamp) ([]*ActionRunJob, error) {
+	var jobs []*ActionRunJob
+	err := db.GetEngine(ctx).
 		Where("task_id = ? AND status = ? AND is_reusable_caller = ? AND updated < ?", 0, StatusWaiting, false, before).
 		And(builder.NotIn("runs_on", "", "null", "[]")).
-		Exist(&ActionRunJob{})
+		Distinct("owner_id", "repo_id").
+		Find(&jobs)
+	return jobs, err
 }
 
 func UpdateRunJob(ctx context.Context, job *ActionRunJob, cond builder.Cond, cols ...string) (int64, error) {
@@ -419,9 +423,7 @@ func UpdateRunJob(ctx context.Context, job *ActionRunJob, cond builder.Cond, col
 		case job.Status.IsWaiting():
 			// A job returning to the waiting queue is work a runner can pick up, so bump the
 			// version to wake idle runners whose tasksVersion already equals latestVersion.
-			if err := IncreaseTaskVersion(ctx, job.OwnerID, job.RepoID); err != nil {
-				return 0, err
-			}
+			IncreaseTaskVersion(ctx, job.OwnerID, job.RepoID)
 		case job.Status.IsDone():
 			// When a job finishes, bump the version so that idle runners — whose
 			// tasksVersion already equals the current latestVersion — learn that
@@ -437,9 +439,7 @@ func UpdateRunJob(ctx context.Context, job *ActionRunJob, cond builder.Cond, col
 				return 0, err
 			}
 			if hasWaiting {
-				if err := IncreaseTaskVersion(ctx, job.OwnerID, job.RepoID); err != nil {
-					return 0, err
-				}
+				IncreaseTaskVersion(ctx, job.OwnerID, job.RepoID)
 			}
 		}
 	}

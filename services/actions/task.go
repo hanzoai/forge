@@ -55,14 +55,21 @@ func TryPickTask(ctx context.Context, runner *actions_model.ActionRunner) (task 
 // stalledGrace is how long a job may wait before idle runners are woken for it.
 const stalledGrace = time.Minute
 
-// WakeRunners moves the global tasks version when a job has waited over a minute with no task, so idle runners
-// ask for work again. It repairs a bump that failed, and waits made without one, such as rows changed in the database.
+// WakeRunners bumps the tasks versions of every owner and repo that has a job waiting over a minute with no task,
+// so idle runners of any scope ask for work again. It repairs a bump that failed, and waits made without one,
+// such as rows changed in the database.
 func WakeRunners(ctx context.Context) error {
-	stalled, err := actions_model.HasStalledJobs(ctx, timeutil.TimeStampNow().AddDuration(-stalledGrace))
-	if err != nil || !stalled {
+	jobs, err := actions_model.FindStalledJobs(ctx, timeutil.TimeStampNow().AddDuration(-stalledGrace))
+	if err != nil {
 		return err
 	}
-	return actions_model.IncreaseTaskVersion(ctx, 0, 0)
+	// One transaction, so the global and owner rows are bumped once however many repos are stalled.
+	return db.WithTx(ctx, func(ctx context.Context) error {
+		for _, job := range jobs {
+			actions_model.IncreaseTaskVersion(ctx, job.OwnerID, job.RepoID)
+		}
+		return nil
+	})
 }
 
 // releaseTaskForRunnerCleanup releases a claimed task using a fresh, bounded context. The request context
