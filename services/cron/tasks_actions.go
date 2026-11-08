@@ -8,6 +8,7 @@ import (
 	"context"
 
 	user_model "github.com/hanzoai/git/models/user"
+	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 	actions_service "github.com/hanzoai/git/services/actions"
 )
@@ -71,6 +72,7 @@ func registerFailUnsatisfiableJobs() {
 // registerWakeRunners runs every minute: a job that has waited past the grace with no runner is
 // the sign that a runner is asleep on a version that should have moved.
 func registerWakeRunners() {
+	warnWakeRunnersUnscheduled()
 	RegisterTaskFatal("wake_runners", &BaseConfig{
 		Enabled:    true,
 		RunAtStart: false,
@@ -78,6 +80,15 @@ func registerWakeRunners() {
 	}, func(ctx context.Context, _ *user_model.User, cfg Config) error {
 		return actions_service.WakeRunners(ctx)
 	})
+}
+
+// warnWakeRunnersUnscheduled says at error level that wake_runners will never fire when Hanzo Tasks is unavailable:
+// it is the only repair for a runner wakeup lost to a failed version bump.
+func warnWakeRunnersUnscheduled() {
+	if tasksClient == nil {
+		log.Error("cron: wake_runners cannot be scheduled because Hanzo Tasks is unavailable: " +
+			"a runner wakeup lost to a failed version bump will not be repaired, and idle runners can sit on work they could take")
+	}
 }
 
 // registerScheduleTasks registers a scheduled task that runs every minute to start any due schedule tasks.
