@@ -496,8 +496,9 @@ func TestInboundRefusedRefIsReportedAndRetried(t *testing.T) {
 	assert.Contains(t, r.notices()[0], "refs/heads/main")
 	assert.Contains(t, r.notices()[0], "protected branch")
 
-	// Once it is allowed, the next sync takes it with no new upstream commit.
+	// Once it is allowed, which is a change of the rules, the next sync takes it with no new upstream commit.
 	require.NoError(t, os.Remove(filepath.Join(r.dir, "refuse")))
+	require.NoError(t, db.Insert(t.Context(), &git_model.ProtectedBranch{RepoID: r.repo.ID, RuleName: "main", CanPush: true}))
 	require.True(t, r.sync())
 	assert.Equal(t, c2, r.forge.tip("refs/heads/main"))
 }
@@ -779,7 +780,6 @@ func TestIsGitHubRepo(t *testing.T) {
 		"https://github.com/hanzo-inc/./app":             false,
 		"https://github.com//hanzo-inc/app":              false,
 		"https://github.com:8080/hanzo-inc/app":          false,
-		" https://github.com/hanzo-inc/app":              false,
 		"https://github.com/hanzo-inc/app\n":             false,
 		"ssh://git@github.com:2222/hanzo-inc/app":        false,
 		"git@evil.com:github.com/hanzo-inc/app.git":      false,
@@ -789,6 +789,7 @@ func TestIsGitHubRepo(t *testing.T) {
 	} {
 		assert.Equal(t, want, IsGitHubRepo(address, "hanzo-inc", "app"), "%q", address)
 	}
+	assert.False(t, IsGitHubRepo(" https://github.com/hanzo-inc/app", "hanzo-inc", "app"), "a leading space")
 }
 
 // The sweep looks for what an event missed in every push mirror of a regular
@@ -1024,7 +1025,8 @@ func TestInboundNeverBringsInBotBranches(t *testing.T) {
 			assert.Error(t, err, "%s: its objects are not in the repository", bot)
 		}
 		assert.Empty(t, r.forge.tip("refs/heads/Dependabot/Capital"), "filled=%v", filled)
-		assert.Equal(t, cased, r.forge.tip("refs/upstream/heads/Dependabot/Capital"), "skipped, and recorded once")
+		assert.Empty(t, r.forge.tip("refs/upstream/heads/Dependabot/Capital"), "not kept, whatever the case")
+		assert.Empty(t, r.forge.tip("refs/upstream/staging/heads/Dependabot/Capital"))
 		assert.NotContains(t, strings.Join(r.calls("pre-receive"), " "), "ependabot")
 		assert.Empty(t, r.notices())
 	}
@@ -1213,4 +1215,127 @@ func TestInboundSkippedTipsCannotBeFetchedById(t *testing.T) {
 	// Which it would, were the forge's setting still in force: the test asks the right question.
 	r.forge.git("config", "uploadpack.allowAnySHA1InWant", "true")
 	assert.NoError(t, fetch("0"))
+}
+
+// What an earlier version left of a bot's branch, staged or recorded, is removed.
+func TestInboundRemovesWhatWasKeptOfBotBranches(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync())
+
+	r.forge.set("refs/upstream/staging/heads/dependabot/old", c1)
+	r.forge.set("refs/upstream/heads/renovate/old", c1)
+	r.forge.set("refs/upstream/heads/Copilot/old", c1)
+	r.github.set("refs/heads/other", c1)
+	require.True(t, r.sync())
+
+	assert.Empty(t, r.forge.tip("refs/upstream/staging/heads/dependabot/old"))
+	assert.Empty(t, r.forge.tip("refs/upstream/heads/renovate/old"))
+	assert.Empty(t, r.forge.tip("refs/upstream/heads/Copilot/old"))
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/main"))
+}
+
+// A name that looks like an object id can be read as the object, so it is not taken.
+func TestInboundSkipsNamesLikeObjectIds(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	r.github.set("refs/heads/"+c1, c1)
+	r.github.git("tag", strings.ToUpper(c1), c1)
+	r.github.git("tag", "v1", c1)
+
+	require.True(t, r.sync())
+	require.True(t, r.sync())
+
+	assert.Equal(t, c1, r.forge.tip("refs/heads/main"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v1"))
+	assert.Empty(t, r.forge.tip("refs/heads/"+c1))
+	assert.Empty(t, r.forge.tip("refs/tags/"+strings.ToUpper(c1)))
+	assert.Empty(t, r.forge.tip("refs/upstream/heads/"+c1))
+	assert.Len(t, r.notices(), 2, "one for each, once")
+}
+
+// git reads <id> as a ref's name before it reads it as an object, and a writer
+// may have made refs/heads/<id> or refs/tags/<id>. The sync pushes the object.
+func TestInboundPushCannotBeRedirectedByRefsNamedLikeTheTip(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync())
+	r.forget()
+
+	attacker := r.forge.commit("", "the writer's commit")
+	decoyBranch := func(id string) { r.forge.set("refs/heads/"+id, attacker) }
+	decoyTag := func(id string) { r.forge.set("refs/tags/"+id, attacker) }
+	decoyAnnotated := func(id string) { r.forge.git("tag", "-a", "-m", "decoy", id, attacker) }
+
+	// A branch that moves forward, and one that is new.
+	moved := r.github.commit(c1, "two")
+	fresh := r.github.commit(c1, "fresh")
+	r.github.set("refs/heads/main", moved)
+	r.github.set("refs/heads/fresh", fresh)
+	decoyBranch(moved)
+	decoyTag(fresh)
+
+	// Tags together, then a tag alone: lightweight and annotated, with a decoy of either kind for each.
+	r.github.git("tag", "light", c1)
+	r.github.git("tag", "-a", "-m", "annotated", "annotated", moved)
+	annotated := r.github.tip("refs/tags/annotated")
+	r.github.git("tag", "-a", "-m", "annotated too", "annotated2", moved)
+	annotated2 := r.github.tip("refs/tags/annotated2")
+	decoyBranch(c1)
+	decoyAnnotated(annotated)
+	decoyTag(annotated2)
+
+	require.True(t, r.sync())
+	assert.Equal(t, moved, r.forge.tip("refs/heads/main"), "a decoy named for the tip did not take its place")
+	assert.Equal(t, fresh, r.forge.tip("refs/heads/fresh"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/light"))
+	assert.Equal(t, annotated, r.forge.tip("refs/tags/annotated"))
+	assert.Equal(t, annotated2, r.forge.tip("refs/tags/annotated2"))
+	assert.Equal(t, "tag", r.forge.git("for-each-ref", "--format=%(objecttype)", "refs/tags/annotated"), "an annotated tag stays a tag object")
+
+	// One tag, which goes the ordinary way.
+	single := r.github.commit(moved, "single")
+	r.github.git("tag", "single", single)
+	decoyBranch(single)
+	require.True(t, r.sync())
+	assert.Equal(t, single, r.forge.tip("refs/tags/single"))
+
+	// The writer's own refs are what they were.
+	assert.Equal(t, attacker, r.forge.tip("refs/heads/"+moved))
+	assert.Equal(t, attacker, r.forge.tip("refs/heads/"+c1))
+}
+
+// A protected branch refuses the same push every time, and there may be many.
+func TestInboundDoesNotAskTheHooksAgainAboutDeclinedBranches(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync())
+	r.forget()
+
+	branches := []string{"refs/heads/b1", "refs/heads/b2", "refs/heads/b3"}
+	r.refuse(branches...)
+	for _, branch := range branches {
+		r.github.set(branch, c1)
+	}
+	for range 3 {
+		require.True(t, r.sync())
+	}
+	assert.Equal(t, 3, r.invocations("pre-receive"), "each asked once, not at every sync")
+	assert.Len(t, r.notices(), 3)
+
+	// One of them moves, which is a different push to refuse.
+	r.github.set("refs/heads/b1", r.github.commit(c1, "b1 moves"))
+	require.True(t, r.sync())
+	assert.Equal(t, 4, r.invocations("pre-receive"))
+
+	// The rules change: all are asked again.
+	require.NoError(t, db.Insert(t.Context(), &git_model.ProtectedBranch{RepoID: r.repo.ID, RuleName: "b*"}))
+	require.True(t, r.sync())
+	assert.Equal(t, 7, r.invocations("pre-receive"))
+	require.True(t, r.sync())
+	assert.Equal(t, 7, r.invocations("pre-receive"))
 }

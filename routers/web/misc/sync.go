@@ -8,7 +8,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	"encoding/json" //nolint:depguard // modules/json has no token stream, which is how the repository is found without reading the whole payload
 	"errors"
 	"io"
 	"net/http"

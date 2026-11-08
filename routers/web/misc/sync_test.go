@@ -63,7 +63,7 @@ func TestReadVerifiedKeepsOnlyTheFront(t *testing.T) {
 	// A body shorter than what may be held is held whole.
 	head, _, err = readVerified("s3cr3t", sign("s3cr3t", payload), strings.NewReader(payload), 1<<20)
 	require.NoError(t, err)
-	assert.Equal(t, payload, string(head))
+	assert.JSONEq(t, payload, string(head))
 }
 
 func TestRepoFromPayload(t *testing.T) {

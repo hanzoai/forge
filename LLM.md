@@ -254,8 +254,9 @@ either side reaches the other. There is no mode to set.
     GitHub repository of its own name (a forge rename turns it off, with a warning),
     and that `[mirror] SYNC_USER` is set and can write; otherwise it does nothing;
   - hides `refs/upstream` (`uploadpack.hideRefs`, `receive.hideRefs`; pre-receive
-    refuses any push there; the dumb-HTTP `info/refs`, which lists every ref, is
-    refused). Only the sync's own pushes are told of `refs/upstream/staging`, by
+    refuses any push there, `GetRefsFiltered` never lists it, and the dumb HTTP
+    protocol, which lists every ref and serves any object, is refused whole:
+    `info/refs` without a service, `HEAD`, `objects/...`). Only the sync's own pushes are told of `refs/upstream/staging`, by
     `git push --receive-pack='git -c receive.hideRefs=!refs/upstream/staging
     receive-pack'`: a push learns which commits the repository has from what
     receive-pack advertises to it, and without that, filling an empty repo from itself
@@ -275,7 +276,12 @@ either side reaches the other. There is no mode to set.
     refs at all changes no record; a record is dropped only when its ref is gone
     while others remain;
   - enters through the normal push path: one non-force `git push` per ref, from
-    the repo to itself, under `PushingEnvironment` of the sync user. Post-receive
+    the repo to itself, under `PushingEnvironment` of the sync user. The source of
+    each refspec is `<id>^{object}`: a bare `<id>` is read as a ref's name before
+    it is read as an object, and a writer may have made `refs/heads/<id>` or
+    `refs/tags/<id>` to take its place. Pre-receive refuses to make a branch or tag
+    named like a full object id (deleting one is allowed), and the importer does not
+    take upstream's, with a notice; Post-receive
     runs the push queue, which starts Actions (`PushCommits`), pull request checks,
     issue references and the push out. The `Sync*` notifiers are a pull mirror's
     and are not used. Archived repos are not written (pre-receive does not check it);
@@ -306,15 +312,18 @@ either side reaches the other. There is no mode to set.
     that skips the hooks (`GIT_INTERNAL_PUSH`). After it, whatever landed, even in
     a push that reports failure, is recorded and gets its release
     (`SyncReleasesWithTags`), as a pull mirror makes them. Where the rules cannot be
-    read the hooks decide (one push, then tag by tag). A tag the hooks decline is not
-    offered to them again for an hour unless its tip or the rules change. So two tags
+    read the hooks decide (one push, then tag by tag). A tag or branch the hooks
+    decline is not offered to them again for an hour unless its tip or the rules
+    (the protected tag list, or the protected branch rules' ids and update times)
+    change. So two tags
     that appear together on GitHub raise no tag events here;
   - never brings in the branches bots open, by name prefix in any case: `dependabot/`,
     `renovate/`, `gh-readonly-queue/`, `copilot/`, `release-please--`,
     `changeset-release/` (`botBranches`, the one list). The fetch excludes them with
-    negative refspecs (git 2.29), so their objects never reach the repo; one that
-    gets through under another case is skipped and recorded once. `deps/` is not a
-    bot prefix;
+    negative refspecs (git 2.29), so their objects never reach the repo (the exclusions
+    are case-sensitive, so a name in another case is fetched, then removed: staged and
+    recorded refs of bot branches, left by any earlier version too, are deleted on
+    every run). `deps/` is not a bot prefix;
   - Not carried in: LFS objects and wikis.
 - **What the push path enforces for `SYNC_USER`.** Pre-receive applies what it
   applies to any direct push, not to a merge: the user's write permission; a
