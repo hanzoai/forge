@@ -250,6 +250,11 @@ either side reaches the other. There is no mode to set.
   starts Actions and webhooks and fires the push mirror back as a no-op for the same
   sha; GitHub emits no event for an unchanged ref, so there is no loop.
 - One lock per repo (`getRepoMirrorLockKey`) serializes pull, inbound and push out.
+- Two queues run the same `doMirrorSync` (`services/mirror/queue.go`): `mirror`
+  carries the scheduled sweep over every mirror (thousands), `mirror_event` the
+  syncs an event asked for (`/v1/sync`, `POST /v1/repos/{owner}/{repo}/mirror-sync`),
+  so an event never waits behind the sweep. Push out on commit and the settings
+  page still use `mirror`.
 - Not carried in: LFS objects and wikis.
 
 ## Image / release lane

@@ -73,7 +73,7 @@ func MirrorSync(ctx *context.APIContext) {
 		return
 	}
 
-	mirror_service.AddPullMirrorToQueue(repo.ID)
+	mirror_service.AddPullMirrorToEventQueue(repo.ID)
 
 	ctx.Status(http.StatusOK)
 }

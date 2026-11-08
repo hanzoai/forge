@@ -98,8 +98,8 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 // The queue entry points, held in variables so a test can see what was queued
 // without running a sync.
 var (
-	queuePull    = mirror_service.AddPullMirrorToQueue
-	queueInbound = mirror_service.AddInboundMirrorToQueue
+	queuePull    = mirror_service.AddPullMirrorToEventQueue
+	queueInbound = mirror_service.AddInboundMirrorToEventQueue
 )
 
 // pushMirrorTo returns the push mirror of repo whose remote is the GitHub
