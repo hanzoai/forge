@@ -7,7 +7,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"runtime"
 	"slices"
 	"sync"
@@ -184,8 +183,9 @@ type hook struct {
 }
 
 // AfterCommit defers f until the outermost transaction in ctx commits; if that transaction rolls back, f never runs.
-// The hooks of one transaction run together, in registration order, in a single new transaction that ignores
-// cancellation of ctx. If that transaction fails it is rolled back and the error is logged: the first one is already committed.
+// The hooks of one transaction run one after another, in registration order, each on a context that is outside any
+// transaction and ignores cancellation of ctx. A hook that fails or panics is logged and the rest still run,
+// because the transaction they follow is already committed and its caller never sees the failure.
 // key must be comparable. A key already registered on the transaction is skipped, so repeating a request defers it once.
 // It reports false, and registers nothing, when ctx is not in a transaction.
 func AfterCommit(ctx context.Context, key any, f func(ctx context.Context) error) bool {
@@ -202,6 +202,18 @@ func AfterCommit(ctx context.Context, key any, f func(ctx context.Context) error
 	return true
 }
 
+// call runs the hook, logging its error or panic.
+func (h hook) call(ctx context.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error("AfterCommit %+v panicked: %v\n%s", h.key, r, log.Stack(2))
+		}
+	}()
+	if err := h.run(ctx); err != nil {
+		log.Error("AfterCommit %+v: %v", h.key, err)
+	}
+}
+
 // Commit commits the transaction, then runs the hooks registered with AfterCommit.
 // Committing a transaction that was already rolled back does nothing and runs no hooks.
 func (s *session) Commit() error {
@@ -211,18 +223,12 @@ func (s *session) Commit() error {
 	}
 	hooks := s.hooks
 	s.hooks = nil
-	if !open || len(hooks) == 0 {
+	if !open {
 		return nil
 	}
-	if err := WithTx(context.WithoutCancel(s.ctx), func(ctx context.Context) error {
-		for _, h := range hooks {
-			if err := h.run(ctx); err != nil {
-				return fmt.Errorf("%v: %w", h.key, err)
-			}
-		}
-		return nil
-	}); err != nil {
-		log.Error("AfterCommit: %v", err)
+	ctx := withContextEngine(context.WithoutCancel(s.ctx), nil)
+	for _, h := range hooks {
+		h.call(ctx)
 	}
 	return nil
 }
