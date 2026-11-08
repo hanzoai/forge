@@ -174,7 +174,7 @@ func InboundPushMirrorsIterate(ctx context.Context, limit int, period time.Durat
 	sess := db.GetEngine(ctx).
 		Table("push_mirror").
 		Join("INNER", "`repository`", "`repository`.id = `push_mirror`.repo_id").
-		Where("`push_mirror`.remote_address LIKE ?", "%github.com%").
+		Where("LOWER(`push_mirror`.remote_address) LIKE ?", "%github.com%").
 		And("`push_mirror`.last_inbound_unix + ? <= ?", int64(period/time.Second), time.Now().Unix()).
 		And("`repository`.is_archived = ?", false).
 		And("`repository`.is_mirror = ?", false).
