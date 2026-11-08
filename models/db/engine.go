@@ -168,7 +168,11 @@ type EngineMigration interface {
 // builders mutate the statement in place and return the same *relational.Session, so each
 // override discards that return and hands back the receiver: no extra allocation,
 // identical behavior. Terminal and tx methods are promoted from the embedded session.
-type session struct{ *relational.Session }
+type session struct {
+	*relational.Session
+	ctx   context.Context // the context a transaction began with, handed to its hooks
+	hooks []hook          // deferred until the transaction commits
+}
 
 func (s *session) Decr(column string, arg ...any) Session { s.Session.Decr(column, arg...); return s }
 func (s *session) ID(id any) Session                      { s.Session.ID(id); return s }
