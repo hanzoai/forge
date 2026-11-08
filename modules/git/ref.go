@@ -33,7 +33,8 @@ var refNamePatternInvalid = regexp.MustCompile(
 		`(?://)|` + // no "//" anywhere
 		`(?:@{)|` + // no "@{"
 		`(?:[/.]$)|` + // no terminal '/' or '.'
-		`(?:^@$)`) // Not "@"
+		`(?:^@$)`,
+) // Not "@"
 
 // IsValidRefPattern ensures that the provided string could be a valid reference
 func IsValidRefPattern(name string) bool {
@@ -104,6 +105,15 @@ func (ref RefName) IsBranch() bool {
 
 func (ref RefName) IsTag() bool {
 	return strings.HasPrefix(string(ref), TagPrefix)
+}
+
+// objectNamePattern matches a full object id, of either hash, in either case.
+var objectNamePattern = regexp.MustCompile(`(?i)^([0-9a-f]{40}|[0-9a-f]{64})$`)
+
+// IsObjectName reports whether name is a full object id. A branch or tag named so
+// is read by git as the object in some places, and as the ref in others.
+func IsObjectName(name string) bool {
+	return objectNamePattern.MatchString(name)
 }
 
 func (ref RefName) IsUpstream() bool {

@@ -5,6 +5,7 @@ package private
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	issues_model "github.com/hanzoai/git/models/issues"
@@ -95,4 +96,41 @@ func TestPreReceiveRefusesTheUpstreamNamespace(t *testing.T) {
 		assert.Equal(t, http.StatusForbidden, resp.Code, ref)
 		assert.Contains(t, resp.Body.String(), "reserved for mirror sync", ref)
 	}
+}
+
+func TestPreReceiveRefusesNamesLikeObjectIds(t *testing.T) {
+	const id = "4a357436d925b5c974181ff12a994538ddc5a269"
+	zero := strings.Repeat("0", 40)
+
+	// Making one is refused, a branch or a tag, of either hash, in either case.
+	for _, ref := range []git.RefName{
+		git.RefNameFromBranch(id), git.RefNameFromTag(id),
+		git.RefNameFromBranch(strings.ToUpper(id)), git.RefNameFromTag(strings.Repeat("ab", 32)),
+	} {
+		assert.True(t, isObjectNamed(ref, id), ref)
+	}
+	// Deleting one is how a writer cleans up after themselves.
+	assert.False(t, isObjectNamed(git.RefNameFromBranch(id), zero))
+	// Names that merely look like it, or are not branches or tags.
+	for _, ref := range []git.RefName{
+		git.RefNameFromBranch(id[:39]), git.RefNameFromBranch(id + "0"), git.RefNameFromBranch("release/" + id),
+		git.RefNameFromTag("v1.0.0"), git.RefName("refs/pull/7/head"),
+	} {
+		assert.False(t, isObjectNamed(ref, id), ref)
+	}
+
+	// And the hook says so.
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	ctx, resp := contexttest.MockPrivateContext(t, "/")
+	ctx.Repo = &git_context.Repository{Repository: repo}
+	web.SetForm(ctx, &private.HookOptions{
+		UserID:       2,
+		OldCommitIDs: []string{zero},
+		NewCommitIDs: []string{id},
+		RefFullNames: []git.RefName{git.RefNameFromBranch(id)},
+	})
+	HookPreReceive(ctx)
+	assert.Equal(t, http.StatusForbidden, resp.Code)
+	assert.Contains(t, resp.Body.String(), "named like an object id")
 }

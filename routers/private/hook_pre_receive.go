@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	asymkey_model "github.com/hanzoai/git/models/asymkey"
 	git_model "github.com/hanzoai/git/models/git"
@@ -127,6 +128,10 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 		refFullName := opts.RefFullNames[i]
 
 		switch {
+		case isObjectNamed(refFullName, newCommitID):
+			ctx.JSON(http.StatusForbidden, private.Response{
+				UserMsg: refFullName.ShortName() + " is named like an object id, which git may read as the object",
+			})
 		case refFullName.IsBranch():
 			preReceiveBranch(ourCtx, oldCommitID, newCommitID, refFullName)
 		case refFullName.IsTag():
@@ -136,7 +141,7 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 		case refFullName.IsUpstream():
 			// The mirror sync's own bookkeeping: whatever a writer put there would be taken for an upstream tip.
 			ctx.JSON(http.StatusForbidden, private.Response{
-				UserMsg: fmt.Sprintf("%s is reserved for mirror sync", git.UpstreamPrefix),
+				UserMsg: git.UpstreamPrefix + " is reserved for mirror sync",
 			})
 		default:
 			ourCtx.assertCanWriteRef(refFullName)
@@ -147,6 +152,14 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 	}
 
 	ctx.PlainText(http.StatusOK, "ok")
+}
+
+// isObjectNamed reports whether the push makes a branch or tag named like an
+// object id. Git reads such a name as the object, and as the ref, depending on
+// where it is asked, so a writer who makes one can redirect a push that names an
+// object. Deleting one is allowed.
+func isObjectNamed(refFullName git.RefName, newCommitID string) bool {
+	return (refFullName.IsBranch() || refFullName.IsTag()) && git.IsObjectName(refFullName.ShortName()) && strings.Trim(newCommitID, "0") != ""
 }
 
 func preReceiveBranch(ctx *preReceiveContext, oldCommitID, newCommitID string, refFullName git.RefName) {
@@ -204,7 +217,8 @@ func preReceiveBranch(ctx *preReceiveContext, oldCommitID, newCommitID string, r
 
 	// 2. Disallow force pushes to protected branches
 	if oldCommitID != objectFormat.EmptyObjectID().String() {
-		output, _, err := gitrepo.RunCmdString(ctx,
+		output, _, err := gitrepo.RunCmdString(
+			ctx,
 			repo,
 			gitcmd.NewCommand("rev-list", "--max-count=1").
 				AddDynamicArguments(oldCommitID, "^"+newCommitID).

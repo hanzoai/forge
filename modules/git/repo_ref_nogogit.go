@@ -54,8 +54,8 @@ func (repo *Repository) GetRefsFiltered(pattern string) ([]*Reference, error) {
 				}
 				refName = refName[:len(refName)-1]
 
-				// refName cannot be HEAD but can be remotes or stash
-				if strings.HasPrefix(refName, RemotePrefix) || refName == "/refs/stash" {
+				// refName cannot be HEAD but can be remotes or stash, and the mirror sync keeps its record in refs/upstream
+				if strings.HasPrefix(refName, RemotePrefix) || strings.HasPrefix(refName, UpstreamPrefix) || refName == "/refs/stash" {
 					continue
 				}
 
