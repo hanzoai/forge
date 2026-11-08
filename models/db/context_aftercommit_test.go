@@ -7,9 +7,12 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/hanzoai/git/models/db"
 	"github.com/hanzoai/git/models/unittest"
+	"github.com/hanzoai/git/modules/log"
+	"github.com/hanzoai/git/modules/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -112,34 +115,59 @@ func TestAfterCommit(t *testing.T) {
 		assert.Empty(t, ran)
 	})
 
-	t.Run("HooksShareOneNewTransaction", func(t *testing.T) {
+	t.Run("HooksRunOutsideTransaction", func(t *testing.T) {
 		reset()
-		var hookCtxs []context.Context
 		var outer context.Context
+		var hookCtxs []context.Context
 		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
 			outer = ctx
 			for _, key := range []string{"a", "b"} {
 				db.AfterCommit(ctx, key, func(ctx context.Context) error {
 					hookCtxs = append(hookCtxs, ctx)
-					assert.True(t, db.InTransaction(ctx))
 					return nil
 				})
 			}
 			return nil
 		}))
 		require.Len(t, hookCtxs, 2)
-		assert.Equal(t, db.GetEngine(hookCtxs[0]), db.GetEngine(hookCtxs[1]))
-		assert.NotEqual(t, db.GetEngine(outer), db.GetEngine(hookCtxs[0]))
+		for _, ctx := range hookCtxs {
+			assert.False(t, db.InTransaction(ctx))
+			assert.NotEqual(t, db.GetEngine(outer), db.GetEngine(ctx), "the finished transaction must not be reused")
+		}
 	})
 
-	t.Run("HookFailureDoesNotFailCommit", func(t *testing.T) {
+	t.Run("FailureDoesNotFailCommitOrStopTheRest", func(t *testing.T) {
 		reset()
+		lc, cleanup := test.NewLogChecker(log.DEFAULT)
+		lc.Filter("AfterCommit a: hook failed")
+		defer cleanup()
+
 		require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
-			db.AfterCommit(ctx, "a", func(context.Context) error { return errors.New("fail") })
+			db.AfterCommit(ctx, "a", func(context.Context) error { return errors.New("hook failed") })
 			db.AfterCommit(ctx, "b", record("b"))
 			return nil
 		}))
-		assert.Empty(t, ran, "a failing hook stops the ones after it")
+		assert.Equal(t, []string{"b"}, ran)
+		seen, _ := lc.Check(200 * time.Millisecond)
+		assert.True(t, seen[0], "the failure must be logged")
+	})
+
+	t.Run("PanicIsContained", func(t *testing.T) {
+		reset()
+		lc, cleanup := test.NewLogChecker(log.DEFAULT)
+		lc.Filter("AfterCommit a panicked: boom")
+		defer cleanup()
+
+		require.NotPanics(t, func() {
+			require.NoError(t, db.WithTx(t.Context(), func(ctx context.Context) error {
+				db.AfterCommit(ctx, "a", func(context.Context) error { panic("boom") })
+				db.AfterCommit(ctx, "b", record("b"))
+				return nil
+			}))
+		})
+		assert.Equal(t, []string{"b"}, ran)
+		seen, _ := lc.Check(200 * time.Millisecond)
+		assert.True(t, seen[0], "the panic must be logged")
 	})
 
 	t.Run("IgnoresCancellation", func(t *testing.T) {
