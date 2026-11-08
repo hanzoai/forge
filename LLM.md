@@ -253,12 +253,17 @@ either side reaches the other. There is no mode to set.
     GitHub repository of its own name (a forge rename turns it off, with a warning),
     and that `[mirror] SYNC_USER` is set and can write; otherwise it does nothing;
   - hides `refs/upstream` (`uploadpack.hideRefs`, `receive.hideRefs`; pre-receive
-    refuses any push there), fetches into `refs/upstream/staging/{heads,tags}/` with
+    refuses any push there), except that receive-pack still advertises
+    `refs/upstream/staging`: a push is told which commits the repository has from
+    what it advertises, and without that, filling an empty repo from itself would
+    send it its whole history again. It fetches into `refs/upstream/staging/{heads,tags}/` with
     forced refspecs and `--prune`, and acts only on names whose staged tip is not
     the one recorded in `refs/upstream/{heads,tags}/`. A tip is recorded only after
     the forge has dealt with it (pushed, found equal or ahead, or skipped as below),
     so a push cut short, refused or failed is looked at again, and a branch deleted
-    on the forge stays deleted until GitHub moves it again;
+    on the forge stays deleted until GitHub moves it again. A fetch that finds no
+    refs at all changes no record; a record is dropped only when its ref is gone
+    while others remain;
   - enters through the normal push path: one non-force `git push` per ref, from
     the repo to itself, under `PushingEnvironment` of the sync user. Post-receive
     runs the push queue, which starts Actions (`PushCommits`), pull request checks,
@@ -278,9 +283,20 @@ either side reaches the other. There is no mode to set.
     that very first event waits until it next moves;
   - on an empty repo, sets the default branch to GitHub's (`ls-remote --symref`,
     else `main`, `master`, the first), pushes it alone, then the other branches in
-    one push, then all the tags in one push that skips the hooks (`GIT_INTERNAL_PUSH`)
-    and makes the releases from them. A push event per historical tag would run
-    every release workflow once for each;
+    one push, and re-checks that the repo is not archived before each. The repo is
+    marked first, so a seed that stops partway is carried on by the ordinary loop,
+    whatever the repo then looks like;
+  - creates tags the forge lacks one push each when it is one, and **in one push
+    when it is more than one**, in any run, not only a seed: a push event per
+    historical tag would run, for every old tag, every workflow a tag push starts,
+    which for a release workflow is a release. That one push skips the hooks
+    (`GIT_INTERNAL_PUSH`) and the releases are made from the tags, as a pull mirror
+    makes them, unless the repo has any protected branch or tag rule, which only
+    the hooks can apply: then it is a hooked push (events included), and if the
+    hooks refuse it the tags are tried one at a time. So two tags that appear
+    together on GitHub raise no tag events here;
+  - never brings in the branches bots open: `dependabot/*`, `renovate/*`,
+    `gh-readonly-queue/*`. Their tips are recorded as dealt with, once;
   - Not carried in: LFS objects and wikis.
 - **What the push path enforces for `SYNC_USER`.** Pre-receive applies what it
   applies to any direct push, not to a merge: the user's write permission; a
@@ -297,7 +313,10 @@ either side reaches the other. There is no mode to set.
 - **Trust.** Whoever can push to a repo on GitHub can push to it here, as
   `SYNC_USER`, and the forge then runs that repo's Actions with its org secrets.
   This is the same trust as GitHub Actions, and intended: there is no allowlist of
-  GitHub authors.
+  GitHub authors. The one exception is the branches bots open (`dependabot/*`,
+  `renovate/*`, `gh-readonly-queue/*`), which are never brought in, so the forge
+  never runs bot-authored code with those secrets. Pull requests are not brought in
+  at all: only branches and tags are.
 - **Recovery:** the scheduled sweep (`Update`) queues an inbound sync for each push
   mirror of a regular repo that mirrors to GitHub when none has run for
   `[mirror] DEFAULT_INTERVAL`, when `SYNC_USER` is set. It runs on its own clock,
@@ -309,6 +328,12 @@ either side reaches the other. There is no mode to set.
   syncs an event asked for (`/v1/sync`, `POST /v1/repos/{owner}/{repo}/mirror-sync`,
   and push out on commit), so an event never waits behind the sweep. The settings
   page buttons use `mirror`. Tune each in `[queue.mirror]` and `[queue.mirror_event]`.
+- **Rolling back.** Migration 346 adds `push_mirror.last_inbound_unix` and sets the
+  `version` row to 347 (a migration's number plus one). A binary whose last
+  migration is 345 expects at most 346 and refuses to start on 347, so rolling back
+  past it needs `UPDATE version SET version = 346 WHERE id = 1;` first. The column
+  is `NOT NULL DEFAULT 0`, so the older binary inserts push mirrors without it and
+  leaves it be.
 
 ## Image / release lane
 

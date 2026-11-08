@@ -5,6 +5,7 @@ package mirror
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"github.com/hanzoai/git/models/db"
+	git_model "github.com/hanzoai/git/models/git"
 	access_model "github.com/hanzoai/git/models/perm/access"
 	repo_model "github.com/hanzoai/git/models/repo"
 	system_model "github.com/hanzoai/git/models/system"
@@ -143,7 +145,7 @@ pre-receive|post-receive)
   while read -r old new ref; do
     echo "$hook $ref" >> "$dir/hooks.log"
     if [ "$hook" = pre-receive ] && grep -qxF "$ref" "$dir/refuse" 2>/dev/null; then
-      echo "protected branch" >&2
+      echo "protected branch: unverified commit $new" >&2
       exit 1
     fi
   done
@@ -243,13 +245,15 @@ func TestInboundCreatesAbsentRefsThroughThePushPath(t *testing.T) {
 	assert.Equal(t, r.github.tip("refs/tags/v1"), r.forge.tip("refs/tags/v1"), "an annotated tag keeps its tag object")
 	assert.Empty(t, r.notices())
 
-	// Each ref went through pre-receive and post-receive, which is where the
-	// daemon enforces protection and starts Actions, pull request checks and the push out.
-	want := []string{"refs/heads/main", "refs/heads/topic", "refs/tags/light", "refs/tags/v1"}
+	// Each branch went through pre-receive and post-receive, which is where the
+	// daemon enforces protection and starts Actions, pull request checks and the
+	// push out, one push to a branch. The two tags are new together, so they came in one push without the hooks.
+	want := []string{"refs/heads/main", "refs/heads/topic"}
 	assert.ElementsMatch(t, want, r.calls("pre-receive"))
 	assert.ElementsMatch(t, want, r.calls("post-receive"))
 	assert.ElementsMatch(t, want, r.calls("update"))
-	assert.Equal(t, 4, r.invocations("pre-receive"), "one push per ref: a refusal of one must not hold up the others")
+	assert.Equal(t, 2, r.invocations("pre-receive"), "one push per branch: a refusal of one must not hold up the others")
+	unittest.AssertExistsAndLoadBean(t, &repo_model.Release{RepoID: r.repo.ID, TagName: "v1"})
 
 	// As the sync user, with the environment of a person's push: not an internal one that skips the hooks.
 	out, err := os.ReadFile(filepath.Join(r.dir, "hooks.log"))
@@ -620,8 +624,9 @@ func TestInboundHidesTheNamespaceFromClients(t *testing.T) {
 	advertised := r.forge.git("ls-remote", r.forge.path)
 	assert.Contains(t, advertised, "refs/heads/main")
 	assert.NotContains(t, advertised, "refs/upstream/")
-	assert.Equal(t, "refs/upstream", r.forge.git("config", "--get", "uploadpack.hideRefs"))
-	assert.Equal(t, "refs/upstream", r.forge.git("config", "--get", "receive.hideRefs"))
+	assert.Equal(t, "refs/upstream", r.forge.git("config", "--get-all", "uploadpack.hideRefs"))
+	// Hidden from pushers too, bar the staged tips, which receive-pack advertises for the push's sake.
+	assert.Equal(t, "refs/upstream\n!refs/upstream/staging", r.forge.git("config", "--get-all", "receive.hideRefs"))
 }
 
 func TestInboundSkipsArchivedRepo(t *testing.T) {
@@ -779,6 +784,11 @@ func TestSweepHealsWhatAnEventMissed(t *testing.T) {
 	})
 	// sweep runs the sweep and returns what it queued: it waits for want requests
 	// to come through the queue, then for any that should not.
+	// SQLite matches LIKE without regard to case unless told not to, as the other databases do not.
+	_, err := db.GetEngine(t.Context()).Exec("PRAGMA case_sensitive_like = ON")
+	require.NoError(t, err)
+	t.Cleanup(func() { _, _ = db.GetEngine(context.Background()).Exec("PRAGMA case_sensitive_like = OFF") })
+
 	sweep := func(want int) []SyncRequest {
 		require.NoError(t, Update(t.Context(), 0, 10))
 		var got []SyncRequest
@@ -821,6 +831,13 @@ func TestSweepHealsWhatAnEventMissed(t *testing.T) {
 	require.NoError(t, repo_model.UpdatePushMirrorLastInbound(t.Context(), r.mirror))
 	assert.Equal(t, inbound, sweep(1))
 
+	// The address is matched in any letter case, as it is elsewhere.
+	r.mirror.RemoteAddress = "https://GitHub.COM/Org3/Repo21.git"
+	require.NoError(t, repo_model.UpdatePushMirror(t.Context(), r.mirror))
+	r.mirror.LastInboundUnix = 0
+	require.NoError(t, repo_model.UpdatePushMirrorLastInbound(t.Context(), r.mirror))
+	assert.Equal(t, inbound, sweep(1))
+
 	// Not one whose address is another repository, another host, or not here: the repository was renamed, say.
 	for _, address := range []string{"https://github.com/org3/renamed", "https://example.com/org3/repo21"} {
 		r.mirror.RemoteAddress = address
@@ -837,4 +854,208 @@ func TestSweepHealsWhatAnEventMissed(t *testing.T) {
 	require.NoError(t, repo_model.UpdatePushMirrorLastInbound(t.Context(), r.mirror))
 	setting.Mirror.SyncUser = ""
 	assert.Empty(t, sweep(0))
+}
+
+// Tags the forge lacks, more than one, come in one push. A push event for each
+// would run every old tag's release workflow.
+func TestInboundImportsSeveralTagsInOnePush(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync())
+	r.forget()
+
+	for _, tag := range []string{"v1", "v2", "v3", "v4", "v5"} {
+		r.github.git("tag", tag, c1)
+	}
+	require.True(t, r.sync())
+	for _, tag := range []string{"v1", "v2", "v3", "v4", "v5"} {
+		assert.Equal(t, c1, r.forge.tip("refs/tags/"+tag))
+		unittest.AssertExistsAndLoadBean(t, &repo_model.Release{RepoID: r.repo.ID, TagName: tag})
+	}
+	assert.Zero(t, r.invocations("pre-receive"), "no protection to apply, and no push event per tag")
+
+	// One new tag is an ordinary push, as a person's would be.
+	r.forget()
+	r.github.git("tag", "v6", c1)
+	require.True(t, r.sync())
+	assert.Equal(t, []string{"refs/tags/v6"}, r.calls("pre-receive"))
+
+	// Where tags are protected, the rules are the hooks' to apply: still one push.
+	require.NoError(t, db.Insert(t.Context(), &git_model.ProtectedTag{RepoID: r.repo.ID, NamePattern: "v*"}))
+	r.forget()
+	for _, tag := range []string{"v7", "v8", "v9"} {
+		r.github.git("tag", tag, c1)
+	}
+	require.True(t, r.sync())
+	assert.Equal(t, 1, r.invocations("pre-receive"))
+	assert.ElementsMatch(t, []string{"refs/tags/v7", "refs/tags/v8", "refs/tags/v9"}, r.calls("pre-receive"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v9"))
+}
+
+// A protected branch is as much a rule as a protected tag: only the hooks apply it.
+func TestInboundSeedUsesTheHooksWhereBranchesAreProtected(t *testing.T) {
+	r := newRig(t)
+	require.NoError(t, db.Insert(t.Context(), &git_model.ProtectedBranch{RepoID: r.repo.ID, RuleName: "main"}))
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	for _, tag := range []string{"v1", "v2", "v3"} {
+		r.github.git("tag", tag, c1)
+	}
+
+	require.True(t, r.sync())
+
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v3"))
+	assert.Equal(t, 2, r.invocations("pre-receive"), "the branch, then the three tags in one push")
+	assert.Equal(t, []string{"refs/heads/main", "refs/tags/v1", "refs/tags/v2", "refs/tags/v3"}, r.calls("pre-receive"))
+}
+
+// A seed that stops partway is carried on by the next run, however the
+// repository looks by then, and its tags still come in one push.
+func TestInboundSeedResumesAfterAPartialFailure(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.git("symbolic-ref", "HEAD", "refs/heads/trunk")
+	r.github.set("refs/heads/trunk", c1)
+	r.github.set("refs/heads/b1", c1)
+	r.github.set("refs/heads/b2", c1)
+	for _, tag := range []string{"v1", "v2", "v3"} {
+		r.github.git("tag", tag, c1)
+	}
+
+	r.refuse("refs/heads/b1")
+	assert.False(t, r.sync())
+	assert.Equal(t, c1, r.forge.tip("refs/heads/trunk"), "the default branch went in first")
+	assert.Empty(t, r.forge.tip("refs/heads/b2"), "the rest was one push, which was refused")
+	assert.Empty(t, r.forge.tip("refs/tags/v1"))
+	require.NoError(t, os.Remove(filepath.Join(r.dir, "refuse")))
+	r.forget()
+
+	require.True(t, r.sync())
+	assert.Equal(t, c1, r.forge.tip("refs/heads/b1"))
+	assert.Equal(t, c1, r.forge.tip("refs/heads/b2"))
+	assert.Equal(t, c1, r.forge.tip("refs/tags/v3"))
+	assert.Equal(t, []string{"refs/heads/b1", "refs/heads/b2"}, r.calls("pre-receive"), "the tags raised no hooks")
+	for _, tag := range []string{"v1", "v2", "v3"} {
+		unittest.AssertExistsAndLoadBean(t, &repo_model.Release{RepoID: r.repo.ID, TagName: tag})
+	}
+}
+
+// What a bot opens on GitHub is never brought in: it would run here with the
+// organization's secrets.
+func TestInboundNeverBringsInBotBranches(t *testing.T) {
+	bots := []string{"refs/heads/dependabot/npm_and_yarn/x", "refs/heads/renovate/foo", "refs/heads/gh-readonly-queue/main/pr-1"}
+	for _, filled := range []bool{false, true} {
+		r := newRig(t)
+		c1 := r.github.commit("", "one")
+		r.github.set("refs/heads/main", c1)
+		if filled {
+			require.True(t, r.sync()) // the repository has content now: the loop, not the seed
+			r.forget()
+		}
+		for _, bot := range bots {
+			r.github.set(bot, c1)
+		}
+		r.github.set("refs/heads/feature", c1)
+
+		require.True(t, r.sync())
+
+		assert.Equal(t, c1, r.forge.tip("refs/heads/feature"), "filled=%v", filled)
+		for _, bot := range bots {
+			assert.Empty(t, r.forge.tip(bot), "%s filled=%v", bot, filled)
+			assert.Equal(t, c1, r.forge.tip(recordName(bot)), "the skip is recorded, once")
+		}
+		assert.NotContains(t, strings.Join(r.calls("pre-receive"), " "), "dependabot")
+		assert.Empty(t, r.notices())
+	}
+}
+
+// Every commit of a branch that requires signatures is refused by name, and the
+// name carries the commit: it is one condition, not one per commit.
+func TestInboundNoticeIgnoresCommitsInTheReason(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	require.True(t, r.sync())
+	r.refuse("refs/heads/main")
+
+	for _, message := range []string{"two", "three", "four"} {
+		r.github.set("refs/heads/main", r.github.commit(r.github.tip("refs/heads/main"), message))
+		require.True(t, r.sync())
+	}
+
+	require.Len(t, r.notices(), 1)
+	assert.Contains(t, r.notices()[0], "unverified commit")
+}
+
+// A fetch that finds no refs says nothing about the ones recorded.
+func TestInboundKeepsRecordsWhenTheRemoteAnswersEmpty(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.set("refs/heads/main", c1)
+	r.github.set("refs/heads/dev", c1)
+	require.True(t, r.sync())
+	r.forget()
+
+	r.github.delete("refs/heads/main")
+	r.github.delete("refs/heads/dev")
+	require.True(t, r.sync())
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/main"))
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/dev"))
+
+	// When it answers again, nothing is new.
+	r.github.set("refs/heads/main", c1)
+	r.github.set("refs/heads/dev", c1)
+	r.forge.delete("refs/heads/dev")
+	require.True(t, r.sync())
+	assert.Empty(t, r.forge.tip("refs/heads/dev"), "a branch deleted here stays deleted across the outage")
+	assert.Empty(t, r.calls("pre-receive"))
+
+	// A ref gone while others remain is no longer recorded.
+	r.github.delete("refs/heads/dev")
+	require.True(t, r.sync())
+	assert.Empty(t, r.forge.tip("refs/upstream/heads/dev"))
+	assert.Equal(t, c1, r.forge.tip("refs/upstream/heads/main"))
+}
+
+// Filling a repository from itself does not send it its own history: receive-pack
+// advertises the staged tips, so the push is told the repository has them.
+func TestInboundSeedDoesNotSendHistoryBack(t *testing.T) {
+	r := newRig(t)
+	tip := ""
+	for i := range 250 {
+		tip = r.github.commit(tip, fmt.Sprintf("commit %d", i))
+	}
+	r.github.set("refs/heads/main", tip)
+
+	require.True(t, r.sync())
+
+	assert.Equal(t, tip, r.forge.tip("refs/heads/main"))
+	packs, err := filepath.Glob(filepath.Join(r.forge.path, "objects", "pack", "*.pack"))
+	require.NoError(t, err)
+	assert.Len(t, packs, 1, "the fetch's pack, and no second copy of it from the push")
+
+	// The staged tips are in receive-pack's advertisement and not in upload-pack's.
+	assert.Contains(t, r.forge.git("receive-pack", "--advertise-refs", "."), "refs/upstream/staging/heads/main")
+	assert.NotContains(t, r.forge.git("upload-pack", "--advertise-refs", "."), "refs/upstream/")
+}
+
+// A seed does not go on writing to a repository archived while it ran.
+func TestInboundSeedStopsWhenArchivedMidway(t *testing.T) {
+	r := newRig(t)
+	c1 := r.github.commit("", "one")
+	r.github.git("symbolic-ref", "HEAD", "refs/heads/trunk")
+	r.github.set("refs/heads/trunk", c1)
+	r.github.set("refs/heads/other", c1)
+	require.NoError(t, os.WriteFile(filepath.Join(r.dir, "delay"), []byte("1"), 0o644))
+
+	done := make(chan bool, 1)
+	go func() { done <- SyncInboundMirror(t.Context(), r.mirror.ID) }()
+	require.Eventually(t, func() bool { _, err := os.Stat(filepath.Join(r.dir, "entered")); return err == nil }, 10*time.Second, 10*time.Millisecond)
+	r.repo.IsArchived = true
+	require.NoError(t, repo_model.UpdateRepositoryColsNoAutoTime(t.Context(), r.repo, "is_archived"))
+
+	assert.False(t, <-done)
+	assert.Equal(t, c1, r.forge.tip("refs/heads/trunk"), "the push under way finished")
+	assert.Empty(t, r.forge.tip("refs/heads/other"), "and the next one was not made")
 }

@@ -33,3 +33,20 @@ func GitConfigSet(ctx context.Context, repo Repository, key, value string) error
 		return err
 	})
 }
+
+// GitConfigSetAll makes values, in that order, the whole of the multi-valued key.
+func GitConfigSetAll(ctx context.Context, repo Repository, key string, values ...string) error {
+	return globallock.LockAndDo(ctx, getRepoConfigLockKey(repo.RelativePath()), func(ctx context.Context) error {
+		// The first value replaces every value the key has, in one write; the rest follow it.
+		for i, value := range values {
+			cmd := gitcmd.NewCommand("config", "--add")
+			if i == 0 {
+				cmd = gitcmd.NewCommand("config", "--replace-all")
+			}
+			if _, _, err := RunCmdString(ctx, repo, cmd.AddDynamicArguments(key, value)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
