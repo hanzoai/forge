@@ -57,6 +57,7 @@ func MirrorSync(ctx *context.APIContext) {
 
 	if !ctx.Repo.Permission.CanWrite(unit.TypeCode) {
 		ctx.APIError(http.StatusForbidden, "Must have write access")
+		return
 	}
 
 	if !setting.Mirror.Enabled {
@@ -73,10 +74,13 @@ func MirrorSync(ctx *context.APIContext) {
 		return
 	}
 
-	mirror_service.AddPullMirrorToEventQueue(repo.ID)
+	queuePull(repo.ID)
 
 	ctx.Status(http.StatusOK)
 }
+
+// queuePull is held in a variable so a test can see what was queued without running a sync.
+var queuePull = mirror_service.AddPullMirrorToEventQueue
 
 // PushMirrorSync adds all push mirrored repositories to the sync queue
 func PushMirrorSync(ctx *context.APIContext) {
