@@ -54,6 +54,17 @@ func CreateNotice(ctx context.Context, tp NoticeType, desc string, args ...any) 
 	return db.Insert(ctx, n)
 }
 
+// CreateRepositoryNoticeOnce creates the repository notice unless one with the same
+// description exists, so a condition that persists is reported once, not per event.
+func CreateRepositoryNoticeOnce(desc string) error {
+	ctx := graceful.GetManager().ShutdownContext()
+	exists, err := db.GetEngine(ctx).Where("type = ?", NoticeRepository).And("description = ?", desc).Exist(new(Notice))
+	if err != nil || exists {
+		return err
+	}
+	return CreateNotice(ctx, NoticeRepository, desc)
+}
+
 // CreateRepositoryNotice creates new system notice with type NoticeRepository.
 func CreateRepositoryNotice(desc string, args ...any) error {
 	return CreateNotice(graceful.GetManager().ShutdownContext(), NoticeRepository, desc, args...)

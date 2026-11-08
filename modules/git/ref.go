@@ -16,6 +16,9 @@ const (
 	RemotePrefix = "refs/remotes/"
 	// PullPrefix is the base directory of the pull information of git.
 	PullPrefix = "refs/pull/"
+	// UpstreamPrefix is where the inbound mirror sync keeps the last upstream
+	// tips it handled. It is hidden from clients and closed to pushes.
+	UpstreamPrefix = "refs/upstream/"
 )
 
 // refNamePatternInvalid is regular expression with unallowed characters in git reference name
@@ -101,6 +104,10 @@ func (ref RefName) IsBranch() bool {
 
 func (ref RefName) IsTag() bool {
 	return strings.HasPrefix(string(ref), TagPrefix)
+}
+
+func (ref RefName) IsUpstream() bool {
+	return strings.HasPrefix(string(ref), UpstreamPrefix)
 }
 
 func (ref RefName) IsRemote() bool {

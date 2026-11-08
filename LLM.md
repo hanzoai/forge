@@ -235,27 +235,47 @@ either side reaches the other. There is no mode to set.
 
 - **Out (forge to GitHub):** a push mirror with `sync_on_commit`. It pushes
   `refs/heads/*` and `refs/tags/*` without `+`, so a diverged GitHub ref is
-  refused, never overwritten (`services/mirror/mirror_push.go`).
+  refused, never overwritten (`services/mirror/mirror_push.go`). It takes no lock.
 - **In, pull mirror:** the GitHub org webhook reaches `/v1/sync`
-  (`routers/web/misc/sync.go`, HMAC under `[mirror] SYNC_SECRET`) and queues a pull.
+  (`routers/web/misc/sync.go`, HMAC under `[mirror] SYNC_SECRET`) and queues a
+  pull. Only `X-GitHub-Event: push`, `create` and `delete` do; any other event is
+  answered `ok` and ignored.
 - **In, regular repo:** with no pull mirror row, the same event finds the push
-  mirror whose address is `github.com/<owner>/<name>` (any scheme, credentials,
-  `.git`, case) and queues `InboundMirrorType`. `SyncInboundMirror`
-  (`services/mirror/mirror_inbound.go`) fetches that remote into `refs/upstream/*`
-  (forced; the namespace is ours, pruned each time) and moves each branch and tag
-  by compare-and-swap: absent is created, an ancestor of the upstream tip is
-  advanced, equal or ahead is left. A diverged ref is left alone and raises a
-  repository notice. A ref upstream lacks is never deleted, and nothing is forced.
-  What moved is announced as a push (`announce`, shared with the pull mirror), which
-  starts Actions and webhooks and fires the push mirror back as a no-op for the same
-  sha; GitHub emits no event for an unchanged ref, so there is no loop.
-- One lock per repo (`getRepoMirrorLockKey`) serializes pull, inbound and push out.
-- Two queues run the same `doMirrorSync` (`services/mirror/queue.go`): `mirror`
+  mirror whose address is `github.com/<owner>/<name>` (`IsGitHubRepo`: any
+  scheme, credentials, `.git`, case; no port, query, fragment or odd path) and
+  queues `InboundMirrorType`. `SyncInboundMirror` (`services/mirror/mirror_inbound.go`):
+  - takes the pull lock (`repo_pull_mirror_<id>`), re-checks that the repo is not
+    archived, has no pull mirror, and still mirrors to GitHub, and that `[mirror]
+    SYNC_USER` is set and can write (otherwise it does nothing);
+  - hides `refs/upstream` (`uploadpack.hideRefs`, `receive.hideRefs`; pre-receive
+    refuses any push there) and records the tips under `refs/upstream/{heads,tags}/`
+    before the fetch, fetches with forced refspecs and `--prune`, and acts only on
+    names whose tip changed. `refs/upstream/*` is "the last upstream tip handled",
+    so a branch deleted on the forge stays deleted until GitHub moves it again;
+  - enters through the normal push path: one non-force `git push` per ref, from
+    the repo to itself, under `PushingEnvironment` of the sync user. Pre-receive
+    enforces protected branches and tags, approvals, status checks, signed commits
+    and quota for that user; post-receive runs the push queue, which is what starts
+    Actions (`PushCommits`), pull request checks, issue references and the push
+    out. The `Sync*` notifiers are a pull mirror's and are not used. Archived
+    repos are not written (pre-receive does not check it);
+  - creates an absent ref, and fast-forwards a branch the forge holds an ancestor
+    of. A branch the forge is ahead of is left. A diverged branch, a tag that
+    differs (tags are create-only, so an annotated tag is never retyped), and a
+    ref the push refuses each raise one repository notice per (ref, forge sha,
+    upstream sha) and are looked at again on the next sync;
+  - on the first sync of a repo that has content and no `refs/upstream` record,
+    only records upstream: GitHub keeps every branch the forge ever deleted, since
+    the push out never deletes, and creating them all would bring them back.
+  - Not carried in: LFS objects and wikis.
+- **Recovery:** the scheduled sweep (`Update`) also queues an inbound sync for each
+  due push mirror of a regular repo that mirrors to GitHub, when `SYNC_USER` is set.
+  A push mirror with interval 0 is never due, so a missed event is not healed for it.
+- **Queues**, all running `doMirrorSync` (`services/mirror/queue.go`): `mirror`
   carries the scheduled sweep over every mirror (thousands), `mirror_event` the
   syncs an event asked for (`/v1/sync`, `POST /v1/repos/{owner}/{repo}/mirror-sync`,
-  and push out on commit), so an event never waits behind the sweep. The schedule
-  and the settings-page buttons use `mirror`.
-- Not carried in: LFS objects and wikis.
+  and push out on commit), so an event never waits behind the sweep. The settings
+  page buttons use `mirror`. Tune each in `[queue.mirror]` and `[queue.mirror_event]`.
 
 ## Image / release lane
 

@@ -45,6 +45,7 @@ func Update(ctx context.Context, pullLimit, pushLimit int) error {
 		var repo *repo_model.Repository
 		var mirrorType SyncType
 		var referenceID int64
+		var inbound bool
 
 		if m, ok := bean.(*repo_model.Mirror); ok {
 			if m.GetRepository(ctx) == nil {
@@ -62,6 +63,8 @@ func Update(ctx context.Context, pullLimit, pushLimit int) error {
 			repo = m.Repo
 			mirrorType = PushMirrorType
 			referenceID = m.ID
+			// A due push mirror to GitHub also looks for what an event about it missed.
+			inbound = setting.Mirror.SyncUser != "" && isRegular(ctx, repo) && IsGitHubRepo(m.RemoteAddress, repo.OwnerName, repo.Name)
 		} else {
 			log.Error("Unknown bean: %v", bean)
 			return nil
@@ -75,6 +78,11 @@ func Update(ctx context.Context, pullLimit, pushLimit int) error {
 		}
 
 		// Push to the Queue
+		if inbound {
+			if err := PushToQueue(InboundMirrorType, referenceID); err != nil && !errors.Is(err, queue.ErrAlreadyInQueue) {
+				return err
+			}
+		}
 		if err := PushToQueue(mirrorType, referenceID); err != nil {
 			if err == queue.ErrAlreadyInQueue {
 				if mirrorType == PushMirrorType {

@@ -133,6 +133,11 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 			preReceiveTag(ourCtx, refFullName)
 		case git.DefaultFeatures().SupportProcReceive && refFullName.IsFor():
 			preReceiveFor(ourCtx, refFullName)
+		case refFullName.IsUpstream():
+			// The mirror sync's own bookkeeping: whatever a writer put there would be taken for an upstream tip.
+			ctx.JSON(http.StatusForbidden, private.Response{
+				UserMsg: fmt.Sprintf("%s is reserved for mirror sync", git.UpstreamPrefix),
+			})
 		default:
 			ourCtx.assertCanWriteRef(refFullName)
 		}

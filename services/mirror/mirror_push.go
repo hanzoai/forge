@@ -15,7 +15,6 @@ import (
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/modules/git"
 	"github.com/hanzoai/git/modules/gitrepo"
-	"github.com/hanzoai/git/modules/globallock"
 	"github.com/hanzoai/git/modules/lfs"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/process"
@@ -97,14 +96,6 @@ func SyncPushMirror(ctx context.Context, mirrorID int64) bool {
 
 	_ = m.GetRepository(ctx)
 
-	// Not while a pull or an inbound fast-forward is moving this repository's refs.
-	releaser, err := globallock.Lock(ctx, getRepoMirrorLockKey(m.RepoID))
-	if err != nil {
-		log.Error("globallock.Lock(): %v", err)
-		return false
-	}
-	defer releaser()
-
 	m.LastError = ""
 
 	ctx, _, finished := process.GetManager().AddContext(ctx, fmt.Sprintf("Syncing PushMirror %s/%s to %s", m.Repo.OwnerName, m.Repo.Name, m.RemoteName))
@@ -158,7 +149,9 @@ func runPushSync(ctx context.Context, m *repo_model.PushMirror) error {
 			if err != nil {
 				return err
 			}
-			if err := pushAllLFSObjects(ctx, gitRepo, lfsClient); err != nil {
+			lfsCtx, cancel := context.WithTimeout(ctx, timeout)
+			defer cancel()
+			if err := pushAllLFSObjects(lfsCtx, gitRepo, lfsClient); err != nil {
 				return util.SanitizeErrorCredentialURLs(err)
 			}
 		}

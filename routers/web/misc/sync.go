@@ -4,26 +4,24 @@
 package misc
 
 import (
-	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
 
-	"github.com/hanzoai/git/models/db"
 	repo_model "github.com/hanzoai/git/models/repo"
-	giturl "github.com/hanzoai/git/modules/git/url"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 	mirror_service "github.com/hanzoai/git/services/mirror"
 )
 
-// maxSyncBody bounds the read: a push payload is a few KiB, and an unbounded
-// read ahead of authentication is a memory DoS.
-const maxSyncBody = 1 << 20
+// maxSyncBody bounds the read: GitHub caps a webhook payload at 25 MiB, and an
+// unbounded read ahead of authentication is a memory DoS.
+const maxSyncBody = 25 << 20
 
 // Sync is the one entry point for "this repo changed upstream, take it now".
 // It exists because an org-level webhook is a single static URL that cannot
@@ -34,12 +32,15 @@ const maxSyncBody = 1 << 20
 // fetches, and that fetch propagates to its push mirrors (services/mirror), so
 // one upstream push reaches every platform we mirror to in one hop. A regular
 // repo pushes to its platform through a push mirror; when that platform is the
-// one speaking, the event fast-forwards the repo from the push mirror's remote,
-// so a push to either side reaches the other.
+// one speaking, the event brings what it gained in from the push mirror's remote
+// as pushes by the sync user, so a push to either side reaches the other.
 //
 // Mounted ahead of the session middleware because the credential is the payload
 // itself: HMAC-SHA256 over the exact bytes in X-Hub-Signature-256, keyed by
 // [mirror] SYNC_SECRET. Fail-closed — an unset secret refuses everything.
+//
+// Only a push, a branch or tag created, and a branch or tag deleted change refs,
+// so only those fetch; any other verified event is answered and ignored.
 //
 // A verified event naming a repo we do not mirror is 200, not 404: a delivery
 // log is not a repository-existence oracle, and red deliveries for repos we
@@ -62,6 +63,13 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	switch req.Header.Get("X-GitHub-Event") {
+	case "push", "create", "delete":
+	default:
+		_, _ = w.Write([]byte("ok"))
+		return
+	}
+
 	ownerName, repoName, ok := repoFromPayload(body)
 	if !ok {
 		// An event naming no repository: a ping, or one we do not act on.
@@ -76,23 +84,27 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// The mirror row is the test for "has an upstream"; failing that, a push
-	// mirror to the repo the event names is the way back in. A repo with
+	// mirror to the same repo on GitHub is the way back in. A repo with
 	// neither must never be queued for a fetch.
-	if _, err := repo_model.GetMirrorByRepoID(req.Context(), repo.ID); err == nil {
+	_, err = repo_model.GetMirrorByRepoID(req.Context(), repo.ID)
+	switch {
+	case err == nil:
 		queuePull(repo.ID)
 		log.Trace("sync: queued pull for %s", repo.FullName())
 		_, _ = w.Write([]byte("queued"))
-		return
+	case errors.Is(err, repo_model.ErrMirrorNotExist):
+		if m := mirror_service.GitHubPushMirror(req.Context(), repo); m != nil {
+			queueInbound(m.ID)
+			log.Trace("sync: queued inbound for %s", repo.FullName())
+			_, _ = w.Write([]byte("queued"))
+			return
+		}
+		_, _ = w.Write([]byte("ok"))
+	default:
+		// Not "no mirror": say so, so GitHub shows the delivery red and can redeliver it.
+		log.Error("sync: unable to read the mirror of %s: %v", repo.FullName(), err)
+		http.Error(w, "try again", http.StatusInternalServerError)
 	}
-
-	if m := pushMirrorTo(req.Context(), repo, ownerName, repoName); m != nil {
-		queueInbound(m.ID)
-		log.Trace("sync: queued inbound for %s", repo.FullName())
-		_, _ = w.Write([]byte("queued"))
-		return
-	}
-
-	_, _ = w.Write([]byte("ok"))
 }
 
 // The queue entry points, held in variables so a test can see what was queued
@@ -101,34 +113,6 @@ var (
 	queuePull    = mirror_service.AddPullMirrorToEventQueue
 	queueInbound = mirror_service.AddInboundMirrorToEventQueue
 )
-
-// pushMirrorTo returns the push mirror of repo whose remote is the GitHub
-// repository ownerName/repoName, or nil if it has none.
-func pushMirrorTo(ctx context.Context, repo *repo_model.Repository, ownerName, repoName string) *repo_model.PushMirror {
-	mirrors, _, err := repo_model.GetPushMirrorsByRepoID(ctx, repo.ID, db.ListOptionsAll)
-	if err != nil {
-		log.Error("sync: unable to list push mirrors of %s: %v", repo.FullName(), err)
-		return nil
-	}
-	for _, m := range mirrors {
-		if isGitHubRepo(m.RemoteAddress, ownerName, repoName) {
-			return m
-		}
-	}
-	return nil
-}
-
-// isGitHubRepo reports whether address names github.com/ownerName/repoName,
-// whatever its scheme or credentials, with or without a trailing ".git" or "/",
-// and in any letter case.
-func isGitHubRepo(address, ownerName, repoName string) bool {
-	u, err := giturl.ParseGitURL(address)
-	if err != nil || !strings.EqualFold(u.Hostname(), "github.com") {
-		return false
-	}
-	path := strings.TrimSuffix(strings.Trim(u.Path, "/"), ".git")
-	return strings.EqualFold(path, ownerName+"/"+repoName)
-}
 
 // repoFromPayload reads the repository a push event names, a field every
 // platform whose events we accept spells the same way.

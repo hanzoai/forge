@@ -95,3 +95,18 @@ func TestEventQueueDoesNotWaitForSweep(t *testing.T) {
 	}, 60*time.Second, 10*time.Millisecond, "the plain adders did not reach the sweep queue")
 	assert.Empty(t, heard, "the plain adders must not use the event queue")
 }
+
+// Each queue is tuned in its own section, so the event queue can be given workers
+// without the sweep getting them.
+func TestEventQueueHasItsOwnSettings(t *testing.T) {
+	cfg, err := setting.NewConfigProviderFromData("[queue.mirror]\nMAX_WORKERS = 2\n[queue.mirror_event]\nMAX_WORKERS = 7\n")
+	require.NoError(t, err)
+
+	sweep, err := setting.GetQueueSettings(cfg, "mirror")
+	require.NoError(t, err)
+	event, err := setting.GetQueueSettings(cfg, "mirror_event")
+	require.NoError(t, err)
+
+	assert.Equal(t, 2, sweep.MaxWorkers)
+	assert.Equal(t, 7, event.MaxWorkers)
+}

@@ -97,35 +97,6 @@ func TestSyncPingIsBenign(t *testing.T) {
 	assert.Equal(t, "ok", w.Body.String())
 }
 
-func TestIsGitHubRepo(t *testing.T) {
-	for address, want := range map[string]bool{
-		"https://github.com/hanzo-inc/app":                true,
-		"http://github.com/hanzo-inc/app":                 true,
-		"https://github.com/hanzo-inc/app.git":            true,
-		"https://github.com/hanzo-inc/app/":               true,
-		"https://github.com/hanzo-inc/app.git/":           true,
-		"https://user:token@github.com/hanzo-inc/app.git": true,
-		"https://x-access-token@github.com/hanzo-inc/app": true,
-		"HTTPS://GitHub.com/Hanzo-Inc/APP":                true,
-		"https://github.com:443/hanzo-inc/app":            true,
-		"ssh://git@github.com/hanzo-inc/app.git":          true,
-		"git@github.com:hanzo-inc/app.git":                true,
-		"https://github.com/hanzo-inc/other":              false,
-		"https://github.com/other/app":                    false,
-		"https://github.com/hanzo-inc/app-extra":          false,
-		"https://github.com/hanzo-inc/app/tree/main":      false,
-		"https://github.com/app":                          false,
-		"https://gitlab.com/hanzo-inc/app":                false,
-		"https://notgithub.com/hanzo-inc/app":             false,
-		"https://github.com.evil.example/hanzo-inc/app":   false,
-		"https://evil.example/github.com/hanzo-inc/app":   false,
-		"/srv/git/github.com/hanzo-inc/app":               false,
-		"":                                                false,
-	} {
-		assert.Equal(t, want, isGitHubRepo(address, "hanzo-inc", "app"), address)
-	}
-}
-
 // queued records what Sync queues, and answers for the tests that call it.
 func queued(t *testing.T) (pulls, inbound *[]int64) {
 	t.Helper()
@@ -136,10 +107,16 @@ func queued(t *testing.T) (pulls, inbound *[]int64) {
 	return pulls, inbound
 }
 
-func event(t *testing.T, fullName string) *httptest.ResponseRecorder {
+// event delivers a signed GitHub event of the given kind about a repository.
+func event(t *testing.T, kind, fullName string) *httptest.ResponseRecorder {
 	t.Helper()
 	body := `{"repository":{"full_name":"` + fullName + `"}}`
-	return post(t, body, sign("s3cr3t", body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/sync", strings.NewReader(body))
+	req.Header.Set("X-Hub-Signature-256", sign("s3cr3t", body))
+	req.Header.Set("X-GitHub-Event", kind)
+	w := httptest.NewRecorder()
+	Sync(w, req)
+	return w
 }
 
 func TestSyncQueuesInboundForRegularRepo(t *testing.T) {
@@ -152,7 +129,7 @@ func TestSyncQueuesInboundForRegularRepo(t *testing.T) {
 	require.NoError(t, db.Insert(t.Context(), other))
 	require.NoError(t, db.Insert(t.Context(), match))
 
-	w := event(t, "user2/repo1")
+	w := event(t, "push", "user2/repo1")
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "queued", w.Body.String())
@@ -164,17 +141,17 @@ func TestSyncIgnoresRegularRepoWithoutMatchingPushMirror(t *testing.T) {
 	unittest.PrepareTestEnv(t)
 	pulls, inbound := queued(t)
 
-	w := event(t, "user2/repo1")
+	w := event(t, "push", "user2/repo1")
 	assert.Equal(t, "ok", w.Body.String(), "no push mirror")
 
 	// A push mirror to somewhere else, or to another repository, is not the way back in.
 	for _, address := range []string{"https://gitlab.com/user2/repo1", "https://github.com/user2/repo2", "https://github.com/org3/repo1"} {
 		require.NoError(t, db.Insert(t.Context(), &repo_model.PushMirror{RepoID: 1, RemoteName: "r", RemoteAddress: address}))
 	}
-	w = event(t, "user2/repo1")
+	w = event(t, "push", "user2/repo1")
 	assert.Equal(t, "ok", w.Body.String(), "push mirrors to other repositories")
 
-	w = event(t, "user2/nonesuch")
+	w = event(t, "push", "user2/nonesuch")
 	assert.Equal(t, "ok", w.Body.String(), "unknown repository")
 
 	assert.Empty(t, *inbound)
@@ -188,9 +165,45 @@ func TestSyncQueuesPullForMirrorRepo(t *testing.T) {
 	// org3/repo5 has a pull mirror row; a push mirror beside it must not turn the pull into an inbound sync.
 	require.NoError(t, db.Insert(t.Context(), &repo_model.PushMirror{RepoID: 5, RemoteName: "github", RemoteAddress: "https://github.com/org3/repo5"}))
 
-	w := event(t, "org3/repo5")
+	w := event(t, "push", "org3/repo5")
 
 	assert.Equal(t, "queued", w.Body.String())
 	assert.Equal(t, []int64{5}, *pulls)
 	assert.Empty(t, *inbound)
+}
+
+func TestSyncActsOnlyOnEventsThatChangeRefs(t *testing.T) {
+	unittest.PrepareTestEnv(t)
+	pulls, inbound := queued(t)
+	require.NoError(t, db.Insert(t.Context(), &repo_model.PushMirror{RepoID: 1, RemoteName: "github", RemoteAddress: "https://github.com/user2/repo1"}))
+
+	// Anyone can star, fork or comment, so none of those may start a fetch.
+	for _, kind := range []string{"star", "watch", "fork", "ping", "issues", "pull_request", "issue_comment", "check_run", "release", ""} {
+		w := event(t, kind, "user2/repo1")
+		assert.Equal(t, http.StatusOK, w.Code, kind)
+		assert.Equal(t, "ok", w.Body.String(), kind)
+	}
+	assert.Empty(t, *inbound)
+	assert.Empty(t, *pulls)
+
+	for _, kind := range []string{"push", "create", "delete"} {
+		assert.Equal(t, "queued", event(t, kind, "user2/repo1").Body.String(), kind)
+	}
+	assert.Len(t, *inbound, 3)
+}
+
+// GitHub sends payloads of up to 25 MiB; one past a megabyte must still verify.
+func TestSyncReadsALargePayload(t *testing.T) {
+	unittest.PrepareTestEnv(t)
+	pulls, _ := queued(t)
+
+	body := `{"repository":{"full_name":"org3/repo5"},"padding":"` + strings.Repeat("x", 3<<20) + `"}`
+	req := httptest.NewRequest(http.MethodPost, "/v1/sync", strings.NewReader(body))
+	req.Header.Set("X-Hub-Signature-256", sign("s3cr3t", body))
+	req.Header.Set("X-GitHub-Event", "push")
+	w := httptest.NewRecorder()
+	Sync(w, req)
+
+	assert.Equal(t, "queued", w.Body.String())
+	assert.Equal(t, []int64{5}, *pulls)
 }

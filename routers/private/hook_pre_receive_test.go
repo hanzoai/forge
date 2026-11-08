@@ -4,6 +4,7 @@
 package private
 
 import (
+	"net/http"
 	"testing"
 
 	issues_model "github.com/hanzoai/git/models/issues"
@@ -11,6 +12,9 @@ import (
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/modules/web"
+	git_context "github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
@@ -66,4 +70,29 @@ func TestPreReceiveCanWriteCodePerBranch(t *testing.T) {
 	// scoped to PR head branches, so a non-branch ref can never match it. (A tag ref already
 	// yields an empty branch name, so this guards the per-ref evaluation, not the IsBranch check.)
 	assert.False(t, ctx.canWriteCodeRef(git.RefNameFromTag("granted-branch")))
+}
+
+// The namespace the inbound mirror sync keeps its record in is closed to every
+// pusher, one with write access included: whatever sat there would be taken for
+// a tip the sync last handled.
+func TestPreReceiveRefusesTheUpstreamNamespace(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+
+	for _, ref := range []git.RefName{"refs/upstream/heads/main", "refs/upstream/tags/v1", "refs/upstream/pull/7/head"} {
+		ctx, resp := contexttest.MockPrivateContext(t, "/")
+		ctx.Repo = &git_context.Repository{Repository: repo}
+		// user2 owns user2/repo1 and could push to any branch of it.
+		web.SetForm(ctx, &private.HookOptions{
+			UserID:       2,
+			OldCommitIDs: []string{"0000000000000000000000000000000000000000"},
+			NewCommitIDs: []string{"4a357436d925b5c974181ff12a994538ddc5a269"},
+			RefFullNames: []git.RefName{ref},
+		})
+
+		HookPreReceive(ctx)
+
+		assert.Equal(t, http.StatusForbidden, resp.Code, ref)
+		assert.Contains(t, resp.Body.String(), "reserved for mirror sync", ref)
+	}
 }
