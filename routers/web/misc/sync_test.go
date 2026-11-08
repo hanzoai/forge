@@ -30,16 +30,40 @@ func sign(secret, body string) string {
 	return "sha256=" + hex.EncodeToString(mac.Sum(nil))
 }
 
-func TestValidSignature(t *testing.T) {
+func TestReadVerified(t *testing.T) {
 	good := sign("s3cr3t", payload)
+	read := func(secret, header, body string) bool {
+		_, valid, err := readVerified(secret, header, strings.NewReader(body), 1<<10)
+		require.NoError(t, err)
+		return valid
+	}
 
-	assert.True(t, validSignature("s3cr3t", good, []byte(payload)))
-	assert.False(t, validSignature("other", good, []byte(payload)), "wrong key")
-	assert.False(t, validSignature("s3cr3t", good, []byte(payload+" ")), "tampered body")
-	assert.False(t, validSignature("s3cr3t", "", []byte(payload)), "absent header")
-	assert.False(t, validSignature("s3cr3t", strings.TrimPrefix(good, "sha256="), []byte(payload)), "unprefixed")
-	assert.False(t, validSignature("s3cr3t", "sha256=zz", []byte(payload)), "non-hex")
-	assert.False(t, validSignature("", good, []byte(payload)), "empty key never validates")
+	assert.True(t, read("s3cr3t", good, payload))
+	assert.False(t, read("other", good, payload), "wrong key")
+	assert.False(t, read("s3cr3t", good, payload+" "), "tampered body")
+	assert.False(t, read("s3cr3t", "", payload), "absent header")
+	assert.False(t, read("s3cr3t", strings.TrimPrefix(good, "sha256="), payload), "unprefixed")
+	assert.False(t, read("s3cr3t", "sha256=zz", payload), "non-hex")
+	assert.False(t, read("", good, payload), "empty key never validates")
+}
+
+// The whole payload is hashed and only the front of it is held.
+func TestReadVerifiedKeepsOnlyTheFront(t *testing.T) {
+	body := strings.Repeat("0123456789", 1<<19) // 5 MiB
+	head, valid, err := readVerified("s3cr3t", sign("s3cr3t", body), strings.NewReader(body), 1<<20)
+	require.NoError(t, err)
+	assert.True(t, valid)
+	assert.Equal(t, body[:1<<20], string(head))
+
+	// A change after what is held still breaks the signature.
+	_, valid, err = readVerified("s3cr3t", sign("s3cr3t", body), strings.NewReader(body[:len(body)-1]+"x"), 1<<20)
+	require.NoError(t, err)
+	assert.False(t, valid)
+
+	// A body shorter than what may be held is held whole.
+	head, _, err = readVerified("s3cr3t", sign("s3cr3t", payload), strings.NewReader(payload), 1<<20)
+	require.NoError(t, err)
+	assert.Equal(t, payload, string(head))
 }
 
 func TestRepoFromPayload(t *testing.T) {
@@ -48,12 +72,20 @@ func TestRepoFromPayload(t *testing.T) {
 	assert.Equal(t, "o", owner)
 	assert.Equal(t, "r", repo)
 
+	// The repository is read wherever it falls in the front of the payload, after other fields too.
+	owner, repo, ok = repoFromPayload([]byte(`{"ref":"refs/heads/main","commits":[{"id":"a"}],"repository":{"id":1,"full_name":"o/r"},"sender":{}}`))
+	assert.True(t, ok)
+	assert.Equal(t, "o", owner)
+	assert.Equal(t, "r", repo)
+
 	for name, body := range map[string]string{
-		"ping":         `{"zen":"Design for failure."}`,
-		"no slash":     `{"repository":{"full_name":"lonely"}}`,
-		"empty owner":  `{"repository":{"full_name":"/r"}}`,
-		"empty repo":   `{"repository":{"full_name":"o/"}}`,
-		"not an event": `not json`,
+		"ping":          `{"zen":"Design for failure."}`,
+		"no slash":      `{"repository":{"full_name":"lonely"}}`,
+		"empty owner":   `{"repository":{"full_name":"/r"}}`,
+		"empty repo":    `{"repository":{"full_name":"o/"}}`,
+		"not an event":  `not json`,
+		"cut short":     `{"ref":"refs/heads/main","commits":[{"id":"a"`,
+		"not an object": `["repository"]`,
 	} {
 		_, _, ok := repoFromPayload([]byte(body))
 		assert.False(t, ok, name)
@@ -197,7 +229,7 @@ func TestSyncReadsALargePayload(t *testing.T) {
 	unittest.PrepareTestEnv(t)
 	pulls, _ := queued(t)
 
-	body := `{"repository":{"full_name":"org3/repo5"},"padding":"` + strings.Repeat("x", 3<<20) + `"}`
+	body := `{"repository":{"full_name":"org3/repo5"},"padding":"` + strings.Repeat("x", 20<<20) + `"}`
 	req := httptest.NewRequest(http.MethodPost, "/v1/sync", strings.NewReader(body))
 	req.Header.Set("X-Hub-Signature-256", sign("s3cr3t", body))
 	req.Header.Set("X-GitHub-Event", "push")
@@ -206,4 +238,27 @@ func TestSyncReadsALargePayload(t *testing.T) {
 
 	assert.Equal(t, "queued", w.Body.String())
 	assert.Equal(t, []int64{5}, *pulls)
+}
+
+func TestSyncRefusesWhatIsTooLargeOrUnsigned(t *testing.T) {
+	unittest.PrepareTestEnv(t)
+	pulls, _ := queued(t)
+	deliver := func(body, signature string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest(http.MethodPost, "/v1/sync", strings.NewReader(body))
+		req.Header.Set("X-Hub-Signature-256", signature)
+		req.Header.Set("X-GitHub-Event", "push")
+		w := httptest.NewRecorder()
+		Sync(w, req)
+		return w
+	}
+
+	big := `{"repository":{"full_name":"org3/repo5"},"padding":"` + strings.Repeat("x", 26<<20) + `"}`
+	assert.Equal(t, http.StatusRequestEntityTooLarge, deliver(big, sign("s3cr3t", big)).Code)
+
+	// Signed over all of it, not just the front the repository is read from.
+	body := `{"repository":{"full_name":"org3/repo5"},"padding":"` + strings.Repeat("x", 3<<20) + `"}`
+	signature := sign("s3cr3t", body)
+	assert.Equal(t, http.StatusUnauthorized, deliver(body+" ", signature).Code)
+
+	assert.Empty(t, *pulls)
 }

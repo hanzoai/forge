@@ -4,6 +4,7 @@
 package misc
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -19,9 +20,14 @@ import (
 	mirror_service "github.com/hanzoai/git/services/mirror"
 )
 
-// maxSyncBody bounds the read: GitHub caps a webhook payload at 25 MiB, and an
-// unbounded read ahead of authentication is a memory DoS.
-const maxSyncBody = 25 << 20
+const (
+	// maxSyncBody bounds the read: GitHub caps a webhook payload at 25 MiB, and an
+	// unbounded read ahead of authentication is a memory DoS.
+	maxSyncBody = 25 << 20
+	// keepSyncBody is how much of the payload is held to read the repository from.
+	// The rest is only hashed, so the memory a delivery takes does not grow with it.
+	keepSyncBody = 1 << 20
+)
 
 // Sync is the one entry point for "this repo changed upstream, take it now".
 // It exists because an org-level webhook is a single static URL that cannot
@@ -52,13 +58,16 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	body, err := io.ReadAll(io.LimitReader(req.Body, maxSyncBody))
+	head, valid, err := readVerified(secret, req.Header.Get("X-Hub-Signature-256"), http.MaxBytesReader(w, req.Body, maxSyncBody), keepSyncBody)
 	if err != nil {
+		if _, tooBig := errors.AsType[*http.MaxBytesError](err); tooBig {
+			http.Error(w, "payload too large", http.StatusRequestEntityTooLarge)
+			return
+		}
 		http.Error(w, "unreadable body", http.StatusBadRequest)
 		return
 	}
-
-	if !validSignature(secret, req.Header.Get("X-Hub-Signature-256"), body) {
+	if !valid {
 		http.Error(w, "invalid signature", http.StatusUnauthorized)
 		return
 	}
@@ -70,7 +79,7 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ownerName, repoName, ok := repoFromPayload(body)
+	ownerName, repoName, ok := repoFromPayload(head)
 	if !ok {
 		// An event naming no repository: a ping, or one we do not act on.
 		_, _ = w.Write([]byte("ok"))
@@ -115,32 +124,71 @@ var (
 )
 
 // repoFromPayload reads the repository a push event names, a field every
-// platform whose events we accept spells the same way.
-func repoFromPayload(body []byte) (ownerName, repoName string, ok bool) {
-	var payload struct {
-		Repository struct {
-			FullName string `json:"full_name"`
-		} `json:"repository"`
-	}
-	if err := json.Unmarshal(body, &payload); err != nil {
+// platform whose events we accept spells the same way. It reads from the start
+// of the payload and stops at the repository, so a payload cut short after it
+// is still read: GitHub puts the repository ahead of the commits.
+func repoFromPayload(head []byte) (ownerName, repoName string, ok bool) {
+	dec := json.NewDecoder(bytes.NewReader(head))
+	if tok, err := dec.Token(); err != nil || tok != json.Delim('{') {
 		return "", "", false
 	}
-	ownerName, repoName, ok = strings.Cut(payload.Repository.FullName, "/")
-	return ownerName, repoName, ok && ownerName != "" && repoName != ""
+	for dec.More() {
+		key, err := dec.Token()
+		if err != nil {
+			return "", "", false
+		}
+		if key != "repository" {
+			var skip json.RawMessage
+			if err := dec.Decode(&skip); err != nil {
+				return "", "", false
+			}
+			continue
+		}
+		var repository struct {
+			FullName string `json:"full_name"`
+		}
+		if err := dec.Decode(&repository); err != nil {
+			return "", "", false
+		}
+		ownerName, repoName, ok = strings.Cut(repository.FullName, "/")
+		return ownerName, repoName, ok && ownerName != "" && repoName != ""
+	}
+	return "", "", false
 }
 
-// validSignature reports whether sigHeader is the "sha256=<hex>" HMAC of body
-// under secret. Constant-time; a malformed header is simply invalid.
-func validSignature(secret, sigHeader string, body []byte) bool {
+// readVerified reads all of body through the HMAC under secret, and reports
+// whether sigHeader, "sha256=<hex>", is the signature of every byte of it. It
+// returns the first keep bytes of the body, no more, whatever its size. A
+// malformed header is invalid without reading anything.
+func readVerified(secret, sigHeader string, body io.Reader, keep int) (head []byte, valid bool, err error) {
 	hexDigest, ok := strings.CutPrefix(sigHeader, "sha256=")
 	if !ok {
-		return false
+		return nil, false, nil
 	}
 	sent, err := hex.DecodeString(hexDigest)
 	if err != nil {
-		return false
+		return nil, false, nil
 	}
+
 	mac := hmac.New(sha256.New, []byte(secret))
-	mac.Write(body)
-	return hmac.Equal(sent, mac.Sum(nil))
+	var kept bytes.Buffer
+	if _, err := io.Copy(io.MultiWriter(mac, &limitedWriter{buf: &kept, left: keep}), body); err != nil {
+		return nil, false, err
+	}
+	return kept.Bytes(), hmac.Equal(sent, mac.Sum(nil)), nil
+}
+
+// limitedWriter keeps the first left bytes written to it and drops the rest, without failing.
+type limitedWriter struct {
+	buf  *bytes.Buffer
+	left int
+}
+
+func (w *limitedWriter) Write(p []byte) (int, error) {
+	if w.left > 0 {
+		n := min(len(p), w.left)
+		w.buf.Write(p[:n])
+		w.left -= n
+	}
+	return len(p), nil
 }
