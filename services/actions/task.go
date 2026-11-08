@@ -18,6 +18,7 @@ import (
 	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
 
 	"google.golang.org/protobuf/types/known/structpb"
 )
@@ -49,6 +50,19 @@ func TryPickTask(ctx context.Context, runner *actions_model.ActionRunner) (task 
 	}
 	task, ok, err = PickTask(ctx, runner)
 	return task, ok, false, err
+}
+
+// stalledGrace is how long a job may wait before idle runners are woken for it.
+const stalledGrace = time.Minute
+
+// WakeRunners moves the global tasks version when a job has waited over a minute with no task, so idle runners
+// ask for work again. It repairs a bump that failed, and waits made without one, such as rows changed in the database.
+func WakeRunners(ctx context.Context) error {
+	stalled, err := actions_model.HasStalledJobs(ctx, timeutil.TimeStampNow().AddDuration(-stalledGrace))
+	if err != nil || !stalled {
+		return err
+	}
+	return actions_model.IncreaseTaskVersion(ctx, 0, 0)
 }
 
 // releaseTaskForRunnerCleanup releases a claimed task using a fresh, bounded context. The request context
