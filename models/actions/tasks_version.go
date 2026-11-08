@@ -8,7 +8,6 @@ import (
 	"context"
 
 	"github.com/hanzoai/git/models/db"
-	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/timeutil"
 )
 
@@ -73,30 +72,36 @@ func increaseTasksVersionByScope(ctx context.Context, ownerID, repoID int64) err
 	return nil
 }
 
+// scope names one version row: {0, 0} is global, {owner, 0} an org, {0, repo} a repo.
+type scope struct{ ownerID, repoID int64 }
+
+// IncreaseTaskVersion bumps the global, owner and repo versions, in that order, so idle runners poll again.
+// In a transaction the bumps wait for it to commit and run once per scope in a short transaction of their own:
+// the version rows stay unlocked while the enclosing transaction works, and a rollback bumps nothing.
 func IncreaseTaskVersion(ctx context.Context, ownerID, repoID int64) error {
+	scopes := []scope{{}}
+	if ownerID > 0 {
+		scopes = append(scopes, scope{ownerID: ownerID})
+	}
+	if repoID > 0 {
+		scopes = append(scopes, scope{repoID: repoID})
+	}
+
+	if db.InTransaction(ctx) {
+		for _, s := range scopes {
+			db.AfterCommit(ctx, s, func(ctx context.Context) error {
+				return increaseTasksVersionByScope(ctx, s.ownerID, s.repoID)
+			})
+		}
+		return nil
+	}
+
 	return db.WithTx(ctx, func(ctx context.Context) error {
-		// 1. increase global
-		if err := increaseTasksVersionByScope(ctx, 0, 0); err != nil {
-			log.Error("IncreaseTasksVersionByScope(Global): %v", err)
-			return err
-		}
-
-		// 2. increase owner
-		if ownerID > 0 {
-			if err := increaseTasksVersionByScope(ctx, ownerID, 0); err != nil {
-				log.Error("IncreaseTasksVersionByScope(Owner): %v", err)
+		for _, s := range scopes {
+			if err := increaseTasksVersionByScope(ctx, s.ownerID, s.repoID); err != nil {
 				return err
 			}
 		}
-
-		// 3. increase repo
-		if repoID > 0 {
-			if err := increaseTasksVersionByScope(ctx, 0, repoID); err != nil {
-				log.Error("IncreaseTasksVersionByScope(Repo): %v", err)
-				return err
-			}
-		}
-
 		return nil
 	})
 }

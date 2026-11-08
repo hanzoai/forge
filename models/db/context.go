@@ -8,10 +8,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"runtime"
 	"slices"
 	"sync"
 
+	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
 
 	"github.com/hanzoai/builder"
@@ -78,7 +80,7 @@ func GetEngine(ctx context.Context) Engine {
 		return engine
 	}
 	// no need to do "contextSafetyCheck" because it's a new Session
-	return &session{xormEngine.Context(ctx)}
+	return &session{Session: xormEngine.Context(ctx)}
 }
 
 func GetXORMEngineForTesting() *relational.Engine {
@@ -131,7 +133,7 @@ func TxContext(parentCtx context.Context) (context.Context, Committer, error) {
 		return withContextEngine(parentCtx, sess), &halfCommitter{committer: sess}, nil
 	}
 
-	sess := &session{xormEngine.NewSession()}
+	sess := &session{Session: xormEngine.NewSession(), ctx: parentCtx}
 	if err := sess.Begin(); err != nil {
 		_ = sess.Close()
 		return nil, nil, err
@@ -163,7 +165,7 @@ func WithTx2[T any](parentCtx context.Context, f func(ctx context.Context) (T, e
 }
 
 func txWithNoCheck(parentCtx context.Context, f func(ctx context.Context) error) error {
-	sess := &session{xormEngine.NewSession()}
+	sess := &session{Session: xormEngine.NewSession(), ctx: parentCtx}
 	defer sess.Close()
 	if err := sess.Begin(); err != nil {
 		return err
@@ -174,6 +176,56 @@ func txWithNoCheck(parentCtx context.Context, f func(ctx context.Context) error)
 	}
 
 	return sess.Commit()
+}
+
+// hook is work deferred until a transaction commits.
+type hook struct {
+	key any
+	run func(ctx context.Context) error
+}
+
+// AfterCommit defers f until the outermost transaction in ctx commits; if that transaction rolls back, f never runs.
+// The hooks of one transaction run together, in registration order, in a single new transaction that ignores
+// cancellation of ctx. If that transaction fails it is rolled back and the error is logged: the first one is already committed.
+// key must be comparable. A key already registered on the transaction is skipped, so repeating a request defers it once.
+// It reports false, and registers nothing, when ctx is not in a transaction.
+func AfterCommit(ctx context.Context, key any, f func(ctx context.Context) error) bool {
+	sess := getTransactionSession(ctx)
+	if sess == nil {
+		return false
+	}
+	for _, h := range sess.hooks {
+		if h.key == key {
+			return true
+		}
+	}
+	sess.hooks = append(sess.hooks, hook{key: key, run: f})
+	return true
+}
+
+// Commit commits the transaction, then runs the hooks registered with AfterCommit.
+// Committing a transaction that was already rolled back does nothing and runs no hooks.
+func (s *session) Commit() error {
+	open := s.IsInTx()
+	if err := s.Session.Commit(); err != nil {
+		return err
+	}
+	hooks := s.hooks
+	s.hooks = nil
+	if !open || len(hooks) == 0 {
+		return nil
+	}
+	if err := WithTx(context.WithoutCancel(s.ctx), func(ctx context.Context) error {
+		for _, h := range hooks {
+			if err := h.run(ctx); err != nil {
+				return fmt.Errorf("%v: %w", h.key, err)
+			}
+		}
+		return nil
+	}); err != nil {
+		log.Error("AfterCommit: %v", err)
+	}
+	return nil
 }
 
 // Insert inserts records into database
