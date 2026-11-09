@@ -232,9 +232,7 @@ func task(ctx context.Context, in *runner_module.TaskIn) (*runner_module.TaskOut
 		return nil, fmt.Errorf("query tasks version: %w", err)
 	}
 	if latest == 0 {
-		if err := actions_model.IncreaseTaskVersion(ctx, r.OwnerID, r.RepoID); err != nil {
-			return nil, fmt.Errorf("increase task version: %w", err)
-		}
+		actions_model.IncreaseTaskVersion(ctx, r.OwnerID, r.RepoID)
 		// Answering zero here would tell the runner this forge is too old to
 		// version its queue at all.
 		latest++
