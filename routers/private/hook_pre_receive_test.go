@@ -106,6 +106,7 @@ func TestPreReceiveRefusesNamesLikeObjectIds(t *testing.T) {
 	for _, ref := range []git.RefName{
 		git.RefNameFromBranch(id), git.RefNameFromTag(id),
 		git.RefNameFromBranch(strings.ToUpper(id)), git.RefNameFromTag(strings.Repeat("ab", 32)),
+		git.RefName("refs/" + id), // git looks there for the name, too
 	} {
 		assert.True(t, isObjectNamed(ref, id), ref)
 	}
@@ -114,7 +115,7 @@ func TestPreReceiveRefusesNamesLikeObjectIds(t *testing.T) {
 	// Names that merely look like it, or are not branches or tags.
 	for _, ref := range []git.RefName{
 		git.RefNameFromBranch(id[:39]), git.RefNameFromBranch(id + "0"), git.RefNameFromBranch("release/" + id),
-		git.RefNameFromTag("v1.0.0"), git.RefName("refs/pull/7/head"),
+		git.RefNameFromTag("v1.0.0"), git.RefName("refs/pull/7/head"), git.RefName("refs/notes/commits"),
 	} {
 		assert.False(t, isObjectNamed(ref, id), ref)
 	}
@@ -133,4 +134,24 @@ func TestPreReceiveRefusesNamesLikeObjectIds(t *testing.T) {
 	HookPreReceive(ctx)
 	assert.Equal(t, http.StatusForbidden, resp.Code)
 	assert.Contains(t, resp.Body.String(), "named like an object id")
+}
+
+// refs/remotes is where git looks for a ref by a name after tags and branches, and
+// nothing is pushed there on purpose.
+func TestPreReceiveRefusesRemotes(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	ctx, resp := contexttest.MockPrivateContext(t, "/")
+	ctx.Repo = &git_context.Repository{Repository: repo}
+	web.SetForm(ctx, &private.HookOptions{
+		UserID:       2,
+		OldCommitIDs: []string{strings.Repeat("0", 40)},
+		NewCommitIDs: []string{"4a357436d925b5c974181ff12a994538ddc5a269"},
+		RefFullNames: []git.RefName{"refs/remotes/origin/main"},
+	})
+
+	HookPreReceive(ctx)
+
+	assert.Equal(t, http.StatusForbidden, resp.Code)
+	assert.Contains(t, resp.Body.String(), "refs/remotes/ is not for pushes")
 }

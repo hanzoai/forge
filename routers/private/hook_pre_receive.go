@@ -138,6 +138,11 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 			preReceiveTag(ourCtx, refFullName)
 		case git.DefaultFeatures().SupportProcReceive && refFullName.IsFor():
 			preReceiveFor(ourCtx, refFullName)
+		case refFullName.IsRemote():
+			// Git looks there for a ref by a name, too, and nothing is meant to be pushed there.
+			ctx.JSON(http.StatusForbidden, private.Response{
+				UserMsg: git.RemotePrefix + " is not for pushes",
+			})
 		case refFullName.IsUpstream():
 			// The mirror sync's own bookkeeping: whatever a writer put there would be taken for an upstream tip.
 			ctx.JSON(http.StatusForbidden, private.Response{
@@ -155,11 +160,21 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 }
 
 // isObjectNamed reports whether the push makes a branch or tag named like an
-// object id. Git reads such a name as the object, and as the ref, depending on
-// where it is asked, so a writer who makes one can redirect a push that names an
-// object. Deleting one is allowed.
+// object id, in any of the places git looks for a ref by a name. Git reads such a
+// name as the object, and as the ref, depending on where it is asked, so a writer
+// who makes one can redirect a push that names an object. Deleting one is allowed.
 func isObjectNamed(refFullName git.RefName, newCommitID string) bool {
-	return (refFullName.IsBranch() || refFullName.IsTag()) && git.IsObjectName(refFullName.ShortName()) && strings.Trim(newCommitID, "0") != ""
+	if strings.Trim(newCommitID, "0") == "" {
+		return false
+	}
+	switch {
+	case refFullName.IsBranch(), refFullName.IsTag():
+		return git.IsObjectName(refFullName.ShortName())
+	default:
+		// refs/<id> is one of the places git looks for the name <id>, too.
+		name, ok := strings.CutPrefix(refFullName.String(), "refs/")
+		return ok && git.IsObjectName(name)
+	}
 }
 
 func preReceiveBranch(ctx *preReceiveContext, oldCommitID, newCommitID string, refFullName git.RefName) {

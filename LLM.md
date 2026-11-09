@@ -279,9 +279,12 @@ either side reaches the other. There is no mode to set.
     the repo to itself, under `PushingEnvironment` of the sync user. The source of
     each refspec is `<id>^{object}`: a bare `<id>` is read as a ref's name before
     it is read as an object, and a writer may have made `refs/heads/<id>` or
-    `refs/tags/<id>` to take its place. Pre-receive refuses to make a branch or tag
-    named like a full object id (deleting one is allowed), and the importer does not
-    take upstream's, with a notice; Post-receive
+    `refs/tags/<id>` to take its place. Every push of an object by its id in the
+    forge says `git.ObjectName(id)` (the sync, create branch from a commit, update
+    branch, restore branch). Pre-receive refuses to make a branch or tag named like a
+    full object id, or `refs/<id>`, or anything under `refs/remotes/` (deleting one is
+    allowed); the tag and release API runs no hook, so `createTag` refuses such a
+    name itself; and the importer does not take upstream's, with a notice; Post-receive
     runs the push queue, which starts Actions (`PushCommits`), pull request checks,
     issue references and the push out. The `Sync*` notifiers are a pull mirror's
     and are not used. Archived repos are not written (pre-receive does not check it);

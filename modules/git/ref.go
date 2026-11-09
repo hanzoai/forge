@@ -110,6 +110,14 @@ func (ref RefName) IsTag() bool {
 // objectNamePattern matches a full object id, of either hash, in either case.
 var objectNamePattern = regexp.MustCompile(`(?i)^([0-9a-f]{40}|[0-9a-f]{64})$`)
 
+// ObjectName names an object by its id and by nothing else. A refspec's source
+// that is only an id is read as the name of a ref before it is read as an object,
+// and a writer may have made refs/heads/<id>, refs/tags/<id> or the like to be
+// read in its place; <id>^{object} is the object itself, whatever refs there are.
+func ObjectName(id string) string {
+	return id + "^{object}"
+}
+
 // IsObjectName reports whether name is a full object id. A branch or tag named so
 // is read by git as the object in some places, and as the ref in others.
 func IsObjectName(name string) bool {

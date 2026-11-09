@@ -474,21 +474,13 @@ func writable(ctx context.Context, repo *repo_model.Repository) bool {
 	return true
 }
 
-// objectName names an object by its id and by nothing else. A refspec's source
-// that is only an id is read as a ref's name first, and a writer may have made
-// refs/heads/<id> or refs/tags/<id> to be read in its place; ^{object} is the
-// object itself, whatever refs there are.
-func objectName(id string) string {
-	return id + "^{object}"
-}
-
 // pushBatch pushes the staged tips of names to their refs in one push, as env, and
 // records the ones that arrived. A push that failed may still have landed some of
 // its refs, so what is recorded, and returned, is what the repository holds now.
 func pushBatch(ctx context.Context, repo *repo_model.Repository, env, names []string, tips map[string]string) (landed []string, err error) {
 	refspecs := make([]string, len(names))
 	for i, name := range names {
-		refspecs[i] = objectName(tips[name]) + ":" + forgeRef(name)
+		refspecs[i] = git.ObjectName(tips[name]) + ":" + forgeRef(name)
 	}
 	err = gitrepo.Push(ctx, repo, repo, git.PushOptions{Refspecs: refspecs, Env: env, ReceivePack: advertiseStaging(), Timeout: mirrorTimeout()})
 
@@ -811,7 +803,7 @@ func advance(ctx context.Context, repo *repo_model.Repository, user *user_model.
 	// Not forced: the receiving side refuses anything but an addition, as well as
 	// whatever its hooks refuse.
 	err := gitrepo.Push(ctx, repo, repo, git.PushOptions{
-		Branch:      objectName(tip) + ":" + ref,
+		Branch:      git.ObjectName(tip) + ":" + ref,
 		Env:         repo_module.PushingEnvironment(user, repo),
 		ReceivePack: advertiseStaging(),
 		Timeout:     mirrorTimeout(),

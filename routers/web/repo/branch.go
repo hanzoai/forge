@@ -138,7 +138,7 @@ func RestoreBranchPost(ctx *context.Context) {
 	}
 
 	if err := gitrepo.Push(ctx, ctx.Repo.Repository, ctx.Repo.Repository, git.PushOptions{
-		Branch: fmt.Sprintf("%s:%s%s", deletedBranch.CommitID, git.BranchPrefix, deletedBranch.Name),
+		Branch: fmt.Sprintf("%s:%s%s", git.ObjectName(deletedBranch.CommitID), git.BranchPrefix, deletedBranch.Name),
 		Env:    repo_module.PushingEnvironment(ctx.Doer, ctx.Repo.Repository),
 	}); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
