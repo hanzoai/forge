@@ -387,3 +387,21 @@ func TestCreateNewTag(t *testing.T) {
 	assert.NoError(t, CreateNewTag(t.Context(), user, repo, "master", "v2.0",
 		"v2.0 is released \n\n BUGFIX: .... \n\n 123"))
 }
+
+// No hook sees a tag made through the API, and git may read a tag named like an
+// object id as the object, so a writer could make one to take the object's place.
+func TestCreateNewTagRefusesANameLikeAnObjectId(t *testing.T) {
+	assert.NoError(t, unittest.PrepareTestDatabase())
+	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	commitID, err := gitrepo.GetBranchCommitID(t.Context(), repo, "master")
+	assert.NoError(t, err)
+
+	for _, name := range []string{commitID, strings.ToUpper(commitID), strings.Repeat("ab", 32)} {
+		err := CreateNewTag(t.Context(), user, repo, "master", name, "message")
+		assert.True(t, IsErrInvalidTagName(err), "%s: %v", name, err)
+		assert.False(t, gitrepo.IsTagExist(t.Context(), repo, name))
+	}
+	// Anything else that is hex is a tag like any other.
+	assert.NoError(t, CreateNewTag(t.Context(), user, repo, "master", commitID[:39], "message"))
+}

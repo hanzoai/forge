@@ -8,13 +8,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	auth_model "github.com/hanzoai/git/models/auth"
 	"github.com/hanzoai/git/models/perm"
@@ -319,35 +317,6 @@ func setHeaderNoCache(ctx *context.Context) {
 	ctx.Resp.Header().Set("Cache-Control", "no-cache, max-age=0, must-revalidate")
 }
 
-func setHeaderCacheForever(ctx *context.Context) {
-	now := time.Now().Unix()
-	expires := now + 365*86400 // 365 days
-	ctx.Resp.Header().Set("Date", strconv.FormatInt(now, 10))
-	ctx.Resp.Header().Set("Expires", strconv.FormatInt(expires, 10))
-	ctx.Resp.Header().Set("Cache-Control", "public, max-age=31536000")
-}
-
-func containsParentDirectorySeparator(v string) bool {
-	if !strings.Contains(v, "..") {
-		return false
-	}
-	return slices.Contains(strings.FieldsFunc(v, isSlashRune), "..")
-}
-
-func isSlashRune(r rune) bool { return r == '/' || r == '\\' }
-
-func (h *serviceHandler) sendFile(ctx *context.Context, contentType, file string) {
-	if containsParentDirectorySeparator(file) {
-		log.Debug("request file path contains invalid path: %v", file)
-		ctx.Resp.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	fs := gitrepo.GetRepoFS(h.getStorageRepo())
-	ctx.Resp.Header().Set("Content-Type", contentType)
-	http.ServeFileFS(ctx.Resp, ctx.Req, fs, path.Clean(file))
-}
-
 // one or more key=value pairs separated by colons
 var safeGitProtocolHeader = regexp.MustCompile(`^[0-9a-zA-Z]+=[0-9a-zA-Z]+(:[0-9a-zA-Z]+=[0-9a-zA-Z]+)*$`)
 
@@ -412,10 +381,11 @@ func serviceRPC(ctx *context.Context, service string) {
 		h.environ = append(h.environ, "GIT_PROTOCOL="+protocol)
 	}
 
-	if err := gitrepo.RunCmdWithStderr(ctx, h.getStorageRepo(), cmd.AddArguments(".").
-		WithEnv(append(os.Environ(), h.environ...)).
-		WithStdinCopy(reqBody).
-		WithStdoutCopy(ctx.Resp),
+	if err := gitrepo.RunCmdWithStderr(
+		ctx, h.getStorageRepo(), cmd.AddArguments(".").
+			WithEnv(append(os.Environ(), h.environ...)).
+			WithStdinCopy(reqBody).
+			WithStdoutCopy(ctx.Resp),
 	); err != nil {
 		if !gitcmd.IsErrorCanceledOrKilled(err) {
 			log.Error("Fail to serve RPC(%s) in %s: %v", service, h.getStorageRepo().RelativePath(), err)
@@ -470,13 +440,10 @@ func GetInfoRefs(ctx *context.Context) {
 
 	setHeaderNoCache(ctx)
 	if h.serviceType == "" {
-		// it's said that some legacy git clients will send requests to "/info/refs" without "service" parameter,
-		// although there should be no such case client in the modern days. TODO: not quite sure why we need this UpdateServerInfo logic
-		if err := gitrepo.UpdateServerInfo(ctx, h.getStorageRepo()); err != nil {
-			ctx.ServerError("UpdateServerInfo", err)
-			return
-		}
-		h.sendFile(ctx, "text/plain; charset=utf-8", "info/refs")
+		// The dumb protocol's list of refs is written by git update-server-info,
+		// which lists every ref the repository has, those that are hidden from
+		// clients too. No client of this century asks for it without a service.
+		ctx.PlainText(http.StatusForbidden, "The dumb HTTP protocol is not served; ask for a service")
 		return
 	}
 
@@ -505,55 +472,10 @@ func GetInfoRefs(ctx *context.Context) {
 	_, _ = ctx.Resp.Write(refs)
 }
 
-// GetTextFile implements Git dumb HTTP
-func GetTextFile(p string) func(*context.Context) {
-	return func(ctx *context.Context) {
-		h := httpBase(ctx)
-		if h != nil {
-			setHeaderNoCache(ctx)
-			file := ctx.PathParam("file")
-			if file != "" {
-				h.sendFile(ctx, "text/plain", "objects/info/"+file)
-			} else {
-				h.sendFile(ctx, "text/plain", p)
-			}
-		}
-	}
-}
-
-// GetInfoPacks implements Git dumb HTTP
-func GetInfoPacks(ctx *context.Context) {
-	h := httpBase(ctx)
-	if h != nil {
-		setHeaderCacheForever(ctx)
-		h.sendFile(ctx, "text/plain; charset=utf-8", "objects/info/packs")
-	}
-}
-
-// GetLooseObject implements Git dumb HTTP
-func GetLooseObject(ctx *context.Context) {
-	h := httpBase(ctx)
-	if h != nil {
-		setHeaderCacheForever(ctx)
-		h.sendFile(ctx, "application/x-git-loose-object", fmt.Sprintf("objects/%s/%s",
-			ctx.PathParam("head"), ctx.PathParam("hash")))
-	}
-}
-
-// GetPackFile implements Git dumb HTTP
-func GetPackFile(ctx *context.Context) {
-	h := httpBase(ctx)
-	if h != nil {
-		setHeaderCacheForever(ctx)
-		h.sendFile(ctx, "application/x-git-packed-objects", "objects/pack/pack-"+ctx.PathParam("file")+".pack")
-	}
-}
-
-// GetIdxFile implements Git dumb HTTP
-func GetIdxFile(ctx *context.Context) {
-	h := httpBase(ctx)
-	if h != nil {
-		setHeaderCacheForever(ctx)
-		h.sendFile(ctx, "application/x-git-packed-objects-toc", "objects/pack/pack-"+ctx.PathParam("file")+".idx")
-	}
+// RefuseDumbHTTP answers the routes of Git's dumb HTTP protocol, which serve a
+// repository's files as they are. They list every ref, those hidden from clients
+// among them, and hand out any object, loose or packed, to whoever names it.
+// No client of this century asks for them: a smart one asks for a service.
+func RefuseDumbHTTP(ctx *context.Context) {
+	ctx.PlainText(http.StatusForbidden, "The dumb HTTP protocol is not served; ask for a service")
 }

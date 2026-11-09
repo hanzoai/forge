@@ -5,6 +5,7 @@ package mirror
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ import (
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/process"
 	"github.com/hanzoai/git/modules/proxy"
+	"github.com/hanzoai/git/modules/queue"
 	repo_module "github.com/hanzoai/git/modules/repository"
 	"github.com/hanzoai/git/modules/setting"
 	"github.com/hanzoai/git/modules/timeutil"
@@ -106,23 +108,33 @@ func checkRecoverableSyncError(stderrMessage string) bool {
 	}
 }
 
-// runSync returns true if sync finished without error.
-func runSync(ctx context.Context, m *repo_model.Mirror) ([]*repo_module.SyncResult, bool) {
-	log.Trace("SyncMirrors [repo: %-v]: running git remote update...", m.Repo)
-
-	remoteURL, remoteErr := gitrepo.GitRemoteGetURL(ctx, m.Repo, m.GetRemoteName())
+// fetchableRemote returns the address of the named remote of repo, or false
+// when it cannot be read or may no longer be fetched from.
+func fetchableRemote(ctx context.Context, repo *repo_model.Repository, remoteName string) (*giturl.GitURL, bool) {
+	remoteURL, remoteErr := gitrepo.GitRemoteGetURL(ctx, repo, remoteName)
 	if remoteErr != nil {
-		log.Error("SyncMirrors [repo: %-v]: GetRemoteURL Error %v", m.Repo, remoteErr)
+		log.Error("SyncMirrors [repo: %-v]: GetRemoteURL Error %v", repo, remoteErr)
 		return nil, false
 	}
 	// re-validate on every sync: the host may now resolve to an internal IP (rebinding) or the
 	// allow/block list may have changed. ssh/file are skipped (not an HTTP SSRF vector).
 	switch remoteURL.URL.Scheme {
 	case "http", "https", "git":
-		if allowErr := migrations.IsMigrateURLAllowed(remoteURL.String(), m.Repo.MustOwner(ctx)); allowErr != nil {
-			log.Error("SyncMirrors [repo: %-v]: remote URL is not allowed: %v", m.Repo, allowErr)
+		if allowErr := migrations.IsMigrateURLAllowed(remoteURL.String(), repo.MustOwner(ctx)); allowErr != nil {
+			log.Error("SyncMirrors [repo: %-v]: remote URL is not allowed: %v", repo, allowErr)
 			return nil, false
 		}
+	}
+	return remoteURL, true
+}
+
+// runSync returns true if sync finished without error.
+func runSync(ctx context.Context, m *repo_model.Mirror) ([]*repo_module.SyncResult, bool) {
+	log.Trace("SyncMirrors [repo: %-v]: running git remote update...", m.Repo)
+
+	remoteURL, ok := fetchableRemote(ctx, m.Repo, m.GetRemoteName())
+	if !ok {
+		return nil, false
 	}
 	envs := proxy.EnvWithProxy(remoteURL.URL)
 	timeout := time.Duration(setting.Git.Timeout.Mirror) * time.Second
@@ -416,7 +428,7 @@ func SyncPullMirror(ctx context.Context, repoID int64) bool {
 	// Update License
 	if err = repo_service.AddRepoToLicenseUpdaterQueue(&repo_service.LicenseUpdaterOptions{
 		RepoID: m.Repo.ID,
-	}); err != nil {
+	}); err != nil && !errors.Is(err, queue.ErrAlreadyInQueue) {
 		log.Error("SyncMirrors [repo: %-v]: unable to add repo to license updater queue: %v", m.Repo, err)
 		return false
 	}
@@ -424,13 +436,7 @@ func SyncPullMirror(ctx context.Context, repoID int64) bool {
 	// An upstream sync IS new commits arriving, so it fires the same
 	// sync_on_commit opt-in a local push does — no second policy, and the hub
 	// fans out in one hop rather than sitting on the change for an interval.
-	if pushMirrors, err := repo_model.GetPushMirrorsSyncedOnCommit(ctx, m.RepoID); err != nil {
-		log.Error("SyncMirrors [repo: %-v]: unable to GetPushMirrorsSyncedOnCommit: %v", m.Repo, err)
-	} else {
-		for _, pushMirror := range pushMirrors {
-			AddPushMirrorToQueue(pushMirror.ID)
-		}
-	}
+	syncPushMirrorWithSyncOnCommit(ctx, m.RepoID)
 
 	log.Trace("SyncMirrors [repo: %-v]: Successfully updated", m.Repo)
 

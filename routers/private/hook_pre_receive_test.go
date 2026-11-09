@@ -4,6 +4,8 @@
 package private
 
 import (
+	"net/http"
+	"strings"
 	"testing"
 
 	issues_model "github.com/hanzoai/git/models/issues"
@@ -11,6 +13,9 @@ import (
 	repo_model "github.com/hanzoai/git/models/repo"
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/git"
+	"github.com/hanzoai/git/modules/private"
+	"github.com/hanzoai/git/modules/web"
+	git_context "github.com/hanzoai/git/services/context"
 	"github.com/hanzoai/git/services/contexttest"
 
 	"github.com/stretchr/testify/assert"
@@ -66,4 +71,107 @@ func TestPreReceiveCanWriteCodePerBranch(t *testing.T) {
 	// scoped to PR head branches, so a non-branch ref can never match it. (A tag ref already
 	// yields an empty branch name, so this guards the per-ref evaluation, not the IsBranch check.)
 	assert.False(t, ctx.canWriteCodeRef(git.RefNameFromTag("granted-branch")))
+}
+
+// The namespace the inbound mirror sync keeps its record in is closed to every
+// pusher, one with write access included: whatever sat there would be taken for
+// a tip the sync last handled.
+func TestPreReceiveRefusesTheUpstreamNamespace(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+
+	for _, ref := range []git.RefName{"refs/upstream/heads/main", "refs/upstream/tags/v1", "refs/upstream/pull/7/head"} {
+		ctx, resp := contexttest.MockPrivateContext(t, "/")
+		ctx.Repo = &git_context.Repository{Repository: repo}
+		// user2 owns user2/repo1 and could push to any branch of it.
+		web.SetForm(ctx, &private.HookOptions{
+			UserID:       2,
+			OldCommitIDs: []string{"0000000000000000000000000000000000000000"},
+			NewCommitIDs: []string{"4a357436d925b5c974181ff12a994538ddc5a269"},
+			RefFullNames: []git.RefName{ref},
+		})
+
+		HookPreReceive(ctx)
+
+		assert.Equal(t, http.StatusForbidden, resp.Code, ref)
+		assert.Contains(t, resp.Body.String(), "reserved for mirror sync", ref)
+	}
+}
+
+func TestPreReceiveRefusesNamesLikeObjectIds(t *testing.T) {
+	const id = "4a357436d925b5c974181ff12a994538ddc5a269"
+	zero := strings.Repeat("0", 40)
+
+	// Making one is refused, a branch or a tag, of either hash, in either case.
+	for _, ref := range []git.RefName{
+		git.RefNameFromBranch(id), git.RefNameFromTag(id),
+		git.RefNameFromBranch(strings.ToUpper(id)), git.RefNameFromTag(strings.Repeat("ab", 32)),
+		git.RefName("refs/" + id), // git looks there for the name, too
+	} {
+		assert.True(t, isObjectNamed(ref, id), ref)
+	}
+	// Deleting one is how a writer cleans up after themselves.
+	assert.False(t, isObjectNamed(git.RefNameFromBranch(id), zero))
+	// Names that merely look like it, or are not branches or tags.
+	for _, ref := range []git.RefName{
+		git.RefNameFromBranch(id[:39]), git.RefNameFromBranch(id + "0"), git.RefNameFromBranch("release/" + id),
+		git.RefNameFromTag("v1.0.0"), git.RefName("refs/pull/7/head"), git.RefName("refs/notes/commits"),
+	} {
+		assert.False(t, isObjectNamed(ref, id), ref)
+	}
+
+	// And the hook says so.
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	ctx, resp := contexttest.MockPrivateContext(t, "/")
+	ctx.Repo = &git_context.Repository{Repository: repo}
+	web.SetForm(ctx, &private.HookOptions{
+		UserID:       2,
+		OldCommitIDs: []string{zero},
+		NewCommitIDs: []string{id},
+		RefFullNames: []git.RefName{git.RefNameFromBranch(id)},
+	})
+	HookPreReceive(ctx)
+	assert.Equal(t, http.StatusForbidden, resp.Code)
+	assert.Contains(t, resp.Body.String(), "named like an object id")
+}
+
+// refs/remotes is where git looks for a ref by a name after tags and branches, and
+// nothing is pushed there on purpose.
+func TestPreReceiveRefusesRemotes(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	ctx, resp := contexttest.MockPrivateContext(t, "/")
+	ctx.Repo = &git_context.Repository{Repository: repo}
+	web.SetForm(ctx, &private.HookOptions{
+		UserID:       2,
+		OldCommitIDs: []string{strings.Repeat("0", 40)},
+		NewCommitIDs: []string{"4a357436d925b5c974181ff12a994538ddc5a269"},
+		RefFullNames: []git.RefName{"refs/remotes/origin/main"},
+	})
+
+	HookPreReceive(ctx)
+
+	assert.Equal(t, http.StatusForbidden, resp.Code)
+	assert.Contains(t, resp.Body.String(), "refs/remotes/ is not for pushes")
+}
+
+// Deleting what is under refs/remotes is allowed: it is how a decoy that was made
+// before the rule goes, and what a mirror push from an ordinary clone does.
+func TestPreReceiveAllowsDeletingRemotes(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	zero := strings.Repeat("0", 40)
+	ctx, resp := contexttest.MockPrivateContext(t, "/")
+	ctx.Repo = &git_context.Repository{Repository: repo}
+	web.SetForm(ctx, &private.HookOptions{
+		UserID:       2,
+		OldCommitIDs: []string{"4a357436d925b5c974181ff12a994538ddc5a269"},
+		NewCommitIDs: []string{zero},
+		RefFullNames: []git.RefName{"refs/remotes/origin/main"},
+	})
+
+	HookPreReceive(ctx)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
 }

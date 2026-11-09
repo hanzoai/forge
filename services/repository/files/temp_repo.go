@@ -340,7 +340,7 @@ func (t *TemporaryUploadRepository) Push(ctx context.Context, doer *user_model.U
 	// Because calls hooks we need to pass in the environment
 	env := repo_module.PushingEnvironment(doer, t.repo)
 	if err := gitrepo.PushFromLocal(ctx, t.basePath, t.repo, git.PushOptions{
-		Branch: strings.TrimSpace(commitHash) + ":" + git.BranchPrefix + strings.TrimSpace(branch),
+		Branch: git.ObjectName(strings.TrimSpace(commitHash)) + ":" + git.BranchPrefix + strings.TrimSpace(branch),
 		Env:    env,
 		Force:  force,
 	}); err != nil {

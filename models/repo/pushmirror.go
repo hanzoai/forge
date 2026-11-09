@@ -32,6 +32,11 @@ type PushMirror struct {
 	// no comparison against NULL is ever true, so the column must never hold one.
 	LastUpdateUnix timeutil.TimeStamp `xorm:"INDEX NOT NULL DEFAULT 0 last_update"`
 	LastError      string             `xorm:"text"`
+
+	// When the inbound sync last looked at the remote, or was last scheduled to.
+	// It has its own clock because a busy repository pushes out constantly,
+	// which keeps last_update fresh and would keep its inbound sync from ever being due.
+	LastInboundUnix timeutil.TimeStamp `xorm:"INDEX NOT NULL DEFAULT 0"`
 }
 
 type PushMirrorOptions struct {
@@ -77,9 +82,17 @@ func (m *PushMirror) GetRemoteName() string {
 	return m.RemoteName
 }
 
-// UpdatePushMirror updates the push-mirror
+// UpdatePushMirror updates the push-mirror. It leaves the inbound clock alone: a
+// push out holds a copy of the row for as long as it runs, and writing that copy
+// back would undo what an inbound sync recorded in the meantime.
 func UpdatePushMirror(ctx context.Context, m *PushMirror) error {
-	_, err := db.GetEngine(ctx).ID(m.ID).AllCols().Update(m)
+	_, err := db.GetEngine(ctx).ID(m.ID).Cols("remote_name", "remote_address", "sync_on_commit", "interval", "last_update", "last_error").Update(m)
+	return err
+}
+
+// UpdatePushMirrorLastInbound records when the inbound sync last ran for the push-mirror
+func UpdatePushMirrorLastInbound(ctx context.Context, m *PushMirror) error {
+	_, err := db.GetEngine(ctx).ID(m.ID).Cols("last_inbound_unix").Update(m)
 	return err
 }
 
@@ -148,6 +161,24 @@ func PushMirrorsIterate(ctx context.Context, limit int, f func(idx int, bean any
 		And("`push_mirror`.`interval` != 0").
 		And("`repository`.is_archived = ?", false).
 		OrderBy("last_update ASC")
+	if limit > 0 {
+		sess = sess.Limit(limit)
+	}
+	return sess.Iterate(new(PushMirror), f)
+}
+
+// InboundPushMirrorsIterate iterates the push-mirrors that may point at GitHub, on
+// repositories that are neither archived nor pull mirrors, whose inbound sync was
+// last run more than period ago, the longest idle first.
+func InboundPushMirrorsIterate(ctx context.Context, limit int, period time.Duration, f func(idx int, bean any) error) error {
+	sess := db.GetEngine(ctx).
+		Table("push_mirror").
+		Join("INNER", "`repository`", "`repository`.id = `push_mirror`.repo_id").
+		Where("LOWER(`push_mirror`.remote_address) LIKE ?", "%github.com%").
+		And("`push_mirror`.last_inbound_unix + ? <= ?", int64(period/time.Second), time.Now().Unix()).
+		And("`repository`.is_archived = ?", false).
+		And("`repository`.is_mirror = ?", false).
+		OrderBy("`push_mirror`.last_inbound_unix ASC")
 	if limit > 0 {
 		sess = sess.Limit(limit)
 	}

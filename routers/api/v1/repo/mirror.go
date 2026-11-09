@@ -31,7 +31,7 @@ import (
 func MirrorSync(ctx *context.APIContext) {
 	// swagger:operation POST /repos/{owner}/{repo}/mirror-sync repository repoMirrorSync
 	// ---
-	// summary: Sync a mirrored repository
+	// summary: Sync a mirrored repository, or a repository that mirrors to GitHub
 	// produces:
 	// - application/json
 	// parameters:
@@ -57,6 +57,7 @@ func MirrorSync(ctx *context.APIContext) {
 
 	if !ctx.Repo.Permission.CanWrite(unit.TypeCode) {
 		ctx.APIError(http.StatusForbidden, "Must have write access")
+		return
 	}
 
 	if !setting.Mirror.Enabled {
@@ -64,19 +65,31 @@ func MirrorSync(ctx *context.APIContext) {
 		return
 	}
 
-	if _, err := repo_model.GetMirrorByRepoID(ctx, repo.ID); err != nil {
-		if errors.Is(err, repo_model.ErrMirrorNotExist) {
+	_, err := repo_model.GetMirrorByRepoID(ctx, repo.ID)
+	switch {
+	case err == nil:
+		queuePull(repo.ID)
+	case errors.Is(err, repo_model.ErrMirrorNotExist):
+		// A regular repository takes in what its GitHub repository gained, from its push mirror.
+		m := mirror_service.GitHubPushMirror(ctx, repo)
+		if m == nil {
 			ctx.APIError(http.StatusBadRequest, "Repository is not a mirror")
 			return
 		}
+		queueInbound(m.ID)
+	default:
 		ctx.APIErrorInternal(err)
 		return
 	}
 
-	mirror_service.AddPullMirrorToQueue(repo.ID)
-
 	ctx.Status(http.StatusOK)
 }
+
+// The queue entry points, held in variables so a test can see what was queued without running a sync.
+var (
+	queuePull    = mirror_service.AddPullMirrorToEventQueue
+	queueInbound = mirror_service.AddInboundMirrorToEventQueue
+)
 
 // PushMirrorSync adds all push mirrored repositories to the sync queue
 func PushMirrorSync(ctx *context.APIContext) {

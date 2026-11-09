@@ -4,10 +4,12 @@
 package misc
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	"encoding/json" //nolint:depguard // modules/json has no token stream, which is how the repository is found without reading the whole payload
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -18,9 +20,14 @@ import (
 	mirror_service "github.com/hanzoai/git/services/mirror"
 )
 
-// maxSyncBody bounds the read: a push payload is a few KiB, and an unbounded
-// read ahead of authentication is a memory DoS.
-const maxSyncBody = 1 << 20
+const (
+	// maxSyncBody bounds the read: GitHub caps a webhook payload at 25 MiB, and an
+	// unbounded read ahead of authentication is a memory DoS.
+	maxSyncBody = 25 << 20
+	// keepSyncBody is how much of the payload is held to read the repository from.
+	// The rest is only hashed, so the memory a delivery takes does not grow with it.
+	keepSyncBody = 1 << 20
+)
 
 // Sync is the one entry point for "this repo changed upstream, take it now".
 // It exists because an org-level webhook is a single static URL that cannot
@@ -29,11 +36,17 @@ const maxSyncBody = 1 << 20
 //
 // Direction is a property of the repo, not of this route — a pull mirror
 // fetches, and that fetch propagates to its push mirrors (services/mirror), so
-// one upstream push reaches every platform we mirror to in one hop.
+// one upstream push reaches every platform we mirror to in one hop. A regular
+// repo pushes to its platform through a push mirror; when that platform is the
+// one speaking, the event brings what it gained in from the push mirror's remote
+// as pushes by the sync user, so a push to either side reaches the other.
 //
 // Mounted ahead of the session middleware because the credential is the payload
 // itself: HMAC-SHA256 over the exact bytes in X-Hub-Signature-256, keyed by
 // [mirror] SYNC_SECRET. Fail-closed — an unset secret refuses everything.
+//
+// Only a push, a branch or tag created, and a branch or tag deleted change refs,
+// so only those fetch; any other verified event is answered and ignored.
 //
 // A verified event naming a repo we do not mirror is 200, not 404: a delivery
 // log is not a repository-existence oracle, and red deliveries for repos we
@@ -45,18 +58,28 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	body, err := io.ReadAll(io.LimitReader(req.Body, maxSyncBody))
+	head, valid, err := readVerified(secret, req.Header.Get("X-Hub-Signature-256"), http.MaxBytesReader(w, req.Body, maxSyncBody), keepSyncBody)
 	if err != nil {
+		if _, tooBig := errors.AsType[*http.MaxBytesError](err); tooBig {
+			http.Error(w, "payload too large", http.StatusRequestEntityTooLarge)
+			return
+		}
 		http.Error(w, "unreadable body", http.StatusBadRequest)
 		return
 	}
-
-	if !validSignature(secret, req.Header.Get("X-Hub-Signature-256"), body) {
+	if !valid {
 		http.Error(w, "invalid signature", http.StatusUnauthorized)
 		return
 	}
 
-	ownerName, repoName, ok := repoFromPayload(body)
+	switch req.Header.Get("X-GitHub-Event") {
+	case "push", "create", "delete":
+	default:
+		_, _ = w.Write([]byte("ok"))
+		return
+	}
+
+	ownerName, repoName, ok := repoFromPayload(head)
 	if !ok {
 		// An event naming no repository: a ping, or one we do not act on.
 		_, _ = w.Write([]byte("ok"))
@@ -69,45 +92,103 @@ func Sync(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// The mirror row is the single test for "has an upstream": a plain repo or
-	// a push-only repo has none and must never be queued for a fetch.
-	if _, err := repo_model.GetMirrorByRepoID(req.Context(), repo.ID); err != nil {
+	// The mirror row is the test for "has an upstream"; failing that, a push
+	// mirror to the same repo on GitHub is the way back in. A repo with
+	// neither must never be queued for a fetch.
+	_, err = repo_model.GetMirrorByRepoID(req.Context(), repo.ID)
+	switch {
+	case err == nil:
+		queuePull(repo.ID)
+		log.Trace("sync: queued pull for %s", repo.FullName())
+		_, _ = w.Write([]byte("queued"))
+	case errors.Is(err, repo_model.ErrMirrorNotExist):
+		if m := mirror_service.GitHubPushMirror(req.Context(), repo); m != nil {
+			queueInbound(m.ID)
+			log.Trace("sync: queued inbound for %s", repo.FullName())
+			_, _ = w.Write([]byte("queued"))
+			return
+		}
 		_, _ = w.Write([]byte("ok"))
-		return
+	default:
+		// Not "no mirror": say so, so GitHub shows the delivery red and can redeliver it.
+		log.Error("sync: unable to read the mirror of %s: %v", repo.FullName(), err)
+		http.Error(w, "try again", http.StatusInternalServerError)
 	}
-
-	mirror_service.AddPullMirrorToQueue(repo.ID)
-	log.Trace("sync: queued pull for %s", repo.FullName())
-	_, _ = w.Write([]byte("queued"))
 }
+
+// The queue entry points, held in variables so a test can see what was queued
+// without running a sync.
+var (
+	queuePull    = mirror_service.AddPullMirrorToEventQueue
+	queueInbound = mirror_service.AddInboundMirrorToEventQueue
+)
 
 // repoFromPayload reads the repository a push event names, a field every
-// platform whose events we accept spells the same way.
-func repoFromPayload(body []byte) (ownerName, repoName string, ok bool) {
-	var payload struct {
-		Repository struct {
-			FullName string `json:"full_name"`
-		} `json:"repository"`
-	}
-	if err := json.Unmarshal(body, &payload); err != nil {
+// platform whose events we accept spells the same way. It reads from the start
+// of the payload and stops at the repository, so a payload cut short after it
+// is still read: GitHub puts the repository ahead of the commits.
+func repoFromPayload(head []byte) (ownerName, repoName string, ok bool) {
+	dec := json.NewDecoder(bytes.NewReader(head))
+	if tok, err := dec.Token(); err != nil || tok != json.Delim('{') {
 		return "", "", false
 	}
-	ownerName, repoName, ok = strings.Cut(payload.Repository.FullName, "/")
-	return ownerName, repoName, ok && ownerName != "" && repoName != ""
+	for dec.More() {
+		key, err := dec.Token()
+		if err != nil {
+			return "", "", false
+		}
+		if key != "repository" {
+			var skip json.RawMessage
+			if err := dec.Decode(&skip); err != nil {
+				return "", "", false
+			}
+			continue
+		}
+		var repository struct {
+			FullName string `json:"full_name"`
+		}
+		if err := dec.Decode(&repository); err != nil {
+			return "", "", false
+		}
+		ownerName, repoName, ok = strings.Cut(repository.FullName, "/")
+		return ownerName, repoName, ok && ownerName != "" && repoName != ""
+	}
+	return "", "", false
 }
 
-// validSignature reports whether sigHeader is the "sha256=<hex>" HMAC of body
-// under secret. Constant-time; a malformed header is simply invalid.
-func validSignature(secret, sigHeader string, body []byte) bool {
+// readVerified reads all of body through the HMAC under secret, and reports
+// whether sigHeader, "sha256=<hex>", is the signature of every byte of it. It
+// returns the first keep bytes of the body, no more, whatever its size. A
+// malformed header is invalid without reading anything.
+func readVerified(secret, sigHeader string, body io.Reader, keep int) (head []byte, valid bool, err error) {
 	hexDigest, ok := strings.CutPrefix(sigHeader, "sha256=")
 	if !ok {
-		return false
+		return nil, false, nil
 	}
 	sent, err := hex.DecodeString(hexDigest)
 	if err != nil {
-		return false
+		return nil, false, nil
 	}
+
 	mac := hmac.New(sha256.New, []byte(secret))
-	mac.Write(body)
-	return hmac.Equal(sent, mac.Sum(nil))
+	var kept bytes.Buffer
+	if _, err := io.Copy(io.MultiWriter(mac, &limitedWriter{buf: &kept, left: keep}), body); err != nil {
+		return nil, false, err
+	}
+	return kept.Bytes(), hmac.Equal(sent, mac.Sum(nil)), nil
+}
+
+// limitedWriter keeps the first left bytes written to it and drops the rest, without failing.
+type limitedWriter struct {
+	buf  *bytes.Buffer
+	left int
+}
+
+func (w *limitedWriter) Write(p []byte) (int, error) {
+	if w.left > 0 {
+		n := min(len(p), w.left)
+		w.buf.Write(p[:n])
+		w.left -= n
+	}
+	return len(p), nil
 }

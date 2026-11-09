@@ -252,6 +252,8 @@ func CreateBranch(ctx *context.APIContext) {
 			ctx.APIError(http.StatusConflict, "The branch already exists.")
 		} else if git_model.IsErrBranchNameConflict(err) {
 			ctx.APIError(http.StatusConflict, "The branch with the same name already exists.")
+		} else if errors.Is(err, repo_service.ErrBranchNameLikeObject) {
+			ctx.APIError(http.StatusUnprocessableEntity, err.Error())
 		} else {
 			ctx.APIErrorInternal(err)
 		}
@@ -521,6 +523,8 @@ func RenameBranch(ctx *context.APIContext) {
 			ctx.APIError(http.StatusForbidden, "User must be a repo or site admin to rename default or protected branches.")
 		case errors.Is(err, git_model.ErrBranchIsProtected):
 			ctx.APIError(http.StatusForbidden, "Failed to rename branch due to branch protection rules.")
+		case errors.Is(err, repo_service.ErrBranchNameLikeObject):
+			ctx.APIError(http.StatusUnprocessableEntity, err.Error())
 		default:
 			ctx.APIErrorInternal(err)
 		}

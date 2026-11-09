@@ -422,6 +422,7 @@ func prepareMigrationTasks() []*migration {
 		newMigration(343, "Rename gitea-* built-in themes to hanzo-*", v1_27.RenameGiteaThemesToHanzo),
 		newMigration(344, "Add Drops column to ActionRunJob", v1_27.AddDropsToActionRunJob),
 		newMigration(345, "Make push mirror last_update NOT NULL DEFAULT 0", v1_27.MakePushMirrorLastUpdateNotNull),
+		newMigration(346, "Add last_inbound_unix column to push_mirror table", v1_27.AddLastInboundToPushMirror),
 	}
 	return preparedMigrations
 }

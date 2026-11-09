@@ -228,6 +228,163 @@ CORS allow-list and both swagger specs and read by nothing — identity here is
 IAM's, and basic auth takes a token — so it and the test that asked for a
 response the server could not produce are gone.
 
+## Sync with GitHub, both ways
+
+An estate repo lives at the same `<org>/<name>` here and on GitHub, and a push to
+either side reaches the other. There is no mode to set.
+
+- **Out (forge to GitHub):** a push mirror with `sync_on_commit`. It pushes
+  `refs/heads/*` and `refs/tags/*` without `+`, so a diverged GitHub ref is
+  refused, never overwritten (`services/mirror/mirror_push.go`). It takes no lock.
+  Where the inbound sync is on, a successful push out also records the tips it
+  put there under `refs/upstream`, so a branch pushed out and then deleted here
+  is not brought back.
+- **In, pull mirror:** the GitHub org webhook reaches `/v1/sync`
+  (`routers/web/misc/sync.go`, HMAC under `[mirror] SYNC_SECRET`) and queues a
+  pull. Only `X-GitHub-Event: push`, `create` and `delete` do; any other event is
+  answered `ok` and ignored. The whole payload (up to 25 MiB) goes through the HMAC
+  as it is read, and only the first MiB is held, to read the repository name from.
+- **In, regular repo:** with no pull mirror row, the same event finds the push
+  mirror whose address is `github.com/<owner>/<name>` (`IsGitHubRepo`: `https://`
+  or ssh (`git@github.com:` / `ssh://`) only, any credentials, `.git`, case; no
+  `http://`, `git://`, port, query, fragment or odd path) and
+  queues `InboundMirrorType`. `SyncInboundMirror` (`services/mirror/mirror_inbound.go`):
+  - takes the pull lock (`repo_pull_mirror_<id>`) and re-checks that the repo is not
+    archived (before each ref, too), has no pull mirror, and still mirrors to the
+    GitHub repository of its own name (a forge rename turns it off, with a warning),
+    and that `[mirror] SYNC_USER` is set and can write; otherwise it does nothing;
+  - hides `refs/upstream` (`uploadpack.hideRefs`, `receive.hideRefs`; pre-receive
+    refuses any push there, `GetRefsFiltered` never lists it, and the dumb HTTP
+    protocol, which lists every ref and serves any object, is refused whole:
+    `info/refs` without a service, `HEAD`, `objects/...`). Only the sync's own pushes are told of `refs/upstream/staging`, by
+    `git push --receive-pack='git -c receive.hideRefs=!refs/upstream/staging
+    receive-pack'`: a push learns which commits the repository has from what
+    receive-pack advertises to it, and without that, filling an empty repo from itself
+    would send it its whole history again. (The environment cannot carry this: git
+    clears `GIT_CONFIG_*` for a push to a local path.) The repo's
+    `uploadpack.allowAnySHA1InWant` is set false, over the forge's global true, which
+    stops a client of the old protocol fetching a hidden tip by id; **the new
+    protocol serves any object it is asked for**, so what is not to be seen is
+    not brought in (bot branches are not fetched), and a tip the sync only records
+    (the first sync's branches) is held, reachable by its id for whoever knows it.
+    It fetches into `refs/upstream/staging/{heads,tags}/` with
+    forced refspecs and `--prune`, and acts only on names whose staged tip is not
+    the one recorded in `refs/upstream/{heads,tags}/`. A tip is recorded only after
+    the forge has dealt with it (pushed, found equal or ahead, or skipped as below),
+    so a push cut short, refused or failed is looked at again, and a branch deleted
+    on the forge stays deleted until GitHub moves it again. A fetch that finds no
+    refs at all changes no record; a record is dropped only when its ref is gone
+    while others remain;
+  - enters through the normal push path: one non-force `git push` per ref, from
+    the repo to itself, under `PushingEnvironment` of the sync user. The source of
+    each refspec is `<id>^{object}`: a bare `<id>` is read as a ref's name before
+    it is read as an object, and a writer may have made `refs/heads/<id>` or
+    `refs/tags/<id>` to take its place. Every push of an object by its id in the
+    forge says `git.ObjectName(id)`: the sync, create branch from a commit, update
+    branch, restore branch, the file editor and file API (`TemporaryUploadRepository.Push`)
+    and the wiki. The other pushes name branches, not ids. Pre-receive refuses to make a
+    branch or tag named like a full object id, or `refs/<id>`, or anything under
+    `refs/remotes/` (deleting one is allowed). Where no hook runs, the service refuses
+    the name itself: `createTag` (tag and release API and UI), `RenameBranch`, and branch
+    creation (`checkBranchName`), as `ErrInvalidTagName` and `ErrBranchNameLikeObject`,
+    which the API answers 422 and the UI flashes. The importer does not take upstream's,
+    with a notice; Post-receive
+    runs the push queue, which starts Actions (`PushCommits`), pull request checks,
+    issue references and the push out. The `Sync*` notifiers are a pull mirror's
+    and are not used. Archived repos are not written (pre-receive does not check it);
+  - creates an absent ref, and fast-forwards a branch the forge holds an ancestor
+    of. A branch the forge is ahead of is left. A diverged branch, a tag that
+    differs (tags are create-only, so an annotated tag is never retyped), and a
+    ref the push refuses each raise a repository notice and are looked at again on
+    the next sync. A notice is raised once per (repository, ref, reason) for a week
+    (`cache`, not a scan of the notice table), however far the commits move;
+  - on the first sync of a repo that has content, only records upstream's branches
+    (a tag the forge lacks is still created: tags are immutable). GitHub keeps
+    every branch the forge ever deleted, since the push out never deletes, and
+    creating them all would bring them back. The repository setting
+    `hanzo.inboundprimed` says that first sync is done; a branch GitHub gained in
+    that very first event waits until it next moves;
+  - on an empty repo, sets the default branch to GitHub's (`ls-remote --symref`,
+    else `main`, `master`, the first), pushes it alone, then the other branches in
+    one push, and re-checks that the repo is not archived before each. The repo is
+    marked first, so a seed that stops partway is carried on by the ordinary loop,
+    whatever the repo then looks like;
+  - creates tags the forge lacks one push each when it is one, and **in one push
+    when it is more than one**, in any run, not only a seed: a push event per
+    historical tag would run, for every old tag, every workflow a tag push starts,
+    which for a release workflow is a release. The only rule pre-receive applies to a
+    tag is the protected tag list (a branch rule has no bearing on a tag), so that
+    is applied in Go, right before the push, by `IsUserAllowedToControlTag`: a tag
+    `SYNC_USER` may not create is left and noticed, once; the rest go in one push
+    that skips the hooks (`GIT_INTERNAL_PUSH`). After it, whatever landed, even in
+    a push that reports failure, is recorded and gets its release
+    (`SyncReleasesWithTags`), as a pull mirror makes them. Where the rules cannot be
+    read the hooks decide (one push, then tag by tag). A tag or branch the hooks
+    decline is not offered to them again for an hour unless its tip or the rules
+    (the protected tag list, or the protected branch rules' ids and update times)
+    change. So two tags
+    that appear together on GitHub raise no tag events here;
+  - never brings in the branches bots open, by name prefix in any case: `dependabot/`,
+    `renovate/`, `gh-readonly-queue/`, `copilot/`, `release-please--`,
+    `changeset-release/` (`botBranches`, the one list). The remote's refs are listed
+    first (`ls-remote --symref`, which also says where its HEAD points), and each bot or
+    object-named one is left out of the fetch by its exact name, in whatever case, with
+    a negative refspec (git 2.29; at most 4000 of them), beside a glob for each lower case
+    prefix so that a bot branch made after the listing is left out too, so their objects
+    never reach the repo. Staged and recorded refs of such names, left by an earlier version or
+    past that bound, are deleted on every run. `deps/` is not a bot prefix;
+  - Not carried in: LFS objects and wikis.
+- **What the push path enforces for `SYNC_USER`.** Pre-receive applies what it
+  applies to any direct push, not to a merge: the user's write permission; a
+  protected branch's push rule (push enabled, and `SYNC_USER` in the push whitelist
+  if there is one, or the push is refused); signed commits if the branch requires
+  them (GitHub's own merge commits are signed with a key the forge must know);
+  protected file patterns; no force push or deletion; and a protected tag's allow
+  list for creating a tag. Required approvals and status checks gate **merges**, not
+  pushes, so they do not apply; there is no quota on a push. Give `SYNC_USER`
+  write access and add it to the push whitelist of every protected branch that
+  GitHub also moves and to the allow list of every protected tag pattern; where a
+  branch is protected with push disabled, inbound sync cannot move it and says so
+  in a notice.
+- **Trust.** Whoever can push to a repo on GitHub can push to it here, as
+  `SYNC_USER`, and the forge then runs that repo's Actions with its org secrets.
+  This is the same trust as GitHub Actions, and intended: there is no allowlist of
+  GitHub authors. The one exception is the branches bots open (`dependabot/`,
+  `renovate/`, `gh-readonly-queue/`, `copilot/`, `release-please--`,
+  `changeset-release/`), which are never brought in, so the forge never runs
+  bot-authored code with those secrets. Pull requests are not brought in
+  at all: only branches and tags are.
+- **Converting a pull mirror (no mode, no recreate).** In place, per repo, as the repo
+  owner or a site admin: `DELETE /v1/repos/{o}/{r}/pull-mirror` (422 if it is not a
+  mirror, so a batch can tell); `POST /v1/repos/{o}/{r}/push_mirrors` with
+  `{"remote_address": "https://github.com/{o}/{r}.git", "sync_on_commit": true,
+  "interval": "0"}` and **no username or password**: the URL-scoped credential helper
+  for github.com (KMS `/git github-mirror-token`, mounted as a file) answers for the
+  push out and for the inbound fetch alike, and no credential is stored in a remote;
+  then `POST /v1/repos/{o}/{r}/mirror-sync`, which for a repo like this queues the
+  inbound sync and records where GitHub stands. The DELETE exists on 1.26.51 too; the
+  inbound sync only on 1.27.0. A converted repo does not go back to a pull mirror.
+  The sync user (`[mirror] SYNC_USER`, a non-admin account with no credential, made
+  as the creator-seed init container makes users) must be in a team with write on the
+  repo and in the push list of its protected branches and tags.
+- **Recovery:** the scheduled sweep (`Update`) queues an inbound sync for each push
+  mirror of a regular repo that mirrors to GitHub when none has run for
+  `[mirror] DEFAULT_INTERVAL`, when `SYNC_USER` is set. It runs on its own clock,
+  `push_mirror.last_inbound_unix`, set whenever an inbound sync looks at the
+  remote or is scheduled, so a repo that pushes out constantly, or only on commit,
+  is covered like any other.
+- **Queues**, all running `doMirrorSync` (`services/mirror/queue.go`): `mirror`
+  carries the scheduled sweep over every mirror (thousands), `mirror_event` the
+  syncs an event asked for (`/v1/sync`, `POST /v1/repos/{owner}/{repo}/mirror-sync`,
+  and push out on commit), so an event never waits behind the sweep. The settings
+  page buttons use `mirror`. Tune each in `[queue.mirror]` and `[queue.mirror_event]`.
+- **Rolling back.** Migration 346 adds `push_mirror.last_inbound_unix` and sets the
+  `version` row to 347 (a migration's number plus one). A binary whose last
+  migration is 345 expects at most 346 and refuses to start on 347, so rolling back
+  past it needs `UPDATE version SET version = 346 WHERE id = 1;` first. The column
+  is `NOT NULL DEFAULT 0`, so the older binary inserts push mirrors without it and
+  leaves it be.
+
 ## Image / release lane
 
 - Published as **`ghcr.io/hanzoai/git`** — v1-only, semver-pinned, never `:latest`.
@@ -418,3 +575,5 @@ places for a rule to live, and a rule that exists twice drifts.
 - Include authorship attribution in issue and pull request comments
 - Always add `Assisted-By` trailers to commit messages in format `Assisted-by: AGENT_NAME:MODEL_VERSION`
 - Never add `Co-Authored-By` `Signed-off-by` trailer to commit messages. Sign off must be done by a human.
+- Work that must happen only if a transaction commits (a task-version bump) goes through `db.AfterCommit`, never inside the transaction: a row it locks stays locked until the whole transaction ends.
+- A tasks version bump follows the commit it announces, once per scope, and a failure is logged and never returned. The `wake_runners` cron (every minute) repairs it: it bumps the repo, owner and global versions of every job that has waited over a minute unclaimed.

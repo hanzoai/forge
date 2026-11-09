@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/hanzoai/git/modules/git"
-	"github.com/hanzoai/git/modules/git/gitcmd"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/private"
 	repo_module "github.com/hanzoai/git/modules/repository"
@@ -317,12 +316,7 @@ func runHookUpdate(_ context.Context, c *cli.Command) error {
 func runHookPostReceive(ctx context.Context, c *cli.Command) error {
 	setup(ctx, c.Bool("debug"))
 
-	// First of all run update-server-info no matter what
-	if err := gitcmd.NewCommand("update-server-info").RunWithStderr(ctx); err != nil {
-		return fmt.Errorf("failed to call 'git update-server-info': %w", err)
-	}
-
-	// Now if we're an internal don't do anything else
+	// If we're an internal push don't do anything
 	if isInternal, _ := strconv.ParseBool(os.Getenv(repo_module.EnvIsInternal)); isInternal {
 		return nil
 	}

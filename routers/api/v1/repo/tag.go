@@ -216,6 +216,10 @@ func CreateTag(ctx *context.APIContext) {
 			ctx.APIError(http.StatusUnprocessableEntity, "user not allowed to create protected tag")
 			return
 		}
+		if release_service.IsErrInvalidTagName(err) {
+			ctx.APIError(http.StatusUnprocessableEntity, "invalid tag name: "+err.Error())
+			return
+		}
 
 		ctx.APIErrorInternal(err)
 		return

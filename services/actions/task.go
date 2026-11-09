@@ -15,11 +15,13 @@ import (
 	actions_model "github.com/hanzoai/git/models/actions"
 	"github.com/hanzoai/git/models/db"
 	secret_model "github.com/hanzoai/git/models/secret"
-	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 	"github.com/hanzoai/git/modules/graceful"
 	"github.com/hanzoai/git/modules/json"
 	"github.com/hanzoai/git/modules/log"
 	"github.com/hanzoai/git/modules/setting"
+	"github.com/hanzoai/git/modules/timeutil"
+
+	runner_module "github.com/hanzoai/forge/modules/actions/runner"
 )
 
 var (
@@ -49,6 +51,26 @@ func TryPickTask(ctx context.Context, runner *actions_model.ActionRunner) (task 
 	}
 	task, ok, err = PickTask(ctx, runner)
 	return task, ok, false, err
+}
+
+// stalledGrace is how long a job may wait before idle runners are woken for it.
+const stalledGrace = time.Minute
+
+// WakeRunners bumps the tasks versions of every owner and repo that has a job waiting over a minute with no task,
+// so idle runners of any scope ask for work again. It repairs a bump that failed, and waits made without one,
+// such as rows changed in the database.
+func WakeRunners(ctx context.Context) error {
+	jobs, err := actions_model.FindStalledJobs(ctx, timeutil.TimeStampNow().AddDuration(-stalledGrace))
+	if err != nil {
+		return err
+	}
+	// One transaction, so the global and owner rows are bumped once however many repos are stalled.
+	return db.WithTx(ctx, func(ctx context.Context) error {
+		for _, job := range jobs {
+			actions_model.IncreaseTaskVersion(ctx, job.OwnerID, job.RepoID)
+		}
+		return nil
+	})
 }
 
 // releaseTaskForRunnerCleanup releases a claimed task using a fresh, bounded context. The request context

@@ -25,7 +25,7 @@ func (repo *Repository) GetRefsFiltered(pattern string) ([]*Reference, error) {
 	}
 	refs := make([]*Reference, 0)
 	if err = refsIter.ForEach(func(ref *plumbing.Reference) error {
-		if ref.Name() != plumbing.HEAD && !ref.Name().IsRemote() &&
+		if ref.Name() != plumbing.HEAD && !ref.Name().IsRemote() && !strings.HasPrefix(ref.Name().String(), UpstreamPrefix) &&
 			(pattern == "" || strings.HasPrefix(ref.Name().String(), pattern)) {
 			refType := string(ObjectCommit)
 			if ref.Name().IsTag() {

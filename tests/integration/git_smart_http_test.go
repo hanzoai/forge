@@ -38,26 +38,48 @@ func testGitSmartHTTP(t *testing.T, u *url.URL) {
 		method, path string
 		code         int
 	}{
+		// The dumb protocol lists every ref and hands out any object by its name,
+		// those hidden from clients included, and is not served.
 		{
 			path: "user2/repo1/info/refs",
-			code: http.StatusOK,
+			code: http.StatusForbidden,
 		},
 		{
 			method: "HEAD",
 			path:   "user2/repo1/info/refs",
-			code:   http.StatusOK,
+			code:   http.StatusForbidden,
 		},
 		{
-			path: "user2/repo1/HEAD",
+			path: "user2/repo1/info/refs?service=git-upload-pack",
 			code: http.StatusOK,
 		},
 		{
+			path: "user2/repo1/HEAD",
+			code: http.StatusForbidden,
+		},
+		{
 			path: "user2/repo1/objects/info/alternates",
-			code: http.StatusNotFound,
+			code: http.StatusForbidden,
 		},
 		{
 			path: "user2/repo1/objects/info/http-alternates",
-			code: http.StatusNotFound,
+			code: http.StatusForbidden,
+		},
+		{
+			path: "user2/repo1/objects/info/packs",
+			code: http.StatusForbidden,
+		},
+		{
+			path: "user2/repo1/objects/4a/357436d925b5c974181ff12a994538ddc5a269",
+			code: http.StatusForbidden,
+		},
+		{
+			path: "user2/repo1/objects/pack/pack-4a357436d925b5c974181ff12a994538ddc5a269.pack",
+			code: http.StatusForbidden,
+		},
+		{
+			path: "user2/repo1/objects/pack/pack-4a357436d925b5c974181ff12a994538ddc5a269.idx",
+			code: http.StatusForbidden,
 		},
 		{
 			path: "user2/repo1/../../custom/conf/app.ini",
@@ -69,7 +91,7 @@ func testGitSmartHTTP(t *testing.T, u *url.URL) {
 		},
 		{
 			path: `user2/repo1/objects/info/..\..\..\..\custom\conf\app.ini`,
-			code: http.StatusBadRequest,
+			code: http.StatusForbidden,
 		},
 	}
 

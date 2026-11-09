@@ -236,9 +236,7 @@ func InsertRun(ctx context.Context, run *actions_model.ActionRun, content []byte
 
 		// if there is a job in the waiting status, increase tasks version.
 		if hasWaitingJobs {
-			if err := actions_model.IncreaseTaskVersion(ctx, run.OwnerID, run.RepoID); err != nil {
-				return err
-			}
+			actions_model.IncreaseTaskVersion(ctx, run.OwnerID, run.RepoID)
 		}
 
 		return nil

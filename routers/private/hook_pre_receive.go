@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	asymkey_model "github.com/hanzoai/git/models/asymkey"
 	git_model "github.com/hanzoai/git/models/git"
@@ -127,12 +128,27 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 		refFullName := opts.RefFullNames[i]
 
 		switch {
+		case isObjectNamed(refFullName, newCommitID):
+			ctx.JSON(http.StatusForbidden, private.Response{
+				UserMsg: refFullName.ShortName() + " is named like an object id, which git may read as the object",
+			})
 		case refFullName.IsBranch():
 			preReceiveBranch(ourCtx, oldCommitID, newCommitID, refFullName)
 		case refFullName.IsTag():
 			preReceiveTag(ourCtx, refFullName)
 		case git.DefaultFeatures().SupportProcReceive && refFullName.IsFor():
 			preReceiveFor(ourCtx, refFullName)
+		case refFullName.IsRemote() && strings.Trim(newCommitID, "0") != "":
+			// Git looks there for a ref by a name, too, and nothing is meant to be pushed there.
+			// Deleting is allowed, as it is for an object-named ref: it is how a decoy goes, and what a mirror push does.
+			ctx.JSON(http.StatusForbidden, private.Response{
+				UserMsg: git.RemotePrefix + " is not for pushes",
+			})
+		case refFullName.IsUpstream():
+			// The mirror sync's own bookkeeping: whatever a writer put there would be taken for an upstream tip.
+			ctx.JSON(http.StatusForbidden, private.Response{
+				UserMsg: git.UpstreamPrefix + " is reserved for mirror sync",
+			})
 		default:
 			ourCtx.assertCanWriteRef(refFullName)
 		}
@@ -142,6 +158,24 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 	}
 
 	ctx.PlainText(http.StatusOK, "ok")
+}
+
+// isObjectNamed reports whether the push makes a branch or tag named like an
+// object id, in any of the places git looks for a ref by a name. Git reads such a
+// name as the object, and as the ref, depending on where it is asked, so a writer
+// who makes one can redirect a push that names an object. Deleting one is allowed.
+func isObjectNamed(refFullName git.RefName, newCommitID string) bool {
+	if strings.Trim(newCommitID, "0") == "" {
+		return false
+	}
+	switch {
+	case refFullName.IsBranch(), refFullName.IsTag():
+		return git.IsObjectName(refFullName.ShortName())
+	default:
+		// refs/<id> is one of the places git looks for the name <id>, too.
+		name, ok := strings.CutPrefix(refFullName.String(), "refs/")
+		return ok && git.IsObjectName(name)
+	}
 }
 
 func preReceiveBranch(ctx *preReceiveContext, oldCommitID, newCommitID string, refFullName git.RefName) {
@@ -199,7 +233,8 @@ func preReceiveBranch(ctx *preReceiveContext, oldCommitID, newCommitID string, r
 
 	// 2. Disallow force pushes to protected branches
 	if oldCommitID != objectFormat.EmptyObjectID().String() {
-		output, _, err := gitrepo.RunCmdString(ctx,
+		output, _, err := gitrepo.RunCmdString(
+			ctx,
 			repo,
 			gitcmd.NewCommand("rev-list", "--max-count=1").
 				AddDynamicArguments(oldCommitID, "^"+newCommitID).
@@ -235,7 +270,8 @@ func preReceiveBranch(ctx *preReceiveContext, oldCommitID, newCommitID string, r
 				})
 				return
 			}
-			unverifiedCommit := err.(*errUnverifiedCommit).sha
+			unverified, _ := errors.AsType[*errUnverifiedCommit](err)
+			unverifiedCommit := unverified.sha
 			log.Warn("Forbidden: Branch: %s in %-v is protected from unverified commit %s", branchName, repo, unverifiedCommit)
 			ctx.JSON(http.StatusForbidden, private.Response{
 				UserMsg: fmt.Sprintf("branch %s is protected from unverified commit %s", branchName, unverifiedCommit),

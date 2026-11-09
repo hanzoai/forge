@@ -19,6 +19,10 @@ var Mirror = struct {
 
 	// SyncSecret keys the HMAC on POST /v1/sync. Empty disables that route.
 	SyncSecret string
+
+	// SyncUser is the user the inbound sync pushes as, so branch protection and
+	// every other push check apply to it. Empty disables the inbound sync.
+	SyncUser string
 }{
 	Enabled:         true,
 	DisableNewPull:  false,
@@ -42,6 +46,7 @@ func loadMirrorFrom(rootCfg ConfigProvider) {
 	}
 
 	Mirror.SyncSecret = rootCfg.Section("mirror").Key("SYNC_SECRET").String()
+	Mirror.SyncUser = rootCfg.Section("mirror").Key("SYNC_USER").String()
 
 	if !Mirror.Enabled {
 		Mirror.DisableNewPull = true

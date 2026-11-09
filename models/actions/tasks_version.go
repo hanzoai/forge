@@ -72,30 +72,34 @@ func increaseTasksVersionByScope(ctx context.Context, ownerID, repoID int64) err
 	return nil
 }
 
-func IncreaseTaskVersion(ctx context.Context, ownerID, repoID int64) error {
-	return db.WithTx(ctx, func(ctx context.Context) error {
-		// 1. increase global
-		if err := increaseTasksVersionByScope(ctx, 0, 0); err != nil {
-			log.Error("IncreaseTasksVersionByScope(Global): %v", err)
-			return err
-		}
+// scope names one version row: {0, 0} is global, {owner, 0} an org, {0, repo} a repo.
+type scope struct{ ownerID, repoID int64 }
 
-		// 2. increase owner
-		if ownerID > 0 {
-			if err := increaseTasksVersionByScope(ctx, ownerID, 0); err != nil {
-				log.Error("IncreaseTasksVersionByScope(Owner): %v", err)
-				return err
+// IncreaseTaskVersion bumps the repo, owner and global versions, in that order, so idle runners poll again.
+// In a transaction the bumps wait for it to commit, and a rollback bumps nothing. Each scope is bumped once however
+// often this is called, by a single autocommit statement of its own, so no version row is ever held across work.
+// A bump announces work that has already committed, so a failure is logged and never returned to the caller;
+// the wake_runners sweep repairs it.
+func IncreaseTaskVersion(ctx context.Context, ownerID, repoID int64) {
+	increaseTaskVersion(ctx, ownerID, repoID, increaseTasksVersionByScope)
+}
+
+func increaseTaskVersion(ctx context.Context, ownerID, repoID int64, increase func(ctx context.Context, ownerID, repoID int64) error) {
+	scopes := make([]scope, 0, 3)
+	if repoID > 0 {
+		scopes = append(scopes, scope{repoID: repoID})
+	}
+	if ownerID > 0 {
+		scopes = append(scopes, scope{ownerID: ownerID})
+	}
+	scopes = append(scopes, scope{}) // the global row is the busiest, so waiting on it delays the others least when it is last
+
+	for _, s := range scopes {
+		bump := func(ctx context.Context) error { return increase(ctx, s.ownerID, s.repoID) }
+		if !db.AfterCommit(ctx, s, bump) { // not in a transaction: bump now
+			if err := bump(ctx); err != nil {
+				log.Error("IncreaseTaskVersion %+v: %v", s, err)
 			}
 		}
-
-		// 3. increase repo
-		if repoID > 0 {
-			if err := increaseTasksVersionByScope(ctx, 0, repoID); err != nil {
-				log.Error("IncreaseTasksVersionByScope(Repo): %v", err)
-				return err
-			}
-		}
-
-		return nil
-	})
+	}
 }

@@ -138,7 +138,7 @@ func RestoreBranchPost(ctx *context.Context) {
 	}
 
 	if err := gitrepo.Push(ctx, ctx.Repo.Repository, ctx.Repo.Repository, git.PushOptions{
-		Branch: fmt.Sprintf("%s:%s%s", deletedBranch.CommitID, git.BranchPrefix, deletedBranch.Name),
+		Branch: fmt.Sprintf("%s:%s%s", git.ObjectName(deletedBranch.CommitID), git.BranchPrefix, deletedBranch.Name),
 		Env:    repo_module.PushingEnvironment(ctx.Doer, ctx.Repo.Repository),
 	}); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
@@ -216,6 +216,16 @@ func CreateBranch(ctx *context.Context) {
 		}
 		if git_model.IsErrBranchAlreadyExists(err) || git.IsErrPushOutOfDate(err) {
 			ctx.Flash.Error(ctx.Tr("repo.branch.branch_already_exists", form.NewBranchName))
+			ctx.Redirect(ctx.Repo.RepoLink + "/src/" + ctx.Repo.RefTypeNameSubURL())
+			return
+		}
+		if errors.Is(err, repo_service.ErrBranchNameLikeObject) {
+			ctx.Flash.Error(ctx.Tr("repo.branch.name_like_object_id", form.NewBranchName))
+			ctx.Redirect(ctx.Repo.RepoLink + "/src/" + ctx.Repo.RefTypeNameSubURL())
+			return
+		}
+		if release_service.IsErrInvalidTagName(err) {
+			ctx.Flash.Error(ctx.Tr("repo.release.tag_name_invalid"))
 			ctx.Redirect(ctx.Repo.RepoLink + "/src/" + ctx.Repo.RefTypeNameSubURL())
 			return
 		}

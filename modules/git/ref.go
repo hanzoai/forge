@@ -16,6 +16,9 @@ const (
 	RemotePrefix = "refs/remotes/"
 	// PullPrefix is the base directory of the pull information of git.
 	PullPrefix = "refs/pull/"
+	// UpstreamPrefix is where the inbound mirror sync keeps the last upstream
+	// tips it handled. It is hidden from clients and closed to pushes.
+	UpstreamPrefix = "refs/upstream/"
 )
 
 // refNamePatternInvalid is regular expression with unallowed characters in git reference name
@@ -30,7 +33,8 @@ var refNamePatternInvalid = regexp.MustCompile(
 		`(?://)|` + // no "//" anywhere
 		`(?:@{)|` + // no "@{"
 		`(?:[/.]$)|` + // no terminal '/' or '.'
-		`(?:^@$)`) // Not "@"
+		`(?:^@$)`,
+) // Not "@"
 
 // IsValidRefPattern ensures that the provided string could be a valid reference
 func IsValidRefPattern(name string) bool {
@@ -101,6 +105,27 @@ func (ref RefName) IsBranch() bool {
 
 func (ref RefName) IsTag() bool {
 	return strings.HasPrefix(string(ref), TagPrefix)
+}
+
+// objectNamePattern matches a full object id, of either hash, in either case.
+var objectNamePattern = regexp.MustCompile(`(?i)^([0-9a-f]{40}|[0-9a-f]{64})$`)
+
+// ObjectName names an object by its id and by nothing else. A refspec's source
+// that is only an id is read as the name of a ref before it is read as an object,
+// and a writer may have made refs/heads/<id>, refs/tags/<id> or the like to be
+// read in its place; <id>^{object} is the object itself, whatever refs there are.
+func ObjectName(id string) string {
+	return id + "^{object}"
+}
+
+// IsObjectName reports whether name is a full object id. A branch or tag named so
+// is read by git as the object in some places, and as the ref in others.
+func IsObjectName(name string) bool {
+	return objectNamePattern.MatchString(name)
+}
+
+func (ref RefName) IsUpstream() bool {
+	return strings.HasPrefix(string(ref), UpstreamPrefix)
 }
 
 func (ref RefName) IsRemote() bool {

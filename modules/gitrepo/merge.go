@@ -24,3 +24,17 @@ func MergeBase(ctx context.Context, repo Repository, baseCommitID, headCommitID 
 	}
 	return strings.TrimSpace(mergeBase), nil
 }
+
+// IsAncestor reports whether ancestorID is reachable from descendantID, a
+// commit counting as its own ancestor. Tags are peeled to the commits they name.
+func IsAncestor(ctx context.Context, repo Repository, ancestorID, descendantID string) (bool, error) {
+	err := RunCmdWithStderr(ctx, repo, gitcmd.NewCommand("merge-base", "--is-ancestor").
+		AddDynamicArguments(ancestorID, descendantID))
+	if err == nil {
+		return true, nil
+	}
+	if gitcmd.IsErrorExitCode(err, 1) {
+		return false, nil
+	}
+	return false, fmt.Errorf("is %s an ancestor of %s: %w", ancestorID, descendantID, err)
+}

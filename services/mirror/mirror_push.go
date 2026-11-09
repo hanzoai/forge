@@ -149,12 +149,24 @@ func runPushSync(ctx context.Context, m *repo_model.PushMirror) error {
 			if err != nil {
 				return err
 			}
-			if err := pushAllLFSObjects(ctx, gitRepo, lfsClient); err != nil {
+			lfsCtx, cancel := context.WithTimeout(ctx, timeout)
+			defer cancel()
+			if err := pushAllLFSObjects(lfsCtx, gitRepo, lfsClient); err != nil {
 				return util.SanitizeErrorCredentialURLs(err)
 			}
 		}
 
 		log.Trace("Pushing %s mirror[%d] remote %s", storageRepo.RelativePath(), m.ID, m.RemoteName)
+
+		// Where this repository is mirrored to GitHub and the inbound sync is on,
+		// take the tips as they stand before the push, to record once it is done.
+		var pushed map[string]string
+		if !isWiki && setting.Mirror.SyncUser != "" && isRegular(ctx, repo) && IsGitHubRepo(m.RemoteAddress, repo.OwnerName, repo.Name) {
+			var err error
+			if pushed, err = forgeTips(ctx, repo); err != nil {
+				log.Error("SyncPushMirror [mirror: %d]: %v", m.ID, err)
+			}
+		}
 
 		envs := proxy.EnvWithProxy(remoteURL.URL)
 		// Carry branches and tags outward, additively. This deliberately does NOT
@@ -185,6 +197,10 @@ func runPushSync(ctx context.Context, m *repo_model.PushMirror) error {
 			return util.SanitizeErrorCredentialURLs(err)
 		}
 
+		if pushed != nil {
+			// Even if the request ends now, GitHub has these.
+			recordPushed(context.WithoutCancel(ctx), repo, pushed)
+		}
 		return nil
 	}
 
@@ -272,6 +288,8 @@ func pushAllLFSObjects(ctx context.Context, gitRepo *git.Repository, lfsClient l
 	return err
 }
 
+// syncPushMirrorWithSyncOnCommit queues the push out of new commits, on the
+// event queue so it does not wait behind the scheduled sweep.
 func syncPushMirrorWithSyncOnCommit(ctx context.Context, repoID int64) {
 	pushMirrors, err := repo_model.GetPushMirrorsSyncedOnCommit(ctx, repoID)
 	if err != nil {
@@ -280,6 +298,6 @@ func syncPushMirrorWithSyncOnCommit(ctx context.Context, repoID int64) {
 	}
 
 	for _, mirror := range pushMirrors {
-		AddPushMirrorToQueue(mirror.ID)
+		AddPushMirrorToEventQueue(mirror.ID)
 	}
 }
