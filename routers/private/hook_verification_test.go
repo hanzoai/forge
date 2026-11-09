@@ -4,12 +4,15 @@
 package private
 
 import (
+	"os/exec"
+	"path/filepath"
 	"testing"
 
 	"github.com/hanzoai/git/models/unittest"
 	"github.com/hanzoai/git/modules/git"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var testReposDir = "tests/repos/"
@@ -44,4 +47,36 @@ func TestVerifyCommits(t *testing.T) {
 			assert.Error(t, err)
 		}
 	}
+}
+
+// The mirror sync fetches a branch into refs/upstream before it pushes it, so the
+// commits are already reachable from a ref when pre-receive looks at the new
+// branch. A branch created that way must have its commits checked all the same.
+func TestVerifyCommitsOfABranchTheSyncCreates(t *testing.T) {
+	unittest.PrepareTestEnv(t)
+
+	const unsigned = "9ce3f779ae33f31fce17fac3c512047b75d7498b"
+	path := filepath.Join(t.TempDir(), "repo.git")
+	for _, args := range [][]string{
+		{"clone", "-q", "--bare", testReposDir + "repo1_hook_verification", path},
+		{"-C", path, "update-ref", "refs/upstream/staging/heads/sigtest/a", unsigned},
+		{"-C", path, "update-ref", "refs/upstream/heads/sigtest/a", unsigned},
+	} {
+		out, err := exec.CommandContext(t.Context(), "git", args...).CombinedOutput()
+		require.NoError(t, err, string(out))
+	}
+	gitRepo, err := git.OpenRepository(t.Context(), path)
+	require.NoError(t, err)
+	defer gitRepo.Close()
+	objectFormat, err := gitRepo.GetObjectFormat()
+	require.NoError(t, err)
+
+	err = verifyCommits(objectFormat.EmptyObjectID().String(), unsigned, gitRepo, nil)
+	require.Error(t, err)
+	assert.True(t, isErrUnverifiedCommit(err))
+
+	// Any other ref that reaches the commits is a reason to take them as already there.
+	out, err := exec.CommandContext(t.Context(), "git", "-C", path, "update-ref", "refs/heads/elsewhere", unsigned).CombinedOutput()
+	require.NoError(t, err, string(out))
+	assert.NoError(t, verifyCommits(objectFormat.EmptyObjectID().String(), unsigned, gitRepo, nil))
 }

@@ -254,7 +254,8 @@ func preReceiveBranch(ctx *preReceiveContext, oldCommitID, newCommitID string, r
 				})
 				return
 			}
-			unverifiedCommit := err.(*errUnverifiedCommit).sha
+			unverified, _ := errors.AsType[*errUnverifiedCommit](err)
+			unverifiedCommit := unverified.sha
 			log.Warn("Forbidden: Branch: %s in %-v is protected from unverified commit %s", branchName, repo, unverifiedCommit)
 			ctx.JSON(http.StatusForbidden, private.Response{
 				UserMsg: fmt.Sprintf("branch %s is protected from unverified commit %s", branchName, unverifiedCommit),
