@@ -37,6 +37,10 @@ import (
 	"github.com/hanzoai/builder"
 )
 
+// ErrBranchNameLikeObject is the error for a branch named like an object id, which git may read as the
+// object instead of the branch, and which a writer could make to take the object's place.
+var ErrBranchNameLikeObject = util.ErrorWrap(util.ErrInvalidArgument, "branch name is an object id, which git may read as the object")
+
 // CreateNewBranch creates a new repository branch
 func CreateNewBranch(ctx context.Context, doer *user_model.User, repo *repo_model.Repository, oldBranchName, branchName string) (err error) {
 	branch, err := git_model.GetBranch(ctx, repo.ID, oldBranchName)
@@ -258,6 +262,9 @@ func loadOneBranch(ctx context.Context, repo *repo_model.Repository, dbBranch *g
 
 // checkBranchName validates branch name with existing repository branches
 func checkBranchName(ctx context.Context, repo *repo_model.Repository, name string) error {
+	if git.IsObjectName(name) {
+		return ErrBranchNameLikeObject
+	}
 	_, err := gitrepo.WalkReferences(ctx, repo, func(_, refName string) error {
 		branchRefName := strings.TrimPrefix(refName, git.BranchPrefix)
 		switch {
@@ -401,6 +408,11 @@ func RenameBranch(ctx context.Context, repo *repo_model.Repository, doer *user_m
 	err := repo.MustNotBeArchived()
 	if err != nil {
 		return "", err
+	}
+
+	// No hook sees a rename.
+	if git.IsObjectName(to) {
+		return "", ErrBranchNameLikeObject
 	}
 
 	if from == to {
