@@ -1344,3 +1344,30 @@ func TestInboundDoesNotAskTheHooksAgainAboutDeclinedBranches(t *testing.T) {
 	require.True(t, r.sync())
 	assert.Equal(t, 7, r.invocations("pre-receive"))
 }
+
+// A bot's branch made after the remote was listed is not in the list, so it is
+// kept out of the fetch by its prefix as well as by its name.
+func TestFetchRefspecs(t *testing.T) {
+	offered := map[string]string{
+		"refs/heads/main":                       "1",
+		"refs/heads/Dependabot/zz":              "2",
+		"refs/heads/renovate/x":                 "3",
+		"refs/heads/" + strings.Repeat("a", 40): "4",
+		"refs/tags/v1":                          "5",
+	}
+
+	refspecs := fetchRefspecs(offered)
+
+	assert.Equal(t, []string{
+		"+refs/heads/*:refs/upstream/staging/heads/*",
+		"+refs/tags/*:refs/upstream/staging/tags/*",
+	}, refspecs[:2])
+	for _, prefix := range botBranches {
+		assert.Contains(t, refspecs, "^refs/heads/"+prefix+"*")
+	}
+	for _, ref := range []string{"refs/heads/Dependabot/zz", "refs/heads/renovate/x", "refs/heads/" + strings.Repeat("a", 40)} {
+		assert.Contains(t, refspecs, "^"+ref)
+	}
+	assert.NotContains(t, refspecs, "^refs/heads/main")
+	assert.NotContains(t, refspecs, "^refs/tags/v1")
+}

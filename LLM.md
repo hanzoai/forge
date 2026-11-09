@@ -325,8 +325,9 @@ either side reaches the other. There is no mode to set.
     `changeset-release/` (`botBranches`, the one list). The remote's refs are listed
     first (`ls-remote --symref`, which also says where its HEAD points), and each bot or
     object-named one is left out of the fetch by its exact name, in whatever case, with
-    a negative refspec (git 2.29; at most 4000 of them), so their objects never reach
-    the repo. Staged and recorded refs of such names, left by an earlier version or
+    a negative refspec (git 2.29; at most 4000 of them), beside a glob for each lower case
+    prefix so that a bot branch made after the listing is left out too, so their objects
+    never reach the repo. Staged and recorded refs of such names, left by an earlier version or
     past that bound, are deleted on every run. `deps/` is not a bot prefix;
   - Not carried in: LFS objects and wikis.
 - **What the push path enforces for `SYNC_USER`.** Pre-receive applies what it

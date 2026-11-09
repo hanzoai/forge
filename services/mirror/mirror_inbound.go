@@ -299,24 +299,12 @@ func runInbound(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.
 		notify(repo, "", "fetch: "+message, fmt.Sprintf("Inbound sync of %s failed to fetch %s: %s", repo.FullName(), m.RemoteName, message))
 		return false
 	}
-	refspecs := []string{
-		"+" + git.BranchPrefix + "*:" + stagingName(git.UpstreamPrefix+"heads/*"),
-		"+" + git.TagPrefix + "*:" + stagingName(git.UpstreamPrefix+"tags/*"),
-	}
-	excluded := 0
-	for _, ref := range slices.Sorted(maps.Keys(offered)) {
-		if !isBotBranch(ref) && !isObjectNamed(ref) {
-			continue
-		}
+	for ref := range offered {
 		if isObjectNamed(ref) {
 			notify(repo, ref, "object-named", fmt.Sprintf("Inbound sync of %s did not bring in %s: a name like an object id can be read as the object, so it is not taken", repo.FullName(), ref))
 		}
-		// A negative refspec names its ref exactly, in whatever case: a glob could not. (git 2.29)
-		if excluded < maxExcluded && git.DefaultFeatures().CheckVersionAtLeast("2.29") {
-			refspecs = append(refspecs, "^"+ref)
-			excluded++
-		}
 	}
+	refspecs := fetchRefspecs(offered)
 	// Never follow HTTP redirects, see runSync. The staging namespace is ours, so forcing it is safe.
 	fetch := gitcmd.NewCommand("fetch", "--no-tags", "--prune").AddConfig("http.followRedirects", "false").
 		AddDynamicArguments(append([]string{m.RemoteName}, refspecs...)...).
@@ -909,6 +897,33 @@ func seed(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.Reposi
 		branches = slices.DeleteFunc(branches, func(name string) bool { return name == def })
 	}
 	return push(branches)
+}
+
+// fetchRefspecs says what to fetch of the refs the remote offers: its branches and
+// tags, into the staging namespace, but not the ones that are never taken. Those
+// that are there are left out by their exact names, in whatever case, which a glob
+// cannot do; and the lower case prefixes of the bots are left out as globs besides,
+// so that a bot's branch made after the remote was listed is not fetched either.
+// (Negative refspecs are git 2.29.)
+func fetchRefspecs(offered map[string]string) []string {
+	refspecs := []string{
+		"+" + git.BranchPrefix + "*:" + stagingName(git.UpstreamPrefix+"heads/*"),
+		"+" + git.TagPrefix + "*:" + stagingName(git.UpstreamPrefix+"tags/*"),
+	}
+	if !git.DefaultFeatures().CheckVersionAtLeast("2.29") {
+		return refspecs
+	}
+	for _, prefix := range botBranches {
+		refspecs = append(refspecs, "^"+git.BranchPrefix+prefix+"*")
+	}
+	excluded := 0
+	for _, ref := range slices.Sorted(maps.Keys(offered)) {
+		if excluded < maxExcluded && (isBotBranch(ref) || isObjectNamed(ref)) {
+			refspecs = append(refspecs, "^"+ref)
+			excluded++
+		}
+	}
+	return refspecs
 }
 
 // defaultBranch returns the record name of GitHub's default branch among branches,
