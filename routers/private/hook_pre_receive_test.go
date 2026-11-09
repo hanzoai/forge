@@ -155,3 +155,23 @@ func TestPreReceiveRefusesRemotes(t *testing.T) {
 	assert.Equal(t, http.StatusForbidden, resp.Code)
 	assert.Contains(t, resp.Body.String(), "refs/remotes/ is not for pushes")
 }
+
+// Deleting what is under refs/remotes is allowed: it is how a decoy that was made
+// before the rule goes, and what a mirror push from an ordinary clone does.
+func TestPreReceiveAllowsDeletingRemotes(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 1})
+	zero := strings.Repeat("0", 40)
+	ctx, resp := contexttest.MockPrivateContext(t, "/")
+	ctx.Repo = &git_context.Repository{Repository: repo}
+	web.SetForm(ctx, &private.HookOptions{
+		UserID:       2,
+		OldCommitIDs: []string{"4a357436d925b5c974181ff12a994538ddc5a269"},
+		NewCommitIDs: []string{zero},
+		RefFullNames: []git.RefName{"refs/remotes/origin/main"},
+	})
+
+	HookPreReceive(ctx)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+}

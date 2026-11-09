@@ -138,8 +138,9 @@ func HookPreReceive(ctx *git_context.PrivateContext) {
 			preReceiveTag(ourCtx, refFullName)
 		case git.DefaultFeatures().SupportProcReceive && refFullName.IsFor():
 			preReceiveFor(ourCtx, refFullName)
-		case refFullName.IsRemote():
+		case refFullName.IsRemote() && strings.Trim(newCommitID, "0") != "":
 			// Git looks there for a ref by a name, too, and nothing is meant to be pushed there.
+			// Deleting is allowed, as it is for an object-named ref: it is how a decoy goes, and what a mirror push does.
 			ctx.JSON(http.StatusForbidden, private.Response{
 				UserMsg: git.RemotePrefix + " is not for pushes",
 			})
