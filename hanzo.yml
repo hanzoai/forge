@@ -18,7 +18,7 @@
 # GIT_VERSION reaches the Makefile as the VERSION file. The build context is an
 # export rather than a clone, so without this arg the daemon reports
 # 0.0.0+unknown and no running forge can name the build it came from.
-version: 1.26.56
+version: 1.27.0
 images:
   - name: git
     context: .
