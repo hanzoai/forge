@@ -367,6 +367,9 @@ func RenameBranchPost(ctx *context.Context) {
 		case errors.Is(err, git_model.ErrBranchIsProtected):
 			ctx.Flash.Error(ctx.Tr("repo.branch.rename_protected_branch_failed"))
 			ctx.Redirect(ctx.Repo.RepoLink + "/branches")
+		case errors.Is(err, repository.ErrBranchNameLikeObject):
+			ctx.Flash.Error(ctx.Tr("repo.branch.name_like_object_id", form.To))
+			ctx.Redirect(ctx.Repo.RepoLink + "/branches")
 		default:
 			ctx.ServerError("RenameBranch", err)
 		}

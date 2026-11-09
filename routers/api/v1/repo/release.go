@@ -272,7 +272,7 @@ func CreateRelease(ctx *context.APIContext) {
 		if err := release_service.CreateRelease(ctx.Repo.GitRepo, rel, nil, form.TagMessage); err != nil {
 			if repo_model.IsErrReleaseAlreadyExist(err) {
 				ctx.APIError(http.StatusConflict, err.Error())
-			} else if release_service.IsErrProtectedTagName(err) {
+			} else if release_service.IsErrProtectedTagName(err) || release_service.IsErrInvalidTagName(err) {
 				ctx.APIError(http.StatusUnprocessableEntity, err.Error())
 			} else if git.IsErrNotExist(err) {
 				ctx.APIError(http.StatusNotFound, "target not found")
@@ -298,6 +298,10 @@ func CreateRelease(ctx *context.APIContext) {
 		rel.Target = form.Target
 
 		if err = release_service.UpdateRelease(ctx, ctx.Doer, ctx.Repo.GitRepo, rel, nil, nil, nil); err != nil {
+			if release_service.IsErrInvalidTagName(err) {
+				ctx.APIError(http.StatusUnprocessableEntity, err.Error())
+				return
+			}
 			ctx.APIErrorInternal(err)
 			return
 		}
@@ -372,6 +376,10 @@ func EditRelease(ctx *context.APIContext) {
 		rel.IsPrerelease = *form.IsPrerelease
 	}
 	if err := release_service.UpdateRelease(ctx, ctx.Doer, ctx.Repo.GitRepo, rel, nil, nil, nil); err != nil {
+		if release_service.IsErrInvalidTagName(err) {
+			ctx.APIError(http.StatusUnprocessableEntity, err.Error())
+			return
+		}
 		ctx.APIErrorInternal(err)
 		return
 	}

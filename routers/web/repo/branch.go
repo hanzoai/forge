@@ -219,6 +219,16 @@ func CreateBranch(ctx *context.Context) {
 			ctx.Redirect(ctx.Repo.RepoLink + "/src/" + ctx.Repo.RefTypeNameSubURL())
 			return
 		}
+		if errors.Is(err, repo_service.ErrBranchNameLikeObject) {
+			ctx.Flash.Error(ctx.Tr("repo.branch.name_like_object_id", form.NewBranchName))
+			ctx.Redirect(ctx.Repo.RepoLink + "/src/" + ctx.Repo.RefTypeNameSubURL())
+			return
+		}
+		if release_service.IsErrInvalidTagName(err) {
+			ctx.Flash.Error(ctx.Tr("repo.release.tag_name_invalid"))
+			ctx.Redirect(ctx.Repo.RepoLink + "/src/" + ctx.Repo.RefTypeNameSubURL())
+			return
+		}
 		if git_model.IsErrBranchNameConflict(err) {
 			e := err.(git_model.ErrBranchNameConflict)
 			ctx.Flash.Error(ctx.Tr("repo.branch.branch_name_conflict", form.NewBranchName, e.BranchName))

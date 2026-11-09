@@ -2678,6 +2678,7 @@
   "repo.branch.create_from": "from \"%s\"",
   "repo.branch.create_success": "Branch \"%s\" has been created.",
   "repo.branch.branch_already_exists": "Branch \"%s\" already exists in this repository.",
+  "repo.branch.name_like_object_id": "Branch name \"%s\" is an object id, which git may read as the object instead of the branch.",
   "repo.branch.branch_name_conflict": "Branch name \"%s\" conflicts with the already existing branch \"%s\".",
   "repo.branch.tag_collision": "Branch \"%s\" cannot be created as a tag with same name already exists in the repository.",
   "repo.branch.deleted_by": "Deleted by %s",
