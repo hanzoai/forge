@@ -5,6 +5,7 @@ package repo
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -62,4 +63,36 @@ func TestMirrorSyncQueuesOnlyForWriter(t *testing.T) {
 	MirrorSync(ctx)
 	assert.Equal(t, http.StatusOK, ctx.Resp.WrittenStatus())
 	assert.Equal(t, []int64{5}, queued)
+}
+
+// A regular repository with a push mirror to its own GitHub repository takes in what
+// GitHub gained when asked to, which is also how a converted repository is primed.
+func TestMirrorSyncQueuesInboundForARegularRepository(t *testing.T) {
+	unittest.PrepareTestEnv(t)
+	defer test.MockVariableValue(&setting.Mirror.Enabled, true)()
+	var pulls, inbound []int64
+	defer test.MockVariableValue(&queuePull, func(id int64) { pulls = append(pulls, id) })()
+	defer test.MockVariableValue(&queueInbound, func(id int64) { inbound = append(inbound, id) })()
+
+	request := func() *httptest.ResponseRecorder {
+		ctx, resp := contexttest.MockAPIContext(t, "user2/repo1")
+		contexttest.LoadUser(t, ctx, 2)
+		contexttest.LoadRepo(t, ctx, 1)
+		MirrorSync(ctx)
+		return resp
+	}
+
+	// Nothing to take in from.
+	assert.Equal(t, http.StatusBadRequest, request().Code)
+	assert.Empty(t, inbound)
+
+	// A push mirror somewhere else is no way in.
+	assert.NoError(t, db.Insert(t.Context(), &repo_model.PushMirror{RepoID: 1, RemoteName: "elsewhere", RemoteAddress: "https://example.com/user2/repo1"}))
+	assert.Equal(t, http.StatusBadRequest, request().Code)
+
+	m := &repo_model.PushMirror{RepoID: 1, RemoteName: "github", RemoteAddress: "https://github.com/user2/repo1"}
+	assert.NoError(t, db.Insert(t.Context(), m))
+	assert.Equal(t, http.StatusOK, request().Code)
+	assert.Equal(t, []int64{m.ID}, inbound)
+	assert.Empty(t, pulls)
 }
