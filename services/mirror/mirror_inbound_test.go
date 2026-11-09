@@ -988,7 +988,7 @@ func TestInboundSeedResumesAfterAPartialFailure(t *testing.T) {
 
 // What a bot opens on GitHub is never brought in: it would run here with the
 // organization's secrets. It is not fetched at all, so it is not in the repository
-// to be asked for by id; a name in another case is fetched, and skipped.
+// to be asked for by id, in whatever case the name is.
 func TestInboundNeverBringsInBotBranches(t *testing.T) {
 	bots := []string{
 		"refs/heads/dependabot/npm_and_yarn/x", "refs/heads/renovate/foo", "refs/heads/gh-readonly-queue/main/pr-1",
@@ -1025,6 +1025,8 @@ func TestInboundNeverBringsInBotBranches(t *testing.T) {
 			assert.Error(t, err, "%s: its objects are not in the repository", bot)
 		}
 		assert.Empty(t, r.forge.tip("refs/heads/Dependabot/Capital"), "filled=%v", filled)
+		_, err := exec.Command("git", "-C", r.forge.path, "cat-file", "-e", cased).CombinedOutput()
+		assert.Error(t, err, "a name in capitals is not fetched either: its commit is not in the repository")
 		assert.Empty(t, r.forge.tip("refs/upstream/heads/Dependabot/Capital"), "not kept, whatever the case")
 		assert.Empty(t, r.forge.tip("refs/upstream/staging/heads/Dependabot/Capital"))
 		assert.NotContains(t, strings.Join(r.calls("pre-receive"), " "), "ependabot")
@@ -1241,7 +1243,8 @@ func TestInboundSkipsNamesLikeObjectIds(t *testing.T) {
 	r := newRig(t)
 	c1 := r.github.commit("", "one")
 	r.github.set("refs/heads/main", c1)
-	r.github.set("refs/heads/"+c1, c1)
+	named := r.github.commit(c1, "on a branch named like an id")
+	r.github.set("refs/heads/"+c1, named)
 	r.github.git("tag", strings.ToUpper(c1), c1)
 	r.github.git("tag", "v1", c1)
 
@@ -1253,6 +1256,8 @@ func TestInboundSkipsNamesLikeObjectIds(t *testing.T) {
 	assert.Empty(t, r.forge.tip("refs/heads/"+c1))
 	assert.Empty(t, r.forge.tip("refs/tags/"+strings.ToUpper(c1)))
 	assert.Empty(t, r.forge.tip("refs/upstream/heads/"+c1))
+	_, err := exec.Command("git", "-C", r.forge.path, "cat-file", "-e", named).CombinedOutput()
+	assert.Error(t, err, "never fetched: its commit is not in the repository")
 	assert.Len(t, r.notices(), 2, "one for each, once")
 }
 

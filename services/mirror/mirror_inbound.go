@@ -41,6 +41,10 @@ const (
 	// reminder, not a record: what persists past it is reported once more.
 	noticeTTL = 7 * 24 * 60 * 60
 
+	// maxExcluded bounds the refs left out of a fetch by name, which are arguments of the command.
+	// Any past it are fetched, and removed afterwards.
+	maxExcluded = 4000
+
 	// primedKey is the repository setting that says the first inbound sync is done.
 	primedKey = "hanzo.inboundprimed"
 )
@@ -284,21 +288,40 @@ func runInbound(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.
 		return false
 	}
 
-	// Never follow HTTP redirects, see runSync. The staging namespace is ours, so forcing it is safe.
+	// What the remote has, so that what is never brought in is never fetched: not
+	// in the repository, for anyone to ask for by its id, until it is collected.
+	env := proxy.EnvWithProxy(remoteURL.URL)
+	offered, head, err := advertised(ctx, repo, m.RemoteName, env)
+	if err != nil {
+		// sanitize the output, since it may contain the remote address, which may contain a password
+		message := util.SanitizeCredentialURLs(err.Error())
+		log.Error("SyncInboundMirror [repo: %-v]: failed to list %s: %v", repo, m.RemoteName, message)
+		notify(repo, "", "fetch: "+message, fmt.Sprintf("Inbound sync of %s failed to fetch %s: %s", repo.FullName(), m.RemoteName, message))
+		return false
+	}
 	refspecs := []string{
 		"+" + git.BranchPrefix + "*:" + stagingName(git.UpstreamPrefix+"heads/*"),
 		"+" + git.TagPrefix + "*:" + stagingName(git.UpstreamPrefix+"tags/*"),
 	}
-	if git.DefaultFeatures().CheckVersionAtLeast("2.29") {
-		// Not fetched at all, so what is never brought in is not in the repository for anyone to ask for by id.
-		for _, prefix := range botBranches {
-			refspecs = append(refspecs, "^"+git.BranchPrefix+prefix+"*")
+	excluded := 0
+	for _, ref := range slices.Sorted(maps.Keys(offered)) {
+		if !isBotBranch(ref) && !isObjectNamed(ref) {
+			continue
+		}
+		if isObjectNamed(ref) {
+			notify(repo, ref, "object-named", fmt.Sprintf("Inbound sync of %s did not bring in %s: a name like an object id can be read as the object, so it is not taken", repo.FullName(), ref))
+		}
+		// A negative refspec names its ref exactly, in whatever case: a glob could not. (git 2.29)
+		if excluded < maxExcluded && git.DefaultFeatures().CheckVersionAtLeast("2.29") {
+			refspecs = append(refspecs, "^"+ref)
+			excluded++
 		}
 	}
+	// Never follow HTTP redirects, see runSync. The staging namespace is ours, so forcing it is safe.
 	fetch := gitcmd.NewCommand("fetch", "--no-tags", "--prune").AddConfig("http.followRedirects", "false").
 		AddDynamicArguments(append([]string{m.RemoteName}, refspecs...)...).
 		WithTimeout(mirrorTimeout()).
-		WithEnv(proxy.EnvWithProxy(remoteURL.URL))
+		WithEnv(env)
 	if _, stderr, err := gitrepo.RunCmdString(ctx, repo, fetch); err != nil {
 		// sanitize the output, since it may contain the remote address, which may contain a password
 		stderrMessage := util.SanitizeCredentialURLs(stderr)
@@ -401,7 +424,7 @@ func runInbound(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.
 			markPrimed(settle, repo)
 			primed = true
 		}
-		if !seed(ctx, m, repo, user, remoteURL, changed) {
+		if !seed(ctx, m, repo, user, head, changed) {
 			return false
 		}
 	}
@@ -838,7 +861,7 @@ func refusal(err error) string {
 // branches in one push. A branch is deleted from changed once it is in, so
 // the tags, which are left, are imported with the rest of the run, and a seed
 // that stops partway is simply carried on by it.
-func seed(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.Repository, user *user_model.User, remoteURL *giturl.GitURL, changed map[string]string) bool {
+func seed(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.Repository, user *user_model.User, head string, changed map[string]string) bool {
 	var branches []string
 	for _, name := range slices.Sorted(maps.Keys(changed)) {
 		if !strings.HasPrefix(forgeRef(name), git.TagPrefix) {
@@ -867,7 +890,7 @@ func seed(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.Reposi
 		return true
 	}
 
-	if def := defaultBranch(ctx, m, repo, remoteURL, branches); def != "" {
+	if def := defaultBranch(head, branches); def != "" {
 		branch := strings.TrimPrefix(def, git.UpstreamPrefix+"heads/")
 		if repo.DefaultBranch != branch {
 			repo.DefaultBranch = branch
@@ -889,21 +912,10 @@ func seed(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.Reposi
 }
 
 // defaultBranch returns the record name of GitHub's default branch among branches,
-// or else of main, master or the first of them; "" if there are none.
-func defaultBranch(ctx context.Context, m *repo_model.PushMirror, repo *repo_model.Repository, remoteURL *giturl.GitURL, branches []string) string {
-	ls := gitcmd.NewCommand("ls-remote", "--symref").AddConfig("http.followRedirects", "false").
-		AddDynamicArguments(m.RemoteName, "HEAD").
-		WithTimeout(mirrorTimeout()).
-		WithEnv(proxy.EnvWithProxy(remoteURL.URL))
-	if out, _, err := gitrepo.RunCmdString(ctx, repo, ls); err == nil {
-		for line := range strings.SplitSeq(out, "\n") {
-			if target, ok := strings.CutPrefix(line, "ref: "); ok {
-				target, _, _ = strings.Cut(target, "\t")
-				if name := recordName(target); slices.Contains(branches, name) {
-					return name
-				}
-			}
-		}
+// the one head names, or else of main, master or the first of them; "" if there are none.
+func defaultBranch(head string, branches []string) string {
+	if name := recordName(head); slices.Contains(branches, name) {
+		return name
 	}
 	for _, guess := range []string{"main", "master"} {
 		if name := git.UpstreamPrefix + "heads/" + guess; slices.Contains(branches, name) {
@@ -914,6 +926,32 @@ func defaultBranch(ctx context.Context, m *repo_model.PushMirror, repo *repo_mod
 		return branches[0]
 	}
 	return ""
+}
+
+// advertised lists the branches and tags the remote has, by ref name, and the ref its HEAD points at.
+func advertised(ctx context.Context, repo *repo_model.Repository, remote string, env []string) (refs map[string]string, head string, err error) {
+	ls := gitcmd.NewCommand("ls-remote", "--symref").AddConfig("http.followRedirects", "false").
+		AddDynamicArguments(remote, "HEAD", git.BranchPrefix+"*", git.TagPrefix+"*").
+		WithTimeout(mirrorTimeout()).
+		WithEnv(env)
+	out, stderr, runErr := gitrepo.RunCmdString(ctx, repo, ls)
+	if runErr != nil {
+		return nil, "", errors.New(stderr)
+	}
+	refs = map[string]string{}
+	for line := range strings.SplitSeq(out, "\n") {
+		if target, ok := strings.CutPrefix(line, "ref: "); ok {
+			head, _, _ = strings.Cut(target, "\t")
+			continue
+		}
+		id, ref, ok := strings.Cut(line, "\t")
+		// HEAD is a symref's own line, and a peeled tag repeats its tag.
+		if !ok || ref == "HEAD" || strings.HasSuffix(ref, "^{}") {
+			continue
+		}
+		refs[ref] = id
+	}
+	return refs, head, nil
 }
 
 func short(id string) string {

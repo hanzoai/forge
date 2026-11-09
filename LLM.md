@@ -322,11 +322,12 @@ either side reaches the other. There is no mode to set.
     that appear together on GitHub raise no tag events here;
   - never brings in the branches bots open, by name prefix in any case: `dependabot/`,
     `renovate/`, `gh-readonly-queue/`, `copilot/`, `release-please--`,
-    `changeset-release/` (`botBranches`, the one list). The fetch excludes them with
-    negative refspecs (git 2.29), so their objects never reach the repo (the exclusions
-    are case-sensitive, so a name in another case is fetched, then removed: staged and
-    recorded refs of bot branches, left by any earlier version too, are deleted on
-    every run). `deps/` is not a bot prefix;
+    `changeset-release/` (`botBranches`, the one list). The remote's refs are listed
+    first (`ls-remote --symref`, which also says where its HEAD points), and each bot or
+    object-named one is left out of the fetch by its exact name, in whatever case, with
+    a negative refspec (git 2.29; at most 4000 of them), so their objects never reach
+    the repo. Staged and recorded refs of such names, left by an earlier version or
+    past that bound, are deleted on every run. `deps/` is not a bot prefix;
   - Not carried in: LFS objects and wikis.
 - **What the push path enforces for `SYNC_USER`.** Pre-receive applies what it
   applies to any direct push, not to a merge: the user's write permission; a
