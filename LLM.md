@@ -354,6 +354,19 @@ either side reaches the other. There is no mode to set.
   `changeset-release/`), which are never brought in, so the forge never runs
   bot-authored code with those secrets. Pull requests are not brought in
   at all: only branches and tags are.
+- **Converting a pull mirror (no mode, no recreate).** In place, per repo, as the repo
+  owner or a site admin: `DELETE /v1/repos/{o}/{r}/pull-mirror` (422 if it is not a
+  mirror, so a batch can tell); `POST /v1/repos/{o}/{r}/push_mirrors` with
+  `{"remote_address": "https://github.com/{o}/{r}.git", "sync_on_commit": true,
+  "interval": "0"}` and **no username or password**: the URL-scoped credential helper
+  for github.com (KMS `/git github-mirror-token`, mounted as a file) answers for the
+  push out and for the inbound fetch alike, and no credential is stored in a remote;
+  then `POST /v1/repos/{o}/{r}/mirror-sync`, which for a repo like this queues the
+  inbound sync and records where GitHub stands. The DELETE exists on 1.26.51 too; the
+  inbound sync only on 1.27.0. A converted repo does not go back to a pull mirror.
+  The sync user (`[mirror] SYNC_USER`, a non-admin account with no credential, made
+  as the creator-seed init container makes users) must be in a team with write on the
+  repo and in the push list of its protected branches and tags.
 - **Recovery:** the scheduled sweep (`Update`) queues an inbound sync for each push
   mirror of a regular repo that mirrors to GitHub when none has run for
   `[mirror] DEFAULT_INTERVAL`, when `SYNC_USER` is set. It runs on its own clock,
