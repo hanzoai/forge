@@ -46,12 +46,12 @@ require (
 	github.com/google/go-github/v89 v89.0.0
 	github.com/google/licenseclassifier/v2 v2.0.0
 	github.com/google/pprof v0.0.0-20260604005048-7023385849c0
-	github.com/google/uuid v1.6.0
+	github.com/google/uuid v1.6.1-0.20241114170450-2d3c2a9cc518
 	github.com/gorilla/feeds v1.2.0
 	github.com/hanzoai/act v1.0.0
 	github.com/hanzoai/authz v1.10.29
 	github.com/hanzoai/forge/modules/actions/runner v0.0.0
-	github.com/hanzoai/sqlite v0.3.2
+	github.com/hanzoai/sqlite v0.5.10
 	github.com/hanzoai/tasks v1.52.0
 	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hanzokv/lock/v4 v4.17.2
@@ -135,8 +135,8 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
-	github.com/hanzoai/csqlite v0.1.0 // indirect
-	github.com/hanzoai/sqlcipher v0.1.0 // indirect
+	github.com/hanzoai/csqlite v0.1.2 // indirect
+	github.com/hanzoai/sqlcipher v0.1.1 // indirect
 	github.com/hanzoai/vfs v0.4.3 // indirect
 	github.com/hanzos3/crc64nvme v1.1.2 // indirect
 	github.com/hanzos3/md5-simd v1.1.3 // indirect
@@ -176,6 +176,10 @@ require (
 	golang.org/x/exp v0.0.0-20260529124908-c761662dc8c9 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
+	modernc.org/libc v1.72.3 // indirect
+	modernc.org/mathutil v1.7.1 // indirect
+	modernc.org/memory v1.11.0 // indirect
+	modernc.org/sqlite v1.51.0 // indirect
 )
 
 require (
